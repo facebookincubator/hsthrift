@@ -55,7 +55,10 @@ parsingGenTest (testLabel, input, expected) = TestLabel testLabel $ TestCase $
 parseDouble :: B.ByteString -> Either String Double
 parseDouble = parse (Protocol.parseDouble @JSON Proxy)
 
-main :: IO ()
-main = testRunner $ TestList $
+tests :: Test
+tests = TestLabel "JSONNumTest" $ TestList $
   map doubleGenTest serializationTests ++
   map parsingGenTest parserTests
+
+main :: IO ()
+main = testRunner tests

@@ -1,0 +1,26 @@
+# https://docs.github.com/en/free-pro-team@latest/actions/reference/workflow-syntax-for-github-actions
+name: CI
+on: [push, pull_request]
+
+jobs:
+  ci-ghc84:
+    runs-on: ubuntu-latest
+    container:
+      image: alpmestan/thrift:0.1
+      options: --cpus 2
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - name: Populate hackage index
+        run: cabal update
+      - name: Generate C++ code from thrift files
+        run: make thrift-cpp
+      - name: Build everything up to thrift-compiler
+        run: cabal build exe:thrift-compiler
+      - name: Generate Haskell code from thrift files
+        run: make thrift-hs
+      - name: Build all packages and their testsuites
+        run: cabal build --enable-tests all
+      - name: Run testsuites
+        shell: bash {0}
+        run: ./run_tests.sh

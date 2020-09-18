@@ -1,15 +1,16 @@
-module Test where
+module Main where
 
+import Test.Hspec               (hspec)
+import Test.Hspec.Contrib.HUnit (fromHUnitTest)
 import Test.HUnit
-import TestRunner
 
 import Mangle
 
 main :: IO ()
-main = testRunner tests
+main = hspec (fromHUnitTest tests) >> return ()
 
 tests :: Test
-tests = TestList $ map (uncurry3 assertMangle)
+tests = TestLabel "mangle-test" $ TestList $ map (uncurry3 assertMangle)
   [ eg "simple"
     "_Z7examplei"
     "int example(int)"

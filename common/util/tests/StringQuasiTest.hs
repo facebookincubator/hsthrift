@@ -1,5 +1,5 @@
 {-# LANGUAGE QuasiQuotes #-}
-module StringQuasiTest (main) where
+module StringQuasiTest (main, tests) where
 
 import Data.List
 
@@ -9,7 +9,10 @@ import TestRunner
 import Util.String.Quasi
 
 main :: IO ()
-main = testRunner $ TestList
+main = testRunner tests
+
+tests :: Test
+tests = TestLabel "StringQuasiTest" $ TestList
   [ TestLabel "util-string-quasi" . TestCase $ do
       let str = [s|
 this is a

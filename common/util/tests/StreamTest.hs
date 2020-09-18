@@ -1,4 +1,4 @@
-module StreamTest (main) where
+module StreamTest (main, tests) where
 
 import Control.Concurrent
 import Data.IORef
@@ -13,7 +13,7 @@ import Control.Concurrent.Stream
 -- Run a worker that sleeps for 1 second over 10 elements.
 -- Using 5 workers means we should finish in less than 10 seconds.
 timingTest :: Bool -> Test
-timingTest bound = TestLabel "timing" $ TestCase $ do
+timingTest bound = TestLabel ("timing " ++ show bound) $ TestCase $ do
   s <- now
   count <- newIORef (0::Int)
   let
@@ -26,8 +26,11 @@ timingTest bound = TestLabel "timing" $ TestCase $ do
   final <- readIORef count
   assertEqual "all done" 10 final
 
-main :: IO ()
-main = withFacebookUnitTest $ testRunner $ TestList
+tests :: Test
+tests = TestLabel "StreamTest" $ TestList
   [ timingTest True
   , timingTest False
   ]
+
+main :: IO ()
+main = withFacebookUnitTest $ testRunner tests

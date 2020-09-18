@@ -1,6 +1,6 @@
 -- Copyright 2014-present Facebook. All Rights Reserved.
 
-module MovingAverageRateLimiterTest (main) where
+module MovingAverageRateLimiterTest (main, tests) where
 
 import Data.List
 import Test.HUnit
@@ -76,10 +76,13 @@ convergeTest qps0 hl expected bumps = do
     (_, count) = foldl' go (mkRateLimiter, 0 :: Int) bumps
     closeEnough = abs (fromIntegral count - expected) / expected < 0.01
 
-main :: IO ()
-main = testRunner $ TestList
+tests :: Test
+tests = TestLabel "MovingAverageRateLimiterTest" $ TestList
   [ smoothRateLimiter
   , nonSmoothRateLimiter
   , observedRateTest
   , qpsConverges
   ]
+
+main :: IO ()
+main = testRunner tests

@@ -1,4 +1,4 @@
-module TimeSecTest (main) where
+module TimeSecTest (main, tests) where
 
 import Test.HUnit
 import TestRunner
@@ -13,7 +13,10 @@ jsonTest = TestLabel "Aeson instances" $ TestCase $ do
   assertEqual "fromJSON" (eitherDecode "123")
     (timeInSeconds <$> eitherDecode "123")
 
-main :: IO ()
-main = testRunner $ TestList
+tests :: Test
+tests = TestLabel "TimeSecTest" $ TestList
   [ jsonTest
   ]
+
+main :: IO ()
+main = testRunner tests

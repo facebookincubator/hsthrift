@@ -30,7 +30,10 @@ cacheSuccessTest = TestLabel "cacheSuccess" $ TestCase $ do
   r <- try c :: IO (Either ErrorCall ())
   assertEqual "cacheSuccess fail2" r (Left (ErrorCall "2"))
 
-main :: IO ()
-main = testRunner $ TestList
+tests :: Test
+tests = TestLabel "ConcurrentTest" $ TestList
   [ cacheSuccessTest
   ]
+
+main :: IO ()
+main = testRunner tests

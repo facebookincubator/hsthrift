@@ -1,4 +1,4 @@
-#include <common/hs/runtime/HaskellRuntime.h>
+#include <runtime/HaskellRuntime.h>
 #include <gtest/gtest.h>
 
 extern "C" {

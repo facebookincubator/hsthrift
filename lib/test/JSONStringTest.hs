@@ -25,8 +25,8 @@ expectParseError name input = TestLabel name $ TestCase $
     Left{} -> return ()
     Right{} -> assertFailure "Should fail"
 
-main :: IO ()
-main = testRunner $ TestList
+tests :: Test
+tests = TestLabel "JSONStringTest" $ TestList
   [ unicodeParsingTest
   , expectParseError "Incomplete String" "\"xxx"
   , expectParseError "Incomplete Escape" "\"xxx\\\""
@@ -34,3 +34,6 @@ main = testRunner $ TestList
   , expectParseError "Incorrect Unicode" "\"\\uwxyz\""
   , expectParseError "Incomplete Unicode" "\"\\u00\""
   ]
+
+main :: IO ()
+main = testRunner tests

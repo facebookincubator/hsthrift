@@ -1,5 +1,5 @@
 {-# OPTIONS_GHC -fno-warn-orphans #-}
-module BufferTest (main) where
+module BufferTest (main, tests) where
 
 import Control.Monad.ST
 import Control.Monad.ST.Unsafe
@@ -61,8 +61,11 @@ prop_fillByteString ss =
   where
     stepss = getNonEmpty <$> getNonEmpty ss
 
-main :: IO ()
-main = withFacebookUnitTest $ testRunner $ TestList
+tests :: Test
+tests = TestLabel "BufferTest" $ TestList
   [ TestLabel "fillByteString" $ TestCase $ assertProperty "mismatch"
       prop_fillByteString
   ]
+
+main :: IO ()
+main = withFacebookUnitTest $ testRunner tests

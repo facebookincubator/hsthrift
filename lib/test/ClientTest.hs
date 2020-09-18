@@ -82,10 +82,13 @@ multiTest = mkClientTest "multiple requests" $ do
   r3 <- get
   lift $ assertEqual "put = get" 100 r3
 
+tests :: Test
+tests = TestLabel "ClientTest" $ TestList
+  [ addTest, divTest, putGetTest
+  , exceptionTest, optionsTest, unimplementedTest, multiTest ]
+
 main :: IO ()
-main = testRunner $ TestList
-       [ addTest, divTest, putGetTest
-       , exceptionTest, optionsTest, unimplementedTest, multiTest ]
+main = testRunner tests
 
 -- Server Implementation -------------------------------------------------------
 

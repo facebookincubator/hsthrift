@@ -1,4 +1,4 @@
-cabal-version:       2.1
+cabal-version:       3.6
 
 name:                thrift-compiler
 version:             0.1.0.0
@@ -11,7 +11,7 @@ maintainer:          hsthrift-team@fb.com
 copyright:           (c) Facebook, All Rights Reserved
 category:            Thrift
 build-type:          Simple
-extra-source-files:  CHANGELOG.md
+-- extra-source-files:  CHANGELOG.md
 
 common fb-haskell
     default-language: Haskell2010
@@ -42,11 +42,10 @@ common fb-haskell
         TypeSynonymInstances
         NondecreasingIndentation
 
-executable thrift-compiler
+library
     import: fb-haskell
-    main-is: Main.hs
     hs-source-dirs: . plugins
-    other-modules:
+    exposed-modules:
         Thrift.Compiler
         Thrift.Compiler.GenClient
         Thrift.Compiler.GenConst
@@ -94,5 +93,31 @@ executable thrift-compiler
         unordered-containers ^>=0.2.9.0,
         directory ^>=1.3.1.5,
         pretty ^>=1.1.3.6
+    build-tool-depends: alex:alex, happy:happy
 
-    build-tools: alex, happy
+executable thrift-compiler
+    import: fb-haskell
+    hs-source-dirs: exe
+    main-is: Main.hs
+    build-depends: base, optparse-applicative, thrift-compiler
+
+test-suite thrift-compiler-tests
+  import: fb-haskell
+  type: exitcode-stdio-1.0
+  hs-source-dirs: test
+  main-is: Main.hs
+  ghc-options: -threaded
+  other-modules: TestFixtures
+                 TestRunner
+                 Util
+  build-depends: aeson-pretty,
+                 base,
+                 directory,
+                 extra,
+                 filepath,
+                 haskell-src-exts ^>=1.20.3,
+                 hspec,
+                 hspec-contrib,
+                 HUnit,
+                 text,
+                 thrift-compiler

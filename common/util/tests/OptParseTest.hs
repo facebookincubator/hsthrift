@@ -54,9 +54,11 @@ partialTest = TestLabel "partial" $ TestCase $ do
       (_, args) <- partialParse defaultPrefs optsInfo inp
       assertEqual (show inp) ex args
 
+tests :: Test
+tests = TestLabel "OptParseTest" $ TestList
+    [ partialTest
+    ]
 
 main :: IO ()
 main = withFacebookUnitTest $
-  testRunner $ TestList
-    [ partialTest
-    ]
+  testRunner tests

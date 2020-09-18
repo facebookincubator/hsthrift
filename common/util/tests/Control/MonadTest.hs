@@ -1,4 +1,4 @@
-module Control.MonadTest (main) where
+module Control.MonadTest (main, tests) where
 
 import Test.HUnit
 import TestRunner
@@ -19,6 +19,10 @@ firstMLazyTest = TestLabel "firstMLazy" . TestCase $ do
     ]
   assertEqual "Just" (Just 1) (r :: Maybe Int)
 
+tests :: Test
+tests = TestLabel "Control.MonadTest" $ TestList
+  [ firstMLazyTest ]
+
 main :: IO ()
 main = withFacebookUnitTest $
-  testRunner firstMLazyTest
+  testRunner tests

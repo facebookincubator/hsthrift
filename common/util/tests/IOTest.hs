@@ -1,7 +1,7 @@
 -- Copyright 2004-present Facebook. All Rights Reserved.
 
 module IOTest
-  ( main
+  ( main, tests
   ) where
 
 import System.Directory
@@ -12,7 +12,10 @@ import Test.HUnit
 import Util.IO
 
 main :: IO ()
-main = testRunner $ TestList
+main = testRunner tests
+
+tests :: Test
+tests = TestLabel "IOTest" $ TestList
   [ writeFileAtomicUTF8Test ]
 
 writeFileAtomicUTF8Test :: Test

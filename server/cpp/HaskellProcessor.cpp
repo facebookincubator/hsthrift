@@ -90,7 +90,10 @@ void HaskellAsyncProcessor::processSerializedRequest(
 
             // Send the output bytes along
             transf = transport::THeader::transform(
-                std::move(outbuf), context->getHeader()->getWriteTransforms());
+                std::move(outbuf), context->getHeader()->getWriteTransforms(), 0);
+	        // FIXME: 0 needs to be passed explicitly because this code is for now
+	        // compiled against a C++ thrift revision that does not have:
+	        // https://github.com/facebook/fbthrift/commit/c9e0c6a36358000120e6e7cc8bc203ec2aaf10ed#diff-14d3f451c536a0b8e6e994f460629cd2
           } catch (const std::exception& e) {
             if (!oneway) {
               const auto s = e.what();

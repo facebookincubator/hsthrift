@@ -1,4 +1,4 @@
-cabal-version:       2.2
+cabal-version:       3.6
 name:                thrift-server
 version:             0.1.0.0
 synopsis:            Support for creating Thrift servers in Haskell
@@ -64,10 +64,51 @@ library
 
   default-language:    Haskell2010
 
-  build-tools: hsc2hs
-  hsc2hs-options: --cc=g++ --lflag=-lstdc++ --cflag=-D__HSC2HS__=1
+  build-tool-depends: hsc2hs:hsc2hs
+  hsc2hs-options: --cc=g++ --lflag=-lstdc++ --cflag=-D__HSC2HS__=1 --lflag=-lboost_context
   include-dirs: .
 
   -- TODO: I needed this to satisfy an undefined reference to jump_fcontext
   -- when running hsc2hs on Thrift.Server.ProcessorCallback
   extra-libraries: boost_context
+
+test-suite thrift-server-tests
+  import: fb-haskell
+  type: exitcode-stdio-1.0
+  hs-source-dirs: test
+                  ../lib/test/gen-hs2
+                  ../lib/test
+                  -- ^^^ for Math.* modules
+  main-is: Main.hs
+  other-modules: TestRunner
+                 Facebook.Init
+                 HandlerTest
+                 ServerTest
+                 CalculatorHandler
+                 EchoHandler
+                 Math.Adder.Client
+                 Math.Adder.Service
+                 Math.Calculator.Service
+                 Math.Types
+                 Echoer.Echoer.Client
+                 Echoer.Echoer.Service
+                 Echoer.Types
+                 Math.Calculator.Client
+                 TestChannel
+  ghc-options: -threaded
+  build-depends: aeson,
+                 base,
+                 bytestring,
+                 data-default,
+                 deepseq,
+                 fb-util,
+                 hashable,
+                 hspec,
+                 hspec-contrib,
+                 HUnit,
+                 STMonadTrans,
+                 text,
+                 thrift-lib,
+                 thrift-server,
+                 transformers,
+                 unordered-containers

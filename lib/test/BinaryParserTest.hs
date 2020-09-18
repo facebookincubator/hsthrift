@@ -63,8 +63,8 @@ testTakeWhile :: Test
 testTakeWhile =
   mkTestParseSuccess "takeWhile" "abc\7" "abc" (takeWhile (/= 7))
 
-main :: IO ()
-main = testRunner $ TestList
+tests :: Test
+tests = TestLabel "BinaryParserTest" $ TestList
   [ mkTestParseSuccess "getByteString" "abcd" "abc" (getByteString 3)
   , testAnyWord8
   , mkTestParseFailure "anyWord8 not enough bytes" "" anyWord8
@@ -76,3 +76,6 @@ main = testRunner $ TestList
   , mkTestParseSuccess "double scientific" "1.0e-9" (1.0e-9 :: Double) double
   , mkTestParseSuccess "double negative" "-1.0e-9" (-1.0e-9 :: Double) double
   ]
+
+main :: IO ()
+main = testRunner tests

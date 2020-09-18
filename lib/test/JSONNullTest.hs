@@ -1,4 +1,4 @@
-module JSONNullTest (main) where
+module JSONNullTest where
 
 import Test.HUnit
 import TestRunner
@@ -12,7 +12,10 @@ nullParsingTest = TestLabel "JSON with Null" $ TestCase $
   assertEqual "parse null" (Right $ Foo 999 0) $ deserializeJSON
     "{\"bar\":999,\"baz\":null}"
 
-main :: IO ()
-main = testRunner $ TestList
+tests :: Test
+tests = TestLabel "JSONNullTest" $ TestList
   [ nullParsingTest
   ]
+
+main :: IO ()
+main = testRunner tests

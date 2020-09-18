@@ -38,8 +38,11 @@ addTest = mkTest "Add" $ do
   res <- add 4 5
   lift $ assertEqual "Add added" (4 + 5) res
 
-main :: IO ()
-main = testRunner $ TestList
+tests :: Test
+tests = TestLabel "HandlerTest" $ TestList
   [ echoTest
   , addTest
   ]
+
+main :: IO ()
+main = testRunner tests

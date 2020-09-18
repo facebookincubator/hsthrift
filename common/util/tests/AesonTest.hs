@@ -1,7 +1,6 @@
 -- Copyright 2014-present Facebook. All Rights Reserved.
 
-
-module AesonTest (main) where
+module AesonTest (main, tests) where
 
 import Test.HUnit
 import TestRunner
@@ -21,7 +20,10 @@ utf16SurrogatesTest = TestLabel "UTF-16 surrogates" . TestCase $ do
   pack = String . Text.pack . map chr
   decode = either (const Nothing) Just . parseValueStrict
 
-main :: IO ()
-main = testRunner $ TestList
+tests :: Test
+tests = TestLabel "AesonTest" $ TestList
   [ utf16SurrogatesTest
   ]
+
+main :: IO ()
+main = testRunner tests

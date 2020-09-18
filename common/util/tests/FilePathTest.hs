@@ -1,4 +1,4 @@
-module FilePathTest (main) where
+module FilePathTest (main, tests) where
 
 import Data.Text (Text)
 
@@ -86,10 +86,13 @@ mkMNameToPathTestCase :: String -> Text -> FilePath -> Test
 mkMNameToPathTestCase name mname expected =
   TestLabel name . TestCase $ expected @=? mnameToPath mname
 
-main :: IO ()
-main = testRunner $ TestList
+tests :: Test
+tests = TestLabel "FilePathTest" $ TestList
   [ homeDirTest
   , relPathTest
   , testPathToMName
   , testMNameToPath
   ]
+
+main :: IO ()
+main = testRunner tests

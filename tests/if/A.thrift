@@ -1,7 +1,7 @@
-include "common/hs/thrift/tests/if/B.thrift"
-include "common/hs/thrift/tests/if/C.thrift"
-include "common/hs/thrift/tests/if/D.thrift"
-include "common/hs/thrift/tests/if/E.thrift"
+include "tests/if/B.thrift"
+include "tests/if/C.thrift"
+include "tests/if/D.thrift"
+include "tests/if/E.thrift"
 
 # INCLUSION HIERARCHY
 #

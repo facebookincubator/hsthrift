@@ -146,7 +146,7 @@
                 ]
             }
         ],
-        "path": "common/hs/thrift/compiler/test/if/a.thrift",
+        "path": "compiler/test/if/a.thrift",
         "unions": [
             {
                 "name": "U",
@@ -355,14 +355,14 @@
         ],
         "name": "a",
         "includes": [
-            "common/hs/thrift/compiler/test/if/b.thrift"
+            "compiler/test/if/b.thrift"
         ],
         "enums": [],
         "options": {
-            "path": "common/hs/thrift/compiler/test/if/a.thrift",
+            "path": "compiler/test/if/a.thrift",
             "include_path": ".",
             "genfiles": null,
-            "out_path": "common/hs/thrift/compiler/test/fixtures/gen-single-out",
+            "out_path": "compiler/test/fixtures/gen-single-out",
             "recursive": true
         },
         "services": [
@@ -528,7 +528,7 @@
                 ]
             }
         ],
-        "path": "common/hs/thrift/compiler/test/if/b.thrift",
+        "path": "compiler/test/if/b.thrift",
         "unions": [],
         "consts": [
             {
@@ -1083,10 +1083,10 @@
             }
         ],
         "options": {
-            "path": "common/hs/thrift/compiler/test/if/a.thrift",
+            "path": "compiler/test/if/a.thrift",
             "include_path": ".",
             "genfiles": null,
-            "out_path": "common/hs/thrift/compiler/test/fixtures/gen-single-out",
+            "out_path": "compiler/test/fixtures/gen-single-out",
             "recursive": true
         },
         "services": []

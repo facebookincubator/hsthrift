@@ -5,9 +5,8 @@ import Util.GFlags
 import Test.Hspec
 import SpecRunner
 
-main :: IO ()
-main = specRunner $ do
-
+spec :: Spec
+spec = describe "GFlagsTest" $ do
   around_ withFlagSaver $ do
 
   let key = "gflags_test_key"
@@ -71,3 +70,6 @@ main = specRunner $ do
           setFlagValue key "foo" `shouldReturn` Right ()
           setFlagValueIfDefault key "bar" `shouldReturn` Right ()
           getFlagValue key `shouldReturn` Right "foo"
+
+main :: IO ()
+main = specRunner spec

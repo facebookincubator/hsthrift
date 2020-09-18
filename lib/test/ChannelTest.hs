@@ -21,5 +21,9 @@ clientTest = TestLabel "client test" $ TestCase $ do
     Response{..} <- wait handle
     assertEqual "request is same as response" request respMsg
 
+tests :: Test
+tests = TestLabel "ChannelTest" $ TestList
+  [ clientTest ]
+
 main :: IO ()
-main = testRunner clientTest
+main = testRunner tests

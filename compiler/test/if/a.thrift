@@ -1,4 +1,4 @@
-include "common/hs/thrift/compiler/test/if/b.thrift"
+include "compiler/test/if/b.thrift"
 
 typedef i64 T
 

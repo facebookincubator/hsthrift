@@ -16,8 +16,11 @@ roundTripTest = TestLabel "round trip" $ TestCase $ do
   bs <- unsafePackMallocCString =<< unsafeWithIOBuf lazyBS c_echo
   assertEqual "echo'd" "hello world" bs
 
+tests :: Test
+tests = TestLabel "IOBufTest" $ TestList [ roundTripTest ]
+
 main :: IO ()
-main = testRunner $ TestList [ roundTripTest ]
+main = testRunner tests
 
 --------------------------------------------------------------------------------
 

@@ -9,7 +9,7 @@ import qualified Data.Vector as Vector
 import Util.ToExp
 
 tests :: Test
-tests = TestList
+tests = TestLabel "ToExpTest" $ TestList
   [ TestLabel "numbers" $ TestCase $ do
       assertEqual "int"
         "3"

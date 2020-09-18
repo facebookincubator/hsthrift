@@ -28,7 +28,7 @@ import Language.Haskell.Exts
 main :: IO ()
 main = withFixtureOptions $ \opts -> do
   fixtures <- mapM genFixtures opts
-  testRunner $ TestList $ map checkFixture $ concat fixtures
+  testRunner $ TestLabel "thrift-compiler-tests" $ TestList $ map checkFixture $ concat fixtures
 
 genFixtures :: SomeOptions -> IO [ThriftModule]
 genFixtures (TheseOptions opts@Options{..}) = do
@@ -67,12 +67,14 @@ checkFixture ThriftModule{..} = TestLabel mname $ TestCase $ do
     assertBool
       (printf "Test fixture for file '%s' parses" tmPath)
       (isOk parseResult)
-
   fixture <- readFile tmPath
+  writeFile (mname' ++ "_fixture.hs") fixture
+  writeFile (mname' ++ "_contents.hs") tmContents
   assertBool
     (printf "Test fixture for file '%s' is not up to date" tmPath)
-    (tmContents == fixture)
+    (contentsEqual tmContents fixture)
   where
+    mname' = filter (\c -> c `elem` ['a'..'z']++['A'..'Z']) mname
     mname = intercalate "/" $ dropLower $ wordsBy (== '/') tmPath
     dropLower [] = []
     dropLower [x] = [x] -- Don't drop the last thing
@@ -90,3 +92,7 @@ checkFixture ThriftModule{..} = TestLabel mname $ TestCase $ do
     isOk (ParseOk _) = True
     isOk (ParseFailed _ _) = False
     exts = map EnableExtension [ConstraintKinds]
+
+contentsEqual :: String -> String -> Bool
+contentsEqual s s' = s == s' -- f s == f s'
+  where f = dropWhileEnd isSpace

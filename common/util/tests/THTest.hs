@@ -2,7 +2,7 @@
 
 {-# LANGUAGE TemplateHaskell #-}
 
-module THTest (main) where
+module THTest (main, tests) where
 
 import Test.HUnit
 import TestRunner
@@ -10,7 +10,7 @@ import Language.Haskell.TH
 import Util.MD5
 
 tests :: Test
-tests = TestList
+tests = TestLabel "THTest" $ TestList
   [ TestLabel "th test" $ TestCase $
       assertEqual "th test" (md5 "dupa") $(runQ [| md5 "dupa" |]) ]
 

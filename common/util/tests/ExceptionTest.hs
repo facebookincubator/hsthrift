@@ -1,7 +1,7 @@
 {-# OPTIONS_GHC -fno-warn-name-shadowing #-}
 {-# LANGUAGE OverloadedStrings #-}
 
-module ExceptionTest (main) where
+module ExceptionTest (main, tests) where
 
 import Control.Exception
 import Util.Control.Exception
@@ -76,10 +76,13 @@ tryFinallyTest = TestLabel "tryFinally" . TestCase $ do
     Left e | Just (ErrorCall "b") <- fromException e -> True
     _other -> False
 
-main :: IO ()
-main = testRunner $ TestList
+tests :: Test
+tests = TestLabel "ExceptionTest" $ TestList
   [ catchAllTest
   , tryAllTest
   , tryBracketTest
   , tryFinallyTest
   ]
+
+main :: IO ()
+main = testRunner tests

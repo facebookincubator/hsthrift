@@ -1,7 +1,7 @@
 -- Copyright 2014-present Facebook. All Rights Reserved.
 
 {-# LANGUAGE QuasiQuotes #-}
-module JSONPrettyTest (main) where
+module JSONPrettyTest (main, tests) where
 
 import qualified Data.Aeson as Aeson
 import qualified Data.ByteString.Lazy.Char8 as B
@@ -28,7 +28,10 @@ jsonPrettyTest = TestLabel "jsonPrettyTest" $ TestCase $ do
     Just v1 = Aeson.decode (B.pack prettyJson)
   assertEqual "pretty" v0 v1
 
-main :: IO ()
-main = testRunner $ TestList
+tests :: Test
+tests = TestLabel "JSONPrettyTest" $ TestList
   [ jsonPrettyTest
   ]
+
+main :: IO ()
+main = testRunner tests

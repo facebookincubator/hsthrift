@@ -24,7 +24,10 @@ readTest = TestLabel "read test" $ TestCase $
   where
     adjust = over fooBar (+ 1)
 
-main :: IO ()
-main = testRunner $ TestList
+tests :: Test
+tests = TestLabel "LensTest" $ TestList
   [ readTest
   ]
+
+main :: IO ()
+main = testRunner tests

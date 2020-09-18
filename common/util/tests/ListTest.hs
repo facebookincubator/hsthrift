@@ -1,6 +1,6 @@
 -- Copyright 2014-present Facebook. All Rights Reserved.
 
-module ListTest (main) where
+module ListTest (main, tests) where
 
 import Test.QuickCheck
 import Test.HUnit
@@ -8,7 +8,10 @@ import TestRunner
 import Util.List
 
 main :: IO ()
-main = testRunner $ TestList
+main = testRunner tests
+
+tests :: Test
+tests = TestLabel "ListTest" $ TestList
   [ TestLabel "atMostChunksOf" $ TestCase $ do
       result <- quickCheckResult prop_atMostChunksOf
       case result of

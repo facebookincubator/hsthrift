@@ -1,4 +1,4 @@
-module ServerTest (main) where
+module ServerTest (main, tests) where
 
 import Control.Exception hiding (DivideByZero)
 import Control.Monad
@@ -127,8 +127,8 @@ portAlreadyBoundTest pname protId =
     headerConfig :: HeaderConfig t
     headerConfig = mkHeaderConfig port protId
 
-tests :: String -> ProtocolId -> [Test]
-tests pname protId = map (\f -> f pname protId)
+testsWith :: String -> ProtocolId -> [Test]
+testsWith pname protId = map (\f -> f pname protId)
   [ addTest
   , divideTest
   , divideExceptionTest
@@ -138,8 +138,12 @@ tests pname protId = map (\f -> f pname protId)
   , portAlreadyBoundTest
   ]
 
+tests :: Test
+tests = TestLabel "ServerTest" $ TestList $
+    testsWith "compact" compactProtocolId ++
+    testsWith "binary" binaryProtocolId
+
+
 main :: IO ()
 main = withFacebookUnitTest $
-  testRunner $ TestList $
-    tests "compact" compactProtocolId ++
-    tests "binary" binaryProtocolId
+  testRunner tests

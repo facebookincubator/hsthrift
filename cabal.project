@@ -4,3 +4,6 @@ packages:
     lib/thrift-lib.cabal
     server/thrift-server.cabal
     compiler/thrift-compiler.cabal
+    util/thrift-util.cabal
+
+tests: true

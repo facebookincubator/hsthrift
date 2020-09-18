@@ -11,8 +11,8 @@ import Facebook.Init (withFacebookUnitTest)
 newtype MyException = MyException String deriving (Eq, Show)
 instance Exception MyException
 
-main :: IO ()
-main = withFacebookUnitTest $ testRunner $ TestLabel "throwLeftIO" $ TestList
+tests :: Test
+tests = TestLabel "ControlExceptionTest" $ TestLabel "throwLeftIO" $ TestList
   [ TestLabel "with left" $ TestCase $ do
     let
       ex = MyException "bad!"
@@ -25,3 +25,7 @@ main = withFacebookUnitTest $ testRunner $ TestLabel "throwLeftIO" $ TestList
       (Right val :: Either MyException String)
     assertEqual "returns the value" res (Right val)
   ]
+
+
+main :: IO ()
+main = withFacebookUnitTest $ testRunner tests

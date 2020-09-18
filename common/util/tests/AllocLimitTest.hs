@@ -1,5 +1,5 @@
 {-# LANGUAGE MagicHash #-}
-module AllocLimitTest (main) where
+module AllocLimitTest (main, tests) where
 
 import Test.HUnit
 import TestRunner
@@ -32,8 +32,11 @@ limitAllocsTest = TestLabel "limitAllocs" $ TestCase $ do
   e <- limitAllocs 10000 $ evaluate $ sum [(1::Integer)..]
   assertEqual "limitAllocs Nothing" Nothing e
 
-main :: IO ()
-main = testRunner $ TestList
+tests :: Test
+tests = TestLabel "AllocLimitTest" $ TestList
   [ allocLimitStackTest
   , limitAllocsTest
   ]
+
+main :: IO ()
+main = testRunner tests

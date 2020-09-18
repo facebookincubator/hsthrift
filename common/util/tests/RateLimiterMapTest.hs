@@ -54,8 +54,11 @@ rlThreadedTest = do
   assertBool "foo was limited" (fooCount < 100)
   assertBool "bar was limited" (barCount < 100)
 
-main :: IO ()
-main = testRunner $ TestList
+tests :: Test
+tests = TestLabel "RateLimiterMapTest" $ TestList
   [ TestLabel "RateLimiterMap" $ TestCase rlTest
   , TestLabel "RateLimiterMapThreads" $ TestCase rlThreadedTest
   ]
+
+main :: IO ()
+main = testRunner tests

@@ -90,9 +90,8 @@ putAndGetIOTest = mkChannelIOTest "GetIO gets PutIO" $ \counter c p -> do
   where
     val = 1337
 
-
-main :: IO ()
-main = testRunner $ TestList
+tests :: Test
+tests = TestLabel "HeaderChannelTest" $ TestList
   [ addTest
   , divideTest
   , putAndGetTest
@@ -100,6 +99,9 @@ main = testRunner $ TestList
   , divideIOTest
   , putAndGetIOTest
   ]
+
+main :: IO ()
+main = testRunner tests
 
 -- -----------------------------------------------------------------------------
 
