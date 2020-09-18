@@ -1,0 +1,121 @@
+cabal-version:       2.1
+
+name:                thrift-lib
+version:             0.1.0.0
+synopsis:            Libraries for Haskell Thrift
+bug-reports:         https://github.com/facebookincubator/hsthrift/issues
+license:             BSD-3-Clause
+license-file:        LICENSE
+author:              Facebook, Inc.
+maintainer:          hsthrift-team@fb.com
+copyright:           (c) Facebook, All Rights Reserved
+-- category:
+build-type:          Simple
+extra-source-files:  CHANGELOG.md
+build-tool-depends: thrift-compiler
+
+common fb-haskell
+    default-language: Haskell2010
+    default-extensions:
+        BangPatterns
+        BinaryLiterals
+        DataKinds
+        DeriveDataTypeable
+        DeriveGeneric
+        EmptyCase
+        ExistentialQuantification
+        FlexibleContexts
+        FlexibleInstances
+        GADTs
+        GeneralizedNewtypeDeriving
+        LambdaCase
+        MultiParamTypeClasses
+        MultiWayIf
+        NoMonomorphismRestriction
+        OverloadedStrings
+        PatternSynonyms
+        RankNTypes
+        RecordWildCards
+        ScopedTypeVariables
+        StandaloneDeriving
+        TupleSections
+        TypeFamilies
+        TypeSynonymInstances
+        NondecreasingIndentation
+
+library
+    import: fb-haskell
+    exposed-modules:
+        Thrift.HasFields
+        Thrift.Monad
+        Thrift.CodegenTypesOnly
+        Thrift.Processor
+        Thrift.Api
+        Thrift.Codegen
+        Thrift.Channel
+        Thrift.Channel.CppChannel
+        Thrift.Channel.HeaderChannel
+        Thrift.Protocol
+        Thrift.Protocol.Compact
+        Thrift.Protocol.Id
+        Thrift.Protocol.JSON
+        Thrift.Protocol.Binary
+        Thrift.Protocol.Binary.Internal
+        Thrift.Protocol.JSON.Base64
+        Thrift.Protocol.JSON.String
+        Thrift.Binary.Parser
+        Thrift.Protocol.ApplicationException.Types
+        Thrift.Protocol.RpcOptions.Types
+  
+    cxx-sources:
+        cpp/HeaderChannel.cpp
+        cpp/HsChannel.cpp
+        if/gen-cpp2/RpcOptions_types.cpp
+
+    hs-source-dirs: . gen-hs2
+  
+    build-tools: hsc2hs
+    hsc2hs-options: --cc=g++ --lflag=-lstdc++ --cflag=-D__HSC2HS__=1
+    include-dirs: .
+
+    pkgconfig-depends: libfolly, fmt, openssl, libsodium
+    extra-libraries:
+        thriftcpp2
+        thriftprotocol
+        transport
+        concurrency
+        protocol
+        thrift-core
+        async
+        wangle
+        yarpl
+        fmt
+        fizz
+        stdc++
+        -- TODO: I needed this to satisfy an undefined reference to
+        -- jump_fcontext when running hsc2hs
+        boost_context
+
+    build-depends:
+        dependent-sum >= 0.6 && <= 0.6.2.0,
+          -- TODO: Data.Some was split out into package some at 0.6.2.2,
+          -- deprecated 'This' was removed.
+        containers,
+        deepseq,
+        STMonadTrans,
+        data-default,
+        fb-util,
+        bytestring-lexing,
+        scientific,
+        ghc,
+        aeson,
+        word8,
+        aeson-pretty,
+        text-show,
+        base ^>=4.11.1.0,
+        transformers ^>=0.5.5.0,
+        bytestring ^>=0.10.8.2,
+        text ^>=1.2.3.0,
+        unordered-containers ^>=0.2.9.0,
+        hashable ^>=1.2.7.0,
+        vector ^>=0.12.0.1
