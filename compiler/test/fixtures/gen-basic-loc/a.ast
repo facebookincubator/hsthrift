@@ -1,0 +1,612 @@
+{
+    "typedefs": [
+        {
+            "newtype": false,
+            "anns": null,
+            "ann_type": {
+                "anns": null,
+                "loc": [
+                    "Loc {locFile = \"common/hs/thrift/compiler/test/if/a.thrift\", locStartLine = 3, locStartCol = 9, locEndLine = 3, locEndCol = 12}"
+                ],
+                "type": {
+                    "type": "i64"
+                }
+            },
+            "xref": [],
+            "name": "T",
+            "loc_name": "Loc {locFile = \"common/hs/thrift/compiler/test/if/a.thrift\", locStartLine = 3, locStartCol = 13, locEndLine = 3, locEndCol = 14}",
+            "type": {
+                "type": "i64"
+            },
+            "loc_keyword": "Loc {locFile = \"common/hs/thrift/compiler/test/if/a.thrift\", locStartLine = 3, locStartCol = 1, locEndLine = 3, locEndCol = 8}"
+        }
+    ],
+    "structs": [
+        {
+            "name": "A",
+            "loc_name": "Loc {locFile = \"common/hs/thrift/compiler/test/if/a.thrift\", locStartLine = 5, locStartCol = 8, locEndLine = 5, locEndCol = 9}",
+            "struct_type": "STRUCT",
+            "loc_keyword": "Loc {locFile = \"common/hs/thrift/compiler/test/if/a.thrift\", locStartLine = 5, locStartCol = 1, locEndLine = 5, locEndCol = 7}",
+            "fields": [
+                {
+                    "default_value": {
+                        "named_constant": {
+                            "name": "a"
+                        }
+                    },
+                    "xref": [
+                        {
+                            "rLoc": "Loc {locFile = \"common/hs/thrift/compiler/test/if/a.thrift\", locStartLine = 3, locStartCol = 13, locEndLine = 3, locEndCol = 14}",
+                            "aLoc": "Loc {locFile = \"common/hs/thrift/compiler/test/if/a.thrift\", locStartLine = 6, locStartCol = 6, locEndLine = 6, locEndCol = 7}"
+                        }
+                    ],
+                    "name": "a",
+                    "requiredness": "default",
+                    "id": 1,
+                    "loc_name": "Loc {locFile = \"common/hs/thrift/compiler/test/if/a.thrift\", locStartLine = 6, locStartCol = 8, locEndLine = 6, locEndCol = 9}",
+                    "type": {
+                        "inner_type": {
+                            "type": "i64"
+                        },
+                        "name": {
+                            "name": "T"
+                        },
+                        "loc": "Loc {locFile = \"common/hs/thrift/compiler/test/if/a.thrift\", locStartLine = 3, locStartCol = 13, locEndLine = 3, locEndCol = 14}",
+                        "type": "typedef"
+                    }
+                },
+                {
+                    "default_value": {
+                        "named_constant": {
+                            "name": "b"
+                        }
+                    },
+                    "xref": [
+                        {
+                            "rLoc": "Loc {locFile = \"common/hs/thrift/compiler/test/if/b.thrift\", locStartLine = 1, locStartCol = 8, locEndLine = 1, locEndCol = 9}",
+                            "aLoc": "Loc {locFile = \"common/hs/thrift/compiler/test/if/a.thrift\", locStartLine = 7, locStartCol = 6, locEndLine = 7, locEndCol = 9}"
+                        }
+                    ],
+                    "name": "b",
+                    "requiredness": "default",
+                    "id": 2,
+                    "loc_name": "Loc {locFile = \"common/hs/thrift/compiler/test/if/a.thrift\", locStartLine = 7, locStartCol = 10, locEndLine = 7, locEndCol = 11}",
+                    "type": {
+                        "name": {
+                            "name": "B",
+                            "src": "b"
+                        },
+                        "loc": "Loc {locFile = \"common/hs/thrift/compiler/test/if/b.thrift\", locStartLine = 1, locStartCol = 8, locEndLine = 1, locEndCol = 9}",
+                        "type": "struct"
+                    }
+                },
+                {
+                    "default_value": {
+                        "named_constant": {
+                            "name": "bool_value",
+                            "src": "b"
+                        }
+                    },
+                    "xref": [],
+                    "name": "c",
+                    "requiredness": "default",
+                    "id": 3,
+                    "loc_name": "Loc {locFile = \"common/hs/thrift/compiler/test/if/a.thrift\", locStartLine = 8, locStartCol = 11, locEndLine = 8, locEndCol = 12}",
+                    "type": {
+                        "type": "bool"
+                    }
+                },
+                {
+                    "xref": [],
+                    "name": "d",
+                    "requiredness": "default",
+                    "id": 4,
+                    "loc_name": "Loc {locFile = \"common/hs/thrift/compiler/test/if/a.thrift\", locStartLine = 9, locStartCol = 22, locEndLine = 9, locEndCol = 23}",
+                    "type": {
+                        "inner_type": {
+                            "inner_type": {
+                                "type": "i32"
+                            },
+                            "type": "list"
+                        },
+                        "type": "list"
+                    }
+                },
+                {
+                    "xref": [],
+                    "name": "e",
+                    "requiredness": "default",
+                    "id": 5,
+                    "loc_name": "Loc {locFile = \"common/hs/thrift/compiler/test/if/a.thrift\", locStartLine = 10, locStartCol = 23, locEndLine = 10, locEndCol = 24}",
+                    "type": {
+                        "val_type": {
+                            "type": "string"
+                        },
+                        "key_type": {
+                            "type": "i32"
+                        },
+                        "type": "map"
+                    }
+                },
+                {
+                    "default_value": {
+                        "literal": {
+                            "value": {
+                                "name": "Two",
+                                "src": "b"
+                            },
+                            "type": "enum"
+                        }
+                    },
+                    "xref": [
+                        {
+                            "rLoc": "Loc {locFile = \"common/hs/thrift/compiler/test/if/b.thrift\", locStartLine = 12, locStartCol = 6, locEndLine = 12, locEndCol = 12}",
+                            "aLoc": "Loc {locFile = \"common/hs/thrift/compiler/test/if/a.thrift\", locStartLine = 11, locStartCol = 6, locEndLine = 11, locEndCol = 14}"
+                        }
+                    ],
+                    "name": "f",
+                    "requiredness": "default",
+                    "id": 6,
+                    "loc_name": "Loc {locFile = \"common/hs/thrift/compiler/test/if/a.thrift\", locStartLine = 11, locStartCol = 15, locEndLine = 11, locEndCol = 16}",
+                    "type": {
+                        "name": {
+                            "name": "Number",
+                            "src": "b"
+                        },
+                        "loc": "Loc {locFile = \"common/hs/thrift/compiler/test/if/b.thrift\", locStartLine = 12, locStartCol = 6, locEndLine = 12, locEndCol = 12}",
+                        "type": "enum"
+                    }
+                },
+                {
+                    "xref": [],
+                    "name": "g",
+                    "requiredness": "optional",
+                    "id": 7,
+                    "loc_name": "Loc {locFile = \"common/hs/thrift/compiler/test/if/a.thrift\", locStartLine = 12, locStartCol = 22, locEndLine = 12, locEndCol = 23}",
+                    "type": {
+                        "type": "string"
+                    }
+                },
+                {
+                    "xref": [],
+                    "name": "h",
+                    "requiredness": "required",
+                    "id": 8,
+                    "loc_name": "Loc {locFile = \"common/hs/thrift/compiler/test/if/a.thrift\", locStartLine = 13, locStartCol = 22, locEndLine = 13, locEndCol = 23}",
+                    "type": {
+                        "type": "string"
+                    }
+                }
+            ]
+        },
+        {
+            "name": "X",
+            "loc_name": "Loc {locFile = \"common/hs/thrift/compiler/test/if/a.thrift\", locStartLine = 22, locStartCol = 11, locEndLine = 22, locEndCol = 12}",
+            "struct_type": "EXCEPTION",
+            "loc_keyword": "Loc {locFile = \"common/hs/thrift/compiler/test/if/a.thrift\", locStartLine = 22, locStartCol = 1, locEndLine = 22, locEndCol = 10}",
+            "fields": [
+                {
+                    "xref": [],
+                    "name": "reason",
+                    "requiredness": "default",
+                    "id": 1,
+                    "loc_name": "Loc {locFile = \"common/hs/thrift/compiler/test/if/a.thrift\", locStartLine = 23, locStartCol = 13, locEndLine = 23, locEndCol = 19}",
+                    "type": {
+                        "type": "string"
+                    }
+                }
+            ]
+        }
+    ],
+    "path": "common/hs/thrift/compiler/test/if/a.thrift",
+    "unions": [
+        {
+            "name": "U",
+            "loc_name": "Loc {locFile = \"common/hs/thrift/compiler/test/if/a.thrift\", locStartLine = 16, locStartCol = 7, locEndLine = 16, locEndCol = 8}",
+            "loc_keyword": "Loc {locFile = \"common/hs/thrift/compiler/test/if/a.thrift\", locStartLine = 16, locStartCol = 1, locEndLine = 16, locEndCol = 6}",
+            "fields": [
+                {
+                    "name": "x",
+                    "id": 1,
+                    "loc_name": "Loc {locFile = \"common/hs/thrift/compiler/test/if/a.thrift\", locStartLine = 17, locStartCol = 11, locEndLine = 17, locEndCol = 12}",
+                    "type": {
+                        "type": "byte"
+                    }
+                },
+                {
+                    "name": "y",
+                    "id": 2,
+                    "loc_name": "Loc {locFile = \"common/hs/thrift/compiler/test/if/a.thrift\", locStartLine = 18, locStartCol = 19, locEndLine = 18, locEndCol = 20}",
+                    "type": {
+                        "inner_type": {
+                            "type": "string"
+                        },
+                        "type": "list"
+                    }
+                },
+                {
+                    "name": "z",
+                    "id": 3,
+                    "loc_name": "Loc {locFile = \"common/hs/thrift/compiler/test/if/a.thrift\", locStartLine = 19, locStartCol = 15, locEndLine = 19, locEndCol = 16}",
+                    "type": {
+                        "inner_type": {
+                            "type": "i64"
+                        },
+                        "type": "set"
+                    }
+                }
+            ]
+        }
+    ],
+    "consts": [
+        {
+            "value": {
+                "named_constant": {
+                    "name": "i64_value",
+                    "src": "b"
+                }
+            },
+            "ann_type": {
+                "anns": null,
+                "loc": [
+                    "Loc {locFile = \"common/hs/thrift/compiler/test/if/a.thrift\", locStartLine = 26, locStartCol = 7, locEndLine = 26, locEndCol = 8}"
+                ],
+                "type": {
+                    "name": "T"
+                }
+            },
+            "xref": [
+                {
+                    "rLoc": "Loc {locFile = \"common/hs/thrift/compiler/test/if/a.thrift\", locStartLine = 3, locStartCol = 13, locEndLine = 3, locEndCol = 14}",
+                    "aLoc": "Loc {locFile = \"common/hs/thrift/compiler/test/if/a.thrift\", locStartLine = 26, locStartCol = 7, locEndLine = 26, locEndCol = 8}"
+                },
+                {
+                    "rLoc": "Loc {locFile = \"common/hs/thrift/compiler/test/if/b.thrift\", locStartLine = 37, locStartCol = 11, locEndLine = 37, locEndCol = 20}",
+                    "aLoc": "Loc {locFile = \"common/hs/thrift/compiler/test/if/a.thrift\", locStartLine = 26, locStartCol = 13, locEndLine = 26, locEndCol = 24}"
+                }
+            ],
+            "name": "a",
+            "loc_name": "Loc {locFile = \"common/hs/thrift/compiler/test/if/a.thrift\", locStartLine = 26, locStartCol = 9, locEndLine = 26, locEndCol = 10}",
+            "type": {
+                "inner_type": {
+                    "type": "i64"
+                },
+                "name": {
+                    "name": "T"
+                },
+                "loc": "Loc {locFile = \"common/hs/thrift/compiler/test/if/a.thrift\", locStartLine = 3, locStartCol = 13, locEndLine = 3, locEndCol = 14}",
+                "type": "typedef"
+            },
+            "loc_keyword": "Loc {locFile = \"common/hs/thrift/compiler/test/if/a.thrift\", locStartLine = 26, locStartCol = 1, locEndLine = 26, locEndCol = 6}"
+        },
+        {
+            "value": {
+                "literal": {
+                    "value": {
+                        "field_name": "y",
+                        "field_type": {
+                            "inner_type": {
+                                "type": "string"
+                            },
+                            "type": "list"
+                        },
+                        "field_value": {
+                            "literal": {
+                                "value": [
+                                    {
+                                        "named_constant": {
+                                            "name": "string_value",
+                                            "src": "b"
+                                        }
+                                    }
+                                ],
+                                "type": "list"
+                            }
+                        }
+                    },
+                    "type": "union"
+                }
+            },
+            "ann_type": {
+                "anns": null,
+                "loc": [
+                    "Loc {locFile = \"common/hs/thrift/compiler/test/if/a.thrift\", locStartLine = 28, locStartCol = 7, locEndLine = 28, locEndCol = 8}"
+                ],
+                "type": {
+                    "name": "U"
+                }
+            },
+            "xref": [
+                {
+                    "rLoc": "Loc {locFile = \"common/hs/thrift/compiler/test/if/a.thrift\", locStartLine = 16, locStartCol = 7, locEndLine = 16, locEndCol = 8}",
+                    "aLoc": "Loc {locFile = \"common/hs/thrift/compiler/test/if/a.thrift\", locStartLine = 28, locStartCol = 7, locEndLine = 28, locEndCol = 8}"
+                }
+            ],
+            "name": "u",
+            "loc_name": "Loc {locFile = \"common/hs/thrift/compiler/test/if/a.thrift\", locStartLine = 28, locStartCol = 9, locEndLine = 28, locEndCol = 10}",
+            "type": {
+                "name": {
+                    "name": "U"
+                },
+                "loc": "Loc {locFile = \"common/hs/thrift/compiler/test/if/a.thrift\", locStartLine = 16, locStartCol = 7, locEndLine = 16, locEndCol = 8}",
+                "type": "union"
+            },
+            "loc_keyword": "Loc {locFile = \"common/hs/thrift/compiler/test/if/a.thrift\", locStartLine = 28, locStartCol = 1, locEndLine = 28, locEndCol = 6}"
+        },
+        {
+            "value": {
+                "literal": {
+                    "value": [
+                        {
+                            "field_name": "a",
+                            "field_type": {
+                                "type": "i16"
+                            },
+                            "field_value": {
+                                "named_constant": {
+                                    "name": "i16_value",
+                                    "src": "b"
+                                }
+                            }
+                        },
+                        {
+                            "field_name": "b",
+                            "field_type": {
+                                "type": "i32"
+                            },
+                            "field_value": {
+                                "named_constant": {
+                                    "name": "i32_value",
+                                    "src": "b"
+                                }
+                            }
+                        },
+                        {
+                            "field_name": "c",
+                            "field_type": {
+                                "type": "i64"
+                            },
+                            "field_value": {
+                                "named_constant": {
+                                    "name": "i64_value",
+                                    "src": "b"
+                                }
+                            }
+                        }
+                    ],
+                    "type": "struct"
+                }
+            },
+            "ann_type": {
+                "anns": null,
+                "loc": [
+                    "Loc {locFile = \"common/hs/thrift/compiler/test/if/a.thrift\", locStartLine = 30, locStartCol = 7, locEndLine = 30, locEndCol = 10}"
+                ],
+                "type": {
+                    "name": "b.B"
+                }
+            },
+            "xref": [
+                {
+                    "rLoc": "Loc {locFile = \"common/hs/thrift/compiler/test/if/b.thrift\", locStartLine = 1, locStartCol = 8, locEndLine = 1, locEndCol = 9}",
+                    "aLoc": "Loc {locFile = \"common/hs/thrift/compiler/test/if/a.thrift\", locStartLine = 30, locStartCol = 7, locEndLine = 30, locEndCol = 10}"
+                }
+            ],
+            "name": "b",
+            "loc_name": "Loc {locFile = \"common/hs/thrift/compiler/test/if/a.thrift\", locStartLine = 30, locStartCol = 11, locEndLine = 30, locEndCol = 12}",
+            "type": {
+                "name": {
+                    "name": "B",
+                    "src": "b"
+                },
+                "loc": "Loc {locFile = \"common/hs/thrift/compiler/test/if/b.thrift\", locStartLine = 1, locStartCol = 8, locEndLine = 1, locEndCol = 9}",
+                "type": "struct"
+            },
+            "loc_keyword": "Loc {locFile = \"common/hs/thrift/compiler/test/if/a.thrift\", locStartLine = 30, locStartCol = 1, locEndLine = 30, locEndCol = 6}"
+        },
+        {
+            "value": {
+                "literal": {
+                    "value": [
+                        {
+                            "field_name": "a",
+                            "field_type": {
+                                "type": "i16"
+                            },
+                            "field_value": {
+                                "default": null
+                            }
+                        },
+                        {
+                            "field_name": "b",
+                            "field_type": {
+                                "type": "i32"
+                            },
+                            "field_value": {
+                                "default": null
+                            }
+                        },
+                        {
+                            "field_name": "c",
+                            "field_type": {
+                                "type": "i64"
+                            },
+                            "field_value": {
+                                "default": null
+                            }
+                        }
+                    ],
+                    "type": "struct"
+                }
+            },
+            "ann_type": {
+                "anns": null,
+                "loc": [
+                    "Loc {locFile = \"common/hs/thrift/compiler/test/if/a.thrift\", locStartLine = 36, locStartCol = 7, locEndLine = 36, locEndCol = 10}"
+                ],
+                "type": {
+                    "name": "b.B"
+                }
+            },
+            "xref": [
+                {
+                    "rLoc": "Loc {locFile = \"common/hs/thrift/compiler/test/if/b.thrift\", locStartLine = 1, locStartCol = 8, locEndLine = 1, locEndCol = 9}",
+                    "aLoc": "Loc {locFile = \"common/hs/thrift/compiler/test/if/a.thrift\", locStartLine = 36, locStartCol = 7, locEndLine = 36, locEndCol = 10}"
+                }
+            ],
+            "name": "default_d",
+            "loc_name": "Loc {locFile = \"common/hs/thrift/compiler/test/if/a.thrift\", locStartLine = 36, locStartCol = 11, locEndLine = 36, locEndCol = 20}",
+            "type": {
+                "name": {
+                    "name": "B",
+                    "src": "b"
+                },
+                "loc": "Loc {locFile = \"common/hs/thrift/compiler/test/if/b.thrift\", locStartLine = 1, locStartCol = 8, locEndLine = 1, locEndCol = 9}",
+                "type": "struct"
+            },
+            "loc_keyword": "Loc {locFile = \"common/hs/thrift/compiler/test/if/a.thrift\", locStartLine = 36, locStartCol = 1, locEndLine = 36, locEndCol = 6}"
+        },
+        {
+            "value": {
+                "literal": {
+                    "value": {
+                        "name": "Zero",
+                        "src": "b"
+                    },
+                    "type": "enum"
+                }
+            },
+            "ann_type": {
+                "anns": null,
+                "loc": [
+                    "Loc {locFile = \"common/hs/thrift/compiler/test/if/a.thrift\", locStartLine = 38, locStartCol = 7, locEndLine = 38, locEndCol = 15}"
+                ],
+                "type": {
+                    "name": "b.Number"
+                }
+            },
+            "xref": [
+                {
+                    "rLoc": "Loc {locFile = \"common/hs/thrift/compiler/test/if/b.thrift\", locStartLine = 12, locStartCol = 6, locEndLine = 12, locEndCol = 12}",
+                    "aLoc": "Loc {locFile = \"common/hs/thrift/compiler/test/if/a.thrift\", locStartLine = 38, locStartCol = 7, locEndLine = 38, locEndCol = 15}"
+                },
+                {
+                    "rLoc": "Loc {locFile = \"common/hs/thrift/compiler/test/if/b.thrift\", locStartLine = 13, locStartCol = 3, locEndLine = 13, locEndCol = 7}",
+                    "aLoc": "Loc {locFile = \"common/hs/thrift/compiler/test/if/a.thrift\", locStartLine = 38, locStartCol = 23, locEndLine = 38, locEndCol = 29}"
+                }
+            ],
+            "name": "zero",
+            "loc_name": "Loc {locFile = \"common/hs/thrift/compiler/test/if/a.thrift\", locStartLine = 38, locStartCol = 16, locEndLine = 38, locEndCol = 20}",
+            "type": {
+                "name": {
+                    "name": "Number",
+                    "src": "b"
+                },
+                "loc": "Loc {locFile = \"common/hs/thrift/compiler/test/if/b.thrift\", locStartLine = 12, locStartCol = 6, locEndLine = 12, locEndCol = 12}",
+                "type": "enum"
+            },
+            "loc_keyword": "Loc {locFile = \"common/hs/thrift/compiler/test/if/a.thrift\", locStartLine = 38, locStartCol = 1, locEndLine = 38, locEndCol = 6}"
+        }
+    ],
+    "name": "a",
+    "includes": [
+        "common/hs/thrift/compiler/test/if/b.thrift"
+    ],
+    "enums": [],
+    "options": {
+        "path": "common/hs/thrift/compiler/test/if/a.thrift",
+        "include_path": ".",
+        "genfiles": null,
+        "out_path": "common/hs/thrift/compiler/test/fixtures/gen-basic-loc",
+        "recursive": true
+    },
+    "services": [
+        {
+            "name": "S",
+            "loc_name": "Loc {locFile = \"common/hs/thrift/compiler/test/if/a.thrift\", locStartLine = 40, locStartCol = 9, locEndLine = 40, locEndCol = 10}",
+            "loc_keyword": "Loc {locFile = \"common/hs/thrift/compiler/test/if/a.thrift\", locStartLine = 40, locStartCol = 1, locEndLine = 40, locEndCol = 8}",
+            "functions": [
+                {
+                    "args": [
+                        {
+                            "xref": [],
+                            "name": "x",
+                            "id": 1,
+                            "loc_name": "Loc {locFile = \"common/hs/thrift/compiler/test/if/a.thrift\", locStartLine = 42, locStartCol = 29, locEndLine = 42, locEndCol = 30}",
+                            "type": {
+                                "type": "i32"
+                            }
+                        }
+                    ],
+                    "return_type": {
+                        "name": {
+                            "name": "Number",
+                            "src": "b"
+                        },
+                        "loc": "Loc {locFile = \"common/hs/thrift/compiler/test/if/b.thrift\", locStartLine = 12, locStartCol = 6, locEndLine = 12, locEndCol = 12}",
+                        "type": "enum"
+                    },
+                    "throws": [],
+                    "name": "getNumber",
+                    "loc_name": "Loc {locFile = \"common/hs/thrift/compiler/test/if/a.thrift\", locStartLine = 42, locStartCol = 12, locEndLine = 42, locEndCol = 21}",
+                    "oneway": false
+                },
+                {
+                    "args": [],
+                    "return_type": {
+                        "type": "void"
+                    },
+                    "throws": [
+                        {
+                            "xref": [
+                                {
+                                    "rLoc": "Loc {locFile = \"common/hs/thrift/compiler/test/if/a.thrift\", locStartLine = 22, locStartCol = 11, locEndLine = 22, locEndCol = 12}",
+                                    "aLoc": "Loc {locFile = \"common/hs/thrift/compiler/test/if/a.thrift\", locStartLine = 44, locStartCol = 31, locEndLine = 44, locEndCol = 32}"
+                                }
+                            ],
+                            "name": "ex",
+                            "id": 1,
+                            "loc_name": "Loc {locFile = \"common/hs/thrift/compiler/test/if/a.thrift\", locStartLine = 44, locStartCol = 33, locEndLine = 44, locEndCol = 35}",
+                            "type": {
+                                "name": {
+                                    "name": "X"
+                                },
+                                "loc": "Loc {locFile = \"common/hs/thrift/compiler/test/if/a.thrift\", locStartLine = 22, locStartCol = 11, locEndLine = 22, locEndCol = 12}",
+                                "type": "exception"
+                            }
+                        }
+                    ],
+                    "name": "doNothing",
+                    "loc_name": "Loc {locFile = \"common/hs/thrift/compiler/test/if/a.thrift\", locStartLine = 44, locStartCol = 8, locEndLine = 44, locEndCol = 17}",
+                    "oneway": false
+                }
+            ]
+        },
+        {
+            "name": "ParentService",
+            "loc_name": "Loc {locFile = \"common/hs/thrift/compiler/test/if/a.thrift\", locStartLine = 48, locStartCol = 9, locEndLine = 48, locEndCol = 22}",
+            "loc_keyword": "Loc {locFile = \"common/hs/thrift/compiler/test/if/a.thrift\", locStartLine = 48, locStartCol = 1, locEndLine = 48, locEndCol = 8}",
+            "functions": []
+        },
+        {
+            "super": {
+                "name": "ParentService"
+            },
+            "name": "ChildService",
+            "loc_name": "Loc {locFile = \"common/hs/thrift/compiler/test/if/a.thrift\", locStartLine = 51, locStartCol = 9, locEndLine = 51, locEndCol = 21}",
+            "loc_keyword": "Loc {locFile = \"common/hs/thrift/compiler/test/if/a.thrift\", locStartLine = 51, locStartCol = 1, locEndLine = 51, locEndCol = 8}",
+            "functions": [
+                {
+                    "args": [],
+                    "return_type": {
+                        "type": "i32"
+                    },
+                    "throws": [],
+                    "name": "foo",
+                    "loc_name": "Loc {locFile = \"common/hs/thrift/compiler/test/if/a.thrift\", locStartLine = 52, locStartCol = 7, locEndLine = 52, locEndCol = 10}",
+                    "oneway": false
+                }
+            ]
+        }
+    ]
+}
