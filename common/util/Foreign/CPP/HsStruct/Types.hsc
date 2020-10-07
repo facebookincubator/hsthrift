@@ -48,10 +48,10 @@ import qualified Data.Map.Strict as Map
 import Foreign.CPP.Addressable hiding (alignment, sizeOf)
 import qualified Foreign.CPP.Addressable as Addressable
 import Foreign.CPP.Marshallable.TH
+import Mangle.TH
 import Util.Text (cStringLenToText, cStringLenToTextLenient)
 
 #include <common/hs/util/hsc.h>
-#include <common/hs/mangle/hsc.h>
 #include <common/hs/util/cpp/HsStruct.h>
 
 -- | An abstraction over storable containers. The elements will be marshaled or
@@ -129,6 +129,71 @@ instance StorableContainer HsMaybe where
     ptr <- #{peek DummyHsMaybe, ptr} p
     HsMaybe <$> maybePeek f ptr
 
+-- HsString -------------------------------------------------------------------
+
+newtype HsString = HsString
+  { hsString :: String
+  }
+
+$(mangle
+  "void ctorHsString(HsString*, const char*, size_t)}"
+  [d|
+    foreign import ccall unsafe
+      c_constructHsString :: Ptr HsString -> CString -> Word -> IO ()
+  |])
+
+$(mangle
+  "HsString* newHsString(const char*, size_t)}"
+  [d|
+    foreign import ccall unsafe
+      c_newHsString :: CString -> Word -> IO (Ptr HsString)
+  |])
+
+instance Addressable HsString
+
+instance Storable HsString where
+  sizeOf _ = #{size HsString}
+  alignment _ = #{alignment HsString}
+  poke = notPokeable "HsString"
+  peek p = fmap HsString $ peekCStringLen =<< peekStrLen p
+
+peekStrLen :: Ptr a -> IO CStringLen
+peekStrLen p = do
+  (str :: CString) <- #{peek HsString, str} p
+  (len :: CSize) <- #{peek HsString, len} p
+  return (str, fromIntegral len)
+
+newStrImpl :: ByteString -> IO (Ptr a)
+newStrImpl bs = castPtr <$> (unsafeUseAsCStringLen bs $ \(str, len) ->
+  c_newHsString str (fromIntegral len))
+
+constructStrImpl :: Ptr a -> ByteString -> IO ()
+constructStrImpl p bs = unsafeUseAsCStringLen bs $ \(str, len) ->
+  c_constructHsString (castPtr p) str (fromIntegral len)
+
+-- HsText ---------------------------------------------------------------
+
+newtype HsText = HsText
+  { hsText :: Text
+  }
+
+instance Addressable HsText where
+  sizeOf _ = #{size HsString}
+  alignment _ = #{alignment HsString}
+
+instance Constructible HsText where
+  newValue (HsText txt) = newStrImpl (Text.encodeUtf8 txt)
+  constructValue p (HsText txt) =
+    constructStrImpl (castPtr p) (Text.encodeUtf8 txt)
+
+instance Assignable HsText
+
+instance Storable HsText where
+  sizeOf _ = #{size HsString}
+  alignment _ = #{alignment HsString}
+  poke = error "HsStruct.HsText: poke not implemented"
+  peek p = fmap HsText $ uncurry cStringLenToText =<< peekStrLen p
+
 -- HsEither -------------------------------------------------------------------
 
 #{enum HsEitherTag, HsEitherTag
@@ -142,6 +207,13 @@ newtype HsEitherTag = HsEitherTag #{type HsEitherTag}
 newtype HsEither a b = HsEither
   { hsEither :: Either a b
   }
+
+$(mangle
+  "void* newHsEither(HsEitherTag, void*)}"
+  [d|
+    foreign import ccall unsafe
+      c_newHsEither :: HsEitherTag -> Ptr c -> IO (Ptr (HsEither a b))
+  |])
 
 instance Addressable1 (HsEither a) where
   sizeOf1 _ = #{size DummyHsEither}
@@ -186,11 +258,6 @@ instance Assignable (HsEither HsText Double)
 instance Assignable (HsEither HsText HsByteString)
 instance Assignable (HsEither HsText HsText)
 
-foreign import ccall unsafe
-  #{mangled
-    void* newHsEither(HsEitherTag, void*)}
-  c_newHsEither :: HsEitherTag -> Ptr c -> IO (Ptr (HsEither a b))
-
 -- HsPair ---------------------------------------------------------------------
 
 newtype HsPair a b = HsPair
@@ -214,45 +281,6 @@ instance (Addressable a, Storable a) => StorableContainer (HsPair a) where
     sn <- f ptr_b
     return $ HsPair (fs, sn)
 
--- HsString -------------------------------------------------------------------
-
-newtype HsString = HsString
-  { hsString :: String
-  }
-
-instance Addressable HsString
-
-instance Storable HsString where
-  sizeOf _ = #{size HsString}
-  alignment _ = #{alignment HsString}
-  poke = notPokeable "HsString"
-  peek p = fmap HsString $ peekCStringLen =<< peekStrLen p
-
-peekStrLen :: Ptr a -> IO CStringLen
-peekStrLen p = do
-  (str :: CString) <- #{peek HsString, str} p
-  (len :: CSize) <- #{peek HsString, len} p
-  return (str, fromIntegral len)
-
-
-newStrImpl :: ByteString -> IO (Ptr a)
-newStrImpl bs = castPtr <$> (unsafeUseAsCStringLen bs $ \(str, len) ->
-  c_newHsString str (fromIntegral len))
-
-constructStrImpl :: Ptr a -> ByteString -> IO ()
-constructStrImpl p bs = unsafeUseAsCStringLen bs $ \(str, len) ->
-  c_constructHsString (castPtr p) str (fromIntegral len)
-
-foreign import ccall unsafe
-  #{mangled
-    void ctorHsString(HsString*, const char*, size_t)}
-  c_constructHsString :: Ptr HsString -> CString -> Word -> IO ()
-
-foreign import ccall unsafe
-  #{mangled
-    HsString* newHsString(const char*, size_t)}
-  c_newHsString :: CString -> Word -> IO (Ptr HsString)
-
 -- HsByteString ---------------------------------------------------------------
 
 newtype HsByteString = HsByteString
@@ -274,29 +302,6 @@ instance Storable HsByteString where
   alignment _ = #{alignment HsString}
   poke = notPokeable "HsByteString"
   peek p = fmap HsByteString $ packCStringLen =<< peekStrLen p
-
--- HsText ---------------------------------------------------------------
-
-newtype HsText = HsText
-  { hsText :: Text
-  }
-
-instance Addressable HsText where
-  sizeOf _ = #{size HsString}
-  alignment _ = #{alignment HsString}
-
-instance Constructible HsText where
-  newValue (HsText txt) = newStrImpl (Text.encodeUtf8 txt)
-  constructValue p (HsText txt) =
-    constructStrImpl (castPtr p) (Text.encodeUtf8 txt)
-
-instance Assignable HsText
-
-instance Storable HsText where
-  sizeOf _ = #{size HsString}
-  alignment _ = #{alignment HsString}
-  poke = error "HsStruct.HsText: poke not implemented"
-  peek p = fmap HsText $ uncurry cStringLenToText =<< peekStrLen p
 
 -- HsLenientText --------------------------------------------------------------
 
