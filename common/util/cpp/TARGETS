@@ -1,0 +1,91 @@
+load("@fbcode_macros//build_defs:cpp_library.bzl", "cpp_library")
+
+cpp_library(
+    name = "eventbase",
+    srcs = [
+        "EventBaseDataplane.cpp",
+    ],
+    deps = [
+        "//folly/executors:io_thread_pool_executor",
+    ],
+    external_deps = [
+        "glog",
+    ],
+)
+
+cpp_library(
+    name = "cdynamic",
+    srcs = [
+        "cdynamic.cpp",
+    ],
+    headers = [
+        "cdynamic.h",
+    ],
+    deps = [
+        ":marshallable",
+        "//folly:dynamic",
+        "//folly:json",
+        "//folly:memory",
+        "//folly:optional",
+        "//folly/io:iobuf",
+    ],
+)
+
+cpp_library(
+    name = "iobuf",
+    srcs = [
+        "IOBuf.cpp",
+    ],
+    headers = [
+        "IOBuf.h",
+    ],
+    deps = [
+        "//folly:dynamic",
+        "//folly:memory",
+        "//folly:optional",
+        "//folly/io:iobuf",
+    ],
+)
+
+cpp_library(
+    name = "logging",
+    srcs = [
+        "logging.cpp",
+    ],
+    headers = [
+        "logging.h",
+    ],
+    external_deps = [
+        "glog",
+    ],
+)
+
+cpp_library(
+    name = "marshallable",
+    headers = [
+        "Constructible.h",
+        "Destructible.h",
+        "Marshallable.h",
+    ],
+)
+
+cpp_library(
+    name = "hs_struct",
+    srcs = [
+        "HsStruct.cpp",
+    ],
+    headers = [
+        "HsStruct.h",
+        "HsVariant.h",
+    ],
+    deps = [
+        ":marshallable",
+        "//folly:dynamic",
+        "//folly:memory",
+        "//folly:optional",
+        "//folly:try",
+    ],
+    external_deps = [
+        "glog",
+    ],
+)
