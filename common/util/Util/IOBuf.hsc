@@ -13,7 +13,7 @@ import Foreign.Ptr
 import Foreign.Storable
 import qualified Data.ByteString.Lazy as Lazy
 
-#include <common/hs/cpp/IOBuf.h>
+#include <common/hs/util/cpp/IOBuf.h>
 
 -- | This is the representation of a C++ HS_IOBuf. It has no representation in
 -- Haskell therefore we use an uninhabited type
