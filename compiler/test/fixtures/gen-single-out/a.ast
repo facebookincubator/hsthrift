@@ -1,0 +1,1094 @@
+[
+    {
+        "typedefs": [
+            {
+                "newtype": false,
+                "name": "T",
+                "type": {
+                    "type": "i64"
+                }
+            }
+        ],
+        "structs": [
+            {
+                "name": "A",
+                "struct_type": "STRUCT",
+                "fields": [
+                    {
+                        "default_value": {
+                            "named_constant": {
+                                "name": "a"
+                            }
+                        },
+                        "name": "a",
+                        "requiredness": "default",
+                        "id": 1,
+                        "type": {
+                            "inner_type": {
+                                "type": "i64"
+                            },
+                            "name": {
+                                "name": "T"
+                            },
+                            "type": "typedef"
+                        }
+                    },
+                    {
+                        "default_value": {
+                            "named_constant": {
+                                "name": "b"
+                            }
+                        },
+                        "name": "b",
+                        "requiredness": "default",
+                        "id": 2,
+                        "type": {
+                            "name": {
+                                "name": "B",
+                                "src": "b"
+                            },
+                            "type": "struct"
+                        }
+                    },
+                    {
+                        "default_value": {
+                            "named_constant": {
+                                "name": "bool_value",
+                                "src": "b"
+                            }
+                        },
+                        "name": "c",
+                        "requiredness": "default",
+                        "id": 3,
+                        "type": {
+                            "type": "bool"
+                        }
+                    },
+                    {
+                        "name": "d",
+                        "requiredness": "default",
+                        "id": 4,
+                        "type": {
+                            "inner_type": {
+                                "inner_type": {
+                                    "type": "i32"
+                                },
+                                "type": "list"
+                            },
+                            "type": "list"
+                        }
+                    },
+                    {
+                        "name": "e",
+                        "requiredness": "default",
+                        "id": 5,
+                        "type": {
+                            "val_type": {
+                                "type": "string"
+                            },
+                            "key_type": {
+                                "type": "i32"
+                            },
+                            "type": "map"
+                        }
+                    },
+                    {
+                        "default_value": {
+                            "literal": {
+                                "value": {
+                                    "name": "Two",
+                                    "src": "b"
+                                },
+                                "type": "enum"
+                            }
+                        },
+                        "name": "f",
+                        "requiredness": "default",
+                        "id": 6,
+                        "type": {
+                            "name": {
+                                "name": "Number",
+                                "src": "b"
+                            },
+                            "type": "enum"
+                        }
+                    },
+                    {
+                        "name": "g",
+                        "requiredness": "optional",
+                        "id": 7,
+                        "type": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "h",
+                        "requiredness": "required",
+                        "id": 8,
+                        "type": {
+                            "type": "string"
+                        }
+                    }
+                ]
+            },
+            {
+                "name": "X",
+                "struct_type": "EXCEPTION",
+                "fields": [
+                    {
+                        "name": "reason",
+                        "requiredness": "default",
+                        "id": 1,
+                        "type": {
+                            "type": "string"
+                        }
+                    }
+                ]
+            }
+        ],
+        "path": "common/hs/thrift/compiler/test/if/a.thrift",
+        "unions": [
+            {
+                "name": "U",
+                "fields": [
+                    {
+                        "name": "x",
+                        "id": 1,
+                        "type": {
+                            "type": "byte"
+                        }
+                    },
+                    {
+                        "name": "y",
+                        "id": 2,
+                        "type": {
+                            "inner_type": {
+                                "type": "string"
+                            },
+                            "type": "list"
+                        }
+                    },
+                    {
+                        "name": "z",
+                        "id": 3,
+                        "type": {
+                            "inner_type": {
+                                "type": "i64"
+                            },
+                            "type": "set"
+                        }
+                    }
+                ]
+            }
+        ],
+        "consts": [
+            {
+                "value": {
+                    "named_constant": {
+                        "name": "i64_value",
+                        "src": "b"
+                    }
+                },
+                "name": "a",
+                "type": {
+                    "inner_type": {
+                        "type": "i64"
+                    },
+                    "name": {
+                        "name": "T"
+                    },
+                    "type": "typedef"
+                }
+            },
+            {
+                "value": {
+                    "literal": {
+                        "value": {
+                            "field_name": "y",
+                            "field_type": {
+                                "inner_type": {
+                                    "type": "string"
+                                },
+                                "type": "list"
+                            },
+                            "field_value": {
+                                "literal": {
+                                    "value": [
+                                        {
+                                            "named_constant": {
+                                                "name": "string_value",
+                                                "src": "b"
+                                            }
+                                        }
+                                    ],
+                                    "type": "list"
+                                }
+                            }
+                        },
+                        "type": "union"
+                    }
+                },
+                "name": "u",
+                "type": {
+                    "name": {
+                        "name": "U"
+                    },
+                    "type": "union"
+                }
+            },
+            {
+                "value": {
+                    "literal": {
+                        "value": [
+                            {
+                                "field_name": "a",
+                                "field_type": {
+                                    "type": "i16"
+                                },
+                                "field_value": {
+                                    "named_constant": {
+                                        "name": "i16_value",
+                                        "src": "b"
+                                    }
+                                }
+                            },
+                            {
+                                "field_name": "b",
+                                "field_type": {
+                                    "type": "i32"
+                                },
+                                "field_value": {
+                                    "named_constant": {
+                                        "name": "i32_value",
+                                        "src": "b"
+                                    }
+                                }
+                            },
+                            {
+                                "field_name": "c",
+                                "field_type": {
+                                    "type": "i64"
+                                },
+                                "field_value": {
+                                    "named_constant": {
+                                        "name": "i64_value",
+                                        "src": "b"
+                                    }
+                                }
+                            }
+                        ],
+                        "type": "struct"
+                    }
+                },
+                "name": "b",
+                "type": {
+                    "name": {
+                        "name": "B",
+                        "src": "b"
+                    },
+                    "type": "struct"
+                }
+            },
+            {
+                "value": {
+                    "literal": {
+                        "value": [
+                            {
+                                "field_name": "a",
+                                "field_type": {
+                                    "type": "i16"
+                                },
+                                "field_value": {
+                                    "default": null
+                                }
+                            },
+                            {
+                                "field_name": "b",
+                                "field_type": {
+                                    "type": "i32"
+                                },
+                                "field_value": {
+                                    "default": null
+                                }
+                            },
+                            {
+                                "field_name": "c",
+                                "field_type": {
+                                    "type": "i64"
+                                },
+                                "field_value": {
+                                    "default": null
+                                }
+                            }
+                        ],
+                        "type": "struct"
+                    }
+                },
+                "name": "default_d",
+                "type": {
+                    "name": {
+                        "name": "B",
+                        "src": "b"
+                    },
+                    "type": "struct"
+                }
+            },
+            {
+                "value": {
+                    "literal": {
+                        "value": {
+                            "name": "Zero",
+                            "src": "b"
+                        },
+                        "type": "enum"
+                    }
+                },
+                "name": "zero",
+                "type": {
+                    "name": {
+                        "name": "Number",
+                        "src": "b"
+                    },
+                    "type": "enum"
+                }
+            }
+        ],
+        "name": "a",
+        "includes": [
+            "common/hs/thrift/compiler/test/if/b.thrift"
+        ],
+        "enums": [],
+        "options": {
+            "path": "common/hs/thrift/compiler/test/if/a.thrift",
+            "include_path": ".",
+            "genfiles": null,
+            "out_path": "common/hs/thrift/compiler/test/fixtures/gen-single-out",
+            "recursive": true
+        },
+        "services": [
+            {
+                "name": "S",
+                "functions": [
+                    {
+                        "args": [
+                            {
+                                "name": "x",
+                                "id": 1,
+                                "type": {
+                                    "type": "i32"
+                                }
+                            }
+                        ],
+                        "return_type": {
+                            "name": {
+                                "name": "Number",
+                                "src": "b"
+                            },
+                            "type": "enum"
+                        },
+                        "throws": [],
+                        "name": "getNumber",
+                        "oneway": false
+                    },
+                    {
+                        "args": [],
+                        "return_type": {
+                            "type": "void"
+                        },
+                        "throws": [
+                            {
+                                "name": "ex",
+                                "id": 1,
+                                "type": {
+                                    "name": {
+                                        "name": "X"
+                                    },
+                                    "type": "exception"
+                                }
+                            }
+                        ],
+                        "name": "doNothing",
+                        "oneway": false
+                    }
+                ]
+            },
+            {
+                "name": "ParentService",
+                "functions": []
+            },
+            {
+                "super": {
+                    "name": "ParentService"
+                },
+                "name": "ChildService",
+                "functions": [
+                    {
+                        "args": [],
+                        "return_type": {
+                            "type": "i32"
+                        },
+                        "throws": [],
+                        "name": "foo",
+                        "oneway": false
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        "typedefs": [
+            {
+                "newtype": true,
+                "name": "Int",
+                "type": {
+                    "type": "i64"
+                }
+            }
+        ],
+        "structs": [
+            {
+                "name": "B",
+                "struct_type": "STRUCT",
+                "fields": [
+                    {
+                        "default_value": {
+                            "literal": {
+                                "value": 1,
+                                "type": "i16"
+                            }
+                        },
+                        "name": "a",
+                        "requiredness": "default",
+                        "id": 1,
+                        "type": {
+                            "type": "i16"
+                        }
+                    },
+                    {
+                        "name": "b",
+                        "requiredness": "default",
+                        "id": 2,
+                        "type": {
+                            "type": "i32"
+                        }
+                    },
+                    {
+                        "name": "c",
+                        "requiredness": "default",
+                        "id": 3,
+                        "type": {
+                            "type": "i64"
+                        }
+                    }
+                ]
+            },
+            {
+                "name": "C",
+                "struct_type": "STRUCT",
+                "fields": [
+                    {
+                        "name": "x",
+                        "requiredness": "default",
+                        "id": 1,
+                        "type": {
+                            "inner_type": {
+                                "name": {
+                                    "name": "Number"
+                                },
+                                "type": "enum"
+                            },
+                            "type": "list"
+                        }
+                    },
+                    {
+                        "name": "y",
+                        "requiredness": "default",
+                        "id": 2,
+                        "type": {
+                            "inner_type": {
+                                "name": {
+                                    "name": "Number_Strict"
+                                },
+                                "type": "enum"
+                            },
+                            "type": "list"
+                        }
+                    },
+                    {
+                        "name": "z",
+                        "requiredness": "default",
+                        "id": 3,
+                        "type": {
+                            "name": {
+                                "name": "B"
+                            },
+                            "type": "struct"
+                        }
+                    }
+                ]
+            }
+        ],
+        "path": "common/hs/thrift/compiler/test/if/b.thrift",
+        "unions": [],
+        "consts": [
+            {
+                "value": {
+                    "literal": {
+                        "value": 0,
+                        "type": "byte"
+                    }
+                },
+                "name": "byte_value",
+                "type": {
+                    "type": "byte"
+                }
+            },
+            {
+                "value": {
+                    "literal": {
+                        "value": 1,
+                        "type": "i16"
+                    }
+                },
+                "name": "i16_value",
+                "type": {
+                    "type": "i16"
+                }
+            },
+            {
+                "value": {
+                    "literal": {
+                        "value": 2,
+                        "type": "i32"
+                    }
+                },
+                "name": "i32_value",
+                "type": {
+                    "type": "i32"
+                }
+            },
+            {
+                "value": {
+                    "literal": {
+                        "string": "3",
+                        "value": 3,
+                        "type": "i64"
+                    }
+                },
+                "name": "i64_value",
+                "type": {
+                    "type": "i64"
+                }
+            },
+            {
+                "value": {
+                    "literal": {
+                        "value": 0.5,
+                        "binary": "3f000000",
+                        "type": "float"
+                    }
+                },
+                "name": "float_value",
+                "type": {
+                    "type": "float"
+                }
+            },
+            {
+                "value": {
+                    "literal": {
+                        "value": 3.14159,
+                        "binary": "400921f9f01b866e",
+                        "type": "double"
+                    }
+                },
+                "name": "double_value",
+                "type": {
+                    "type": "double"
+                }
+            },
+            {
+                "value": {
+                    "literal": {
+                        "value": true,
+                        "type": "bool"
+                    }
+                },
+                "name": "bool_value",
+                "type": {
+                    "type": "bool"
+                }
+            },
+            {
+                "value": {
+                    "literal": {
+                        "value": "xxx",
+                        "type": "string"
+                    }
+                },
+                "name": "string_value",
+                "type": {
+                    "type": "string"
+                }
+            },
+            {
+                "value": {
+                    "literal": {
+                        "value": "797979",
+                        "type": "binary"
+                    }
+                },
+                "name": "binary_value",
+                "type": {
+                    "type": "binary"
+                }
+            },
+            {
+                "value": {
+                    "literal": {
+                        "value": {
+                            "string": "10",
+                            "value": 10,
+                            "type": "i64"
+                        },
+                        "type": "newtype"
+                    }
+                },
+                "name": "newtype_value",
+                "type": {
+                    "inner_type": {
+                        "type": "i64"
+                    },
+                    "name": {
+                        "name": "Int"
+                    },
+                    "type": "newtype"
+                }
+            },
+            {
+                "value": {
+                    "literal": {
+                        "value": [
+                            {
+                                "literal": {
+                                    "string": "0",
+                                    "value": 0,
+                                    "type": "i64"
+                                }
+                            },
+                            {
+                                "named_constant": {
+                                    "name": "i64_value"
+                                }
+                            }
+                        ],
+                        "type": "list"
+                    }
+                },
+                "name": "list_value",
+                "type": {
+                    "inner_type": {
+                        "type": "i64"
+                    },
+                    "type": "list"
+                }
+            },
+            {
+                "value": {
+                    "literal": {
+                        "value": [
+                            {
+                                "named_constant": {
+                                    "name": "string_value"
+                                }
+                            },
+                            {
+                                "literal": {
+                                    "value": "",
+                                    "type": "string"
+                                }
+                            }
+                        ],
+                        "type": "set"
+                    }
+                },
+                "name": "set_value",
+                "type": {
+                    "inner_type": {
+                        "type": "string"
+                    },
+                    "type": "set"
+                }
+            },
+            {
+                "value": {
+                    "literal": {
+                        "value": [
+                            {
+                                "key": {
+                                    "literal": {
+                                        "string": "0",
+                                        "value": 0,
+                                        "type": "i64"
+                                    }
+                                },
+                                "val": {
+                                    "literal": {
+                                        "value": true,
+                                        "type": "bool"
+                                    }
+                                }
+                            },
+                            {
+                                "key": {
+                                    "literal": {
+                                        "string": "1",
+                                        "value": 1,
+                                        "type": "i64"
+                                    }
+                                },
+                                "val": {
+                                    "literal": {
+                                        "value": false,
+                                        "type": "bool"
+                                    }
+                                }
+                            }
+                        ],
+                        "type": "map"
+                    }
+                },
+                "name": "map_value",
+                "type": {
+                    "val_type": {
+                        "type": "bool"
+                    },
+                    "key_type": {
+                        "type": "i64"
+                    },
+                    "type": "map"
+                }
+            },
+            {
+                "value": {
+                    "literal": {
+                        "value": [
+                            {
+                                "key": {
+                                    "literal": {
+                                        "value": "a",
+                                        "type": "string"
+                                    }
+                                },
+                                "val": {
+                                    "literal": {
+                                        "value": "A",
+                                        "type": "string"
+                                    }
+                                }
+                            },
+                            {
+                                "key": {
+                                    "literal": {
+                                        "value": "b",
+                                        "type": "string"
+                                    }
+                                },
+                                "val": {
+                                    "literal": {
+                                        "value": "B",
+                                        "type": "string"
+                                    }
+                                }
+                            }
+                        ],
+                        "type": "map"
+                    }
+                },
+                "name": "hash_map_value",
+                "type": {
+                    "val_type": {
+                        "type": "string"
+                    },
+                    "key_type": {
+                        "type": "string"
+                    },
+                    "type": "map"
+                }
+            },
+            {
+                "value": {
+                    "literal": {
+                        "value": [
+                            {
+                                "field_name": "a",
+                                "field_type": {
+                                    "type": "i16"
+                                },
+                                "field_value": {
+                                    "literal": {
+                                        "value": 1,
+                                        "type": "i16"
+                                    }
+                                }
+                            },
+                            {
+                                "field_name": "b",
+                                "field_type": {
+                                    "type": "i32"
+                                },
+                                "field_value": {
+                                    "literal": {
+                                        "value": 2,
+                                        "type": "i32"
+                                    }
+                                }
+                            },
+                            {
+                                "field_name": "c",
+                                "field_type": {
+                                    "type": "i64"
+                                },
+                                "field_value": {
+                                    "literal": {
+                                        "string": "3",
+                                        "value": 3,
+                                        "type": "i64"
+                                    }
+                                }
+                            }
+                        ],
+                        "type": "struct"
+                    }
+                },
+                "name": "struct_value",
+                "type": {
+                    "name": {
+                        "name": "B"
+                    },
+                    "type": "struct"
+                }
+            },
+            {
+                "value": {
+                    "literal": {
+                        "value": [
+                            {
+                                "field_name": "a",
+                                "field_type": {
+                                    "type": "i16"
+                                },
+                                "field_value": {
+                                    "literal": {
+                                        "value": 1,
+                                        "type": "i16"
+                                    }
+                                }
+                            },
+                            {
+                                "field_name": "b",
+                                "field_type": {
+                                    "type": "i32"
+                                },
+                                "field_value": {
+                                    "literal": {
+                                        "value": 2,
+                                        "type": "i32"
+                                    }
+                                }
+                            },
+                            {
+                                "field_name": "c",
+                                "field_type": {
+                                    "type": "i64"
+                                },
+                                "field_value": {
+                                    "literal": {
+                                        "string": "3",
+                                        "value": 3,
+                                        "type": "i64"
+                                    }
+                                }
+                            }
+                        ],
+                        "type": "struct"
+                    }
+                },
+                "name": "explicit_struct_value",
+                "type": {
+                    "name": {
+                        "name": "B"
+                    },
+                    "type": "struct"
+                }
+            },
+            {
+                "value": {
+                    "literal": {
+                        "value": [
+                            {
+                                "field_name": "x",
+                                "field_type": {
+                                    "inner_type": {
+                                        "name": {
+                                            "name": "Number"
+                                        },
+                                        "type": "enum"
+                                    },
+                                    "type": "list"
+                                },
+                                "field_value": {
+                                    "literal": {
+                                        "value": [],
+                                        "type": "list"
+                                    }
+                                }
+                            },
+                            {
+                                "field_name": "y",
+                                "field_type": {
+                                    "inner_type": {
+                                        "name": {
+                                            "name": "Number_Strict"
+                                        },
+                                        "type": "enum"
+                                    },
+                                    "type": "list"
+                                },
+                                "field_value": {
+                                    "literal": {
+                                        "value": [],
+                                        "type": "list"
+                                    }
+                                }
+                            },
+                            {
+                                "field_name": "z",
+                                "field_type": {
+                                    "name": {
+                                        "name": "B"
+                                    },
+                                    "type": "struct"
+                                },
+                                "field_value": {
+                                    "literal": {
+                                        "value": [
+                                            {
+                                                "field_name": "a",
+                                                "field_type": {
+                                                    "type": "i16"
+                                                },
+                                                "field_value": {
+                                                    "literal": {
+                                                        "value": 1,
+                                                        "type": "i16"
+                                                    }
+                                                }
+                                            },
+                                            {
+                                                "field_name": "b",
+                                                "field_type": {
+                                                    "type": "i32"
+                                                },
+                                                "field_value": {
+                                                    "literal": {
+                                                        "value": 2,
+                                                        "type": "i32"
+                                                    }
+                                                }
+                                            },
+                                            {
+                                                "field_name": "c",
+                                                "field_type": {
+                                                    "type": "i64"
+                                                },
+                                                "field_value": {
+                                                    "literal": {
+                                                        "string": "3",
+                                                        "value": 3,
+                                                        "type": "i64"
+                                                    }
+                                                }
+                                            }
+                                        ],
+                                        "type": "struct"
+                                    }
+                                }
+                            }
+                        ],
+                        "type": "struct"
+                    }
+                },
+                "name": "explicit_nested_struct_value",
+                "type": {
+                    "name": {
+                        "name": "C"
+                    },
+                    "type": "struct"
+                }
+            }
+        ],
+        "name": "b",
+        "includes": [],
+        "enums": [
+            {
+                "is_psuedo": false,
+                "name": "Number",
+                "constants": [
+                    {
+                        "value": 0,
+                        "name": "Zero"
+                    },
+                    {
+                        "value": 1,
+                        "name": "One"
+                    },
+                    {
+                        "value": 2,
+                        "name": "Two"
+                    },
+                    {
+                        "value": 3,
+                        "name": "Three"
+                    }
+                ]
+            },
+            {
+                "is_psuedo": false,
+                "name": "Number_Strict",
+                "constants": [
+                    {
+                        "value": 0,
+                        "name": "Zero"
+                    }
+                ]
+            },
+            {
+                "is_psuedo": false,
+                "name": "Number_Discontinuous",
+                "constants": [
+                    {
+                        "value": 5,
+                        "name": "Five"
+                    },
+                    {
+                        "value": 0,
+                        "name": "Zero"
+                    }
+                ]
+            },
+            {
+                "is_psuedo": false,
+                "name": "Number_Empty",
+                "constants": []
+            }
+        ],
+        "options": {
+            "path": "common/hs/thrift/compiler/test/if/a.thrift",
+            "include_path": ".",
+            "genfiles": null,
+            "out_path": "common/hs/thrift/compiler/test/fixtures/gen-single-out",
+            "recursive": true
+        },
+        "services": []
+    }
+]
