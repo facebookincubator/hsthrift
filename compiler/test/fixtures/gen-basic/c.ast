@@ -1,0 +1,220 @@
+{
+    "typedefs": [
+        {
+            "newtype": false,
+            "name": "annotated_string",
+            "type": {
+                "type": "string"
+            }
+        }
+    ],
+    "structs": [
+        {
+            "name": "FirstAnnotation",
+            "struct_type": "STRUCT",
+            "fields": [
+                {
+                    "name": "name",
+                    "requiredness": "default",
+                    "id": 1,
+                    "type": {
+                        "type": "string"
+                    }
+                },
+                {
+                    "default_value": {
+                        "literal": {
+                            "string": "1",
+                            "value": 1,
+                            "type": "i64"
+                        }
+                    },
+                    "name": "count",
+                    "requiredness": "default",
+                    "id": 2,
+                    "type": {
+                        "type": "i64"
+                    }
+                }
+            ]
+        },
+        {
+            "name": "SecondAnnotation",
+            "struct_type": "STRUCT",
+            "fields": [
+                {
+                    "default_value": {
+                        "literal": {
+                            "string": "0",
+                            "value": 0,
+                            "type": "i64"
+                        }
+                    },
+                    "name": "total",
+                    "requiredness": "default",
+                    "id": 2,
+                    "type": {
+                        "type": "i64"
+                    }
+                },
+                {
+                    "name": "recurse",
+                    "requiredness": "default",
+                    "id": 3,
+                    "type": {
+                        "name": {
+                            "name": "SecondAnnotation"
+                        },
+                        "type": "struct"
+                    }
+                }
+            ]
+        },
+        {
+            "name": "MyStruct",
+            "struct_type": "STRUCT",
+            "fields": [
+                {
+                    "name": "tag",
+                    "requiredness": "default",
+                    "id": 5,
+                    "type": {
+                        "inner_type": {
+                            "type": "string"
+                        },
+                        "name": {
+                            "name": "annotated_string"
+                        },
+                        "type": "typedef"
+                    }
+                }
+            ]
+        },
+        {
+            "name": "MyException",
+            "struct_type": "EXCEPTION",
+            "fields": [
+                {
+                    "name": "message",
+                    "requiredness": "default",
+                    "id": 1,
+                    "type": {
+                        "type": "string"
+                    }
+                }
+            ]
+        }
+    ],
+    "path": "common/hs/thrift/compiler/test/if/c.thrift",
+    "unions": [
+        {
+            "name": "MyUnion",
+            "fields": [
+                {
+                    "name": "int_value",
+                    "id": 1,
+                    "type": {
+                        "type": "i64"
+                    }
+                },
+                {
+                    "name": "string_value",
+                    "id": 2,
+                    "type": {
+                        "type": "string"
+                    }
+                }
+            ]
+        }
+    ],
+    "consts": [
+        {
+            "value": {
+                "literal": {
+                    "value": [
+                        {
+                            "key": {
+                                "literal": {
+                                    "value": "ENUMERATOR",
+                                    "type": "string"
+                                }
+                            },
+                            "val": {
+                                "literal": {
+                                    "value": "value",
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    ],
+                    "type": "map"
+                }
+            },
+            "name": "MyConst",
+            "type": {
+                "val_type": {
+                    "type": "string"
+                },
+                "key_type": {
+                    "type": "string"
+                },
+                "type": "map"
+            }
+        }
+    ],
+    "name": "c",
+    "includes": [],
+    "enums": [
+        {
+            "is_psuedo": false,
+            "name": "MyEnum",
+            "constants": [
+                {
+                    "value": 0,
+                    "name": "UNKNOWN"
+                },
+                {
+                    "value": 1,
+                    "name": "FIRST"
+                }
+            ]
+        }
+    ],
+    "options": {
+        "path": "common/hs/thrift/compiler/test/if/c.thrift",
+        "include_path": ".",
+        "genfiles": null,
+        "out_path": "common/hs/thrift/compiler/test/fixtures/gen-basic",
+        "recursive": true
+    },
+    "services": [
+        {
+            "name": "MyService",
+            "functions": [
+                {
+                    "args": [
+                        {
+                            "name": "param",
+                            "id": 2,
+                            "type": {
+                                "inner_type": {
+                                    "type": "string"
+                                },
+                                "name": {
+                                    "name": "annotated_string"
+                                },
+                                "type": "typedef"
+                            }
+                        }
+                    ],
+                    "return_type": {
+                        "type": "i64"
+                    },
+                    "throws": [],
+                    "name": "my_function",
+                    "oneway": false
+                }
+            ]
+        }
+    ]
+}

@@ -1,0 +1,6 @@
+packages:
+    common/util/fb-util.cabal
+    common/mangle/mangle.cabal
+    lib/thrift-lib.cabal
+    server/thrift-server.cabal
+    compiler/thrift-compiler.cabal
