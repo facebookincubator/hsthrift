@@ -6,7 +6,9 @@
 
 module Thrift.HasFields (HasField(..)) where
 
+import GHC.TypeLits
+
 -- | HasField type family. Same as
 -- GHC.Records.HasField, but custom so we can overlap it
-class HasField (x :: k) r a | x r -> a where
+class HasField (x :: Symbol) r a | x r -> a where
   getField :: r -> a
