@@ -9,7 +9,7 @@ license-file:        LICENSE
 author:              Facebook, Inc.
 maintainer:          hsthrift-team@fb.com
 copyright:           (c) Facebook, All Rights Reserved
--- category:
+category:            Utilities
 build-type:          Simple
 extra-source-files:  CHANGELOG.md
 

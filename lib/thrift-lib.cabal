@@ -9,7 +9,7 @@ license-file:        LICENSE
 author:              Facebook, Inc.
 maintainer:          hsthrift-team@fb.com
 copyright:           (c) Facebook, All Rights Reserved
--- category:
+category:            Thrift
 build-type:          Simple
 extra-source-files:  CHANGELOG.md
 build-tool-depends: thrift-compiler
@@ -66,14 +66,14 @@ library
         Thrift.Binary.Parser
         Thrift.Protocol.ApplicationException.Types
         Thrift.Protocol.RpcOptions.Types
-  
+
     cxx-sources:
         cpp/HeaderChannel.cpp
         cpp/HsChannel.cpp
         if/gen-cpp2/RpcOptions_types.cpp
 
     hs-source-dirs: . gen-hs2
-  
+
     build-tools: hsc2hs
     hsc2hs-options: --cc=g++ --lflag=-lstdc++ --cflag=-D__HSC2HS__=1
     include-dirs: .
