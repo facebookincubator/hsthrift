@@ -1,15 +1,18 @@
 module TestChannel
   ( TestChannel(..), Req(..)
+  , runServer
   , runTestServer
   ) where
 
-import Control.Exception
 import Control.Concurrent
 import Control.Monad
 import Data.ByteString (ByteString)
+import Data.Proxy
 
 import Thrift.Channel
-import Thrift.Monad (getRpcPriority)
+import Thrift.Monad (getRpcPriority, newCounter)
+import Thrift.Processor
+import Thrift.Protocol
 
 newtype TestChannel s = TestChannel (MVar Req)
 
@@ -25,9 +28,20 @@ instance ClientChannel TestChannel where
       send () = sendCob Nothing >> putMVar reqBuf (Req reqMsg recvCob)
 
   sendOnewayRequest (TestChannel reqBuf) Request{..} sendCob = do
-    putMVar reqBuf $ Req reqMsg
-      (throw (ChannelException "no readbuf for oneway request"))
+    putMVar reqBuf $ Req reqMsg (\_ -> return ())
     sendCob Nothing
+
+runServer
+  :: (Processor c, Protocol p)
+  => Proxy p
+  -> TestChannel s
+  -> (forall r . c r -> IO r)
+  -> IO ()
+runServer p ch handler = do
+  counter <- newCounter
+  runTestServer ch $ \bytes -> do
+    seqNum <- counter
+    process p seqNum handler bytes
 
 runTestServer
   :: TestChannel s
