@@ -113,7 +113,7 @@ ppDecl (D_Service Service{serviceLoc=StructLoc{..},..}) = mconcat $
 
 ppStruct
   :: StructLoc Offset
-  -> [StructuredAnnotation Offset]
+  -> [StructuredAnnotation s l Offset]
   -> Builder
   -> Strict.Text
   -> [Builder]
@@ -317,10 +317,10 @@ ppAnn ValueAnn{..} = mconcat
   , ppSeparator vaSep
   ]
 
-ppSAnns :: [StructuredAnnotation Offset] -> Builder
+ppSAnns :: [StructuredAnnotation s l Offset] -> Builder
 ppSAnns sAnns = mconcat $ map ppSAnn sAnns
 
-ppSAnn :: StructuredAnnotation Offset -> Builder
+ppSAnn :: StructuredAnnotation s l Offset -> Builder
 ppSAnn StructuredAnn{..} = mconcat
   [ addHeader saAt, "@"
   , fromText saType

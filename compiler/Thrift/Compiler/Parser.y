@@ -321,7 +321,7 @@ StructuredAnnotation
     { StructuredAnn
       { saAt = getLoc $1
       , saType = lVal $2
-      , saTypeLoc = lLoc $2
+      , saTypeLoc = Arity0Loc $ lLoc $2
       , saMaybeElems = Nothing
       }
     }
@@ -329,7 +329,7 @@ StructuredAnnotation
     { StructuredAnn
       { saAt = getLoc $1
       , saType = lVal $2
-      , saTypeLoc = lLoc $2
+      , saTypeLoc = Arity0Loc $ lLoc $2
       , saMaybeElems = Just $ StructuredAnnElems
         { saOpenBrace = getLoc $3
         , saElems = $4

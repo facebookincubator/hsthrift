@@ -133,6 +133,8 @@ ppErrorMsg (TypeMismatch ty1 ty2) =
     hang "type mismatch:" 1 $
     "expected type" <+> quotes (ppType ty1) $$
     "but got type" <+> quotes (ppType ty2)
+ppErrorMsg (NotDefinedBeforeUsed ty) =
+    "type" <+> quotes (ppType ty) <+> "must be defined before it is used"
 
 red :: Doc -> Doc
 red doc = zeroWidthText "\ESC[31;1m" <> doc <> zeroWidthText "\ESC[0m"

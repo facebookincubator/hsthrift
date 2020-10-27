@@ -283,12 +283,20 @@ filterDecls reqSymbols symbolMap =
     -- are required
     filterDecl (D_Service s, _, _) symbols = mkVertex newDecl
       where
-        newDecl = D_Service s { serviceFunctions = filteredFuns }
+        newDecl = D_Service s {serviceFunctions = filteredFuns, serviceSAnns=[]}
         filteredFuns =
           filter (\Function{..} -> Set.member funName symbols) $
           serviceFunctions s
-    filterDecl node _ = node
-
+    filterDecl (D_Struct s, syms, smap) _ =
+      (D_Struct s {structSAnns=[]}, syms, smap)
+    filterDecl (D_Union u, syms, smap) _ =
+      (D_Union u {unionSAnns=[]}, syms, smap)
+    filterDecl (D_Typedef t, syms, smap) _ =
+      (D_Typedef t {tdSAnns=[]}, syms, smap)
+    filterDecl (D_Enum e, syms, smap) _ =
+      (D_Enum e {enumSAnns=[]}, syms, smap)
+    filterDecl (D_Const c, syms, smap) _ =
+      (D_Const c {constSAnns=[]}, syms, smap)
     addSym symbol (syms, smap)
       | Text.null name = (Set.insert symbol syms, smap)
       | otherwise = (syms, Map.insertWith Set.union prefix nameSet smap)
@@ -381,12 +389,14 @@ resolveTypedef t@Typedef{..} = mkTypedef
     mkTypedef :: Typechecked l Typedef
     mkTypedef = do
       Env{..} <- ask
-      This ty <- resolveType tdType
+      This ty <- resolveAnnotatedType tdType
+      sAnns   <- resolveStructuredAnns tdSAnns
       declIsNewtype <- or <$> mapM checkAnn (filterHsAnns $ getAnns tdAnns)
       return $ Typedef
         { tdResolvedName = renameTypedef options t
         , tdResolvedType = ty
         , tdTag = if declIsNewtype then IsNewtype else IsTypedef
+        , tdSAnns = sAnns
         , ..
         }
 
@@ -400,9 +410,11 @@ resolveStruct
 resolveStruct s@Struct{..} = do
   Env{..} <- ask
   fields <- resolveFields structName (getAnns structAnns) structMembers
+  sAnns   <- resolveStructuredAnns structSAnns
   return Struct
     { structResolvedName = renameStruct options s
     , structMembers      = fields
+    , structSAnns        = sAnns
     , ..
     }
 
@@ -452,10 +464,10 @@ resolveField
   -> Text
   -> Parsed (Field u)
   -> Typechecked l (Field u)
-resolveField sAnns sname field@Field{..} = do
+resolveField anns sname field@Field{..} = do
   when (fieldId == 0) $
     typeError (lLocation $ flId fieldLoc) $ InvalidFieldId fieldName 0
-  This ty <- resolveType fieldType
+  This ty <- resolveAnnotatedType fieldType
   val  <- sequence (typecheckConst ty <$> fieldVal)
   lazy <- case filterHsAnns $ getAnns fieldAnns of
             [SimpleAnn{..}]
@@ -463,17 +475,19 @@ resolveField sAnns sname field@Field{..} = do
               | saTag == "hs.lazy"   -> pure Lazy
             [] -> pure fieldLaziness
             ann : _ -> typeError (annLoc ann) $ AnnotationMismatch AnnField ann
+  sAnns <- resolveStructuredAnns fieldSAnns
   Env{..} <- ask
   case resolveTag fieldTag ty of
     Nothing -> typeError (lLocation $ flName fieldLoc) $
                InvalidThrows ty fieldName
     Just tag ->
       return Field
-        { fieldResolvedName = renameField options sAnns sname field
+        { fieldResolvedName = renameField options anns sname field
         , fieldResolvedType = ty
         , fieldResolvedVal  = val
         , fieldLaziness = lazy
         , fieldTag = tag
+        , fieldSAnns = sAnns
         , ..
         }
 
@@ -494,12 +508,15 @@ resolveUnion u@Union{..} = do
   This hasEmpty <-
     fromMaybe (This HasEmpty) . listToMaybe . catMaybes <$>
     mapM resolveAnn (filterHsAnns $ getAnns unionAnns)
+  sAnns <- resolveStructuredAnns unionSAnns
+
   Env{..} <- ask
   return Union
     { unionResolvedName = renameUnion options u
     , unionAlts = alts
     , unionEmptyName = getEmptyName options hasEmpty
     , unionHasEmpty  = hasEmpty
+    , unionSAnns = sAnns
     , ..
     }
   where
@@ -520,11 +537,13 @@ resolveUnion u@Union{..} = do
 
     resolveAlt :: Parsed UnionAlt -> Typechecked l UnionAlt
     resolveAlt alt@UnionAlt{..} = do
-      This ty <- resolveType altType
+      This ty <- resolveAnnotatedType altType
+      sAnns   <- resolveStructuredAnns altSAnns
       Env{..} <- ask
       return UnionAlt
         { altResolvedName = renameUnionAlt options u alt
         , altResolvedType = ty
+        , altSAnns = sAnns
         , ..
         }
 
@@ -543,6 +562,7 @@ resolveUnion u@Union{..} = do
 resolveEnum :: forall l. Typecheckable l => Parsed Enum -> Typechecked l Enum
 resolveEnum enum@Enum{..} = do
   consts <- mapM mkAlt enumConstants
+  sAnns   <- resolveStructuredAnns enumSAnns
   Env{..} <- ask
   let
     tag = isPseudo options enum
@@ -554,14 +574,17 @@ resolveEnum enum@Enum{..} = do
     , enumConstants = consts
     , enumIsPseudo  = tag
     , enumNoUnknown = n
+    , enumSAnns = sAnns
     , ..
     }
   where
     mkAlt :: Parsed EnumValue -> Typechecked l EnumValue
     mkAlt EnumValue{..} = do
+      sAnns   <- resolveStructuredAnns evSAnns
       Env{..} <- ask
       return EnumValue
         { evResolvedName = renameEnumAlt options enum evName
+        , evSAnns = sAnns
         , ..
         }
 
@@ -575,26 +598,30 @@ resolveEnum enum@Enum{..} = do
 
 resolveConst :: Typecheckable l => Parsed Const -> Typechecked l Const
 resolveConst Const{..} = do
-  This ty <- resolveType constType
+  This ty <- resolveAnnotatedType constType
   Env{..} <- ask
   val     <- typecheckConst ty constVal
+  sAnns   <- resolveStructuredAnns constSAnns
   return Const
     { constResolvedName = renameConst options constName
     , constResolvedType = ty
     , constResolvedVal  = val
+    , constSAnns        = sAnns
     , ..
     }
 
 resolveService :: Typecheckable l => Parsed Service -> Typechecked l Service
 resolveService s@Service{..} = do
-  (super, funs)
-    <- (,) <$> sequence (resolveSuper <$> serviceSuper)
+  (super, funs, sAnns)
+    <- (,,) <$> sequence (resolveSuper <$> serviceSuper)
            `collect` mapT resolveFunction serviceFunctions
+           `collect` resolveStructuredAnns serviceSAnns
   Env{..} <- ask
   pure Service
     { serviceResolvedName = renameService options s
     , serviceSuper        = super
     , serviceFunctions    = funs
+    , serviceSAnns        = sAnns
     , ..
     }
   where
@@ -605,10 +632,12 @@ resolveService s@Service{..} = do
 
 resolveFunction :: Typecheckable l => Parsed Function -> Typechecked l Function
 resolveFunction f@Function{..} = do
-  (rtype, args, excepts)
-    <- (,,) <$> sequence ((`withSome` resolveType) <$> rightToMaybe funType)
-            `collect` resolveFields funName annNoPriorities funArgs
-            `collect` resolveFields funName annNoPriorities funExceptions
+  (rtype, args, excepts, sAnns)
+    <- (,,,) <$>
+        sequence ((`withSome` resolveAnnotatedType) <$> rightToMaybe funType)
+          `collect` resolveFields funName annNoPriorities funArgs
+          `collect` resolveFields funName annNoPriorities funExceptions
+          `collect` resolveStructuredAnns funSAnns
   Env{..} <- ask
   pure Function
     { funResolvedName = renameFunction options f
@@ -616,6 +645,7 @@ resolveFunction f@Function{..} = do
     , funArgs         = args
     , funExceptions   = excepts
     , funPriority = fromMaybe funPriority $ getPriority annPriorities
+    , funSAnns = sAnns
     , ..
     }
   where
@@ -623,6 +653,44 @@ resolveFunction f@Function{..} = do
     isPriority ValueAnn{..}
       | TextAnn{} <- vaVal = vaTag == "priority"
     isPriority _ = False
+
+-- Resolve Structured Annotations ----------------------------------------------
+
+resolveStructuredAnns
+  :: Typecheckable l
+  => [StructuredAnnotation 'Unresolved () Loc]
+  -> TC l [StructuredAnnotation 'Resolved  l Loc]
+resolveStructuredAnns = mapM resolveStructuredAnn
+
+resolveStructuredAnn
+  :: Typecheckable l
+  => Parsed StructuredAnnotation
+  -> Typechecked l StructuredAnnotation
+resolveStructuredAnn StructuredAnn{..} = do
+  This ty <- resolveType (TNamed saType) saTypeLoc Nothing
+  saTypeName <- mkThriftName saType
+  This schema <- lookupSchema saTypeName lLocation
+  val <- typecheckStruct lLocation schema =<<
+    mkStructFieldMap (maybe [] saElems saMaybeElems)
+  case ty of
+    TStruct _ loc | not $ loc `isDefinedAt` lLocation ->
+      typeError lLocation (NotDefinedBeforeUsed ty)
+    _ ->
+      pure StructuredAnn
+        { saResolvedType = ty
+        , saResolvedVal = This val
+        , ..
+        }
+  where
+    Located{..} = a0Ty saTypeLoc
+    isDefinedAt :: Loc -> Loc -> Bool
+    isDefinedAt defLoc loc
+      | locFile defLoc /= locFile loc = True
+      | locEndLine defLoc < locStartLine loc = True
+      | locEndLine defLoc > locStartLine loc = False
+      -- locEndLine defLoc == locStartLine loc
+      | locEndCol defLoc <= locStartCol loc = True
+      | otherwise = False
 
 -- Build the Constant Map ------------------------------------------------------
 
@@ -704,7 +772,7 @@ mkConstMap (thriftName, opts@Options{..}) imap tmap = foldM insertC emptyContext
             sname = enumName <> "." <> evName
             loc = lLocation $ evlName evLoc
     insertC m (D_Const Const{..}) = do
-      ty <- runTypechecker env $ resolveType constType
+      ty <- runTypechecker env $ resolveAnnotatedType constType
       let renamed = renameConst opts constName
       insertContext loc constName renamed (ty, mkName constName renamed, loc) m
       where
@@ -1163,7 +1231,7 @@ mkTypemap (thriftName, opts@Options{..}) imap =
   where
     resolve :: TypeMap l -> Parsed Decl -> Either [TypeError l] (TypeMap l)
     resolve m (D_Typedef t@Typedef{..}) = do
-      tdef <- mkTypedef <$> runTypechecker env (resolveType tdType)
+      tdef <- mkTypedef <$> runTypechecker env (resolveAnnotatedType tdType)
       insertContext loc tdName hsname tdef m
         where
           loc = lLocation (tdlName tdLoc)
@@ -1232,11 +1300,20 @@ sortDecls decls = mapE getVertex sccs
     -- so there is no type-level way to enforce it
     getVertex (CyclicSCC []) = Left []
 
-resolveType
+resolveAnnotatedType
   :: forall l t. Typecheckable l
   => AnnotatedType Loc t
   -> TC l (Some (Type l))
-resolveType AnnotatedType{..} =
+resolveAnnotatedType AnnotatedType{..} =
+  resolveType atType atLoc atAnnotations
+
+resolveType
+  :: forall l t n. Typecheckable l
+  => TType 'Unresolved () Loc t
+  -> TypeLoc n Loc
+  -> Maybe (Annotations Loc)
+  -> TC l (Some (Type l))
+resolveType atType atLoc atAnnotations =
   case atType of
     -- Resolving base types is trivial
     I8      -> annotate I8
@@ -1253,12 +1330,12 @@ resolveType AnnotatedType{..} =
     THashSet u -> resolve THashSet u
     TList u    -> resolve TList u
     TMap k v -> do
-      This rk <- resolveType k
-      This rv <- resolveType v
+      This rk <- resolveAnnotatedType k
+      This rv <- resolveAnnotatedType v
       annotate $ TMap rk rv
     THashMap k v -> do
-      This rk <- resolveType k
-      This rv <- resolveType v
+      This rk <- resolveAnnotatedType k
+      This rv <- resolveAnnotatedType v
       annotate $ THashMap rk rv
     -- Named type may not be resolvable
     TNamed name -> do
@@ -1272,7 +1349,8 @@ resolveType AnnotatedType{..} =
       :: (forall v. Type l v -> Type l (s v))
       -> AnnotatedType Loc u
       -> TC l (Some (Type l))
-    resolve mkType u = resolveType u >>= \(This v) -> annotate (mkType v)
+    resolve mkType u = resolveAnnotatedType u >>=
+      \(This v) -> annotate (mkType v)
 
 mkThriftName :: Text -> TC l ThriftName
 mkThriftName text
@@ -1319,7 +1397,7 @@ mkSchema Struct{..} = buildSchema structMembers
   where
     buildSchema (field@Field{..} : fields) = do
       (rty, This schema) <- (,)
-        <$> resolveType fieldType
+        <$> resolveAnnotatedType fieldType
         `collect` buildSchema fields
       opts@Options{..} <- options <$> ask
       let renamed =
@@ -1358,7 +1436,7 @@ mkUSchema u@Union{..} =
   foldM buildSchema (This SEmpty) unionAlts
   where
     buildSchema (This schema) alt@UnionAlt{..} = do
-      rty <- resolveType altType
+      rty <- resolveAnnotatedType altType
       opts@Options{..} <- options <$> ask
       let renamed = Text.unpack $ renameUnionAlt opts u alt
       case (someSymbolVal renamed, rty) of

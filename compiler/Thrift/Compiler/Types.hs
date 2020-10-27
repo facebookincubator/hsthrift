@@ -159,11 +159,13 @@ annLoc :: Annotation a -> a
 annLoc SimpleAnn{..} = lLocation saLoc
 annLoc ValueAnn{..} = lLocation vaTagLoc
 
-data StructuredAnnotation a = StructuredAnn
-  { saAt    :: Located a
-  , saType  :: Text
-  , saTypeLoc :: Located a
+data StructuredAnnotation (s :: Status) (l :: *) a = forall t. StructuredAnn
+  { saAt :: Located a
+  , saType :: Text
+  , saTypeLoc :: TypeLoc 0 a
   , saMaybeElems :: Maybe (StructuredAnnotationElems a)
+  , saResolvedType :: IfResolved s (Type l t)
+  , saResolvedVal :: IfResolved s (Some (StructVal l))
   }
 
 data StructuredAnnotationElems a = StructuredAnnElems
@@ -286,7 +288,7 @@ data Typedef (s :: Status) (l :: * {- Language -}) a = forall v t. Typedef
   , tdResolvedType :: IfResolved s (Type l t)
   , tdLoc          :: TypedefLoc a
   , tdAnns         :: Maybe (Annotations a)
-  , tdSAnns        :: [StructuredAnnotation a]
+  , tdSAnns        :: [StructuredAnnotation s l a]
   }
 
 data TypedefTag (s :: Status) where
@@ -308,7 +310,7 @@ data Const (s :: Status) (l :: * {- Language -}) a = forall v t. Const
   , constResolvedType :: IfResolved s (Type l t)
   , constResolvedVal  :: IfResolved s (TypedConst l t)
   , constLoc          :: ConstLoc a
-  , constSAnns        :: [StructuredAnnotation a]
+  , constSAnns        :: [StructuredAnnotation s l a]
   }
 
 data ConstLoc a = ConstLoc
@@ -448,7 +450,7 @@ data Struct s l a = Struct
   , structMembers      :: [Field 'StructField s l a]
   , structLoc          :: StructLoc a
   , structAnns         :: Maybe (Annotations a)
-  , structSAnns        :: [StructuredAnnotation a]
+  , structSAnns        :: [StructuredAnnotation s l a]
   }
 
 data StructType = StructTy | ExceptionTy
@@ -483,7 +485,7 @@ data Field u s l a = forall v t. Field
   , fieldTag          :: FieldTag u s l t
   , fieldLoc          :: FieldLoc a
   , fieldAnns         :: Maybe (Annotations a)
-  , fieldSAnns        :: [StructuredAnnotation a]
+  , fieldSAnns        :: [StructuredAnnotation s l a]
   }
 
 type FieldId = Int32
@@ -516,7 +518,7 @@ data Union s l a = forall u. Union
   , unionHasEmpty     :: PossiblyEmpty u
   , unionLoc          :: StructLoc a
   , unionAnns         :: Maybe (Annotations a)
-  , unionSAnns        :: [StructuredAnnotation a]
+  , unionSAnns        :: [StructuredAnnotation s l a]
   }
 
 data UnionAlt (s :: Status) (l :: * {- Language -}) a = forall v t. UnionAlt
@@ -527,7 +529,7 @@ data UnionAlt (s :: Status) (l :: * {- Language -}) a = forall v t. UnionAlt
   , altResolvedType :: IfResolved s (Type l t)
   , altLoc          :: FieldLoc a
   , altAnns         :: Maybe (Annotations a)
-  , altSAnns        :: [StructuredAnnotation a]
+  , altSAnns        :: [StructuredAnnotation s l a]
   }
 
 data PossiblyEmpty (u :: Bool) where
@@ -548,7 +550,7 @@ data Enum (s :: Status) (l :: * {- Language -}) a = Enum
   , enumConstants    :: [EnumValue s l a]
   , enumLoc          :: StructLoc a
   , enumAnns         :: Maybe (Annotations a)
-  , enumSAnns        :: [StructuredAnnotation a]
+  , enumSAnns        :: [StructuredAnnotation s l a]
   , enumNoUnknown    :: IfResolved s Bool
   }
 
@@ -558,7 +560,7 @@ data EnumValue (s :: Status) (l :: * {- Language -}) a = EnumValue
   , evValue        :: Int32
   , evLoc          :: EnumValLoc a
   , evAnns         :: Maybe (Annotations a)
-  , evSAnns        :: [StructuredAnnotation a]
+  , evSAnns        :: [StructuredAnnotation s l a]
   }
 
 data EnumValLoc a = EnumValLoc
@@ -578,7 +580,7 @@ data Service (s :: Status) (l :: * {- Language -}) a = Service
   , serviceFunctions    :: [Function s l a]
   , serviceLoc          :: StructLoc a
   , serviceAnns         :: Maybe (Annotations a)
-  , serviceSAnns        :: [StructuredAnnotation a]
+  , serviceSAnns        :: [StructuredAnnotation s l a]
   }
 
 data Super s a = Super
@@ -603,7 +605,7 @@ data Function (s :: Status) (l :: * {- Language -}) a = Function
   , funPriority     :: ThriftPriority
   , funLoc          :: FunLoc a
   , funAnns         :: Maybe (Annotations a)
-  , funSAnns        :: [StructuredAnnotation a]
+  , funSAnns        :: [StructuredAnnotation s l a]
   }
 
 data FunLoc a = FunLoc

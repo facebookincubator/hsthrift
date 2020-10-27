@@ -189,6 +189,7 @@ data ErrorMsg l
   | DuplicateName Text
   | DuplicateEnumVal Text [Text] Int
   | forall t1 t2. TypeMismatch (Type l t1) (Type l t2)
+  | forall t. NotDefinedBeforeUsed (Type l t)
 
 data AnnotationPlacement l
   = forall t. AnnType (Type l t)

@@ -575,16 +575,21 @@ annOffsets origin ValueAnn{..} =
     (sep, sepEnd) = separatorOffsets (lLocation vaValLoc) vaSep
 
 sAnnOffsets
-  :: Loc -> StructuredAnnotation Loc -> (StructuredAnnotation Offset, Loc)
+  :: Loc
+  -> StructuredAnnotation s l Loc
+  -> (StructuredAnnotation s l Offset, Loc)
 sAnnOffsets origin StructuredAnn{..} =
   (StructuredAnn
    { saAt = getOffsets origin saAt
    , saMaybeElems = maybeElems
-   , saTypeLoc = getOffsets (lLocation saAt) saTypeLoc
+   , saTypeLoc = typeLoc
+   , saResolvedType = unsafeCoerce saResolvedType
    , .. },
    elemsEnd)
   where
-    (maybeElems, elemsEnd) = sAnnElemOffsets (lLocation saTypeLoc) saMaybeElems
+    (maybeElems, elemsEnd) =
+      sAnnElemOffsets (lLocation $ a0Ty saTypeLoc) saMaybeElems
+    typeLoc = Arity0Loc { a0Ty = getOffsets (lLocation saAt) (a0Ty saTypeLoc) }
 
 sAnnElemOffsets
   :: Loc
