@@ -71,6 +71,7 @@ library
         cpp/HeaderChannel.cpp
         cpp/HsChannel.cpp
         if/gen-cpp2/RpcOptions_types.cpp
+        if/gen-cpp2/RpcOptions_data.cpp
 
     hs-source-dirs: . gen-hs2
 
@@ -83,6 +84,7 @@ library
         thriftcpp2
         thriftprotocol
         transport
+        rpcmetadata
         concurrency
         protocol
         thrift-core
