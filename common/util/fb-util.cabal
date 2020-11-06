@@ -1,4 +1,4 @@
-cabal-version:       2.1
+cabal-version:       3.6
 
 name:                fb-util
 version:             0.1.0.0
@@ -178,7 +178,7 @@ library
         array ^>=0.5.2.0,
         prettyprinter ^>=1.2.1
 
-    build-tools: hsc2hs
+    build-tool-depends: hsc2hs:hsc2hs
 
     -- We use hsc2hs with C++ headers, so we need to compile the
     -- generated code with g++. The hsc2hs-generated binary is linked
@@ -186,4 +186,84 @@ library
     hsc2hs-options: --cc=g++ --lflag=-lstdc++ --cflag=-D__HSC2HS__=1
 
     pkgconfig-depends: libfolly, libglog
-    extra-libraries: double-conversion
+    extra-libraries: double-conversion, gflags
+
+test-suite fb-util-tests
+  import: fb-haskell
+  type: exitcode-stdio-1.0
+  hs-source-dirs: tests
+  main-is: Main.hs
+  extra-libraries: stdc++
+  ghc-options: -threaded
+  other-modules:
+                 Facebook.Init
+                 SpecRunner
+                 TestRunner
+
+                 -- async
+                 StreamTest
+
+                 -- datastruct
+                 MovingAverageRateLimiterTest
+                 RateLimiterMapTest
+
+                 -- util
+                 IOBufTest
+                 AllocLimitTest
+                 UnitTests
+                 RWVarTest
+                 THTest
+                 FilePathTest
+                 OptParseTest
+                 LensTest
+                 ToExpTest
+                 LogTest
+                 -- GFlagsTest
+                 AesonTest
+                 EncodingLib
+                 BufferTest
+                 ExceptionTest
+                 ControlExceptionTest
+                 JSONPrettyTest
+                 IOTest
+                 TimeSecTest
+                 ListTest
+                 EncodingTest
+                 LogTest.OverloadedStrings
+                 LogTest.Explicit
+                 LogTest.MonadStack
+                 ConcurrentTest
+                 MD5Test
+                 Control.MonadTest
+                 StringQuasiTest
+
+  build-depends: base,
+                 aeson,
+                 async,
+                 binary,
+                 bytestring,
+                 directory,
+                 fb-util,
+                 filepath,
+                 hspec,
+                 hspec-contrib,
+                 HUnit,
+                 json,
+                 lens,
+                 mtl,
+                 optparse-applicative,
+                 prettyprinter,
+                 QuickCheck,
+                 regex-base,
+                 regex-pcre,
+                 template-haskell,
+                 temporary,
+                 text,
+                 text-show,
+                 transformers,
+                 unordered-containers,
+                 vector,
+                 vector-fftw
+
+  c-sources:     tests/IOBufTest.cpp
+                 tests/GFlagsTest.cpp
