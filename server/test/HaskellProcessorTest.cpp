@@ -45,7 +45,12 @@ struct MockThreadManager : public concurrency::ThreadManagerExecutorAdapter {
   MOCK_QUALIFIED_METHOD4(
       add,
       noexcept,
-      void(std::shared_ptr<concurrency::Runnable>, int64_t, int64_t, bool));
+      void(
+          std::shared_ptr<concurrency::Runnable>,
+          int64_t,
+          int64_t,
+          apache::thrift::concurrency::ThreadManager::Source));
+  using concurrency::ThreadManager::add;
 };
 
 struct HaskellProcessorTest : public Test {
