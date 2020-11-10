@@ -7,6 +7,7 @@ module Util.OptParse
   , maybeTextOption
   , maybeIntOption
   , textCommaSplit
+  , testCommaSplitAndStrip
   , stringCommaSplit
   , readCommaSplit
   , absFilePathOption
@@ -56,6 +57,9 @@ maybeIntOption = optional . option (read <$> str)
 
 textCommaSplit :: ReadM [Text]
 textCommaSplit = Text.splitOn "," . Text.pack <$> str
+
+testCommaSplitAndStrip :: ReadM [Text]
+testCommaSplitAndStrip = map Text.strip <$> textCommaSplit
 
 stringCommaSplit :: ReadM [String]
 stringCommaSplit = List.splitOn "," <$> str
