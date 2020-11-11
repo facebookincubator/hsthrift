@@ -84,146 +84,66 @@ not have IPv6 configured.
 
 # Dependencies
 
-The following instructions worked on Ubuntu 16.04, please update as
-necessary for other distros/versions.
+## System dependencies
 
-TODO: automate all this with scripts.
+### Ubuntu
 
-## glog
-
-required by: various things
-
-sudo apt install libgoogle-glog-dev
-
-## gflags
-
-sudo apt install libgflags-dev
-
-## folly
-
-Required by: fbthrift, fb-util
-
-NOTE: make sure that folly, fizz, wangle are all checked out at the same tag. e.g. I used v2019-10-07-00
-
-```
-git clone git@github.com:simonmar/folly.git
-```
-
-(my fork has a couple of changes)
-
-edit `CMake/libfolly.pc.in` to set:
-
-Version: ﻿2020.07.10.00﻿
-
-(otherwise Cabal complains that it can't parse the version "master" in
-the `pkg-config --modversion` output)
-
-follow instructions in `README.md` except for:
-
-`cmake -DBUILD_SHARED_LIBS=ON ..`
-
-(because we always build dynamic versions of Haskell libs, for GHCi,
-and otherwise this will fail saying it needs -fPIC)
-
-```
-sudo make install # puts files under /usr/local
-```
-
-## bison/flex
-
-required by: fbthrift
-
-```
-sudo apt install bison flex
-```
-
-## rsocket / yarpl
-
-required by: fbthrift
-
-```
-git clone ﻿git@github.com﻿:rsocket/rsocket-cpp.git
-```
-
-follow build instructions, but add to cmake: `-DBUILD_SHARED_LIBS=ON`
-
-## fizz
-
-required by: fbthrift
-
-follow instructions at ﻿https://github.com/facebookincubator/fizz﻿
-
-```
-cmake ../fizz -DBUILD_SHARED_LIBS=ON
-```
-
-## wangle
-
-required by: fbthrift
-
-follow instructions at ﻿`https://github.com/facebook/wangle﻿`
-
-```
-cd wangle
-cmake . -DBUILD_SHARED_LIBS=ON
-```
-
-## zstd
-
-required by: fbthrift, rocksdb
-
-```
-sudo apt install libzstd-dev
-```
-
-## fmt
-
-required by: fbthrift
-
-﻿https://github.com/fmtlib/fmt﻿
-
-NB: checkout version 6.1.1 (the one currently in tp2), master doesn’t necessarily work
-
-Apply this patch (TODO: not sure if this is actually needed (2020-07-10)):
-```
-diff --git a/CMakeLists.txt b/CMakeLists.txt
-index f872e3c9..bf684171 100644
---- a/CMakeLists.txt
-+++ b/CMakeLists.txt
-@@ -161,6 +161,8 @@ endif ()
- add_library(fmt ${FMT_SOURCES} ${FMT_HEADERS} README.rst ChangeLog.rst)
- add_library(fmt::fmt ALIAS fmt)
- 
-+set_target_properties(fmt PROPERTIES POSITION_INDEPENDENT_CODE True)
-+
- if (FMT_WERROR)
-   target_compile_options(fmt PRIVATE ${WERROR_FLAG})
- endif ()
-```
-
-build & install as per instructions
-
-## fbthrift
-
-```
-git clone https://github.com/facebook/fbthrift
-cd fbthrift/build
-cmake .. -DBUILD_SHARED_LIBS=ON
-make -j2 && sudo make install
-```
-
-## rocksdb
-
-required by: Glean
-
-```
-sudo apt install librocksdb-dev
-```
-
-## MySQL client lib
-
-required by: some modules in fb-util
-
-```
 sudo apt install libmysqlclient-dev
+
+### Fedora
+
 ```
+sudo yum install \
+     openssl-devel \
+     libevent-devel \
+     double-conversion-devel \
+     boost-devel \
+     cmake \
+     glog-devel \
+     gflags-devel \
+     gmock-devel \
+     bison \
+     flex \
+     libatomic \
+     libsodium \
+     libzstd-devel \
+     pcre-devel \
+     community-mysql-devel
+```
+
+Also
+
+```
+export LD_LIBRARY_PATH=/usr/local/lib:
+export PKG_CONFIG_PATH=/usr/local/lib/pkgconfig
+```
+
+## Other dependencies
+
+hsthrift also depends on:
+
+* [folly](https://github.com/facebook/folly), a library of general C++ utilities
+* [fbthrift](https://github.com/facebook/fbthrift), Facebook's Thrift compiler and support libraries.
+* Other C++ libraries required by fbthrift: [rsocket-cpp](https://github.com/rsocket/rsocket-cpp), [fizz](https://github.com/facebookincubator/fizz), [wangle](https://github.com/facebook/wangle).
+
+These are typically not packaged by Linux distributions, so we have to
+build and install them manually from their github repos.  We've
+provided a script in the hsthrift repository, `install_deps.sh` to do
+that.  Run the following commands to clone the repos and build and
+install the dependencies in `/usr/local`:
+
+```
+mkdir deps
+cd deps
+../install_deps --sudo
+```
+
+Note that you can repeat `../install_deps --sudo --clean` in the
+future to update, build and install all the dependencies
+again.
+
+These library repositories must be checked out with a consistent
+tag. They are all tagged regularly with tags like
+`v2021.01.11.00`. The `install_deps.sh` script will find the most
+recent tag and update all the repos to the same tag.
+
