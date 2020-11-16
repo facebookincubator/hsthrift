@@ -68,6 +68,7 @@ library
         Thrift.Protocol.ApplicationException.Types
         Thrift.Protocol.RpcOptions.Types
 
+    cxx-options: -std=c++17
     cxx-sources:
         cpp/HeaderChannel.cpp
         cpp/HsChannel.cpp
@@ -122,6 +123,29 @@ library
         vector ^>=0.12.0.1
 
 common test-common
+  hs-source-dirs:
+        test,
+        test/github,
+        test/gen-hs2,
+        ../compiler/test/fixtures/gen-hs2
+        -- ^^^ for HsTest.Types
+  other-modules:
+        TestRunner
+        TestChannel
+        Math.Types
+        Math.Adder.Client
+        Math.Calculator.Client
+        Math.Adder.Service
+        Math.Calculator.Service
+        HsTest.Types
+  include-dirs: .
+  cxx-options:   -std=c++17
+  cxx-sources:   test/cpp/MathServer.cpp
+                 test/if/gen-cpp2/Calculator.cpp
+                 test/if/gen-cpp2/AdderAsyncClient.cpp
+                 test/if/gen-cpp2/Adder.cpp
+                 test/if/gen-cpp2/math_types.cpp
+                 test/if/gen-cpp2/math_metadata.cpp
   extra-libraries:
         thriftmetadata
         thriftcpp2
@@ -152,84 +176,44 @@ common test-common
                  STMonadTrans
   ghc-options: -threaded
 
-library test-lib
-  import: fb-haskell, test-common
-  visibility: private
-  exposed-modules:
-        TestRunner
-        TestChannel
-        Math.Types
-        Math.Adder.Client
-        Math.Calculator.Client
-        Math.Adder.Service
-        Math.Calculator.Service
-        HsTest.Types
-  hs-source-dirs:
-        test,
-        test/github,
-        test/gen-hs2,
-        ../compiler/test/fixtures/gen-hs2
-        -- ^^^ for HsTest.Types
-  include-dirs: .
-  cxx-sources:   test/cpp/MathServer.cpp
-                 test/if/gen-cpp2/Calculator.cpp
-                 test/if/gen-cpp2/AdderAsyncClient.cpp
-                 test/if/gen-cpp2/Adder.cpp
-                 test/if/gen-cpp2/math_types.cpp
-                 test/if/gen-cpp2/math_metadata.cpp
-
 test-suite channel
   import: fb-haskell, test-common
   type: exitcode-stdio-1.0
-  hs-source-dirs: test
-  build-depends: test-lib
   main-is: ChannelTest.hs
   ghc-options: -main-is ChannelTest
 
 test-suite client
   import: fb-haskell, test-common
   type: exitcode-stdio-1.0
-  hs-source-dirs: test
-  build-depends: test-lib
   main-is: ClientTest.hs
   ghc-options: -main-is ClientTest
 
 test-suite header-channel
   import: fb-haskell, test-common
   type: exitcode-stdio-1.0
-  hs-source-dirs: test
-  build-depends: test-lib
   main-is: HeaderChannelTest.hs
   ghc-options: -main-is HeaderChannelTest
 
 test-suite binary-parser
   import: fb-haskell, test-common
   type: exitcode-stdio-1.0
-  hs-source-dirs: test
-  build-depends: test-lib
   main-is: BinaryParserTest.hs
   ghc-options: -main-is BinaryParserTest
 
 test-suite json-parsing
   import: fb-haskell, test-common
   type: exitcode-stdio-1.0
-  hs-source-dirs: test
-  build-depends: test-lib
   main-is: JSONStringTest.hs
   ghc-options: -main-is JSONStringTest
 
 test-suite json-num
   import: fb-haskell, test-common
   type: exitcode-stdio-1.0
-  hs-source-dirs: test
-  build-depends: test-lib
   main-is: JSONNumTest.hs
   ghc-options: -main-is JSONNumTest
 
 test-suite json-null
   import: fb-haskell, test-common
   type: exitcode-stdio-1.0
-  hs-source-dirs: test
-  build-depends: test-lib
   main-is: JSONNullTest.hs
   ghc-options: -main-is JSONNullTest

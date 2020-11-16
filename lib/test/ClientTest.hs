@@ -6,6 +6,7 @@ import Control.Monad
 import Control.Monad.Trans.Class
 import Control.Monad.Trans.Reader
 import Data.IORef
+import Data.Int
 import Data.Proxy
 import TestRunner
 import Test.HUnit hiding (State)
@@ -96,7 +97,7 @@ runCalculatorServer proxy ch = do
   runServer proxy ch $ processCommand state
 
 -- Server Implementation
-type State = IORef Int
+type State = IORef Int64
 
 initServerState :: IO State
 initServerState = newIORef 0

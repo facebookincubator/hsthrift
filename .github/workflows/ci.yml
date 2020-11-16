@@ -26,6 +26,8 @@ jobs:
         with:
           path: /usr/local/
           key: ${{ runner.os }}-${{ steps.get-tag.outputs.tag }}
+          restore-keys: |
+            ${{ runner.os }}-${{ steps.get-tag.outputs.tag }}
       - name: Install folly, fizz, wangle, rsocket-cpp, fbthrift
         if: steps.cache-fb-packages.outputs.cache-hit != 'true'
         run:  ./install_deps.sh
@@ -41,8 +43,7 @@ jobs:
         run: make thrift-hs
       - name: Build all packages
         run: cabal build all
-      # - name: Build all packages and their testsuites
-      #   run: cabal build --enable-tests all
-      # - name: Run testsuites
-      #   shell: bash {0}
-      #   run: ./run_tests.sh
+      - name: Run testsuites
+        run: cabal test mangle fb-util thrift-compiler thrift-lib thrift-server --keep-going
+        # --keep-going is necessary to avoid stopping at the first failing
+        # testsuite('s package?)

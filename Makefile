@@ -31,6 +31,9 @@ thrift-hs::
 	$(THRIFT_COMPILE) --hs \
 		lib/test/if/echoer.thrift \
 		-o lib/test
+	$(THRIFT_COMPILE) --hs \
+		server/test/if/hash_map.thrift \
+		-o server/test
 
 
 thrift-cpp::

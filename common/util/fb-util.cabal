@@ -105,6 +105,8 @@ library
         Util.PrettyPrint
         Util.RWVar
         Util.Reader
+        -- Util.Regex
+        -- seems to be missing?
         Util.STM
         Util.Show
         Util.String
@@ -123,6 +125,7 @@ library
         cpp/HsStruct.cpp
         cpp/IOBuf.cpp
         cpp/EventBaseDataplane.cpp
+        -- Util/GFlags.cpp
 
     -- necessary because of the use of 'is_trivially_destructible_v' and friends?
     cxx-options: -std=c++17
@@ -190,60 +193,18 @@ library
     pkgconfig-depends: libfolly, libglog
     extra-libraries: double-conversion, gflags
 
-test-suite fb-util-tests
-  import: fb-haskell
-  type: exitcode-stdio-1.0
-  hs-source-dirs: tests
-  main-is: Main.hs
+common test-common
   extra-libraries: stdc++
+  cxx-options: -std=c++17
   ghc-options: -threaded
-  other-modules:
-                 Facebook.Init
-                 SpecRunner
-                 TestRunner
-
-                 -- async
-                 StreamTest
-
-                 -- datastruct
-                 MovingAverageRateLimiterTest
-                 RateLimiterMapTest
-
-                 -- util
-                 IOBufTest
-                 AllocLimitTest
-                 UnitTests
-                 RWVarTest
-                 THTest
-                 FilePathTest
-                 OptParseTest
-                 LensTest
-                 ToExpTest
-                 LogTest
-                 -- GFlagsTest
-                 AesonTest
-                 EncodingLib
-                 BufferTest
-                 ExceptionTest
-                 ControlExceptionTest
-                 JSONPrettyTest
-                 IOTest
-                 TimeSecTest
-                 ListTest
-                 EncodingTest
-                 LogTest.OverloadedStrings
-                 LogTest.Explicit
-                 LogTest.MonadStack
-                 ConcurrentTest
-                 MD5Test
-                 Control.MonadTest
-                 StringQuasiTest
-
+  hs-source-dirs: tests, tests/github
+  other-modules: SpecRunner, TestRunner, Facebook.Init
   build-depends: base,
                  aeson,
                  async,
                  binary,
                  bytestring,
+                 containers,
                  directory,
                  fb-util,
                  filepath,
@@ -267,5 +228,160 @@ test-suite fb-util-tests
                  vector,
                  vector-fftw
 
-  c-sources:     tests/IOBufTest.cpp
-                 tests/GFlagsTest.cpp
+test-suite stream
+  import: fb-haskell, test-common
+  type: exitcode-stdio-1.0
+  main-is: StreamTest.hs
+  ghc-options: -main-is StreamTest
+test-suite movavgrl
+  import: fb-haskell, test-common
+  type: exitcode-stdio-1.0
+  main-is: MovingAverageRateLimiterTest.hs
+  ghc-options: -main-is MovingAverageRateLimiterTest
+test-suite rlmap
+  import: fb-haskell, test-common
+  type: exitcode-stdio-1.0
+  main-is: RateLimiterMapTest.hs
+  ghc-options: -main-is RateLimiterMapTest
+test-suite iobuf
+  import: fb-haskell, test-common
+  type: exitcode-stdio-1.0
+  main-is: IOBufTest.hs
+  ghc-options: -main-is IOBufTest
+  cxx-sources: tests/IOBufTest.cpp
+test-suite alloc-limit
+  import: fb-haskell, test-common
+  type: exitcode-stdio-1.0
+  main-is: AllocLimitTest.hs
+  ghc-options: -main-is AllocLimitTest
+test-suite unit-tests
+  import: fb-haskell, test-common
+  type: exitcode-stdio-1.0
+  main-is: UnitTests.hs
+  ghc-options: -main-is UnitTests
+test-suite rwvar
+  import: fb-haskell, test-common
+  type: exitcode-stdio-1.0
+  main-is: RWVarTest.hs
+  ghc-options: -main-is RWVarTest
+test-suite th
+  import: fb-haskell, test-common
+  type: exitcode-stdio-1.0
+  main-is: THTest.hs
+  ghc-options: -main-is THTest
+test-suite filepath
+  import: fb-haskell, test-common
+  type: exitcode-stdio-1.0
+  main-is: FilePathTest.hs
+  ghc-options: -main-is FilePathTest
+test-suite optparse
+  import: fb-haskell, test-common
+  type: exitcode-stdio-1.0
+  main-is: OptParseTest.hs
+  ghc-options: -main-is OptParseTest
+test-suite lens
+  import: fb-haskell, test-common
+  type: exitcode-stdio-1.0
+  main-is: LensTest.hs
+  ghc-options: -main-is LensTest
+test-suite toexp
+  import: fb-haskell, test-common
+  type: exitcode-stdio-1.0
+  main-is: ToExpTest.hs
+  ghc-options: -main-is ToExpTest
+test-suite aeson
+  import: fb-haskell, test-common
+  type: exitcode-stdio-1.0
+  main-is: AesonTest.hs
+  ghc-options: -main-is AesonTest
+test-suite buffer
+  import: fb-haskell, test-common
+  type: exitcode-stdio-1.0
+  main-is: BufferTest.hs
+  ghc-options: -main-is BufferTest
+test-suite exception
+  import: fb-haskell, test-common
+  type: exitcode-stdio-1.0
+  main-is: ExceptionTest.hs
+  ghc-options: -main-is ExceptionTest
+test-suite control-exception
+  import: fb-haskell, test-common
+  type: exitcode-stdio-1.0
+  main-is: ControlExceptionTest.hs
+  ghc-options: -main-is ControlExceptionTest
+test-suite json-pretty
+  import: fb-haskell, test-common
+  type: exitcode-stdio-1.0
+  main-is: JSONPrettyTest.hs
+  ghc-options: -main-is JSONPrettyTest
+test-suite io
+  import: fb-haskell, test-common
+  type: exitcode-stdio-1.0
+  main-is: IOTest.hs
+  ghc-options: -main-is IOTest
+test-suite time-sec
+  import: fb-haskell, test-common
+  type: exitcode-stdio-1.0
+  main-is: TimeSecTest.hs
+  ghc-options: -main-is TimeSecTest
+test-suite list
+  import: fb-haskell, test-common
+  type: exitcode-stdio-1.0
+  main-is: ListTest.hs
+  ghc-options: -main-is ListTest
+test-suite encoding
+  import: fb-haskell, test-common
+  type: exitcode-stdio-1.0
+  main-is: EncodingTest.hs
+  ghc-options: -main-is EncodingTest
+  other-modules: EncodingLib
+test-suite concurrent
+  import: fb-haskell, test-common
+  type: exitcode-stdio-1.0
+  main-is: ConcurrentTest.hs
+  ghc-options: -main-is ConcurrentTest
+test-suite md5
+  import: fb-haskell, test-common
+  type: exitcode-stdio-1.0
+  main-is: MD5Test.hs
+  ghc-options: -main-is MD5Test
+test-suite control-monad
+  import: fb-haskell, test-common
+  type: exitcode-stdio-1.0
+  main-is: Control/MonadTest.hs
+  ghc-options: -main-is Control.MonadTest
+test-suite string-quasi
+  import: fb-haskell, test-common
+  type: exitcode-stdio-1.0
+  main-is: StringQuasiTest.hs
+  ghc-options: -main-is StringQuasiTest
+test-suite dynamic
+  import: fb-haskell, test-common
+  type: exitcode-stdio-1.0
+  main-is: DynamicTest.hs
+  cxx-sources: tests/DynamicHelper.cpp
+  cxx-options: -std=c++17
+  ghc-options: -main-is DynamicTest
+test-suite hs-struct
+  import: fb-haskell, test-common
+  type: exitcode-stdio-1.0
+  main-is: HsStructTest.hs
+  cxx-sources: tests/HsStructHelper.cpp
+  cxx-options: -std=c++17
+  ghc-options: -main-is HsStructTest
+
+-- TODO: commented out because Util.Regex, the module that this is supposed to
+-- test, is currently missing.
+-- test-suite regex
+--   import: fb-haskell, test-common
+--   type: exitcode-stdio-1.0
+--   main-is: RegexTest.hs
+--   ghc-options: -main-is RegexTest
+
+-- TODO: commented out because of a linker problem
+-- test-suite gflags
+--   import: fb-haskell, test-common
+--   type: exitcode-stdio-1.0
+--   main-is: GFlagsTest.hs
+--   ghc-options: -main-is GFlagsTest
+--   cxx-sources: tests/GFlagsTest.cpp

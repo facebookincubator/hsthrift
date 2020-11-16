@@ -104,11 +104,10 @@ executable thrift-compiler
 test-suite thrift-compiler-tests
   import: fb-haskell
   type: exitcode-stdio-1.0
-  hs-source-dirs: test
-  main-is: Main.hs
-  ghc-options: -threaded
-  other-modules: TestFixtures
-                 TestRunner
+  hs-source-dirs: test, test/github
+  main-is: TestFixtures.hs
+  ghc-options: -threaded -main-is TestFixtures
+  other-modules: TestRunner
                  Util
   build-depends: aeson-pretty,
                  base,
