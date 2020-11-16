@@ -15,7 +15,19 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
+      - name: Get latest FB packages tag
+        id: get-tag
+        run: |
+          echo "::set-output name=tag::$(bash ./get_deps_tag.sh)"
+        shell: bash
+      - name: Cache FB packages
+        id: cache-fb-packages
+        uses: actions/cache@v2
+        with:
+          path: /usr/local/
+          key: ${{ runner.os }}-${{ steps.get-tag.outputs.tag }}
       - name: Install folly, fizz, wangle, rsocket-cpp, fbthrift
+        if: steps.cache-fb-packages.cache-hit != 'true'
         run:  ./install_deps.sh
       - name: Install ${{ matrix.ghc }}
         run: apt-get install -y ${{ matrix.ghc }}
