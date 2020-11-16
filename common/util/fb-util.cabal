@@ -117,12 +117,15 @@ library
         Util.Typeable
         Util.WBVar
 
-    c-sources:
+    cxx-sources:
         cpp/cdynamic.cpp
         cpp/logging.cpp
         cpp/HsStruct.cpp
         cpp/IOBuf.cpp
         cpp/EventBaseDataplane.cpp
+
+    -- necessary because of the use of 'is_trivially_destructible_v' and friends?
+    cxx-options: -std=c++17
 
     include-dirs: .
     hs-source-dirs: .
@@ -137,8 +140,7 @@ library
         ghc,
         lifted-base,
         monad-control,
-        -- TODO: 0.7 removed Data.Primitive.Addr
-        primitive < 0.7,
+        primitive,
         HUnit,
         json,
         lens,
@@ -153,16 +155,16 @@ library
         scientific,
         haskell-src-exts,
         stm,
-        base ^>=4.11.1.0,
-        containers ^>=0.5.11.0,
+        base >=4.11.1.0 && <4.15,
+        containers >=0.5.11 && <0.7,
         text ^>=1.2.3.0,
-        ghci ^>=8.4.3,
+        ghci >=8.4.3 && <9,
         binary ^>=0.8.5.1,
         bytestring ^>=0.10.8.2,
-        hashable ^>=1.2.7.0,
+        hashable >=1.2.7.0 && <1.4,
         unordered-containers ^>=0.2.9.0,
         transformers ^>=0.5.5.0,
-        time ^>=1.8.0.2,
+        time >=1.8.0.2 && <1.12,
         deepseq ^>=1.4.3.0,
         filepath ^>=1.4.2,
         async ^>=2.2.1,
@@ -172,11 +174,11 @@ library
         process ^>=1.6.3.0,
         vector ^>=0.12.0.1,
         pretty ^>=1.1.3.6,
-        template-haskell ^>=2.13.0.0,
+        template-haskell >=2.13 && <2.17,
         integer-gmp ^>=1.0.2.0,
         mtl ^>=2.2.2,
         array ^>=0.5.2.0,
-        prettyprinter ^>=1.2.1
+        prettyprinter >=1.2.1 && <1.7
 
     build-tool-depends: hsc2hs:hsc2hs
 

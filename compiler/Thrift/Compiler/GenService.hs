@@ -127,7 +127,7 @@ genCommandDT s@Service{..} = HS.GDataDecl () (HS.DataType ()) Nothing
 
     genSuper superName =
       HS.GadtDecl () (textToName $ "Super" <> superName)
-#if __GLASGOW_HASKELL__ > 804
+#if MIN_VERSION_haskell_src_exts(1,21,0)
         Nothing Nothing
 #endif
         Nothing $
@@ -137,7 +137,7 @@ genCommandDT s@Service{..} = HS.GDataDecl () (HS.DataType ()) Nothing
 
     genDTFunction Function{..} =
       HS.GadtDecl () (textToName $ toCamel funName)
-#if __GLASGOW_HASKELL__ > 804
+#if MIN_VERSION_haskell_src_exts(1,21,0)
         Nothing Nothing
 #endif
         Nothing (mkArgs funArgs)
@@ -191,7 +191,7 @@ genReqParser :: HS Service -> [HS.Decl ()]
 genReqParser s@Service{..} =
   [ HS.TypeSig () [textToName "reqParser'"] $
     HS.TyForall () Nothing
-#if __GLASGOW_HASKELL__ > 804
+#if MIN_VERSION_haskell_src_exts(1,22,0)
       (Just $ HS.CxSingle () $ HS.TypeA () (HS.TyApp () (HS.TyCon () (qualSym "Thrift" "Protocol"))
         (tvar "p" ))) $
 #else
@@ -249,7 +249,7 @@ genRespWriter :: HS Service -> [HS.Decl ()]
 genRespWriter s@Service{..} =
   [ HS.TypeSig () [textToName "respWriter'"] $
     HS.TyForall () Nothing
-#if __GLASGOW_HASKELL__ > 804
+#if MIN_VERSION_haskell_src_exts(1,22,0)
       (Just $ HS.CxSingle () $ HS.TypeA () (HS.TyApp () (HS.TyCon () (qualSym "Thrift" "Protocol"))
         (tvar "p" ))) $
 #else
