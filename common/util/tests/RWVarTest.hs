@@ -62,9 +62,14 @@ writeWriteDeadlockTest = TestLabel "write then write deadlocks" $ TestCase $ do
       return (x, ())
 
 
+-- Exceptionally for this test we're using 'runTestTTAndExit'
+-- instead of 'testRunner', because the latter uses hspec,
+-- which comes with very handy features but also concurrent
+-- test execution implemented in a way that makes some of
+-- those tests fail for reasons identical to the ones
+-- documented in: https://github.com/simonmar/async/issues/14
 main :: IO ()
-main = withFacebookUnitTest $
-  testRunner $ TestList
+main = runTestTTAndExit $ TestList
    [ readTest
    , writeTest
    , readReadTest
