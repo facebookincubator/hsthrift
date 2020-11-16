@@ -6,4 +6,4 @@ packages:
     compiler/thrift-compiler.cabal
     util/thrift-util.cabal
 
-tests: true
+-- tests: true

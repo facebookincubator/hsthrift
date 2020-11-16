@@ -86,7 +86,6 @@ library
         transport
         rpcmetadata
         concurrency
-        protocol
         thrift-core
         async
         wangle
@@ -110,7 +109,7 @@ library
         bytestring-lexing,
         scientific,
         ghc,
-        aeson,
+        aeson >= 1,
         word8,
         aeson-pretty,
         text-show,
@@ -129,7 +128,6 @@ common test-common
         thriftprotocol
         transport
         concurrency
-        protocol
         thrift-core
   build-depends: base,
                  bytestring,
