@@ -389,16 +389,17 @@ resolveTypedef t@Typedef{..} = mkTypedef
     mkTypedef :: Typechecked l Typedef
     mkTypedef = do
       Env{..} <- ask
-      This ty <- resolveAnnotatedType tdType
+      thisty <- resolveAnnotatedType tdType
       sAnns   <- resolveStructuredAnns tdSAnns
       declIsNewtype <- or <$> mapM checkAnn (filterHsAnns $ getAnns tdAnns)
-      return $ Typedef
-        { tdResolvedName = renameTypedef options t
-        , tdResolvedType = ty
-        , tdTag = if declIsNewtype then IsNewtype else IsTypedef
-        , tdSAnns = sAnns
-        , ..
-        }
+      case thisty of
+        This ty -> return $ Typedef
+          { tdResolvedName = renameTypedef options t
+          , tdResolvedType = ty
+          , tdTag = if declIsNewtype then IsNewtype else IsTypedef
+          , tdSAnns = sAnns
+          , ..
+          }
 
     checkAnn SimpleAnn{..} | saTag == "hs.newtype" = return True
     checkAnn ann = typeError (annLoc ann) $ AnnotationMismatch AnnTypedef ann
@@ -467,29 +468,31 @@ resolveField
 resolveField anns sname field@Field{..} = do
   when (fieldId == 0) $
     typeError (lLocation $ flId fieldLoc) $ InvalidFieldId fieldName 0
-  This ty <- resolveAnnotatedType fieldType
-  val  <- sequence (typecheckConst ty <$> fieldVal)
-  lazy <- case filterHsAnns $ getAnns fieldAnns of
+  thisty <- resolveAnnotatedType fieldType
+  case thisty of
+    This ty -> do
+      val  <- sequence (typecheckConst ty <$> fieldVal)
+      lazy <- case filterHsAnns $ getAnns fieldAnns of
             [SimpleAnn{..}]
               | saTag == "hs.strict" -> pure Strict
               | saTag == "hs.lazy"   -> pure Lazy
             [] -> pure fieldLaziness
             ann : _ -> typeError (annLoc ann) $ AnnotationMismatch AnnField ann
-  sAnns <- resolveStructuredAnns fieldSAnns
-  Env{..} <- ask
-  case resolveTag fieldTag ty of
-    Nothing -> typeError (lLocation $ flName fieldLoc) $
-               InvalidThrows ty fieldName
-    Just tag ->
-      return Field
-        { fieldResolvedName = renameField options anns sname field
-        , fieldResolvedType = ty
-        , fieldResolvedVal  = val
-        , fieldLaziness = lazy
-        , fieldTag = tag
-        , fieldSAnns = sAnns
-        , ..
-        }
+      sAnns <- resolveStructuredAnns fieldSAnns
+      Env{..} <- ask
+      case resolveTag fieldTag ty of
+        Nothing -> typeError (lLocation $ flName fieldLoc) $
+                   InvalidThrows ty fieldName
+        Just tag ->
+          return Field
+          { fieldResolvedName = renameField options anns sname field
+          , fieldResolvedType = ty
+          , fieldResolvedVal  = val
+          , fieldLaziness = lazy
+          , fieldTag = tag
+          , fieldSAnns = sAnns
+          , ..
+          }
 
 resolveTag
   :: FieldTag u 'Unresolved () a
@@ -505,20 +508,21 @@ resolveTag THROWS_UNRESOLVED ty =
 resolveUnion :: forall l. Typecheckable l => Parsed Union -> Typechecked l Union
 resolveUnion u@Union{..} = do
   alts <- resolveAlts unionAlts
-  This hasEmpty <-
+  thishasEmpty <-
     fromMaybe (This HasEmpty) . listToMaybe . catMaybes <$>
     mapM resolveAnn (filterHsAnns $ getAnns unionAnns)
   sAnns <- resolveStructuredAnns unionSAnns
 
   Env{..} <- ask
-  return Union
-    { unionResolvedName = renameUnion options u
-    , unionAlts = alts
-    , unionEmptyName = getEmptyName options hasEmpty
-    , unionHasEmpty  = hasEmpty
-    , unionSAnns = sAnns
-    , ..
-    }
+  case thishasEmpty of
+    This hasEmpty -> return Union
+      { unionResolvedName = renameUnion options u
+      , unionAlts = alts
+      , unionEmptyName = getEmptyName options hasEmpty
+      , unionHasEmpty  = hasEmpty
+      , unionSAnns = sAnns
+      , ..
+      }
   where
     resolveAlts :: [Parsed UnionAlt] -> TC l [UnionAlt 'Resolved l Loc]
     resolveAlts alts =
@@ -537,15 +541,16 @@ resolveUnion u@Union{..} = do
 
     resolveAlt :: Parsed UnionAlt -> Typechecked l UnionAlt
     resolveAlt alt@UnionAlt{..} = do
-      This ty <- resolveAnnotatedType altType
+      thisty <- resolveAnnotatedType altType
       sAnns   <- resolveStructuredAnns altSAnns
       Env{..} <- ask
-      return UnionAlt
-        { altResolvedName = renameUnionAlt options u alt
-        , altResolvedType = ty
-        , altSAnns = sAnns
-        , ..
-        }
+      case thisty of
+        This ty -> return UnionAlt
+          { altResolvedName = renameUnionAlt options u alt
+          , altResolvedType = ty
+          , altSAnns = sAnns
+          , ..
+          }
 
     resolveAnn :: Annotation Loc -> TC l (Maybe (Some PossiblyEmpty))
     resolveAnn SimpleAnn{..}
@@ -598,17 +603,19 @@ resolveEnum enum@Enum{..} = do
 
 resolveConst :: Typecheckable l => Parsed Const -> Typechecked l Const
 resolveConst Const{..} = do
-  This ty <- resolveAnnotatedType constType
-  Env{..} <- ask
-  val     <- typecheckConst ty constVal
-  sAnns   <- resolveStructuredAnns constSAnns
-  return Const
-    { constResolvedName = renameConst options constName
-    , constResolvedType = ty
-    , constResolvedVal  = val
-    , constSAnns        = sAnns
-    , ..
-    }
+  thisty <- resolveAnnotatedType constType
+  case thisty of
+    This ty -> do
+      Env{..} <- ask
+      val   <- typecheckConst ty constVal
+      sAnns <- resolveStructuredAnns constSAnns
+      return Const
+        { constResolvedName = renameConst options constName
+        , constResolvedType = ty
+        , constResolvedVal  = val
+        , constSAnns        = sAnns
+        , ..
+        }
 
 resolveService :: Typecheckable l => Parsed Service -> Typechecked l Service
 resolveService s@Service{..} = do
@@ -667,20 +674,22 @@ resolveStructuredAnn
   => Parsed StructuredAnnotation
   -> Typechecked l StructuredAnnotation
 resolveStructuredAnn StructuredAnn{..} = do
-  This ty <- resolveType (TNamed saType) saTypeLoc Nothing
+  thisty <- resolveType (TNamed saType) saTypeLoc Nothing
   saTypeName <- mkThriftName saType
-  This schema <- lookupSchema saTypeName lLocation
-  val <- typecheckStruct lLocation schema =<<
-    mkStructFieldMap (maybe [] saElems saMaybeElems)
-  case ty of
-    TStruct _ loc | not $ loc `isDefinedAt` lLocation ->
-      typeError lLocation (NotDefinedBeforeUsed ty)
-    _ ->
-      pure StructuredAnn
-        { saResolvedType = ty
-        , saResolvedVal = This val
-        , ..
-        }
+  thisschema <- lookupSchema saTypeName lLocation
+  case (thisty, thisschema) of
+    (This ty, This schema) -> do
+      val <- typecheckStruct lLocation schema =<<
+             mkStructFieldMap (maybe [] saElems saMaybeElems)
+      case ty of
+        TStruct _ loc | not $ loc `isDefinedAt` lLocation ->
+            typeError lLocation (NotDefinedBeforeUsed ty)
+        _ ->
+            pure StructuredAnn
+            { saResolvedType = ty
+            , saResolvedVal = This val
+            , ..
+            }
   where
     Located{..} = a0Ty saTypeLoc
     isDefinedAt :: Loc -> Loc -> Bool
@@ -902,26 +911,31 @@ typecheckConst newt@(TNewtype _ ty _loc) val@(UntypedConst Located{..} c) =
 -- Structs
 typecheckConst (TStruct Name{..} _loc)
                (UntypedConst Located{..} MapConst{..}) = do
-  This schema <- lookupSchema sourceName lLocation
-  Literal . This <$> (typecheckStruct lLocation schema =<< mkFieldMap mvElems)
+  tschema <- lookupSchema sourceName lLocation
+  case tschema of
+    This schema -> Literal . This
+               <$> (typecheckStruct lLocation schema =<< mkFieldMap mvElems)
 typecheckConst tyTop@(TStruct Name{} _loc)
                (UntypedConst Located{..} StructConst{..}) = do
   -- First typecheck the struct with the type annotated then check this matches
   -- the type given at the top level
   svTypeName <- mkThriftName svType
-  This schema <- lookupSchema svTypeName lLocation
-  let struct = typecheckStruct lLocation schema =<< mkStructFieldMap svElems
-  This tyAnn <- lookupType svTypeName lLocation
-  case eqOrAlias tyTop tyAnn of
-    Just _ -> Literal . This <$> struct
-    Nothing -> typeError lLocation $ TypeMismatch tyTop tyAnn
+  tschema <- lookupSchema svTypeName lLocation
+  ttyAnn <- lookupType svTypeName lLocation
+  case (tschema, ttyAnn) of
+    (This schema, This tyAnn) -> do
+      let struct = typecheckStruct lLocation schema =<< mkStructFieldMap svElems
+      case eqOrAlias tyTop tyAnn of
+        Just _ -> Literal . This <$> struct
+        Nothing -> typeError lLocation $ TypeMismatch tyTop tyAnn
 typecheckConst (TException Name{..} _loc)
                (UntypedConst Located{..} MapConst{..}) = do
-  This schema <- lookupSchema sourceName lLocation
-  Literal . This . EV <$>
-    (typecheckStruct lLocation schema =<< mkFieldMap mvElems)
+  tschema <- lookupSchema sourceName lLocation
+  case tschema of
+    This schema -> Literal . This . EV <$>
+                   (typecheckStruct lLocation schema =<< mkFieldMap mvElems)
 typecheckConst (TUnion n@Name{..} _loc) (UntypedConst uloc MapConst{..}) = do
-  This schema <- lookupUnion sourceName (lLocation uloc)
+  thisschema <- lookupUnion sourceName (lLocation uloc)
   -- Unions can only have one field
   (utname, val) <-
     case mvElems of
@@ -931,7 +945,8 @@ typecheckConst (TUnion n@Name{..} _loc) (UntypedConst uloc MapConst{..}) = do
     case utname of
       UntypedConst _ (StringConst s _) -> pure s
       v@(UntypedConst utloc _) -> typeError (lLocation utloc) $ InvalidField v
-  Literal . This <$> typecheckUnion schema fname val
+  case thisschema of
+    This schema -> Literal . This <$> typecheckUnion schema fname val
 
 -- Identifiers (typecheckIdentNum is not first parameter to the orT)
 typecheckConst ty (UntypedConst Located{..} (IdConst ident)) =
@@ -1019,18 +1034,19 @@ typecheckIdent
   -> TC l (TypedConst l t)
 typecheckIdent ty loc ident = do
   name <- mkThriftName ident
-  (This trueTy, renamed, locDefined) <- lookupConst name loc
+  (thistrueTy, renamed, locDefined) <- lookupConst name loc
   Env{..} <- ask
-  case trueTy `eqOrAlias` ty of
-    Just Refl -> pure $ Identifier renamed ty locDefined
-    Nothing   ->
-      if not (optsLenient options) then
-        typeError loc $ IdentMismatch ty trueTy name
-      else case useEnumAsInt trueTy ty of
-        Nothing -> typeError loc $ IdentMismatch ty trueTy name
-        Just trueTyEnum ->
-          -- This is the one place where WeirdEnumToInt is constructed
-          pure $ WeirdEnumToInt ty renamed trueTyEnum locDefined
+  case thistrueTy of
+    This trueTy -> case trueTy `eqOrAlias` ty of
+      Just Refl -> pure $ Identifier renamed ty locDefined
+      Nothing   ->
+        if not (optsLenient options) then
+          typeError loc $ IdentMismatch ty trueTy name
+        else case useEnumAsInt trueTy ty of
+          Nothing -> typeError loc $ IdentMismatch ty trueTy name
+          Just trueTyEnum ->
+            -- This is the one place where WeirdEnumToInt is constructed
+            pure $ WeirdEnumToInt ty renamed trueTyEnum locDefined
 
 -- | helper for 'typecheckIdent' in weird case
 useEnumAsInt
@@ -1330,13 +1346,15 @@ resolveType atType atLoc atAnnotations =
     THashSet u -> resolve THashSet u
     TList u    -> resolve TList u
     TMap k v -> do
-      This rk <- resolveAnnotatedType k
-      This rv <- resolveAnnotatedType v
-      annotate $ TMap rk rv
+      thisrk <- resolveAnnotatedType k
+      thisrv <- resolveAnnotatedType v
+      case (thisrk, thisrv) of
+        (This rk, This rv) -> annotate $ TMap rk rv
     THashMap k v -> do
-      This rk <- resolveAnnotatedType k
-      This rv <- resolveAnnotatedType v
-      annotate $ THashMap rk rv
+      thisrk <- resolveAnnotatedType k
+      thisrv <- resolveAnnotatedType v
+      case (thisrk, thisrv) of
+        (This rk, This rv) -> annotate $ THashMap rk rv
     -- Named type may not be resolvable
     TNamed name -> do
       qname <- mkThriftName name
@@ -1396,14 +1414,14 @@ mkSchema :: Typecheckable l => Parsed Struct -> TC l (Some (Schema l))
 mkSchema Struct{..} = buildSchema structMembers
   where
     buildSchema (field@Field{..} : fields) = do
-      (rty, This schema) <- (,)
+      (rty, tschema) <- (,)
         <$> resolveAnnotatedType fieldType
         `collect` buildSchema fields
       opts@Options{..} <- options <$> ask
       let renamed =
             Text.unpack $ renameField opts (getAnns structAnns) structName field
-      case (someSymbolVal renamed, rty) of
-       (SomeSymbol proxy, This ty) ->
+      case (someSymbolVal renamed, rty, tschema) of
+       (SomeSymbol proxy, This ty, This schema) ->
           case fieldRequiredness of
             Default ->
               pure . This $
