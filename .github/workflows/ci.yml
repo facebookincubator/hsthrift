@@ -1,0 +1,48 @@
+# https://docs.github.com/en/free-pro-team@latest/actions/reference/workflow-syntax-for-github-actions
+name: CI
+on: [push, pull_request]
+
+jobs:
+  ci:
+    strategy:
+      fail-fast: false
+      matrix:
+        ghc: [ghc-8.4.4, ghc-8.6.5, ghc-8.8.4, ghc-8.10.2]
+    runs-on: ubuntu-latest
+    container:
+      image: alpmestan/thrift:0.2
+      options: --cpus 2
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - name: Get latest FB packages tag
+        id: get-tag
+        run: |
+          echo "::set-output name=tag::$(bash .github/workflows/get_deps_tag.sh)"
+        shell: bash
+      - name: Cache FB packages
+        id: cache-fb-packages
+        uses: actions/cache@v2
+        with:
+          path: /usr/local/
+          key: ${{ runner.os }}-${{ steps.get-tag.outputs.tag }}
+      - name: Install folly, fizz, wangle, rsocket-cpp, fbthrift
+        if: steps.cache-fb-packages.outputs.cache-hit != 'true'
+        run:  ./install_deps.sh
+      - name: Install ${{ matrix.ghc }}
+        run: apt-get install -y ${{ matrix.ghc }}
+      - name: Populate hackage index
+        run: cabal update
+      - name: Generate C++ code from thrift files
+        run: make thrift-cpp
+      - name: Build everything up to thrift-compiler
+        run: cabal build exe:thrift-compiler
+      - name: Generate Haskell code from thrift files
+        run: make thrift-hs
+      - name: Build all packages
+        run: cabal build all
+      # - name: Build all packages and their testsuites
+      #   run: cabal build --enable-tests all
+      # - name: Run testsuites
+      #   shell: bash {0}
+      #   run: ./run_tests.sh
