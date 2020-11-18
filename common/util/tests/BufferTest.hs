@@ -11,7 +11,6 @@ import Foreign.Marshal.Utils
 import Foreign.Ptr (castPtr)
 import Test.HUnit
 import Test.QuickCheck
-import Test.QuickCheck.Modifiers (NonNegative(..))
 
 import Facebook.Init
 import TestRunner
