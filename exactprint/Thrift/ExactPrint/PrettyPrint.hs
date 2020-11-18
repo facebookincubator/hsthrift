@@ -1,3 +1,4 @@
+{-# LANGUAGE CPP #-}
 module Thrift.ExactPrint.PrettyPrint
   ( exactPrint
   , exactPrintThrift
@@ -16,6 +17,10 @@ import Thrift.Compiler.Types
 
 import Thrift.ExactPrint.Convert
 import Thrift.ExactPrint.Types
+
+#if MIN_VERSION_dependent_sum(0,6,0)
+#define This Some
+#endif
 
 exactPrint :: Program l Offset -> Text
 exactPrint Program{..} = toLazyText $ mconcat

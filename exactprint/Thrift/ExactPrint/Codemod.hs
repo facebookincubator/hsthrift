@@ -1,3 +1,4 @@
+{-# LANGUAGE CPP #-}
 module Thrift.ExactPrint.Codemod
   ( roundTripWith
   , codemodConsts
@@ -20,6 +21,10 @@ import Thrift.Compiler.Plugins.Linter
 import Thrift.ExactPrint.Convert
 import Thrift.ExactPrint.PrettyPrint
 import Thrift.ExactPrint.Types
+
+#if MIN_VERSION_dependent_sum(0,6,0)
+#define This Some
+#endif
 
 -- | Round Trip a file, applying some tranformation to the typechecked AST
 roundTripWith
