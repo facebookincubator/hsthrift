@@ -22,7 +22,7 @@ import Control.Monad.ST (ST)
 import Data.ByteString (ByteString)
 import qualified Data.ByteString.Internal as BSI
 import Data.Char (isAscii)
-#if __GLASGOW_HASKELL__ == 804
+#if !MIN_VERSION_primitive(0,7,0)
 import Data.Primitive.Addr (Addr(..))
 #endif
 import Data.Primitive.ByteArray
@@ -153,7 +153,7 @@ alloc
   -> Fill s ()
 {-# INLINE alloc #-}
 alloc !n f = write n $ \arr i -> do
-#if __GLASGOW_HASKELL__ > 804
+#if MIN_VERSION_primitive(0,7,0)
   let p = mutableByteArrayContents arr
   k <- f (p `plusPtr` i)
 #else
@@ -201,7 +201,7 @@ unsafeFreezeByteString :: Buffer s -> ST s ByteString
 unsafeFreezeByteString (Buffer arr@(MutableByteArray arr#) len _ _) = do
   shrink arr len
   case mutableByteArrayContents arr of
-#if __GLASGOW_HASKELL__ > 804
+#if MIN_VERSION_primitive(0,7,0)
     Ptr addr# ->
 #else
     Addr addr# ->

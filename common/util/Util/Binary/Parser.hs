@@ -33,7 +33,14 @@ module Util.Binary.Parser
   ) where
 
 import Control.Applicative
+#if __GLASGOW_HASKELL__ == 806
+import Control.Monad hiding (fail)
+#else
 import Control.Monad
+#endif
+#if __GLASGOW_HASKELL__ == 806
+import Control.Monad.Fail
+#endif
 import Control.Exception
 import Util.Control.Exception (tryAll)
 
@@ -48,11 +55,19 @@ import Data.Word
 
 import FastMutInt
 
+#if __GLASGOW_HASKELL__ == 806
+import GHC.Base hiding (fail)
+#else
 import GHC.Base
+#endif
 import GHC.Word
 import GHC.Int
 
+#if __GLASGOW_HASKELL__ == 806
+import Prelude hiding (takeWhile, fail)
+#else
 import Prelude hiding (takeWhile)
+#endif
 
 import System.IO.Unsafe (unsafeDupablePerformIO)
 
