@@ -51,4 +51,4 @@ library
         aeson,
         aeson-pretty,
         bytestring ^>=0.10.8.2,
-        base ^>=4.11.1.0
+        base >=4.11.1 && <4.15
