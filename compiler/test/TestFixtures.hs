@@ -1,7 +1,7 @@
 {-# LANGUAGE TypeApplications #-}
 module TestFixtures (main) where
 
-import Control.Monad (when)
+import Control.Monad (unless, when)
 import Data.Aeson.Encode.Pretty
 import Data.Char
 import Data.List
@@ -69,9 +69,7 @@ checkFixture ThriftModule{..} = TestLabel mname $ TestCase $ do
       (isOk parseResult)
 
   fixture <- readFile tmPath
-  assertBool
-    (printf "Test fixture for file '%s' is not up to date" tmPath)
-    (tmContents == fixture)
+  assertEqualPgm tmPath fixture tmContents
   where
     mname = intercalate "/" $ dropLower $ wordsBy (== '/') tmPath
     dropLower [] = []
@@ -90,3 +88,21 @@ checkFixture ThriftModule{..} = TestLabel mname $ TestCase $ do
     isOk (ParseOk _) = True
     isOk (ParseFailed _ _) = False
     exts = map EnableExtension [ConstraintKinds]
+
+assertEqualPgm :: String -> String -> String -> IO ()
+assertEqualPgm path expected obtained =
+  unless (normalize expected == normalize obtained) $ do
+    putStrLn path
+    putStrLn "Expected:"
+    putStrLn expected
+    putStrLn "-------------------------------------------------------------------"
+    putStrLn "But got:"
+    putStrLn obtained
+    error "expectation failure"
+  where
+    -- In dependent-sum > 0.6 the This constructor was renamed to Some
+    -- TODO: update the fixtures and remove this replace once 8.8 lands
+    normalize
+      = Text.unpack
+      . Text.replace "Thrift.This" "Thrift.Some"
+      . Text.pack
