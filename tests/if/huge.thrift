@@ -12,7 +12,7 @@
 #           |
 #          bar
 
-hs_include "common/hs/thrift/tests/if/huge.hs"
+hs_include "tests/if/huge.hs"
 
 struct A {
   1: B b

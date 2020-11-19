@@ -4,7 +4,7 @@
 -- DO NOT EDIT UNLESS YOU ARE SURE THAT YOU KNOW WHAT YOU ARE DOING
 --  @generated
 -----------------------------------------------------------------
-{-# LINE 8 "common/hs/thrift/compiler/test/fixtures/gen-hs2/HsTest/Types.hs" #-}
+{-# LINE 8 "compiler/test/fixtures/gen-hs2/HsTest/Types.hs" #-}
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE BangPatterns #-}
 {-# OPTIONS_GHC -fno-warn-unused-imports#-}
@@ -60,15 +60,15 @@ import Data.Monoid ((<>))
 import Prelude ((.), (++), (>), (==))
 import Prelude ((.), (<$>), (<*>), (>>=), (==), (++))
 import Prelude ((.), (<$>), (<*>), (>>=), (==), (/=), (<), (++))
-{-# LINE 20 "common/hs/thrift/tests/if/hs_test_instances.hs" #-}
+{-# LINE 20 "tests/if/hs_test_instances.hs" #-}
 import qualified Test.QuickCheck as QuickCheck
-{-# LINE 21 "common/hs/thrift/tests/if/hs_test_instances.hs" #-}
+{-# LINE 21 "tests/if/hs_test_instances.hs" #-}
 import qualified Data.Vector as Vector
-{-# LINE 22 "common/hs/thrift/tests/if/hs_test_instances.hs" #-}
+{-# LINE 22 "tests/if/hs_test_instances.hs" #-}
 import qualified Data.Vector.Storable as VectorStorable
-{-# LINE 23 "common/hs/thrift/tests/if/hs_test_instances.hs" #-}
+{-# LINE 23 "tests/if/hs_test_instances.hs" #-}
 import Prelude ((/=), ($))
-{-# LINE 72 "common/hs/thrift/compiler/test/fixtures/gen-hs2/HsTest/Types.hs" #-}
+{-# LINE 72 "compiler/test/fixtures/gen-hs2/HsTest/Types.hs" #-}
 
 newtype X = X{unX :: Int.Int64}
             deriving (Prelude.Eq, Prelude.Show, DeepSeq.NFData, Prelude.Ord)
@@ -1373,10 +1373,10 @@ instance Thrift.ThriftEnum Void where
     = Exception.throw
         (Thrift.ProtocolException
            "toThriftEnumEither: Thrift enum 'Void' is uninhabited")
-{-# LINE 25 "common/hs/thrift/tests/if/hs_test_instances.hs" #-}
+{-# LINE 25 "tests/if/hs_test_instances.hs" #-}
 instance QuickCheck.Arbitrary Foo where
   arbitrary = Foo <$> QuickCheck.arbitrary <*> QuickCheck.arbitrary
-{-# LINE 28 "common/hs/thrift/tests/if/hs_test_instances.hs" #-}
+{-# LINE 28 "tests/if/hs_test_instances.hs" #-}
 instance QuickCheck.Arbitrary TestStruct where
   arbitrary
     = TestStruct <$> QuickCheck.arbitrary <*> QuickCheck.arbitrary <*>
@@ -1403,12 +1403,12 @@ instance QuickCheck.Arbitrary TestStruct where
         <*> (VectorStorable.fromList <$> QuickCheck.arbitrary)
         <*> arbitraryBSMap
         <*> (Text.encodeUtf8 <$> arbitraryText)
-{-# LINE 56 "common/hs/thrift/tests/if/hs_test_instances.hs" #-}
+{-# LINE 56 "tests/if/hs_test_instances.hs" #-}
 instance QuickCheck.Arbitrary Number where
   arbitrary
     = QuickCheck.oneof $
         Prelude.map Prelude.pure [Number_One, Number_Two, Number_Three]
-{-# LINE 60 "common/hs/thrift/tests/if/hs_test_instances.hs" #-}
+{-# LINE 60 "tests/if/hs_test_instances.hs" #-}
 instance QuickCheck.Arbitrary TUnion where
   arbitrary
     = QuickCheck.oneof
@@ -1416,24 +1416,24 @@ instance QuickCheck.Arbitrary TUnion where
          TUnion_I64Option <$> QuickCheck.arbitrary,
          TUnion_FooOption <$> QuickCheck.arbitrary,
          Prelude.pure TUnion_EMPTY]
-{-# LINE 68 "common/hs/thrift/tests/if/hs_test_instances.hs" #-}
+{-# LINE 68 "tests/if/hs_test_instances.hs" #-}
 arbitraryString :: QuickCheck.Gen Prelude.String
-{-# LINE 69 "common/hs/thrift/tests/if/hs_test_instances.hs" #-}
+{-# LINE 69 "tests/if/hs_test_instances.hs" #-}
 arbitraryString
   = Prelude.filter (/= '\NUL') <$> QuickCheck.arbitrary
-{-# LINE 71 "common/hs/thrift/tests/if/hs_test_instances.hs" #-}
+{-# LINE 71 "tests/if/hs_test_instances.hs" #-}
 arbitraryText :: QuickCheck.Gen Text.Text
-{-# LINE 72 "common/hs/thrift/tests/if/hs_test_instances.hs" #-}
+{-# LINE 72 "tests/if/hs_test_instances.hs" #-}
 arbitraryText = Text.pack <$> arbitraryString
-{-# LINE 74 "common/hs/thrift/tests/if/hs_test_instances.hs" #-}
+{-# LINE 74 "tests/if/hs_test_instances.hs" #-}
 arbitraryBS :: QuickCheck.Gen ByteString.ByteString
-{-# LINE 75 "common/hs/thrift/tests/if/hs_test_instances.hs" #-}
+{-# LINE 75 "tests/if/hs_test_instances.hs" #-}
 arbitraryBS = ByteString.pack <$> QuickCheck.arbitrary
-{-# LINE 77 "common/hs/thrift/tests/if/hs_test_instances.hs" #-}
+{-# LINE 77 "tests/if/hs_test_instances.hs" #-}
 arbitraryBSMap ::
                  QuickCheck.Arbitrary a =>
                  QuickCheck.Gen (Map.Map ByteString.ByteString a)
-{-# LINE 79 "common/hs/thrift/tests/if/hs_test_instances.hs" #-}
+{-# LINE 79 "tests/if/hs_test_instances.hs" #-}
 arbitraryBSMap
   = Map.fromList . Prelude.map (\ (k, v) -> (ByteString.pack k, v))
       <$> QuickCheck.arbitrary

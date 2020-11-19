@@ -20,21 +20,21 @@ headerSize = 4
 -- error message
 failingTests :: [FilePath]
 failingTests =
-  [ "common/hs/thrift/exactprint/tests/fbthrift-tests/basic-annotations/src/module.thrift"
-  , "common/hs/thrift/exactprint/tests/fbthrift-tests/hack-const-collections/src/module.thrift"
-  , "common/hs/thrift/exactprint/tests/fbthrift-tests/hack-const-collections/src/module.thrift"
-  , "common/hs/thrift/exactprint/tests/fbthrift-tests/interactions/src/module.thrift"
-  , "common/hs/thrift/exactprint/tests/fbthrift-tests/interactions/src/module.thrift"
-  , "common/hs/thrift/exactprint/tests/fbthrift-tests/json_experimental/src/ThriftdocTest.thrift"
-  , "common/hs/thrift/exactprint/tests/fbthrift-tests/map_construct/src/module.thrift"
-  , "common/hs/thrift/exactprint/tests/fbthrift-tests/map_construct/src/module.thrift"
-  , "common/hs/thrift/exactprint/tests/fbthrift-tests/php-migration/src/module.thrift"
-  , "common/hs/thrift/exactprint/tests/fbthrift-tests/php-migration/src/module.thrift"
-  , "common/hs/thrift/exactprint/tests/fbthrift-tests/py-future/src/test.thrift"
-  , "common/hs/thrift/exactprint/tests/fbthrift-tests/py-future/src/test.thrift"
-  , "common/hs/thrift/exactprint/tests/fbthrift-tests/sink/src/module.thrift"
-  , "common/hs/thrift/exactprint/tests/fbthrift-tests/sink/src/module.thrift"
-  , "common/hs/thrift/exactprint/tests/fbthrift-tests/stream/src/module.thrift"
+  [ "exactprint/tests/fbthrift-tests/basic-annotations/src/module.thrift"
+  , "exactprint/tests/fbthrift-tests/hack-const-collections/src/module.thrift"
+  , "exactprint/tests/fbthrift-tests/hack-const-collections/src/module.thrift"
+  , "exactprint/tests/fbthrift-tests/interactions/src/module.thrift"
+  , "exactprint/tests/fbthrift-tests/interactions/src/module.thrift"
+  , "exactprint/tests/fbthrift-tests/json_experimental/src/ThriftdocTest.thrift"
+  , "exactprint/tests/fbthrift-tests/map_construct/src/module.thrift"
+  , "exactprint/tests/fbthrift-tests/map_construct/src/module.thrift"
+  , "exactprint/tests/fbthrift-tests/php-migration/src/module.thrift"
+  , "exactprint/tests/fbthrift-tests/php-migration/src/module.thrift"
+  , "exactprint/tests/fbthrift-tests/py-future/src/test.thrift"
+  , "exactprint/tests/fbthrift-tests/py-future/src/test.thrift"
+  , "exactprint/tests/fbthrift-tests/sink/src/module.thrift"
+  , "exactprint/tests/fbthrift-tests/sink/src/module.thrift"
+  , "exactprint/tests/fbthrift-tests/stream/src/module.thrift"
   ]
 
 fileLineStr :: FilePath -> Int -> String
@@ -95,7 +95,7 @@ roundTripTests = do
   dir <- getCurrentDirectory
   let
     fbcode  = fst $ breakOnEnd "fbcode" dir
-    testPath = "common/hs/thrift/exactprint/tests/fbthrift-tests"
+    testPath = "exactprint/tests/fbthrift-tests"
 
   (testFiles::[String]) <- traverseDir testPath
   let

@@ -1,4 +1,4 @@
-hs_include "common/hs/thrift/tests/if/hs_test_instances.hs"
+hs_include "tests/if/hs_test_instances.hs"
 
 typedef i64 X (hs.newtype, rust.newtype)
 typedef X Y

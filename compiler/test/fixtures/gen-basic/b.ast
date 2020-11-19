@@ -91,7 +91,7 @@
             ]
         }
     ],
-    "path": "common/hs/thrift/compiler/test/if/b.thrift",
+    "path": "compiler/test/if/b.thrift",
     "unions": [],
     "consts": [
         {
@@ -646,10 +646,10 @@
         }
     ],
     "options": {
-        "path": "common/hs/thrift/compiler/test/if/a.thrift",
+        "path": "compiler/test/if/a.thrift",
         "include_path": ".",
         "genfiles": null,
-        "out_path": "common/hs/thrift/compiler/test/fixtures/gen-basic",
+        "out_path": "compiler/test/fixtures/gen-basic",
         "recursive": true
     },
     "services": []
