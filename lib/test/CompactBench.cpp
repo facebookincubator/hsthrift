@@ -1,6 +1,6 @@
 #include <thrift/lib/cpp2/protocol/Serializer.h>
 
-#include <common/hs/thrift/tests/if/gen-cpp2/hs_test_types.h>
+#include <if/gen-cpp2/hs_test_types.h>
 
 extern "C" {
 

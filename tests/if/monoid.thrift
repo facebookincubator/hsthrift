@@ -1,4 +1,4 @@
-hs_include "common/hs/thrift/tests/if/instances.hs"
+hs_include "tests/if/instances.hs"
 
 struct X {
   1: list<i64> intList
