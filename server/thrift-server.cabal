@@ -71,3 +71,63 @@ library
   -- TODO: I needed this to satisfy an undefined reference to jump_fcontext
   -- when running hsc2hs on Thrift.Server.ProcessorCallback
   extra-libraries: boost_context
+
+
+common test-common
+  build-depends: aeson,
+                 base,
+                 bytestring,
+                 data-default,
+                 deepseq,
+                 hashable,
+                 hspec,
+                 hspec-contrib,
+                 HUnit,
+                 STMonadTrans,
+                 text,
+                 fb-util,
+                 thrift-lib,
+                 thrift-server,
+                 transformers,
+                 unordered-containers,
+  ghc-options: -threaded
+
+library test-lib
+  import: fb-haskell, test-common
+  visibility: private
+  exposed-modules:
+        Facebook.Init
+        TestRunner
+        Echoer.Types
+        Echoer.Echoer.Client
+        Echoer.Echoer.Service
+        Math.Types
+        Math.Adder.Client
+        Math.Adder.Service
+        Math.Calculator.Client
+        Math.Calculator.Service
+        EchoHandler
+        CalculatorHandler
+        TestChannel
+  hs-source-dirs:
+        test,
+        test/github,
+        ../lib/test,
+        ../lib/test/gen-hs2
+  include-dirs: .
+
+test-suite handler
+  import: fb-haskell, test-common
+  type: exitcode-stdio-1.0
+  hs-source-dirs: test
+  build-depends: test-lib
+  main-is: HandlerTest.hs
+  ghc-options: -main-is HandlerTest
+
+test-suite server
+  import: fb-haskell, test-common
+  type: exitcode-stdio-1.0
+  hs-source-dirs: test
+  build-depends: test-lib
+  main-is: ServerTest.hs
+  ghc-options: -main-is ServerTest
