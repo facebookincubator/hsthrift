@@ -105,8 +105,6 @@ library
         Util.PrettyPrint
         Util.RWVar
         Util.Reader
-        -- Util.Regex
-        -- seems to be missing?
         Util.STM
         Util.Show
         Util.String
@@ -369,14 +367,6 @@ test-suite hs-struct
   cxx-sources: tests/HsStructHelper.cpp
   cxx-options: -std=c++17
   ghc-options: -main-is HsStructTest
-
--- TODO: commented out because Util.Regex, the module that this is supposed to
--- test, is currently missing.
--- test-suite regex
---   import: fb-haskell, test-common
---   type: exitcode-stdio-1.0
---   main-is: RegexTest.hs
---   ghc-options: -main-is RegexTest
 
 -- TODO: commented out because of a linker problem
 -- test-suite gflags
