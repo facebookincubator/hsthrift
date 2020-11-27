@@ -1,3 +1,4 @@
+{-# LANGUAGE CPP #-}
 module UnitTests (main) where
 
 import Test.HUnit
@@ -34,6 +35,7 @@ parseValueStrictTest = TestCase $ do
   assertEqual "consume all input" (Left "endOfInput") $
     parseValueStrict' "falsee"
 
+#ifdef FACEBOOK
 -- | We've patched the official aeson library to handle NaN. See #5183005
 -- This test ensures that we notice if we forget to patch on upgrade.
 parseNaN :: Test
@@ -42,6 +44,7 @@ parseNaN = TestCase $
     Just [a :: Double] ->
       assertBool "NaN" $ isNaN a
     _ -> assertFailure "couldn't parse NaN"
+#endif
 
 -- | Check that we can still call vector-fftw after T22849884
 useFFTW :: Test
@@ -118,7 +121,9 @@ main :: IO ()
 main = testRunner $ TestList
   [ TestLabel "intToByteString" intToByteStringTest
   , TestLabel "parseValueStrictTest" parseValueStrictTest
+#ifdef FACEBOOK
   , TestLabel "parseNaN" parseNaN
+#endif
   , TestLabel "useFFTW" useFFTW
   , TestLabel "withCStringLen" withCStringLenTest
   , TestLabel "useByteStringsAsCStrings" useByteStringsAsCStringsTest
