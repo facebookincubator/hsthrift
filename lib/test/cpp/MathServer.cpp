@@ -33,7 +33,14 @@ class CalculatorServiceHandler : public CalculatorSvIf {
 
 ScopedServerInterfaceThread* createServer(int64_t& /*port*/) {
   return new ScopedServerInterfaceThread(
-      make_shared<CalculatorServiceHandler>());
+      make_shared<CalculatorServiceHandler>()
+#ifdef IPV4
+          ,
+      "127.0.0.1"); // necessary to force IPV4 in e.g CI/docker
+#else
+          ,
+      "::1");
+#endif
 }
 
 extern "C" {

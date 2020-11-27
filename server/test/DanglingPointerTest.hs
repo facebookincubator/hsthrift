@@ -9,6 +9,7 @@ import Data.IORef
 import Data.Text (Text)
 
 import Facebook.Init
+import Network (testServerHost)
 import Test.HUnit
 import TestRunner
 
@@ -49,7 +50,7 @@ runServer evb st keys protId =
     let
       conf :: HeaderConfig HashMapService
       conf = HeaderConfig
-        { headerHost = "::1"
+        { headerHost = testServerHost
         , headerPort = serverPort
         , headerProtocolId = protId
         , headerConnTimeout = 5000

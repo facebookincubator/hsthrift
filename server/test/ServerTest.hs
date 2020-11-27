@@ -6,6 +6,7 @@ import Control.Monad.Trans.Class
 import Data.Either
 
 import Facebook.Init
+import Network (testServerHost)
 import Test.HUnit
 import TestRunner
 
@@ -33,7 +34,7 @@ withTestServer serverOptions action = do
 mkHeaderConfig :: Int -> ProtocolId -> HeaderConfig t
 mkHeaderConfig port protId =
   HeaderConfig
-    { headerHost = "::1"
+    { headerHost = testServerHost
     , headerPort = port
     , headerProtocolId = protId
     , headerConnTimeout = 5000
