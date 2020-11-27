@@ -16,13 +16,13 @@ util::
 
 thrift:: thrift-cpp thrift-hs
 
-THRIFT_COMPILE = $(CABAL) new-run exe:thrift-compiler --
+THRIFT_COMPILE = $(CABAL) run exe:thrift-compiler --
 
 thrift-hs::
-	$(THRIFT_COMPILE) --hs --use-int \
+	$(THRIFT_COMPILE) --hs \
 		lib/if/RpcOptions.thrift \
 		-o lib
-	$(THRIFT_COMPILE) --hs --use-int \
+	$(THRIFT_COMPILE) --hs \
 		lib/if/ApplicationException.thrift \
 		-o lib
 	$(THRIFT_COMPILE) --hs --use-int \
@@ -31,10 +31,9 @@ thrift-hs::
 	$(THRIFT_COMPILE) --hs --use-int \
 		lib/test/if/echoer.thrift \
 		-o lib/test
-	$(THRIFT_COMPILE) --hs --use-int \
+	$(THRIFT_COMPILE) --hs \
 		server/test/if/hash_map.thrift \
 		-o server/test
-
 
 thrift-cpp::
 	cd lib && thrift1 -I . --gen mstch_cpp2 \

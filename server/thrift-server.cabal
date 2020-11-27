@@ -72,10 +72,16 @@ library
   -- when running hsc2hs on Thrift.Server.ProcessorCallback
   extra-libraries: boost_context
 
+flag tests_use_ipv4
+     description: Force tests to use IPV4 whenever bringing thrift clients/servers up
+     default: False
+     manual: True
+
 common test-common
   hs-source-dirs: test, test/github, test/gen-hs2, ../lib/test/gen-hs2, ../lib/test
 
   other-modules: Facebook.Init
+                 Network
                  TestRunner
                  CalculatorHandler
                  EchoHandler
@@ -105,6 +111,10 @@ common test-common
                  thrift-server,
                  transformers,
                  unordered-containers
+  if flag(tests_use_ipv4)
+    -- for test/Network.hs
+    cpp-options: -DIPV4
+
 
 test-suite dangling-pointer
   import: fb-haskell, test-common

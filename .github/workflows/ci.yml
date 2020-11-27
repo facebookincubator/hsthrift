@@ -1,6 +1,6 @@
 # https://docs.github.com/en/free-pro-team@latest/actions/reference/workflow-syntax-for-github-actions
 name: CI
-on: [push, pull_request]
+on: [push]
 
 jobs:
   ci:
@@ -38,12 +38,12 @@ jobs:
       - name: Generate C++ code from thrift files
         run: make thrift-cpp
       - name: Build everything up to thrift-compiler
-        run: cabal build exe:thrift-compiler
+        run: cabal build --project-file=ci.cabal.project exe:thrift-compiler
       - name: Generate Haskell code from thrift files
         run: make thrift-hs
       - name: Build all packages
-        run: cabal build all
+        run: cabal build --project-file=ci.cabal.project all
       - name: Run testsuites
-        run: cabal test mangle fb-util thrift-compiler thrift-lib thrift-server --keep-going
+        run: cabal test --project-file=ci.cabal.project mangle fb-util thrift-compiler thrift-lib thrift-server --keep-going
         # --keep-going is necessary to avoid stopping at the first failing
         # testsuite('s package?)

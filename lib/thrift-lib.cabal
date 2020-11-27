@@ -122,6 +122,11 @@ library
         hashable >=1.2.7.0 && <1.4,
         vector ^>=0.12.0.1
 
+flag tests_use_ipv4
+     description: Force tests to use IPV4 whenever bringing thrift clients/servers up
+     default: False
+     manual: True
+
 common test-common
   hs-source-dirs:
         test,
@@ -130,6 +135,7 @@ common test-common
         ../compiler/test/fixtures/gen-hs2
         -- ^^^ for HsTest.Types
   other-modules:
+        Network
         TestRunner
         TestChannel
         Math.Types
@@ -175,6 +181,12 @@ common test-common
                  QuickCheck,
                  STMonadTrans
   ghc-options: -threaded
+
+  if flag(tests_use_ipv4)
+    -- for test/Network.hs
+    cpp-options: -DIPV4
+    -- for test/cpp/MathServer.cpp
+    cxx-options: -DIPV4
 
 test-suite channel
   import: fb-haskell, test-common

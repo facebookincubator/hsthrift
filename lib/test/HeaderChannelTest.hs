@@ -5,6 +5,7 @@ import Control.Monad.Trans.Class
 import Data.Proxy
 import Foreign
 import Foreign.C
+import Network (testServerHost)
 import Test.HUnit
 import TestRunner
 import Util.EventBase
@@ -24,7 +25,7 @@ myRpcOptions = defaultRpcOptions { rpc_timeout = 5000 }
 
 mySvcConf :: Int -> HeaderConfig Calculator
 mySvcConf port = HeaderConfig
-  { headerHost = "::1"
+  { headerHost = testServerHost
   , headerPort = port
   , headerProtocolId = compactProtocolId
   , headerConnTimeout = 5000

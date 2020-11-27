@@ -327,12 +327,6 @@ test-suite list
   type: exitcode-stdio-1.0
   main-is: ListTest.hs
   ghc-options: -main-is ListTest
-test-suite encoding
-  import: fb-haskell, test-common
-  type: exitcode-stdio-1.0
-  main-is: EncodingTest.hs
-  ghc-options: -main-is EncodingTest
-  other-modules: EncodingLib
 test-suite concurrent
   import: fb-haskell, test-common
   type: exitcode-stdio-1.0
