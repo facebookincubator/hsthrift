@@ -39,5 +39,6 @@ test-suite mangle-test
   default-language: Haskell2010
   default-extensions: LambdaCase
   main-is: Test.hs
+  other-modules: TestRunner
   build-depends: base, HUnit, hspec, hspec-contrib, mangle
-  ghc-options: -threaded
+  ghc-options: -threaded -main-is Test

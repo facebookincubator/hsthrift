@@ -72,62 +72,65 @@ library
   -- when running hsc2hs on Thrift.Server.ProcessorCallback
   extra-libraries: boost_context
 
+flag tests_use_ipv4
+     description: Force tests to use IPV4 whenever bringing thrift clients/servers up
+     default: False
+     manual: True
 
 common test-common
+  hs-source-dirs: test, test/github, test/gen-hs2, ../lib/test/gen-hs2, ../lib/test
+
+  other-modules: Facebook.Init
+                 Network
+                 TestRunner
+                 CalculatorHandler
+                 EchoHandler
+                 Echoer.Echoer.Client
+                 Echoer.Echoer.Service
+                 Echoer.Types
+                 Math.Adder.Client
+                 Math.Adder.Service
+                 Math.Calculator.Client
+                 Math.Calculator.Service
+                 Math.Types
+                 TestChannel
   build-depends: aeson,
                  base,
                  bytestring,
                  data-default,
                  deepseq,
+                 fb-util,
                  hashable,
                  hspec,
                  hspec-contrib,
                  HUnit,
                  STMonadTrans,
                  text,
-                 fb-util,
+
                  thrift-lib,
                  thrift-server,
                  transformers,
-                 unordered-containers,
-  ghc-options: -threaded
+                 unordered-containers
+  if flag(tests_use_ipv4)
+    -- for test/Network.hs
+    cpp-options: -DIPV4
 
-library test-lib
+
+test-suite dangling-pointer
   import: fb-haskell, test-common
-  visibility: private
-  exposed-modules:
-        Facebook.Init
-        TestRunner
-        Echoer.Types
-        Echoer.Echoer.Client
-        Echoer.Echoer.Service
-        Math.Types
-        Math.Adder.Client
-        Math.Adder.Service
-        Math.Calculator.Client
-        Math.Calculator.Service
-        EchoHandler
-        CalculatorHandler
-        TestChannel
-  hs-source-dirs:
-        test,
-        test/github,
-        ../lib/test,
-        ../lib/test/gen-hs2
-  include-dirs: .
-
+  type: exitcode-stdio-1.0
+  main-is: DanglingPointerTest.hs
+  ghc-options: -main-is DanglingPointerTest -threaded
+  other-modules: HashMap.HashMapService.Client,
+                 HashMap.HashMapService.Service,
+                 HashMap.Types
 test-suite handler
   import: fb-haskell, test-common
   type: exitcode-stdio-1.0
-  hs-source-dirs: test
-  build-depends: test-lib
   main-is: HandlerTest.hs
   ghc-options: -main-is HandlerTest
-
 test-suite server
   import: fb-haskell, test-common
   type: exitcode-stdio-1.0
-  hs-source-dirs: test
-  build-depends: test-lib
   main-is: ServerTest.hs
-  ghc-options: -main-is ServerTest
+  ghc-options: -main-is ServerTest -threaded

@@ -16,9 +16,9 @@ withFixtureOptions f = do
   let fbcode  = fst $ breakOnEnd "fbcode" dir
   compilerDir <-
     if null fbcode
-    then -- running from FB source tree
+    then -- running from github repo
          findCompilerDir
-    else -- running from github repo
+    else -- running from FB source tree
          return (fbcode </> "common" </> "hs" </> "thrift" </> "compiler")
   let outPath          = "compiler/test/fixtures"
       thriftTestsDir   = compilerDir </> ".." </> "tests"

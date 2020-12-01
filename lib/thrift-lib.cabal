@@ -68,6 +68,7 @@ library
         Thrift.Protocol.ApplicationException.Types
         Thrift.Protocol.RpcOptions.Types
 
+    cxx-options: -std=c++17
     cxx-sources:
         cpp/HeaderChannel.cpp
         cpp/HsChannel.cpp
@@ -121,7 +122,36 @@ library
         hashable >=1.2.7.0 && <1.4,
         vector ^>=0.12.0.1
 
+flag tests_use_ipv4
+     description: Force tests to use IPV4 whenever bringing thrift clients/servers up
+     default: False
+     manual: True
+
 common test-common
+  hs-source-dirs:
+        test,
+        test/github,
+        test/gen-hs2,
+        ../compiler/test/fixtures/gen-hs2
+        -- ^^^ for HsTest.Types
+  other-modules:
+        Network
+        TestRunner
+        TestChannel
+        Math.Types
+        Math.Adder.Client
+        Math.Calculator.Client
+        Math.Adder.Service
+        Math.Calculator.Service
+        HsTest.Types
+  include-dirs: .
+  cxx-options:   -std=c++17
+  cxx-sources:   test/cpp/MathServer.cpp
+                 test/if/gen-cpp2/Calculator.cpp
+                 test/if/gen-cpp2/AdderAsyncClient.cpp
+                 test/if/gen-cpp2/Adder.cpp
+                 test/if/gen-cpp2/math_types.cpp
+                 test/if/gen-cpp2/math_metadata.cpp
   extra-libraries:
         thriftmetadata
         thriftcpp2
@@ -152,84 +182,50 @@ common test-common
                  STMonadTrans
   ghc-options: -threaded
 
-library test-lib
-  import: fb-haskell, test-common
-  visibility: private
-  exposed-modules:
-        TestRunner
-        TestChannel
-        Math.Types
-        Math.Adder.Client
-        Math.Calculator.Client
-        Math.Adder.Service
-        Math.Calculator.Service
-        HsTest.Types
-  hs-source-dirs:
-        test,
-        test/github,
-        test/gen-hs2,
-        ../compiler/test/fixtures/gen-hs2
-        -- ^^^ for HsTest.Types
-  include-dirs: .
-  cxx-sources:   test/cpp/MathServer.cpp
-                 test/if/gen-cpp2/Calculator.cpp
-                 test/if/gen-cpp2/AdderAsyncClient.cpp
-                 test/if/gen-cpp2/Adder.cpp
-                 test/if/gen-cpp2/math_types.cpp
-                 test/if/gen-cpp2/math_metadata.cpp
+  if flag(tests_use_ipv4)
+    -- for test/Network.hs
+    cpp-options: -DIPV4
+    -- for test/cpp/MathServer.cpp
+    cxx-options: -DIPV4
 
 test-suite channel
   import: fb-haskell, test-common
   type: exitcode-stdio-1.0
-  hs-source-dirs: test
-  build-depends: test-lib
   main-is: ChannelTest.hs
   ghc-options: -main-is ChannelTest
 
 test-suite client
   import: fb-haskell, test-common
   type: exitcode-stdio-1.0
-  hs-source-dirs: test
-  build-depends: test-lib
   main-is: ClientTest.hs
   ghc-options: -main-is ClientTest
 
 test-suite header-channel
   import: fb-haskell, test-common
   type: exitcode-stdio-1.0
-  hs-source-dirs: test
-  build-depends: test-lib
   main-is: HeaderChannelTest.hs
   ghc-options: -main-is HeaderChannelTest
 
 test-suite binary-parser
   import: fb-haskell, test-common
   type: exitcode-stdio-1.0
-  hs-source-dirs: test
-  build-depends: test-lib
   main-is: BinaryParserTest.hs
   ghc-options: -main-is BinaryParserTest
 
 test-suite json-parsing
   import: fb-haskell, test-common
   type: exitcode-stdio-1.0
-  hs-source-dirs: test
-  build-depends: test-lib
   main-is: JSONStringTest.hs
   ghc-options: -main-is JSONStringTest
 
 test-suite json-num
   import: fb-haskell, test-common
   type: exitcode-stdio-1.0
-  hs-source-dirs: test
-  build-depends: test-lib
   main-is: JSONNumTest.hs
   ghc-options: -main-is JSONNumTest
 
 test-suite json-null
   import: fb-haskell, test-common
   type: exitcode-stdio-1.0
-  hs-source-dirs: test
-  build-depends: test-lib
   main-is: JSONNullTest.hs
   ghc-options: -main-is JSONNullTest
