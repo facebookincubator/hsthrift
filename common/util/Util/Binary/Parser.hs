@@ -7,6 +7,7 @@
 module Util.Binary.Parser
   ( Parser
   , parse
+  , parseAndLeftover
   , peekBS
   , anyWord8
   , word8
@@ -148,6 +149,11 @@ parse getter bs =
   case eitherA of
     Right a -> Right a
     Left err -> Left (show err)
+
+parseAndLeftover
+  :: Parser a -> ByteString -> Either String (a, ByteString)
+parseAndLeftover p bs = parse p' bs
+  where p' = (,) <$> p <*> peekBS
 
 peekBS :: Parser ByteString
 peekBS = get

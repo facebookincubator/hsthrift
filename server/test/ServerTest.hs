@@ -24,7 +24,6 @@ import Math.Calculator.Client
 import Math.Types
 import Echoer.Echoer.Client
 import EchoHandler
-
 import Thrift.Server.CppServer
 
 withTestServer :: ServerOptions -> (Int -> IO a) -> IO a

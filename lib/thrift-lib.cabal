@@ -67,6 +67,7 @@ library
         Thrift.Channel
         Thrift.Channel.CppChannel
         Thrift.Channel.HeaderChannel
+        Thrift.Channel.SocketChannel
         Thrift.Protocol
         Thrift.Protocol.Compact
         Thrift.Protocol.Id
@@ -128,10 +129,16 @@ library
         base >=4.11.1 && <4.15,
         transformers ^>=0.5.5.0,
         bytestring ^>=0.10.8.2,
+        network,
         text ^>=1.2.3.0,
         unordered-containers ^>=0.2.9.0,
         hashable >=1.2.7.0 && <1.4,
         vector ^>=0.12.0.1
+
+    if flag(tests_use_ipv4)
+      -- for SocketChannel.hs
+      cpp-options: -DIPV4
+
 
 flag tests_use_ipv4
      description: Force tests to use IPV4 whenever bringing thrift clients/servers up
@@ -145,6 +152,7 @@ common test-common
         test/gen-hs2
   other-modules:
         Network
+        TestCommon
         TestRunner
         TestChannel
         Math.Types
@@ -152,6 +160,7 @@ common test-common
         Math.Calculator.Client
         Math.Adder.Service
         Math.Calculator.Service
+        SocketServer
         HsTest.Types
   include-dirs: .
   cxx-options:   -std=c++17
@@ -168,7 +177,8 @@ common test-common
         transport
         concurrency
         thrift-core
-  build-depends: base,
+  build-depends: async ^>= 2.2,
+                 base,
                  bytestring,
                  dependent-sum,
                  fb-util,
@@ -176,6 +186,7 @@ common test-common
                  hspec,
                  hspec-contrib,
                  HUnit ^>= 1.6.1,
+                 network,
                  text,
                  thrift-lib,
                  -- vvv for HsTest.Types
@@ -202,6 +213,12 @@ test-suite channel
   type: exitcode-stdio-1.0
   main-is: ChannelTest.hs
   ghc-options: -main-is ChannelTest
+
+test-suite socket-channel
+  import: fb-haskell, test-common
+  type: exitcode-stdio-1.0
+  main-is: SocketChannelTest.hs
+  ghc-options: -main-is SocketChannelTest
 
 test-suite client
   import: fb-haskell, test-common
