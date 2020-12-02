@@ -16,4 +16,20 @@ uint8_t* echo(HS_IOBuf* hs_iobuf) noexcept {
 
   return buf;
 }
+
+IOBuf* create_buffer() noexcept {
+  const char* const strs[] = {
+      "All happy families are alike; ",
+      "every unhappy family is unhappy in its own way."};
+  const int lens[] = {30, 47};
+  std::unique_ptr<IOBuf> bufs[2];
+  for (size_t i = 0; i < 2; i++) {
+    bufs[i] = IOBuf::createCombined(50);
+    strncpy((char*)bufs[i]->writableData(), strs[i], lens[i]);
+    bufs[i]->append(lens[i]);
+    if (i)
+      bufs[0]->appendChain(std::move(bufs[i]));
+  }
+  return bufs[0].release();
+}
 }
