@@ -17,7 +17,7 @@
 -- under the License.
 --
 
-{-# LANGUAGE ConstraintKinds #-}
+{-# LANGUAGE ConstraintKinds, CPP #-}
 module Thrift.Protocol
   ( ThriftSerializable, serializeGen, deserializeGen
   , ThriftStruct(..), ProtocolException(..)
@@ -43,6 +43,12 @@ import Data.Text.Encoding
 import Data.Typeable
 import Data.Word
 import qualified Data.ByteString.Lazy as LBS
+
+#if __GLASGOW_HASKELL__ == 806
+import Prelude hiding (fail)
+import Control.Monad.Fail (fail)
+#endif
+
 
 -- Constraint Kind that every Thrift generated datatype must satisfy
 type ThriftSerializable a = (ToJSON a, ThriftStruct a)
