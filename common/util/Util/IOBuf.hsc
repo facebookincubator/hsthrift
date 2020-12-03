@@ -5,7 +5,6 @@ module Util.IOBuf
   ) where
 
 import Control.Exception (mask_)
-import Data.ByteString (ByteString)
 import Data.ByteString.Internal
 import Data.ByteString.Unsafe
 import Data.Word
