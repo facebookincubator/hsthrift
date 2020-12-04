@@ -30,7 +30,7 @@ jobs:
             ${{ runner.os }}-${{ steps.get-tag.outputs.tag }}
       - name: Install folly, fizz, wangle, rsocket-cpp, fbthrift
         if: steps.cache-fb-packages.outputs.cache-hit != 'true'
-        run:  ./install_deps.sh
+        run:  ./install_deps.sh --nuke
       - name: Install ${{ matrix.ghc }}
         run: apt-get install -y ${{ matrix.ghc }}
       - name: Populate hackage index
