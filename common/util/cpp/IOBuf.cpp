@@ -13,3 +13,17 @@ std::unique_ptr<folly::IOBuf> common::hs::newIOBufWrapping(HS_IOBuf* hs_iobuf) {
 
   return ioBuf;
 }
+
+extern "C" {
+
+void get_iobuf_data(IOBuf* iobuf, IOBufData* iobuf_data) {
+  iobuf_data->length_ = iobuf->length();
+  iobuf_data->data_buf_ = iobuf->data();
+  iobuf_data->next_ = iobuf->pop().release();
+}
+
+void destroy_iobuf(IOBuf* iobuf, uint8_t* buffer) {
+  delete iobuf;
+}
+
+}

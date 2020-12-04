@@ -18,15 +18,9 @@ struct IOBufData {
   IOBuf* next_;
 };
 
-void get_iobuf_data(IOBuf* iobuf, IOBufData* iobuf_data) {
-  iobuf_data->length_ = iobuf->length();
-  iobuf_data->data_buf_ = iobuf->data();
-  iobuf_data->next_ = iobuf->pop().release();
-}
+void get_iobuf_data(IOBuf* iobuf, IOBufData* iobuf_data);
 
-void destroy_iobuf(IOBuf* iobuf, uint8_t* buffer) {
-  delete iobuf;
-}
+void destroy_iobuf(IOBuf* iobuf, uint8_t* buffer);
 
 } // extern "C"
 
