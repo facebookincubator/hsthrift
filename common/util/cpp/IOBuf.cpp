@@ -25,5 +25,4 @@ void get_iobuf_data(IOBuf* iobuf, IOBufData* iobuf_data) {
 void destroy_iobuf(IOBuf* iobuf, uint8_t* buffer) {
   delete iobuf;
 }
-
 }
