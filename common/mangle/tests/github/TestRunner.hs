@@ -1,8 +1,7 @@
-module TestRunner where
+module TestRunner (module TestRunner) where
 
-import Test.Hspec
-import Test.Hspec.Contrib.HUnit (fromHUnitTest)
 import Test.HUnit
+import Test.HUnit.Text
 
 testRunner :: Test -> IO ()
-testRunner t = hspec (fromHUnitTest t)
+testRunner = runTestTTAndExit

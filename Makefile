@@ -34,6 +34,84 @@ thrift-hs::
 	$(THRIFT_COMPILE) --hs \
 		server/test/if/hash_map.thrift \
 		-o server/test
+	$(THRIFT_COMPILE) --hs \
+		tests/if/hs_prefix.thrift \
+		-o tests/
+	$(THRIFT_COMPILE) --hs \
+		tests/if/foo.thrift \
+		-o tests/
+	$(THRIFT_COMPILE) --hs \
+		tests/if/constants.thrift \
+		-o tests/
+	$(THRIFT_COMPILE) --hs \
+		--duplicate-names \
+		tests/if/duplicate.thrift \
+		-o tests/
+	$(THRIFT_COMPILE) --hs \
+		tests/if/EnumConst.thrift \
+		-o tests/
+	$(THRIFT_COMPILE) --hs \
+		tests/if/enum.thrift \
+		-o tests/
+	$(THRIFT_COMPILE) --hs \
+		tests/if/exception.thrift \
+		-o tests/
+	$(THRIFT_COMPILE) --hs \
+		--use-int --use-hash-map --use-hash-set \
+		tests/if/flags.thrift \
+		-o tests/
+	$(THRIFT_COMPILE) --hs --extra-hasfields \
+		tests/if/hasfield.thrift \
+		-o tests/
+	$(THRIFT_COMPILE) --hs \
+		tests/if/A.thrift \
+		-o tests/
+	$(THRIFT_COMPILE) --hs \
+		tests/if/B.thrift \
+		-o tests/
+	$(THRIFT_COMPILE) --hs \
+		tests/if/C.thrift \
+		-o tests/
+	$(THRIFT_COMPILE) --hs \
+		tests/if/D.thrift \
+		-o tests/
+	$(THRIFT_COMPILE) --hs \
+		tests/if/E.thrift \
+		-o tests/
+	$(THRIFT_COMPILE) --hs \
+		tests/if/versions.thrift \
+		-o tests/
+	$(THRIFT_COMPILE) --hs \
+		tests/if/monoid.thrift \
+		-o tests/
+	$(THRIFT_COMPILE) --hs \
+		tests/if/hs_test.thrift \
+		-o tests/
+	$(THRIFT_COMPILE) --hs \
+		tests/if/map.thrift \
+		-o tests/
+	$(THRIFT_COMPILE) --hs \
+		tests/if/messed_up_case.thrift \
+		-o tests/
+	$(THRIFT_COMPILE) --hs \
+		tests/if/namespace.thrift \
+		-o tests/
+	$(THRIFT_COMPILE) --hs \
+		tests/if/namespace_included.thrift \
+		-o tests/
+	$(THRIFT_COMPILE) --hs \
+		tests/if/parens.thrift \
+		-o tests/
+	$(THRIFT_COMPILE) --hs \
+		--required-symbols "A,B,C,X,weNeedThis" \
+		tests/if/huge.thrift \
+		-o tests/
+	$(THRIFT_COMPILE) --hs \
+		tests/if/scoped_enums.thrift \
+		-o tests/
+	$(THRIFT_COMPILE) --hs \
+		tests/if/service.thrift \
+		-o tests/
 
 thrift-cpp::
 	cd lib && thrift1 -I . --gen mstch_cpp2 \
@@ -42,6 +120,9 @@ thrift-cpp::
 	cd lib/test/if && thrift1 -I . --gen mstch_cpp2 \
                 -o . \
                 math.thrift
+	cd tests/if && thrift1 -I . --gen mstch_cpp2 \
+		-o . \
+		hs_test.thrift
 
 # tmp until we rewrite #includes automatically during repo sync
 fix-includes:

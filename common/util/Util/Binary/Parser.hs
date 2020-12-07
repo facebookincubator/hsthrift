@@ -39,7 +39,7 @@ import Control.Monad hiding (fail)
 import Control.Monad
 #endif
 #if __GLASGOW_HASKELL__ == 806
-import Control.Monad.Fail
+import Control.Monad.Fail as Fail
 #endif
 import Control.Exception
 import Util.Control.Exception (tryAll)

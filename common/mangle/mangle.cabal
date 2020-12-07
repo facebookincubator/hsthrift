@@ -40,5 +40,10 @@ test-suite mangle-test
   default-extensions: LambdaCase
   main-is: Test.hs
   other-modules: TestRunner
-  build-depends: base, HUnit, hspec, hspec-contrib, mangle
+  build-depends:
+      base,
+      hspec,
+      hspec-contrib,
+      mangle,
+      HUnit ^>= 1.6.1
   ghc-options: -threaded -main-is Test

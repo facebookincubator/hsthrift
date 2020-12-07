@@ -166,7 +166,7 @@ common test-common
                  filepath,
                  hspec,
                  hspec-contrib,
-                 HUnit,
+                 HUnit ^>= 1.6.1,
                  text,
                  thrift-lib,
                  -- vvv for HsTest.Types

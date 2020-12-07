@@ -103,7 +103,7 @@ common test-common
                  hashable,
                  hspec,
                  hspec-contrib,
-                 HUnit,
+                 HUnit ^>= 1.6.1,
                  STMonadTrans,
                  text,
 
