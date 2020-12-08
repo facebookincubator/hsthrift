@@ -186,7 +186,7 @@ library
     -- We use hsc2hs with C++ headers, so we need to compile the
     -- generated code with g++. The hsc2hs-generated binary is linked
     -- by ghc, because we depend on a Haskell package (mangle).
-    hsc2hs-options: --cc=g++ --lflag=-lstdc++ --cflag=-D__HSC2HS__=1
+    hsc2hs-options: --cc=g++ --lflag=-lstdc++ --cflag=-D__HSC2HS__=1 --cflag=-std=c++17
 
     pkgconfig-depends: libfolly, libglog
     extra-libraries: double-conversion, gflags
