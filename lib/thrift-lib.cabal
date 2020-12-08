@@ -77,7 +77,7 @@ library
 
     hs-source-dirs: . gen-hs2
     build-tool-depends: hsc2hs:hsc2hs
-    hsc2hs-options: --cc=g++ --lflag=-lstdc++ --cflag=-D__HSC2HS__=1 --lflag=-lboost_context
+    hsc2hs-options: --cc=g++ --lflag=-lstdc++ --cflag=-D__HSC2HS__=1 --lflag=-lboost_context --cflag=-std=c++17
     include-dirs: .
 
     pkgconfig-depends: libfolly, fmt, openssl, libsodium
