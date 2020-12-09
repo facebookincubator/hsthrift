@@ -51,7 +51,8 @@ reqParser' ::
              Proxy.Proxy p ->
                Text.Text -> Parser.Parser (Thrift.Some ParentServiceCommand)
 reqParser' _ funName
-  = Prelude.fail ("unknown function call: " ++ Text.unpack funName)
+  = Prelude.errorWithoutStackTrace
+      ("unknown function call: " ++ Text.unpack funName)
 
 respWriter' ::
               Thrift.Protocol p =>
@@ -61,7 +62,7 @@ respWriter' ::
                     Prelude.Either Exception.SomeException a ->
                       (Builder.Builder,
                        Prelude.Maybe (Exception.SomeException, Thrift.Blame))
-respWriter' _ = Prelude.fail ("unknown function")
+respWriter' _ = Prelude.errorWithoutStackTrace ("unknown function")
 
 onewayFunctions' :: [Text.Text]
 onewayFunctions' = []

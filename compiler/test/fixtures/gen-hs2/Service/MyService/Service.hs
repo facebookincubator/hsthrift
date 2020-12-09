@@ -105,7 +105,8 @@ reqParser' _proxy "foo"
             _idMap = HashMap.fromList []
           _parse 0)
 reqParser' _ funName
-  = Prelude.fail ("unknown function call: " ++ Text.unpack funName)
+  = Prelude.errorWithoutStackTrace
+      ("unknown function call: " ++ Text.unpack funName)
 
 respWriter' ::
               Thrift.Protocol p =>

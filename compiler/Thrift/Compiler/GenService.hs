@@ -209,7 +209,7 @@ genReqParser s@Service{..} =
     genSuper Nothing = [ HS.FunBind ()
       [ HS.Match () (textToName "reqParser'")
         [ HS.PWildCard (), pvar "funName"]
-        (HS.UnGuardedRhs () (qvar "Prelude" "fail" `app` HS.Paren ()
+        (HS.UnGuardedRhs () (qvar "Prelude" "errorWithoutStackTrace" `app` HS.Paren ()
            (infixApp "++" (stringLit "unknown function call: ")
            (qvar "Text" "unpack" `app` var "funName"))))
         Nothing
@@ -279,7 +279,7 @@ genRespWriter s@Service{..} =
       [ HS.FunBind ()
         [ HS.Match () (textToName "respWriter'")
           [ HS.PWildCard () ]
-          (HS.UnGuardedRhs () (qvar "Prelude" "fail" `app` HS.Paren ()
+          (HS.UnGuardedRhs () (qvar "Prelude" "errorWithoutStackTrace" `app` HS.Paren ()
             (stringLit "unknown function")))
           Nothing
         ]
