@@ -25,8 +25,8 @@ void HaskellAsyncProcessor::processSerializedRequest(
     concurrency::ThreadManager* tm) {
   // General note: we only want communicate (via req->sendReply or
   // req->sendErrorWrapped) and destroy req on eb's thread. We assume that we
-  // are on eb's thread now but the PriorityEventTask that we create further
-  // below won't necessarily be.
+  // are on eb's thread now but the EventTask that we create further below won't
+  // necessarily be.
 
   // Immediately give reply to one-way calls
   bool oneway = oneways_.find(context->getMethodName()) != oneways_.end();
@@ -35,8 +35,7 @@ void HaskellAsyncProcessor::processSerializedRequest(
   }
 
   // Adds a request handler to the thrift queue.
-  tm->add(std::make_shared<PriorityEventTask>(
-      concurrency::NORMAL,
+  auto task = std::make_shared<EventTask>(
       [context,
        eb,
        oneway,
@@ -81,7 +80,7 @@ void HaskellAsyncProcessor::processSerializedRequest(
                                     : kAppServerErrorCode);
         }
 
-        if (!oneway && req->isActive()) {
+        if (!oneway && req && req->isActive()) {
           std::unique_ptr<folly::IOBuf> transf;
           try {
             // Take ownership of the output bytes into an IOBuf
@@ -119,7 +118,12 @@ void HaskellAsyncProcessor::processSerializedRequest(
       },
       std::move(req),
       eb,
-      oneway));
+      oneway);
+  const auto pri = apache::thrift::concurrency::NORMAL;
+  const auto source =
+      apache::thrift::concurrency::ThreadManager::Source::INTERNAL;
+  auto ka = tm->getKeepAlive(pri, source);
+  ka->add(funcFromTask(std::move(task)));
 }
 
 } // namespace thrift

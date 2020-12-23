@@ -41,16 +41,33 @@ struct MockThreadManager : public concurrency::ThreadManagerExecutorAdapter {
   MockThreadManager()
       : concurrency::ThreadManagerExecutorAdapter(
             std::make_shared<folly::ManualExecutor>()) {}
+};
 
-  MOCK_QUALIFIED_METHOD4(
-      add,
-      noexcept,
-      void(
-          std::shared_ptr<concurrency::Runnable>,
-          int64_t,
-          int64_t,
-          apache::thrift::concurrency::ThreadManager::Source));
-  using concurrency::ThreadManager::add;
+class TestHaskellAsyncProcessor : public HaskellAsyncProcessor {
+ public:
+  TestHaskellAsyncProcessor(
+      TCallback callback,
+      const std::unordered_set<std::string>& oneways)
+      : HaskellAsyncProcessor(std::move(callback), oneways) {}
+
+  void setExpireTasks() {
+    expire_tasks_ = true;
+  }
+
+  void unsetExpireTasks() {
+    expire_tasks_ = false;
+  }
+
+ protected:
+  virtual folly::Func funcFromTask(std::shared_ptr<EventTask> task) override {
+    if (expire_tasks_) {
+      task->expired();
+    }
+    return HaskellAsyncProcessor::funcFromTask(std::move(task));
+  }
+
+ private:
+  bool expire_tasks_{false};
 };
 
 struct HaskellProcessorTest : public Test {
@@ -105,17 +122,12 @@ struct HaskellProcessorTest : public Test {
         request_context.get(),
         &event_base,
         &thread_manager);
-  }
-
-  std::shared_ptr<EventTask> processTask(Request& req) {
-    std::shared_ptr<EventTask> task;
-    EXPECT_CALL(thread_manager, add(_, _, _, _))
-        .WillOnce(Invoke([&](auto t, auto, auto, auto) {
-          task = std::dynamic_pointer_cast<EventTask>(t);
-        }));
-    process(req);
-    EXPECT_TRUE(task);
-    return task;
+    // The specific priority and source don't matter for this mock TM.
+    auto ka = thread_manager.getKeepAlive(
+        concurrency::PRIORITY::NORMAL, MockThreadManager::Source::UPSTREAM);
+    auto* ex = dynamic_cast<folly::ManualExecutor*>(ka.get());
+    EXPECT_NE(ex, nullptr);
+    ex->drain();
   }
 
   static void callback(uint16_t, const uint8_t*, size_t, TResponse* resp) {
@@ -129,7 +141,7 @@ struct HaskellProcessorTest : public Test {
 
   const std::unordered_set<std::string> oneways_;
 
-  HaskellAsyncProcessor processor;
+  TestHaskellAsyncProcessor processor;
 
   folly::EventBase event_base;
   MockThreadManager thread_manager;
@@ -152,8 +164,7 @@ TEST_F(HaskellProcessorTest, respond) {
       }));
   EXPECT_CALL(*req, sendErrorWrapped(_, _)).Times(Exactly(0));
 
-  auto task = processTask(req);
-  task->run();
+  process(req);
   EXPECT_TRUE(req.alive());
   event_base.loop();
 
@@ -165,9 +176,8 @@ TEST_F(HaskellProcessorTest, not_active) {
   EXPECT_CALL(*req, sendReply(_, _, _)).Times(Exactly(0));
   EXPECT_CALL(*req, sendErrorWrapped(_, _)).Times(Exactly(0));
 
-  auto task = processTask(req);
   req->active = false;
-  task->run();
+  process(req);
   EXPECT_TRUE(req.alive());
   event_base.loop();
 }
@@ -177,8 +187,9 @@ TEST_F(HaskellProcessorTest, expired) {
   EXPECT_CALL(*req, sendReply(_, _, _)).Times(Exactly(0));
   EXPECT_CALL(*req, sendErrorWrapped(_, _));
 
-  auto task = processTask(req);
-  task->expired();
+  processor.setExpireTasks();
+
+  process(req);
   EXPECT_FALSE(req.alive());
   event_base.loop();
 }

@@ -47,7 +47,11 @@ class HaskellAsyncProcessor : public AsyncProcessor {
       folly::EventBase* eb,
       concurrency::ThreadManager* tm) override;
 
- private:
+ protected:
+  virtual folly::Func funcFromTask(std::shared_ptr<EventTask> task) {
+    return folly::Func([task = std::move(task)] { task->run(); });
+  }
+
   TCallback callback_;
   const std::unordered_set<std::string>& oneways_;
 };
