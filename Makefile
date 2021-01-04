@@ -129,3 +129,42 @@ fix-includes:
 	for i in `find common lib server | egrep '\.(h|cpp|hsc)$$'`; do \
 	   sed 's@\(#include *["<]\)common/hs/\(util\|mangle\|thrift/lib\|thrift/server\)/@\1@' <$$i >$$i.tmp && mv $$i.tmp $$i; \
 	done
+
+copy-sources:: copy-fixed-sources copy-generated-sources
+
+copy-fixed-sources::
+	cp common/github/Network.hs lib/test/
+	cp common/github/Network.hs server/test/
+
+	mkdir -p common/util/tests/github/Facebook \
+		 server/test/github/Facebook \
+		 common/mangle/tests/github \
+		 tests/github lib/test/github
+
+	cp common/github/Facebook/Init.hs \
+           common/util/tests/github/Facebook/
+	cp common/github/Facebook/Init.hs \
+           server/test/github/Facebook/
+
+	cp common/github/TestRunner.hs \
+	   common/mangle/tests/github/
+	cp common/github/TestRunner.hs \
+	   common/util/tests/github/
+	cp common/github/TestRunner.hs \
+	   tests/github/
+	cp common/github/TestRunner.hs \
+	   compiler/test/github/
+	cp common/github/TestRunner.hs \
+	   server/test/github/
+	cp common/github/TestRunner.hs \
+	   lib/test/github/
+
+copy-generated-sources::
+	cp -R lib/test/gen-hs2 server/test/
+	cp lib/test/TestChannel.hs server/test/
+	cp lib/test/TestChannel.hs tests/
+	cp -R compiler/test/fixtures/gen-hs2/HsTest lib/test/gen-hs2/
+
+	mkdir -p compiler/tests/if
+	cp tests/if/*.thrift compiler/tests/if/
+	cp tests/if/*.hs compiler/tests/if/

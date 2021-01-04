@@ -101,8 +101,19 @@ assertEqualPgm path expected obtained =
     error "expectation failure"
   where
     -- In dependent-sum > 0.6 the This constructor was renamed to Some
-    -- TODO: update the fixtures and remove this replace once 8.8 lands
     normalize
       = Text.unpack
-      . Text.replace "Thrift.This" "Thrift.Some"
+      . Text.unlines
+      . map fixLine
+      . Text.lines
       . Text.pack
+
+    fixLine l
+      = Text.replace "\"compiler/test/fixtures/"
+                     "\"test/fixtures/"
+      . Text.replace "\"compiler/test/if/"
+                     "\"test/if/"
+      . Text.replace "\"include_path\": \"compiler\","
+                     "\"include_path\": \".\","
+    -- TODO: update the fixtures and remove this replace once 8.8 lands
+      $ Text.replace "Thrift.This" "Thrift.Some" l
