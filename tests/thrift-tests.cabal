@@ -11,7 +11,11 @@ maintainer:          hsthrift-team@fb.com
 copyright:           (c) Facebook, All Rights Reserved
 category:            Thrift
 build-type:          Simple
-extra-source-files:  CHANGELOG.md
+extra-source-files:  cpp/*.h, cpp/*.cpp,
+                     if/*.thrift,
+                     if/gen-cpp2/*.h,
+                     if/gen-cpp2/*.cpp,
+                     if/gen-cpp2/*.tcc
 
 common fb-haskell
     default-language: Haskell2010
@@ -131,7 +135,6 @@ test-suite exception
   type: exitcode-stdio-1.0
   main-is: ExceptionTest.hs
   other-modules: Exception.Types, TestChannel
-  hs-source-dirs: ../lib/test
   ghc-options: -main-is ExceptionTest
 test-suite flags
   import: fb-haskell, test-common
