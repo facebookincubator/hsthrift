@@ -15,7 +15,6 @@ extra-source-files:  CHANGELOG.md,
                      test/fixtures/**/*.ast,
                      test/fixtures/gen-hs2/**/*.hs,
                      test/if/*.thrift,
-                     test/if/*.hs,
                      tests/if/*.thrift,
                      tests/if/*.hs,
 
