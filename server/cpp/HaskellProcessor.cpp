@@ -123,9 +123,14 @@ void HaskellAsyncProcessor::processSerializedRequest(
       std::move(req),
       eb,
       oneway);
+
   const auto pri = apache::thrift::concurrency::NORMAL;
   const auto source =
-      apache::thrift::concurrency::ThreadManager::Source::INTERNAL;
+      apache::thrift::concurrency::ThreadManager::Source::UPSTREAM;
+  // the ThreadManager can prioritise upstream jobs differently
+  // from internal jobs. This also affects certain metrics, such
+  // as thrift.queued_requests which only counts upstream jobs on
+  // the queue.
   auto ka = tm->getKeepAlive(pri, source);
   ka->add(funcFromTask(std::move(task)));
 }
