@@ -38,9 +38,12 @@ struct MockResponseChannelRequest : public ResponseChannelRequest {
 };
 
 struct MockThreadManager : public concurrency::ThreadManagerExecutorAdapter {
-  MockThreadManager()
-      : concurrency::ThreadManagerExecutorAdapter(
-            std::make_shared<folly::ManualExecutor>()) {}
+  MockThreadManager(
+      std::shared_ptr<folly::ManualExecutor> exec =
+          std::make_shared<folly::ManualExecutor>())
+      : concurrency::ThreadManagerExecutorAdapter(exec), executor(exec) {}
+
+  std::shared_ptr<folly::ManualExecutor> executor;
 };
 
 class TestHaskellAsyncProcessor : public HaskellAsyncProcessor {
@@ -122,12 +125,8 @@ struct HaskellProcessorTest : public Test {
         request_context.get(),
         &event_base,
         &thread_manager);
-    // The specific priority and source don't matter for this mock TM.
-    auto ka = thread_manager.getKeepAlive(
-        concurrency::PRIORITY::NORMAL, MockThreadManager::Source::UPSTREAM);
-    auto* ex = dynamic_cast<folly::ManualExecutor*>(ka.get());
-    EXPECT_NE(ex, nullptr);
-    ex->drain();
+
+    thread_manager.executor->drain();
   }
 
   static void callback(uint16_t, const uint8_t*, size_t, TResponse* resp) {
