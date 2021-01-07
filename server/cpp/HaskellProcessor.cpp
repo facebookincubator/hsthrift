@@ -48,7 +48,9 @@ void HaskellAsyncProcessor::processSerializedRequest(
           ResponseChannelRequest::UniquePtr req) mutable {
         // Mark the request as processing, so that it won't be failed
         // with a queue timeout.
-        req->setStartedProcessing();
+        if (req) {
+          req->setStartedProcessing();
+        }
 
         // EventTask only calles us if oneway || req->isActive()
         // Receive all the bytes and create a single buffer
