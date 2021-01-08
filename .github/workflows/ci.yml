@@ -42,7 +42,7 @@ jobs:
       - name: Generate Haskell code from thrift files
         run: make thrift-hs
       - name: Copy files around to make all packages standalone
-        run: make copy-sources
+        run: make prepare-sdists
       - name: Generate source distributions for all packages
         run: cabal sdist --project-file=ci.cabal.project all
       - name: Unpack source distributions in new directory

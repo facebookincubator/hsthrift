@@ -130,9 +130,11 @@ fix-includes:
 	   sed 's@\(#include *["<]\)common/hs/\(util\|mangle\|thrift/lib\|thrift/server\)/@\1@' <$$i >$$i.tmp && mv $$i.tmp $$i; \
 	done
 
-copy-sources:: copy-fixed-sources copy-generated-sources
-
-copy-fixed-sources::
+# Copying around some common Haskell modules used
+# by many packages in their testsuites. Might
+# instead have all these common modules be exposed
+# by fb-util?
+copy-sources::
 	cp common/github/Network.hs lib/test/
 	cp common/github/Network.hs server/test/
 
@@ -159,10 +161,20 @@ copy-fixed-sources::
 	cp common/github/TestRunner.hs \
 	   lib/test/github/
 
-copy-generated-sources::
-	cp -R lib/test/gen-hs2 server/test/
 	cp lib/test/TestChannel.hs server/test/
 	cp lib/test/TestChannel.hs tests/
+
+# Copying test .thrift files and their corresponding
+# generated (by thrift-compiler) .hs files around to
+# get each package directory to store everything the
+# corresponding package needs to be built and tested.
+# In particular, calling 'cabal sdist' for any
+# package after this rule has run should result in a
+# self-contained source distribution that can be
+# built and tested from the sdist archive alone,
+# as done in the Github CI.
+prepare-sdists:: copy-sources
+	cp -R lib/test/gen-hs2 server/test/
 	cp -R compiler/test/fixtures/gen-hs2/HsTest lib/test/gen-hs2/
 
 	mkdir -p compiler/tests/if
