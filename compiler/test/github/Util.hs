@@ -1,6 +1,7 @@
 module Util (withFixtureOptions) where
 
 import Data.Foldable
+import Data.List
 import Data.List.Extra
 import Data.Maybe
 import System.Directory
@@ -22,12 +23,14 @@ withFixtureOptions f = do
         else                "test" </> "fixtures"
       inTree = takeBaseName compilerDir == "compiler"
       testsCwd = if inTree then takeDirectory compilerDir else compilerDir
-      includePathFor fp = if inTree && ("compiler/" `isPrefixOf` fp)
-                          then "compiler"
-                          else "."
+      includePathFor fp
+        | inTree, "compiler/" `isPrefixOf` fp = "compiler"
+        | "tests/" `isPrefixOf` fp = "tests"
+        | otherwise = "."
       fixup fp
-        | "compiler/" `isPrefixOf` fp = drop 9 fp
-        | otherwise                   = fp
+        | Just rest <- stripPrefix "compiler/" fp = rest
+        | Just rest <- stripPrefix "tests/" fp = rest
+        | otherwise = fp
 
   withCurrentDirectory testsCwd $ f
     [ TheseOptions (defaultOptions langopts)

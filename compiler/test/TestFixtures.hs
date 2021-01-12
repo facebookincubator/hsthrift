@@ -111,8 +111,6 @@ assertEqualPgm path expected obtained =
     fixLine l
       = Text.replace "\"compiler/test/fixtures/"
                      "\"test/fixtures/"
-      . Text.replace "\"compiler/test/if/"
-                     "\"test/if/"
       . Text.replace "\"include_path\": \"compiler\","
                      "\"include_path\": \".\","
     -- TODO: update the fixtures and remove this replace once 8.8 lands
