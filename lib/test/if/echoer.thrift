@@ -1,4 +1,4 @@
-include "lib/test/if/math.thrift"
+include "test/if/math.thrift"
 
 service Echoer extends math.Calculator {
   string echo (1: string input)

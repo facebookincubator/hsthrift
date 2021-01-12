@@ -145,7 +145,7 @@
             ]
         }
     ],
-    "path": "compiler/test/if/a.thrift",
+    "path": "test/if/a.thrift",
     "unions": [
         {
             "name": "U",
@@ -354,14 +354,14 @@
     ],
     "name": "a",
     "includes": [
-        "compiler/test/if/b.thrift"
+        "test/if/b.thrift"
     ],
     "enums": [],
     "options": {
-        "path": "compiler/test/if/a.thrift",
+        "path": "test/if/a.thrift",
         "include_path": ".",
         "genfiles": null,
-        "out_path": "compiler/test/fixtures/gen-basic",
+        "out_path": "test/fixtures/gen-basic",
         "recursive": true
     },
     "services": [
