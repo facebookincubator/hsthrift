@@ -41,9 +41,24 @@ jobs:
         run: cabal build --project-file=ci.cabal.project exe:thrift-compiler
       - name: Generate Haskell code from thrift files
         run: make thrift-hs
+      - name: Copy files around to make all packages standalone
+        run: make prepare-sdists
+      - name: Generate source distributions for all packages
+        run: cabal sdist --project-file=ci.cabal.project all
+      - name: Unpack source distributions in new directory
+        run: |
+          mkdir _sdists
+          cd _sdists
+          for f in $(ls ../dist-newstyle/sdist/*.tar.gz); do
+            tar xzf $f;
+          done
+          cp ../ci-sdist.cabal.project cabal.project
+          cd ..
       - name: Build all packages
-        run: cabal build --project-file=ci.cabal.project all
+        run: cabal build all
+        working-directory: ./_sdists
       - name: Run testsuites
-        run: cabal test --project-file=ci.cabal.project mangle fb-util thrift-compiler thrift-lib thrift-server thrift-tests --keep-going
+        run: cabal test mangle fb-util thrift-compiler thrift-lib thrift-server thrift-tests --keep-going
+        working-directory: ./_sdists
         # --keep-going is necessary to avoid stopping at the first failing
         # testsuite('s package?)

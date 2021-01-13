@@ -9,7 +9,10 @@ author:              Facebook, Inc.
 maintainer:          hsthrift-team@fb.com
 copyright:           (c) Facebook, All Rights Reserved
 category:            Thrift
-extra-source-files:  CHANGELOG.md
+extra-source-files:  CHANGELOG.md,
+                     cpp/*.h,
+                     cpp/*.cpp,
+                     test/if/*.thrift
 
 common fb-haskell
     default-language: Haskell2010
@@ -78,7 +81,7 @@ flag tests_use_ipv4
      manual: True
 
 common test-common
-  hs-source-dirs: test, test/github, test/gen-hs2, ../lib/test/gen-hs2, ../lib/test
+  hs-source-dirs: test, test/github, test/gen-hs2
 
   other-modules: Facebook.Init
                  Network
