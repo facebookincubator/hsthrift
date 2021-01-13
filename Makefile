@@ -124,12 +124,6 @@ thrift-cpp::
 		-o . \
 		hs_test.thrift
 
-# tmp until we rewrite #includes automatically during repo sync
-fix-includes:
-	for i in `find common lib server | egrep '\.(h|cpp|hsc)$$'`; do \
-	   sed 's@\(#include *["<]\)common/hs/\(util\|mangle\|thrift/lib\|thrift/server\)/@\1@' <$$i >$$i.tmp && mv $$i.tmp $$i; \
-	done
-
 # Copying around some common Haskell modules used
 # by many packages in their testsuites. Might
 # instead have all these common modules be exposed
