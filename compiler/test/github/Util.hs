@@ -1,7 +1,9 @@
 module Util (withFixtureOptions) where
 
 import Data.Foldable
+import Data.List
 import Data.List.Extra
+import Data.Maybe
 import System.Directory
 import System.FilePath
 
@@ -13,19 +15,28 @@ import Thrift.Compiler.Plugins.Linter
 withFixtureOptions :: ([SomeOptions] -> IO a) -> IO a
 withFixtureOptions f = do
   dir <- getCurrentDirectory
-  let fbcode  = fst $ breakOnEnd "fbcode" dir
-  compilerDir <-
-    if null fbcode
-    then -- running from github repo
-         findCompilerDir
-    else -- running from FB source tree
-         return (fbcode </> "common" </> "hs" </> "thrift" </> "compiler")
-  let outPath          = "compiler/test/fixtures"
-      thriftTestsDir   = compilerDir </> ".." </> "tests"
-  withCurrentDirectory (compilerDir </> "..") $ f
+  compilerDir <- findCompilerDir dir
+  relCompilerDir <- (\path -> if "./" `isPrefixOf` path then drop 2 path else path)
+                <$> makeRelativeToCurrentDirectory compilerDir
+  let outPath = if inTree
+        then "compiler" </> "test" </> "fixtures"
+        else                "test" </> "fixtures"
+      inTree = takeBaseName compilerDir == "compiler"
+      testsCwd = if inTree then takeDirectory compilerDir else compilerDir
+      includePathFor fp
+        | inTree, "compiler/" `isPrefixOf` fp = "compiler"
+        | "tests/" `isPrefixOf` fp = "tests"
+        | otherwise = "."
+      fixup fp
+        | Just rest <- stripPrefix "compiler/" fp = rest
+        | Just rest <- stripPrefix "tests/" fp = rest
+        | otherwise = fp
+
+  withCurrentDirectory testsCwd $ f
     [ TheseOptions (defaultOptions langopts)
-         { optsPath = path
+         { optsPath = fixup path
          , optsOutPath = outPath </> genDir
+         , optsIncludePath = includePathFor path
          , optsRecursive = True
          , optsGenMode = mode
          , optsSingleOutput = singleOut
@@ -49,8 +60,26 @@ withFixtureOptions f = do
          ]
     ]
 
-findCompilerDir :: IO FilePath
-findCompilerDir = do
-  asum [ readFile (dir </> "thrift-compiler.cabal") >> return dir
-       | dir <- ["compiler", ".", "..", "../.."]
-       ]
+findCompilerDir :: FilePath -> IO FilePath
+findCompilerDir cwd = lookFor "thrift-compiler.cabal" cwd maxDepth >>= \mdir ->
+  case mdir of
+    Nothing -> error "findCompilerDir: reached max depth, couldn't find thrift-compiler.cabal"
+    Just d  -> return d
+
+  where lookFor file curDir (-1) = return Nothing
+        lookFor file curDir depth = do
+          existsHere <- doesFileExist (curDir </> file)
+          if existsHere
+            then return (Just curDir)
+            else do xs <- listDirectory curDir
+                    visitDirsIn xs file curDir depth
+        visitDirsIn [] _ _ _ = return Nothing
+        visitDirsIn (d:ds) file curDir depth = do
+          dirExists <- doesDirectoryExist (curDir </> d)
+          if dirExists
+            then do mfp <- lookFor file (curDir </> d) (depth-1)
+                    case mfp of
+                      Nothing -> visitDirsIn ds file curDir depth
+                      Just fp -> return (Just fp)
+            else visitDirsIn ds file curDir depth
+        maxDepth = 2
