@@ -10,10 +10,10 @@ programming languages such as C++, Python, and Java using
 
 The **hsthrift** project includes the full collection of tools and
 libraries for using Thrift in your own Haskell projects. The [Haskell
-Thrift compiler](tree/master/compiler) generates the Haskell
+Thrift compiler](compiler) generates the Haskell
 code needed to communicate with other Thrift services, and the
-included [libraries](tree/master/lib) allow you to build both
-Thrift clients and [servers](tree/master/server) in
+included [libraries](lib) allow you to build both
+Thrift clients and [servers](server) in
 Haskell. Haskell Thrift is fully compatible with all other fbthrift
 languages, so your Haskell project can freely communicate with other
 services no matter what language they are implemented in.
@@ -21,21 +21,21 @@ services no matter what language they are implemented in.
 Note: `hsthrift` is compatible with `fbthrift` but not Apache
 Thrift clients and servers.
 
-`hsthrift` is licensed under a standard [BSD license](blob/master/LICENSE).
+`hsthrift` is licensed under a standard [BSD license](LICENSE).
 
 # Cabal packages
 
 The repository contains the following packages:
 
-* [mangle](tree/master/common/mangle), a library for mangling C++
+* [mangle](common/mangle), a library for mangling C++
   function prototypes into symbol names, useful for using C++ code via
   the Haskell FFI.
-* [fb-util](tree/master/common/util), a collection of utilities
-* [thrift-compiler](tree/master/compiler), the Haskell Thrift compiler
-* [thrift-lib](tree/master/lib), libraries for Thrift clients
-* [thrift-util](tree/master/util), utilities
-* [thrift-server](tree/master/server), libraries for Thrift servers
-* [thrift-tests](tree/master/tests), a test suite
+* [fb-util](common/util), a collection of utilities
+* [thrift-compiler](compiler), the Haskell Thrift compiler
+* [thrift-lib](lib), libraries for Thrift clients
+* [thrift-util](util), utilities
+* [thrift-server](server), libraries for Thrift servers
+* [thrift-tests](tests), a test suite
 
 # Building and testing
 
