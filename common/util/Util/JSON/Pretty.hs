@@ -1,3 +1,5 @@
+-- Copyright (c) Facebook, Inc. and its affiliates.
+
 {-# OPTIONS -Wno-orphans #-}
 
 -- | Display JSON values using pretty printing combinators.

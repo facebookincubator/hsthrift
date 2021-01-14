@@ -50,8 +50,8 @@ reqParser' ::
              Thrift.Protocol p =>
              Proxy.Proxy p -> Text.Text -> Parser.Parser (Thrift.Some YCommand)
 reqParser' _proxy funName
-  = do Thrift.This x <- X.reqParser' _proxy funName
-       Prelude.return (Thrift.This (SuperX x))
+  = do Thrift.Some x <- X.reqParser' _proxy funName
+       Prelude.return (Thrift.Some (SuperX x))
 
 respWriter' ::
               Thrift.Protocol p =>

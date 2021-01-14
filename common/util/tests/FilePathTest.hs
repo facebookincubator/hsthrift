@@ -1,3 +1,5 @@
+-- Copyright (c) Facebook, Inc. and its affiliates.
+
 module FilePathTest (main) where
 
 import Data.Text (Text)

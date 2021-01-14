@@ -1,3 +1,5 @@
+// Copyright (c) Facebook, Inc. and its affiliates.
+
 #include <gflags/gflags.h>
 
 #include "cpp/HsStruct.h"

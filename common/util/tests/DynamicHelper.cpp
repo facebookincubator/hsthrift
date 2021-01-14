@@ -1,3 +1,5 @@
+// Copyright (c) Facebook, Inc. and its affiliates.
+
 #include "tests/DynamicHelper.h"
 
 #include <fstream>

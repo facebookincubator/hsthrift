@@ -1,3 +1,5 @@
+-- Copyright (c) Facebook, Inc. and its affiliates.
+
 module ServerTest (main) where
 
 import Control.Exception hiding (DivideByZero)

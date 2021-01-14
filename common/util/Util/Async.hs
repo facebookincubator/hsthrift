@@ -1,4 +1,4 @@
--- Copyright 2004-present Facebook. All Rights Reserved.
+-- Copyright (c) Facebook, Inc. and its affiliates.
 
 -- | This module provides some higher level concurrency facilities
 module Util.Async

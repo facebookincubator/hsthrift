@@ -1,3 +1,5 @@
+// Copyright (c) Facebook, Inc. and its affiliates.
+
 #include <folly/io/async/AsyncSocket.h>
 #include <thrift/lib/cpp2/async/HeaderClientChannel.h>
 

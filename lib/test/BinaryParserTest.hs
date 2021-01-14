@@ -1,3 +1,5 @@
+-- Copyright (c) Facebook, Inc. and its affiliates.
+
 module BinaryParserTest where
 
 import Control.Monad (replicateM)

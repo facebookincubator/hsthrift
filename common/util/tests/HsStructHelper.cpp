@@ -1,3 +1,5 @@
+// Copyright (c) Facebook, Inc. and its affiliates.
+
 #include <map>
 #include <string>
 #include "cpp/HsStruct.h"

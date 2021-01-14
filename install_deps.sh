@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+# Copyright (c) Facebook, Inc. and its affiliates.
+
 # Download, build and install dependencies for hsthrift
 #
 # Flags:

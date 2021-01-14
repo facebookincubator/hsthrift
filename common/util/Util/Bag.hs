@@ -1,3 +1,5 @@
+-- Copyright (c) Facebook, Inc. and its affiliates.
+
 module Util.Bag
   ( Bag -- Do not export constructors.
   , singleton

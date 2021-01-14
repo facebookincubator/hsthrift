@@ -1,3 +1,5 @@
+-- Copyright (c) Facebook, Inc. and its affiliates.
+
 {-# LANGUAGE TemplateHaskell #-}
 module Util.String.Quasi (s) where
 

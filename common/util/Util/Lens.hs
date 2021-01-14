@@ -1,9 +1,4 @@
--- Copyright (c) 2015, Facebook, Inc.
--- All rights reserved.
---
--- This source code is distributed under the terms of a BSD license,
--- found in the LICENSE file. An additional grant of patent rights can
--- be found in the PATENTS file.
+-- Copyright (c) Facebook, Inc. and its affiliates.
 
 module Util.Lens
   ( lowerCamelCaseLensRules

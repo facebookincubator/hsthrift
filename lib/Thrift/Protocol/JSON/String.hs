@@ -1,3 +1,5 @@
+-- Copyright (c) Facebook, Inc. and its affiliates.
+
 {-# OPTIONS_GHC -fprof-auto #-}
 {-# LANGUAGE ApplicativeDo #-}
 {-# LANGUAGE LambdaCase #-}

@@ -1,3 +1,5 @@
+-- Copyright (c) Facebook, Inc. and its affiliates.
+
 module CompactBench where
 
 import Control.DeepSeq

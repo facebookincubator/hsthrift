@@ -1,3 +1,5 @@
+-- Copyright (c) Facebook, Inc. and its affiliates.
+
 -- | Higher level concurrency facilities for multiple workers concurrently
 -- over a streaming source of input
 

@@ -1,3 +1,5 @@
+-- Copyright (c) Facebook, Inc. and its affiliates.
+
 {-# OPTIONS_GHC -Wno-name-shadowing #-}
 module ConcurrentTest where
 

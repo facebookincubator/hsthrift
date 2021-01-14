@@ -1,3 +1,5 @@
+-- Copyright (c) Facebook, Inc. and its affiliates.
+
 {-# LANGUAGE DefaultSignatures #-}
 module Foreign.CPP.Marshallable
   ( withCxxObject

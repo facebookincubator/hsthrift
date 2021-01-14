@@ -1,3 +1,5 @@
+-- Copyright (c) Facebook, Inc. and its affiliates.
+
 module CodemodTest (main) where
 
 import qualified Data.Map as Map

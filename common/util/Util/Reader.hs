@@ -1,3 +1,5 @@
+-- Copyright (c) Facebook, Inc. and its affiliates.
+
 module Util.Reader
   ( catchR, catchR_
   , bracketR, bracketR_

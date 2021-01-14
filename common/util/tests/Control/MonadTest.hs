@@ -1,3 +1,5 @@
+-- Copyright (c) Facebook, Inc. and its affiliates.
+
 module Control.MonadTest (main) where
 
 import Test.HUnit

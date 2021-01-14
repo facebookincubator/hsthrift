@@ -1,3 +1,5 @@
+-- Copyright (c) Facebook, Inc. and its affiliates.
+
 {-# LANGUAGE CPP #-}
 module Thrift.ExactPrint.Codemod
   ( roundTripWith

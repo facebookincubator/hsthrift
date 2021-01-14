@@ -1,4 +1,7 @@
 cabal-version:       3.6
+
+-- Copyright (c) Facebook, Inc. and its affiliates.
+
 name:                thrift-server
 version:             0.1.0.0
 synopsis:            Support for creating Thrift servers in Haskell

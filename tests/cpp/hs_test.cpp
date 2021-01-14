@@ -1,3 +1,5 @@
+// Copyright (c) Facebook, Inc. and its affiliates.
+
 #include <cpp/hs_test.h>
 #include <if/gen-cpp2/hs_test_types.h>
 #include <if/gen-cpp2/hs_test_types_custom_protocol.h>

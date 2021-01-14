@@ -1,3 +1,5 @@
+-- Copyright (c) Facebook, Inc. and its affiliates.
+
 -- (c) The University of Glasgow 2006
 
 module Util.String

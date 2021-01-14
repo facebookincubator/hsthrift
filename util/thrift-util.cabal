@@ -1,5 +1,7 @@
 cabal-version:       2.2
 
+-- Copyright (c) Facebook, Inc. and its affiliates.
+
 name:                thrift-util
 version:             0.1.0.0
 synopsis:            Utilities for Thrift

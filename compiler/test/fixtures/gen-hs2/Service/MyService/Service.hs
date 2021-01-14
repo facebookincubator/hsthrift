@@ -85,7 +85,7 @@ reqParser' _proxy "testFunc"
                      Thrift.FieldEnd -> do !__val__arg1 <- ST.readSTRef __field__arg1
                                            !__val__arg2 <- ST.readSTRef __field__arg2
                                            Prelude.pure
-                                             (Thrift.This (TestFunc __val__arg1 __val__arg2))
+                                             (Thrift.Some (TestFunc __val__arg1 __val__arg2))
             _idMap = HashMap.fromList [("arg1", 1), ("arg2", 2)]
           _parse 0)
 reqParser' _proxy "foo"
@@ -101,7 +101,7 @@ reqParser' _proxy "foo"
                                                                       (Thrift.parseSkip _proxy _type
                                                                          (Prelude.Just _bool))
                                                              _parse _id
-                     Thrift.FieldEnd -> do Prelude.pure (Thrift.This Foo)
+                     Thrift.FieldEnd -> do Prelude.pure (Thrift.Some Foo)
             _idMap = HashMap.fromList []
           _parse 0)
 reqParser' _ funName

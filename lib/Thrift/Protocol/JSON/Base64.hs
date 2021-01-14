@@ -1,3 +1,5 @@
+-- Copyright (c) Facebook, Inc. and its affiliates.
+
 module Thrift.Protocol.JSON.Base64
   ( encodeBase64
   , encodeBase64Text
