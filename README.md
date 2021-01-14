@@ -1,3 +1,42 @@
+# The Haskell Thrift Compiler
+
+[Thrift](https://thrift.apache.org/static/files/thrift-20070401.pdf)
+is a serialization and remote procedure call (RPC) framework used for
+cross-service communication. Most services at Facebook communicate via
+Thrift because it provides a simple, language-agnostic protocol for
+communicating with structured data. Thrift can already be used in
+programming languages such as C++, Python, and Java using
+[fbthrift](https://github.com/facebook/fbthrift).
+
+The **hsthrift** project includes the full collection of tools and
+libraries for using Thrift in your own Haskell projects. The [Haskell
+Thrift compiler](tree/master/compiler) generates the Haskell
+code needed to communicate with other Thrift services, and the
+included [libraries](tree/master/lib) allow you to build both
+Thrift clients and [servers](tree/master/server) in
+Haskell. Haskell Thrift is fully compatible with all other fbthrift
+languages, so your Haskell project can freely communicate with other
+services no matter what language they are implemented in.
+
+Note: `hsthrift` is compatible with `fbthrift` but not Apache
+Thrift clients and servers.
+
+`hsthrift` is licensed under a standard [BSD license](blob/master/LICENSE).
+
+# Cabal packages
+
+The repository contains the following packages:
+
+* [mangle](tree/master/common/mangle), a library for mangling C++
+  function prototypes into symbol names, useful for using C++ code via
+  the Haskell FFI.
+* [fb-util](tree/master/common/util), a collection of utilities
+* [thrift-compiler](tree/master/compiler), the Haskell Thrift compiler
+* [thrift-lib](tree/master/lib), libraries for Thrift clients
+* [thrift-util](tree/master/util), utilities
+* [thrift-server](tree/master/server), libraries for Thrift servers
+* [thrift-tests](tree/master/tests), a test suite
+
 # Building and testing
 
 First install all dependencies (see [Dependencies](#Dependencies) section below).
@@ -146,4 +185,3 @@ These library repositories must be checked out with a consistent
 tag. They are all tagged regularly with tags like
 `v2021.01.11.00`. The `install_deps.sh` script will find the most
 recent tag and update all the repos to the same tag.
-
