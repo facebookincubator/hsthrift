@@ -1,5 +1,5 @@
-include "tests/if/D.thrift"
-include "tests/if/E.thrift"
+include "if/D.thrift"
+include "if/E.thrift"
 
 # INCLUSION HIERARCHY
 #
