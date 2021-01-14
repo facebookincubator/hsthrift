@@ -1,4 +1,4 @@
-include "tests/if/namespace_included.thrift"
+include "if/namespace_included.thrift"
 
 namespace hs Thrift.Test
 
