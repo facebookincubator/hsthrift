@@ -1,3 +1,5 @@
+-- Copyright (c) Facebook, Inc. and its affiliates.
+
 {- |
 A standalone rate limiter that accepts some fluctuations in the traffic.
 

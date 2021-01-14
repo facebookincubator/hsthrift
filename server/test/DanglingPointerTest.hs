@@ -1,3 +1,5 @@
+-- Copyright (c) Facebook, Inc. and its affiliates.
+
 module DanglingPointerTest (main) where
 
 import Control.Exception

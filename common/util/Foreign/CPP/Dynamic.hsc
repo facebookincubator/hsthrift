@@ -1,4 +1,4 @@
--- Copyright 2013-present Facebook. All Rights Reserved.
+-- Copyright (c) Facebook, Inc. and its affiliates.
 
 --
 -- Marshal folly::dynamic directly into Haskell's Data.Aeson,

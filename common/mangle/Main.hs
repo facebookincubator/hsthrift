@@ -1,4 +1,7 @@
--- @lint-ignore HLINT1 T25377293 Grandfathered in
+-- Copyright (c) Facebook, Inc. and its affiliates.
+
+module Main (main) where
+
 import System.Environment
 import System.Exit hiding (die)
 import System.IO

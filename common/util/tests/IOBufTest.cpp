@@ -1,3 +1,5 @@
+// Copyright (c) Facebook, Inc. and its affiliates.
+
 #include <cpp/IOBuf.h>
 #include <folly/io/IOBuf.h>
 

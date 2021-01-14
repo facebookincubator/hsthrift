@@ -1,3 +1,5 @@
+// Copyright (c) Facebook, Inc. and its affiliates.
+
 #include "cpp/HaskellProcessor.h"
 
 #include <folly/executors/ManualExecutor.h>

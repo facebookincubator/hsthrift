@@ -1,3 +1,5 @@
+-- Copyright (c) Facebook, Inc. and its affiliates.
+
 {- |
 This module provides facilities to auto generate instances for
 @DefaultConstructible@ and @Destructible@ typeclasses. It depends

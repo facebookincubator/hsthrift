@@ -1,3 +1,5 @@
+// Copyright (c) Facebook, Inc. and its affiliates.
+
 #pragma once
 #include "cpp/Constructible.h"
 #include "cpp/Destructible.h"

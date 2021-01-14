@@ -1,3 +1,5 @@
+// Copyright (c) Facebook, Inc. and its affiliates.
+
 #include <thrift/lib/cpp2/protocol/Serializer.h>
 
 #include <if/gen-cpp2/hs_test_types.h>

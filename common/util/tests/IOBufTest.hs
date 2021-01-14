@@ -1,3 +1,5 @@
+-- Copyright (c) Facebook, Inc. and its affiliates.
+
 module IOBufTest where
 
 import Data.ByteString.Lazy as Lazy

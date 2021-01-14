@@ -1,3 +1,5 @@
+-- Copyright (c) Facebook, Inc. and its affiliates.
+
 module RWVarTest (main) where
 
 import Test.HUnit

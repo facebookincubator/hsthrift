@@ -1,3 +1,5 @@
+-- Copyright (c) Facebook, Inc. and its affiliates.
+
 {-# OPTIONS_GHC -Wno-incomplete-patterns #-}
 
 module Thrift.Compiler.Plugins.Linter

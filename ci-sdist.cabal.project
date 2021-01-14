@@ -1,3 +1,5 @@
+-- Copyright (c) Facebook, Inc. and its affiliates.
+
 packages: */*.cabal
 tests: true
 -- IPV6 is disabled in the Github Actions environment,

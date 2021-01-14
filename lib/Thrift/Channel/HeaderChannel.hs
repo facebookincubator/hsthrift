@@ -1,3 +1,5 @@
+-- Copyright (c) Facebook, Inc. and its affiliates.
+
 {-# LANGUAGE StandaloneDeriving #-}
 module Thrift.Channel.HeaderChannel
   ( HeaderWrappedChannel

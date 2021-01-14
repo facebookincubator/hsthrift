@@ -1,3 +1,5 @@
+// Copyright (c) Facebook, Inc. and its affiliates.
+
 #include <thrift/lib/cpp2/util/ScopedServerInterfaceThread.h>
 #include "test/if/gen-cpp2/Calculator.h"
 

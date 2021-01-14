@@ -1,3 +1,5 @@
+-- Copyright (c) Facebook, Inc. and its affiliates.
+
 module TimeSecTest (main) where
 
 import Test.HUnit

@@ -1,3 +1,5 @@
+// Copyright (c) Facebook, Inc. and its affiliates.
+
 #include "cpp/cdynamic.h"
 
 #include <folly/dynamic.h>

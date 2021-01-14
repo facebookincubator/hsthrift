@@ -1,3 +1,5 @@
+-- Copyright (c) Facebook, Inc. and its affiliates.
+
 module Util.MD5 (md5) where
 
 import GHC.Fingerprint

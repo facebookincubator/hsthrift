@@ -72,7 +72,7 @@ reqParser' _proxy "getNumber"
                                                                          (Prelude.Just _bool))
                                                              _parse _id
                      Thrift.FieldEnd -> do !__val__x <- ST.readSTRef __field__x
-                                           Prelude.pure (Thrift.This (GetNumber __val__x))
+                                           Prelude.pure (Thrift.Some (GetNumber __val__x))
             _idMap = HashMap.fromList [("x", 1)]
           _parse 0)
 reqParser' _proxy "doNothing"
@@ -88,7 +88,7 @@ reqParser' _proxy "doNothing"
                                                                       (Thrift.parseSkip _proxy _type
                                                                          (Prelude.Just _bool))
                                                              _parse _id
-                     Thrift.FieldEnd -> do Prelude.pure (Thrift.This DoNothing)
+                     Thrift.FieldEnd -> do Prelude.pure (Thrift.Some DoNothing)
             _idMap = HashMap.fromList []
           _parse 0)
 reqParser' _ funName

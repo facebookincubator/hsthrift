@@ -68,12 +68,12 @@ reqParser' _proxy "foo"
                                                                       (Thrift.parseSkip _proxy _type
                                                                          (Prelude.Just _bool))
                                                              _parse _id
-                     Thrift.FieldEnd -> do Prelude.pure (Thrift.This Foo)
+                     Thrift.FieldEnd -> do Prelude.pure (Thrift.Some Foo)
             _idMap = HashMap.fromList []
           _parse 0)
 reqParser' _proxy funName
-  = do Thrift.This x <- ParentService.reqParser' _proxy funName
-       Prelude.return (Thrift.This (SuperParentService x))
+  = do Thrift.Some x <- ParentService.reqParser' _proxy funName
+       Prelude.return (Thrift.Some (SuperParentService x))
 
 respWriter' ::
               Thrift.Protocol p =>

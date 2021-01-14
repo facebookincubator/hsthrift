@@ -1,3 +1,5 @@
+-- Copyright (c) Facebook, Inc. and its affiliates.
+
 module DynamicBench (main) where
 
 import Control.Monad (replicateM)

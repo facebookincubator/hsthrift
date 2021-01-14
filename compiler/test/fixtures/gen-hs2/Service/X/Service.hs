@@ -61,7 +61,7 @@ reqParser' _proxy "testFunc"
                                                                       (Thrift.parseSkip _proxy _type
                                                                          (Prelude.Just _bool))
                                                              _parse _id
-                     Thrift.FieldEnd -> do Prelude.pure (Thrift.This TestFunc)
+                     Thrift.FieldEnd -> do Prelude.pure (Thrift.Some TestFunc)
             _idMap = HashMap.fromList []
           _parse 0)
 reqParser' _ funName

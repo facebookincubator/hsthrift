@@ -1,3 +1,5 @@
+// Copyright (c) Facebook, Inc. and its affiliates.
+
 #include <cpp/IOBuf.h>
 
 std::unique_ptr<folly::IOBuf> common::hs::newIOBufWrapping(HS_IOBuf* hs_iobuf) {

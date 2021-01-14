@@ -1,3 +1,5 @@
+-- Copyright (c) Facebook, Inc. and its affiliates.
+
 module RoundTripTest (main) where
 
 import Control.Monad

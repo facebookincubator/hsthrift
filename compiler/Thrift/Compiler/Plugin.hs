@@ -1,3 +1,5 @@
+-- Copyright (c) Facebook, Inc. and its affiliates.
+
 {-# LANGUAGE CPP           #-}
 {-# LANGUAGE TypeOperators #-}
 module Thrift.Compiler.Plugin

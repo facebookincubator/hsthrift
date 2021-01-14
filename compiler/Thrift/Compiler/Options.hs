@@ -1,3 +1,5 @@
+-- Copyright (c) Facebook, Inc. and its affiliates.
+
 module Thrift.Compiler.Options
   ( Options(..), defaultOptions
   , Mode(..), LangOpts

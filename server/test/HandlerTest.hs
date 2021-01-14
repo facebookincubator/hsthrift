@@ -1,3 +1,5 @@
+-- Copyright (c) Facebook, Inc. and its affiliates.
+
 module HandlerTest where
 
 import Control.Concurrent

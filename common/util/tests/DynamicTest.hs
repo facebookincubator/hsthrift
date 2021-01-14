@@ -1,3 +1,5 @@
+-- Copyright (c) Facebook, Inc. and its affiliates.
+
 module DynamicTest (main) where
 
 import Control.Exception (bracket)

@@ -1,5 +1,4 @@
--- Copyright 2014-present Facebook. All Rights Reserved.
-
+-- Copyright (c) Facebook, Inc. and its affiliates.
 
 module HsStructTest (main) where
 

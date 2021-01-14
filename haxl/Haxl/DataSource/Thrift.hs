@@ -1,3 +1,5 @@
+-- Copyright (c) Facebook, Inc. and its affiliates.
+
 --
 -- | Support for building a Haxl datasource to connect to a Thrift
 -- service.

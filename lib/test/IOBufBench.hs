@@ -1,3 +1,5 @@
+-- Copyright (c) Facebook, Inc. and its affiliates.
+
 module IOBufBench where
 
 import Control.DeepSeq

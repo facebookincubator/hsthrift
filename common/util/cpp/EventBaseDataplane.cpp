@@ -1,4 +1,4 @@
-// Copyright 2008-present Facebook. All Rights Reserved.
+// Copyright (c) Facebook, Inc. and its affiliates.
 
 #include <memory>
 
