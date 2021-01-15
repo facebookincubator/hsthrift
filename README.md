@@ -33,7 +33,6 @@ The repository contains the following packages:
 * [fb-util](common/util), a collection of utilities
 * [thrift-compiler](compiler), the Haskell Thrift compiler
 * [thrift-lib](lib), libraries for Thrift clients
-* [thrift-util](util), utilities
 * [thrift-server](server), libraries for Thrift servers
 * [thrift-tests](tests), a test suite
 

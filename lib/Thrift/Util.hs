@@ -1,6 +1,6 @@
 -- Copyright (c) Facebook, Inc. and its affiliates.
 
-module Util.Thrift
+module Thrift.Util
   ( loadJSON
   , saveJSON
   , ThriftException(..)
