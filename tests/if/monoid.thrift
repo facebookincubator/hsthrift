@@ -1,3 +1,5 @@
+// Copyright (c) Facebook, Inc. and its affiliates.
+
 hs_include "if/instances.hs"
 
 struct X {

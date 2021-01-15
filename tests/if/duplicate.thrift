@@ -1,3 +1,5 @@
+// Copyright (c) Facebook, Inc. and its affiliates.
+
 struct X {
   1: string name,
   2: i64 payload,

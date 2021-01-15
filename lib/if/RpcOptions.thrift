@@ -1,3 +1,5 @@
+// Copyright (c) Facebook, Inc. and its affiliates.
+
 namespace cpp2 "thrift.protocol"
 namespace hs "Thrift.Protocol"
 

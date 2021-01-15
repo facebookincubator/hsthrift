@@ -10,16 +10,16 @@
                         "sep": {
                             "sep_type": "NoSep"
                         },
-                        "loc": "Loc {locFile = \"test/if/b.thrift\", locStartLine = 32, locStartCol = 18, locEndLine = 32, locEndCol = 28}"
+                        "loc": "Loc {locFile = \"test/if/b.thrift\", locStartLine = 34, locStartCol = 18, locEndLine = 34, locEndCol = 28}"
                     }
                 ],
-                "loc_close": "Loc {locFile = \"test/if/b.thrift\", locStartLine = 32, locStartCol = 28, locEndLine = 32, locEndCol = 29}",
-                "loc_open": "Loc {locFile = \"test/if/b.thrift\", locStartLine = 32, locStartCol = 17, locEndLine = 32, locEndCol = 18}"
+                "loc_close": "Loc {locFile = \"test/if/b.thrift\", locStartLine = 34, locStartCol = 28, locEndLine = 34, locEndCol = 29}",
+                "loc_open": "Loc {locFile = \"test/if/b.thrift\", locStartLine = 34, locStartCol = 17, locEndLine = 34, locEndCol = 18}"
             },
             "ann_type": {
                 "anns": null,
                 "loc": [
-                    "Loc {locFile = \"test/if/b.thrift\", locStartLine = 32, locStartCol = 9, locEndLine = 32, locEndCol = 12}"
+                    "Loc {locFile = \"test/if/b.thrift\", locStartLine = 34, locStartCol = 9, locEndLine = 34, locEndCol = 12}"
                 ],
                 "type": {
                     "type": "i64"
@@ -27,19 +27,19 @@
             },
             "xref": [],
             "name": "Int",
-            "loc_name": "Loc {locFile = \"test/if/b.thrift\", locStartLine = 32, locStartCol = 13, locEndLine = 32, locEndCol = 16}",
+            "loc_name": "Loc {locFile = \"test/if/b.thrift\", locStartLine = 34, locStartCol = 13, locEndLine = 34, locEndCol = 16}",
             "type": {
                 "type": "i64"
             },
-            "loc_keyword": "Loc {locFile = \"test/if/b.thrift\", locStartLine = 32, locStartCol = 1, locEndLine = 32, locEndCol = 8}"
+            "loc_keyword": "Loc {locFile = \"test/if/b.thrift\", locStartLine = 34, locStartCol = 1, locEndLine = 34, locEndCol = 8}"
         }
     ],
     "structs": [
         {
             "name": "B",
-            "loc_name": "Loc {locFile = \"test/if/b.thrift\", locStartLine = 1, locStartCol = 8, locEndLine = 1, locEndCol = 9}",
+            "loc_name": "Loc {locFile = \"test/if/b.thrift\", locStartLine = 3, locStartCol = 8, locEndLine = 3, locEndCol = 9}",
             "struct_type": "STRUCT",
-            "loc_keyword": "Loc {locFile = \"test/if/b.thrift\", locStartLine = 1, locStartCol = 1, locEndLine = 1, locEndCol = 7}",
+            "loc_keyword": "Loc {locFile = \"test/if/b.thrift\", locStartLine = 3, locStartCol = 1, locEndLine = 3, locEndCol = 7}",
             "fields": [
                 {
                     "default_value": {
@@ -52,7 +52,7 @@
                     "name": "a",
                     "requiredness": "default",
                     "id": 1,
-                    "loc_name": "Loc {locFile = \"test/if/b.thrift\", locStartLine = 2, locStartCol = 10, locEndLine = 2, locEndCol = 11}",
+                    "loc_name": "Loc {locFile = \"test/if/b.thrift\", locStartLine = 4, locStartCol = 10, locEndLine = 4, locEndCol = 11}",
                     "type": {
                         "type": "i16"
                     }
@@ -62,7 +62,7 @@
                     "name": "b",
                     "requiredness": "default",
                     "id": 2,
-                    "loc_name": "Loc {locFile = \"test/if/b.thrift\", locStartLine = 3, locStartCol = 10, locEndLine = 3, locEndCol = 11}",
+                    "loc_name": "Loc {locFile = \"test/if/b.thrift\", locStartLine = 5, locStartCol = 10, locEndLine = 5, locEndCol = 11}",
                     "type": {
                         "type": "i32"
                     }
@@ -72,7 +72,7 @@
                     "name": "c",
                     "requiredness": "default",
                     "id": 3,
-                    "loc_name": "Loc {locFile = \"test/if/b.thrift\", locStartLine = 4, locStartCol = 10, locEndLine = 4, locEndCol = 11}",
+                    "loc_name": "Loc {locFile = \"test/if/b.thrift\", locStartLine = 6, locStartCol = 10, locEndLine = 6, locEndCol = 11}",
                     "type": {
                         "type": "i64"
                     }
@@ -81,27 +81,27 @@
         },
         {
             "name": "C",
-            "loc_name": "Loc {locFile = \"test/if/b.thrift\", locStartLine = 7, locStartCol = 8, locEndLine = 7, locEndCol = 9}",
+            "loc_name": "Loc {locFile = \"test/if/b.thrift\", locStartLine = 9, locStartCol = 8, locEndLine = 9, locEndCol = 9}",
             "struct_type": "STRUCT",
-            "loc_keyword": "Loc {locFile = \"test/if/b.thrift\", locStartLine = 7, locStartCol = 1, locEndLine = 7, locEndCol = 7}",
+            "loc_keyword": "Loc {locFile = \"test/if/b.thrift\", locStartLine = 9, locStartCol = 1, locEndLine = 9, locEndCol = 7}",
             "fields": [
                 {
                     "xref": [
                         {
-                            "rLoc": "Loc {locFile = \"test/if/b.thrift\", locStartLine = 13, locStartCol = 6, locEndLine = 13, locEndCol = 12}",
-                            "aLoc": "Loc {locFile = \"test/if/b.thrift\", locStartLine = 8, locStartCol = 11, locEndLine = 8, locEndCol = 17}"
+                            "rLoc": "Loc {locFile = \"test/if/b.thrift\", locStartLine = 15, locStartCol = 6, locEndLine = 15, locEndCol = 12}",
+                            "aLoc": "Loc {locFile = \"test/if/b.thrift\", locStartLine = 10, locStartCol = 11, locEndLine = 10, locEndCol = 17}"
                         }
                     ],
                     "name": "x",
                     "requiredness": "default",
                     "id": 1,
-                    "loc_name": "Loc {locFile = \"test/if/b.thrift\", locStartLine = 8, locStartCol = 19, locEndLine = 8, locEndCol = 20}",
+                    "loc_name": "Loc {locFile = \"test/if/b.thrift\", locStartLine = 10, locStartCol = 19, locEndLine = 10, locEndCol = 20}",
                     "type": {
                         "inner_type": {
                             "name": {
                                 "name": "Number"
                             },
-                            "loc": "Loc {locFile = \"test/if/b.thrift\", locStartLine = 13, locStartCol = 6, locEndLine = 13, locEndCol = 12}",
+                            "loc": "Loc {locFile = \"test/if/b.thrift\", locStartLine = 15, locStartCol = 6, locEndLine = 15, locEndCol = 12}",
                             "type": "enum"
                         },
                         "type": "list"
@@ -110,20 +110,20 @@
                 {
                     "xref": [
                         {
-                            "rLoc": "Loc {locFile = \"test/if/b.thrift\", locStartLine = 20, locStartCol = 6, locEndLine = 20, locEndCol = 19}",
-                            "aLoc": "Loc {locFile = \"test/if/b.thrift\", locStartLine = 9, locStartCol = 11, locEndLine = 9, locEndCol = 24}"
+                            "rLoc": "Loc {locFile = \"test/if/b.thrift\", locStartLine = 22, locStartCol = 6, locEndLine = 22, locEndCol = 19}",
+                            "aLoc": "Loc {locFile = \"test/if/b.thrift\", locStartLine = 11, locStartCol = 11, locEndLine = 11, locEndCol = 24}"
                         }
                     ],
                     "name": "y",
                     "requiredness": "default",
                     "id": 2,
-                    "loc_name": "Loc {locFile = \"test/if/b.thrift\", locStartLine = 9, locStartCol = 26, locEndLine = 9, locEndCol = 27}",
+                    "loc_name": "Loc {locFile = \"test/if/b.thrift\", locStartLine = 11, locStartCol = 26, locEndLine = 11, locEndCol = 27}",
                     "type": {
                         "inner_type": {
                             "name": {
                                 "name": "Number_Strict"
                             },
-                            "loc": "Loc {locFile = \"test/if/b.thrift\", locStartLine = 20, locStartCol = 6, locEndLine = 20, locEndCol = 19}",
+                            "loc": "Loc {locFile = \"test/if/b.thrift\", locStartLine = 22, locStartCol = 6, locEndLine = 22, locEndCol = 19}",
                             "type": "enum"
                         },
                         "type": "list"
@@ -132,19 +132,19 @@
                 {
                     "xref": [
                         {
-                            "rLoc": "Loc {locFile = \"test/if/b.thrift\", locStartLine = 1, locStartCol = 8, locEndLine = 1, locEndCol = 9}",
-                            "aLoc": "Loc {locFile = \"test/if/b.thrift\", locStartLine = 10, locStartCol = 6, locEndLine = 10, locEndCol = 7}"
+                            "rLoc": "Loc {locFile = \"test/if/b.thrift\", locStartLine = 3, locStartCol = 8, locEndLine = 3, locEndCol = 9}",
+                            "aLoc": "Loc {locFile = \"test/if/b.thrift\", locStartLine = 12, locStartCol = 6, locEndLine = 12, locEndCol = 7}"
                         }
                     ],
                     "name": "z",
                     "requiredness": "default",
                     "id": 3,
-                    "loc_name": "Loc {locFile = \"test/if/b.thrift\", locStartLine = 10, locStartCol = 8, locEndLine = 10, locEndCol = 9}",
+                    "loc_name": "Loc {locFile = \"test/if/b.thrift\", locStartLine = 12, locStartCol = 8, locEndLine = 12, locEndCol = 9}",
                     "type": {
                         "name": {
                             "name": "B"
                         },
-                        "loc": "Loc {locFile = \"test/if/b.thrift\", locStartLine = 1, locStartCol = 8, locEndLine = 1, locEndCol = 9}",
+                        "loc": "Loc {locFile = \"test/if/b.thrift\", locStartLine = 3, locStartCol = 8, locEndLine = 3, locEndCol = 9}",
                         "type": "struct"
                     }
                 }
@@ -164,7 +164,7 @@
             "ann_type": {
                 "anns": null,
                 "loc": [
-                    "Loc {locFile = \"test/if/b.thrift\", locStartLine = 35, locStartCol = 7, locEndLine = 35, locEndCol = 11}"
+                    "Loc {locFile = \"test/if/b.thrift\", locStartLine = 37, locStartCol = 7, locEndLine = 37, locEndCol = 11}"
                 ],
                 "type": {
                     "type": "byte"
@@ -172,11 +172,11 @@
             },
             "xref": [],
             "name": "byte_value",
-            "loc_name": "Loc {locFile = \"test/if/b.thrift\", locStartLine = 35, locStartCol = 12, locEndLine = 35, locEndCol = 22}",
+            "loc_name": "Loc {locFile = \"test/if/b.thrift\", locStartLine = 37, locStartCol = 12, locEndLine = 37, locEndCol = 22}",
             "type": {
                 "type": "byte"
             },
-            "loc_keyword": "Loc {locFile = \"test/if/b.thrift\", locStartLine = 35, locStartCol = 1, locEndLine = 35, locEndCol = 6}"
+            "loc_keyword": "Loc {locFile = \"test/if/b.thrift\", locStartLine = 37, locStartCol = 1, locEndLine = 37, locEndCol = 6}"
         },
         {
             "value": {
@@ -188,7 +188,7 @@
             "ann_type": {
                 "anns": null,
                 "loc": [
-                    "Loc {locFile = \"test/if/b.thrift\", locStartLine = 36, locStartCol = 7, locEndLine = 36, locEndCol = 10}"
+                    "Loc {locFile = \"test/if/b.thrift\", locStartLine = 38, locStartCol = 7, locEndLine = 38, locEndCol = 10}"
                 ],
                 "type": {
                     "type": "i16"
@@ -196,11 +196,11 @@
             },
             "xref": [],
             "name": "i16_value",
-            "loc_name": "Loc {locFile = \"test/if/b.thrift\", locStartLine = 36, locStartCol = 11, locEndLine = 36, locEndCol = 20}",
+            "loc_name": "Loc {locFile = \"test/if/b.thrift\", locStartLine = 38, locStartCol = 11, locEndLine = 38, locEndCol = 20}",
             "type": {
                 "type": "i16"
             },
-            "loc_keyword": "Loc {locFile = \"test/if/b.thrift\", locStartLine = 36, locStartCol = 1, locEndLine = 36, locEndCol = 6}"
+            "loc_keyword": "Loc {locFile = \"test/if/b.thrift\", locStartLine = 38, locStartCol = 1, locEndLine = 38, locEndCol = 6}"
         },
         {
             "value": {
@@ -212,7 +212,7 @@
             "ann_type": {
                 "anns": null,
                 "loc": [
-                    "Loc {locFile = \"test/if/b.thrift\", locStartLine = 37, locStartCol = 7, locEndLine = 37, locEndCol = 10}"
+                    "Loc {locFile = \"test/if/b.thrift\", locStartLine = 39, locStartCol = 7, locEndLine = 39, locEndCol = 10}"
                 ],
                 "type": {
                     "type": "i32"
@@ -220,11 +220,11 @@
             },
             "xref": [],
             "name": "i32_value",
-            "loc_name": "Loc {locFile = \"test/if/b.thrift\", locStartLine = 37, locStartCol = 11, locEndLine = 37, locEndCol = 20}",
+            "loc_name": "Loc {locFile = \"test/if/b.thrift\", locStartLine = 39, locStartCol = 11, locEndLine = 39, locEndCol = 20}",
             "type": {
                 "type": "i32"
             },
-            "loc_keyword": "Loc {locFile = \"test/if/b.thrift\", locStartLine = 37, locStartCol = 1, locEndLine = 37, locEndCol = 6}"
+            "loc_keyword": "Loc {locFile = \"test/if/b.thrift\", locStartLine = 39, locStartCol = 1, locEndLine = 39, locEndCol = 6}"
         },
         {
             "value": {
@@ -237,7 +237,7 @@
             "ann_type": {
                 "anns": null,
                 "loc": [
-                    "Loc {locFile = \"test/if/b.thrift\", locStartLine = 38, locStartCol = 7, locEndLine = 38, locEndCol = 10}"
+                    "Loc {locFile = \"test/if/b.thrift\", locStartLine = 40, locStartCol = 7, locEndLine = 40, locEndCol = 10}"
                 ],
                 "type": {
                     "type": "i64"
@@ -245,11 +245,11 @@
             },
             "xref": [],
             "name": "i64_value",
-            "loc_name": "Loc {locFile = \"test/if/b.thrift\", locStartLine = 38, locStartCol = 11, locEndLine = 38, locEndCol = 20}",
+            "loc_name": "Loc {locFile = \"test/if/b.thrift\", locStartLine = 40, locStartCol = 11, locEndLine = 40, locEndCol = 20}",
             "type": {
                 "type": "i64"
             },
-            "loc_keyword": "Loc {locFile = \"test/if/b.thrift\", locStartLine = 38, locStartCol = 1, locEndLine = 38, locEndCol = 6}"
+            "loc_keyword": "Loc {locFile = \"test/if/b.thrift\", locStartLine = 40, locStartCol = 1, locEndLine = 40, locEndCol = 6}"
         },
         {
             "value": {
@@ -262,7 +262,7 @@
             "ann_type": {
                 "anns": null,
                 "loc": [
-                    "Loc {locFile = \"test/if/b.thrift\", locStartLine = 39, locStartCol = 7, locEndLine = 39, locEndCol = 12}"
+                    "Loc {locFile = \"test/if/b.thrift\", locStartLine = 41, locStartCol = 7, locEndLine = 41, locEndCol = 12}"
                 ],
                 "type": {
                     "type": "float"
@@ -270,11 +270,11 @@
             },
             "xref": [],
             "name": "float_value",
-            "loc_name": "Loc {locFile = \"test/if/b.thrift\", locStartLine = 39, locStartCol = 13, locEndLine = 39, locEndCol = 24}",
+            "loc_name": "Loc {locFile = \"test/if/b.thrift\", locStartLine = 41, locStartCol = 13, locEndLine = 41, locEndCol = 24}",
             "type": {
                 "type": "float"
             },
-            "loc_keyword": "Loc {locFile = \"test/if/b.thrift\", locStartLine = 39, locStartCol = 1, locEndLine = 39, locEndCol = 6}"
+            "loc_keyword": "Loc {locFile = \"test/if/b.thrift\", locStartLine = 41, locStartCol = 1, locEndLine = 41, locEndCol = 6}"
         },
         {
             "value": {
@@ -287,7 +287,7 @@
             "ann_type": {
                 "anns": null,
                 "loc": [
-                    "Loc {locFile = \"test/if/b.thrift\", locStartLine = 40, locStartCol = 7, locEndLine = 40, locEndCol = 13}"
+                    "Loc {locFile = \"test/if/b.thrift\", locStartLine = 42, locStartCol = 7, locEndLine = 42, locEndCol = 13}"
                 ],
                 "type": {
                     "type": "double"
@@ -295,11 +295,11 @@
             },
             "xref": [],
             "name": "double_value",
-            "loc_name": "Loc {locFile = \"test/if/b.thrift\", locStartLine = 40, locStartCol = 14, locEndLine = 40, locEndCol = 26}",
+            "loc_name": "Loc {locFile = \"test/if/b.thrift\", locStartLine = 42, locStartCol = 14, locEndLine = 42, locEndCol = 26}",
             "type": {
                 "type": "double"
             },
-            "loc_keyword": "Loc {locFile = \"test/if/b.thrift\", locStartLine = 40, locStartCol = 1, locEndLine = 40, locEndCol = 6}"
+            "loc_keyword": "Loc {locFile = \"test/if/b.thrift\", locStartLine = 42, locStartCol = 1, locEndLine = 42, locEndCol = 6}"
         },
         {
             "value": {
@@ -311,7 +311,7 @@
             "ann_type": {
                 "anns": null,
                 "loc": [
-                    "Loc {locFile = \"test/if/b.thrift\", locStartLine = 41, locStartCol = 7, locEndLine = 41, locEndCol = 11}"
+                    "Loc {locFile = \"test/if/b.thrift\", locStartLine = 43, locStartCol = 7, locEndLine = 43, locEndCol = 11}"
                 ],
                 "type": {
                     "type": "bool"
@@ -319,11 +319,11 @@
             },
             "xref": [],
             "name": "bool_value",
-            "loc_name": "Loc {locFile = \"test/if/b.thrift\", locStartLine = 41, locStartCol = 12, locEndLine = 41, locEndCol = 22}",
+            "loc_name": "Loc {locFile = \"test/if/b.thrift\", locStartLine = 43, locStartCol = 12, locEndLine = 43, locEndCol = 22}",
             "type": {
                 "type": "bool"
             },
-            "loc_keyword": "Loc {locFile = \"test/if/b.thrift\", locStartLine = 41, locStartCol = 1, locEndLine = 41, locEndCol = 6}"
+            "loc_keyword": "Loc {locFile = \"test/if/b.thrift\", locStartLine = 43, locStartCol = 1, locEndLine = 43, locEndCol = 6}"
         },
         {
             "value": {
@@ -335,7 +335,7 @@
             "ann_type": {
                 "anns": null,
                 "loc": [
-                    "Loc {locFile = \"test/if/b.thrift\", locStartLine = 42, locStartCol = 7, locEndLine = 42, locEndCol = 13}"
+                    "Loc {locFile = \"test/if/b.thrift\", locStartLine = 44, locStartCol = 7, locEndLine = 44, locEndCol = 13}"
                 ],
                 "type": {
                     "type": "string"
@@ -343,11 +343,11 @@
             },
             "xref": [],
             "name": "string_value",
-            "loc_name": "Loc {locFile = \"test/if/b.thrift\", locStartLine = 42, locStartCol = 14, locEndLine = 42, locEndCol = 26}",
+            "loc_name": "Loc {locFile = \"test/if/b.thrift\", locStartLine = 44, locStartCol = 14, locEndLine = 44, locEndCol = 26}",
             "type": {
                 "type": "string"
             },
-            "loc_keyword": "Loc {locFile = \"test/if/b.thrift\", locStartLine = 42, locStartCol = 1, locEndLine = 42, locEndCol = 6}"
+            "loc_keyword": "Loc {locFile = \"test/if/b.thrift\", locStartLine = 44, locStartCol = 1, locEndLine = 44, locEndCol = 6}"
         },
         {
             "value": {
@@ -359,7 +359,7 @@
             "ann_type": {
                 "anns": null,
                 "loc": [
-                    "Loc {locFile = \"test/if/b.thrift\", locStartLine = 43, locStartCol = 7, locEndLine = 43, locEndCol = 13}"
+                    "Loc {locFile = \"test/if/b.thrift\", locStartLine = 45, locStartCol = 7, locEndLine = 45, locEndCol = 13}"
                 ],
                 "type": {
                     "type": "binary"
@@ -367,11 +367,11 @@
             },
             "xref": [],
             "name": "binary_value",
-            "loc_name": "Loc {locFile = \"test/if/b.thrift\", locStartLine = 43, locStartCol = 14, locEndLine = 43, locEndCol = 26}",
+            "loc_name": "Loc {locFile = \"test/if/b.thrift\", locStartLine = 45, locStartCol = 14, locEndLine = 45, locEndCol = 26}",
             "type": {
                 "type": "binary"
             },
-            "loc_keyword": "Loc {locFile = \"test/if/b.thrift\", locStartLine = 43, locStartCol = 1, locEndLine = 43, locEndCol = 6}"
+            "loc_keyword": "Loc {locFile = \"test/if/b.thrift\", locStartLine = 45, locStartCol = 1, locEndLine = 45, locEndCol = 6}"
         },
         {
             "value": {
@@ -387,7 +387,7 @@
             "ann_type": {
                 "anns": null,
                 "loc": [
-                    "Loc {locFile = \"test/if/b.thrift\", locStartLine = 44, locStartCol = 7, locEndLine = 44, locEndCol = 10}"
+                    "Loc {locFile = \"test/if/b.thrift\", locStartLine = 46, locStartCol = 7, locEndLine = 46, locEndCol = 10}"
                 ],
                 "type": {
                     "name": "Int"
@@ -395,12 +395,12 @@
             },
             "xref": [
                 {
-                    "rLoc": "Loc {locFile = \"test/if/b.thrift\", locStartLine = 32, locStartCol = 13, locEndLine = 32, locEndCol = 16}",
-                    "aLoc": "Loc {locFile = \"test/if/b.thrift\", locStartLine = 44, locStartCol = 7, locEndLine = 44, locEndCol = 10}"
+                    "rLoc": "Loc {locFile = \"test/if/b.thrift\", locStartLine = 34, locStartCol = 13, locEndLine = 34, locEndCol = 16}",
+                    "aLoc": "Loc {locFile = \"test/if/b.thrift\", locStartLine = 46, locStartCol = 7, locEndLine = 46, locEndCol = 10}"
                 }
             ],
             "name": "newtype_value",
-            "loc_name": "Loc {locFile = \"test/if/b.thrift\", locStartLine = 44, locStartCol = 11, locEndLine = 44, locEndCol = 24}",
+            "loc_name": "Loc {locFile = \"test/if/b.thrift\", locStartLine = 46, locStartCol = 11, locEndLine = 46, locEndCol = 24}",
             "type": {
                 "inner_type": {
                     "type": "i64"
@@ -408,10 +408,10 @@
                 "name": {
                     "name": "Int"
                 },
-                "loc": "Loc {locFile = \"test/if/b.thrift\", locStartLine = 32, locStartCol = 13, locEndLine = 32, locEndCol = 16}",
+                "loc": "Loc {locFile = \"test/if/b.thrift\", locStartLine = 34, locStartCol = 13, locEndLine = 34, locEndCol = 16}",
                 "type": "newtype"
             },
-            "loc_keyword": "Loc {locFile = \"test/if/b.thrift\", locStartLine = 44, locStartCol = 1, locEndLine = 44, locEndCol = 6}"
+            "loc_keyword": "Loc {locFile = \"test/if/b.thrift\", locStartLine = 46, locStartCol = 1, locEndLine = 46, locEndCol = 6}"
         },
         {
             "value": {
@@ -436,15 +436,15 @@
             "ann_type": {
                 "anns": null,
                 "loc": [
-                    "Loc {locFile = \"test/if/b.thrift\", locStartLine = 47, locStartCol = 7, locEndLine = 47, locEndCol = 11}",
-                    "Loc {locFile = \"test/if/b.thrift\", locStartLine = 47, locStartCol = 11, locEndLine = 47, locEndCol = 12}",
-                    "Loc {locFile = \"test/if/b.thrift\", locStartLine = 47, locStartCol = 15, locEndLine = 47, locEndCol = 16}"
+                    "Loc {locFile = \"test/if/b.thrift\", locStartLine = 49, locStartCol = 7, locEndLine = 49, locEndCol = 11}",
+                    "Loc {locFile = \"test/if/b.thrift\", locStartLine = 49, locStartCol = 11, locEndLine = 49, locEndCol = 12}",
+                    "Loc {locFile = \"test/if/b.thrift\", locStartLine = 49, locStartCol = 15, locEndLine = 49, locEndCol = 16}"
                 ],
                 "type": {
                     "inner_type": {
                         "anns": null,
                         "loc": [
-                            "Loc {locFile = \"test/if/b.thrift\", locStartLine = 47, locStartCol = 12, locEndLine = 47, locEndCol = 15}"
+                            "Loc {locFile = \"test/if/b.thrift\", locStartLine = 49, locStartCol = 12, locEndLine = 49, locEndCol = 15}"
                         ],
                         "type": {
                             "type": "i64"
@@ -455,14 +455,14 @@
             },
             "xref": [],
             "name": "list_value",
-            "loc_name": "Loc {locFile = \"test/if/b.thrift\", locStartLine = 47, locStartCol = 17, locEndLine = 47, locEndCol = 27}",
+            "loc_name": "Loc {locFile = \"test/if/b.thrift\", locStartLine = 49, locStartCol = 17, locEndLine = 49, locEndCol = 27}",
             "type": {
                 "inner_type": {
                     "type": "i64"
                 },
                 "type": "list"
             },
-            "loc_keyword": "Loc {locFile = \"test/if/b.thrift\", locStartLine = 47, locStartCol = 1, locEndLine = 47, locEndCol = 6}"
+            "loc_keyword": "Loc {locFile = \"test/if/b.thrift\", locStartLine = 49, locStartCol = 1, locEndLine = 49, locEndCol = 6}"
         },
         {
             "value": {
@@ -486,15 +486,15 @@
             "ann_type": {
                 "anns": null,
                 "loc": [
-                    "Loc {locFile = \"test/if/b.thrift\", locStartLine = 48, locStartCol = 7, locEndLine = 48, locEndCol = 10}",
-                    "Loc {locFile = \"test/if/b.thrift\", locStartLine = 48, locStartCol = 10, locEndLine = 48, locEndCol = 11}",
-                    "Loc {locFile = \"test/if/b.thrift\", locStartLine = 48, locStartCol = 17, locEndLine = 48, locEndCol = 18}"
+                    "Loc {locFile = \"test/if/b.thrift\", locStartLine = 50, locStartCol = 7, locEndLine = 50, locEndCol = 10}",
+                    "Loc {locFile = \"test/if/b.thrift\", locStartLine = 50, locStartCol = 10, locEndLine = 50, locEndCol = 11}",
+                    "Loc {locFile = \"test/if/b.thrift\", locStartLine = 50, locStartCol = 17, locEndLine = 50, locEndCol = 18}"
                 ],
                 "type": {
                     "inner_type": {
                         "anns": null,
                         "loc": [
-                            "Loc {locFile = \"test/if/b.thrift\", locStartLine = 48, locStartCol = 11, locEndLine = 48, locEndCol = 17}"
+                            "Loc {locFile = \"test/if/b.thrift\", locStartLine = 50, locStartCol = 11, locEndLine = 50, locEndCol = 17}"
                         ],
                         "type": {
                             "type": "string"
@@ -505,14 +505,14 @@
             },
             "xref": [],
             "name": "set_value",
-            "loc_name": "Loc {locFile = \"test/if/b.thrift\", locStartLine = 48, locStartCol = 19, locEndLine = 48, locEndCol = 28}",
+            "loc_name": "Loc {locFile = \"test/if/b.thrift\", locStartLine = 50, locStartCol = 19, locEndLine = 50, locEndCol = 28}",
             "type": {
                 "inner_type": {
                     "type": "string"
                 },
                 "type": "set"
             },
-            "loc_keyword": "Loc {locFile = \"test/if/b.thrift\", locStartLine = 48, locStartCol = 1, locEndLine = 48, locEndCol = 6}"
+            "loc_keyword": "Loc {locFile = \"test/if/b.thrift\", locStartLine = 50, locStartCol = 1, locEndLine = 50, locEndCol = 6}"
         },
         {
             "value": {
@@ -555,16 +555,16 @@
             "ann_type": {
                 "anns": null,
                 "loc": [
-                    "Loc {locFile = \"test/if/b.thrift\", locStartLine = 51, locStartCol = 7, locEndLine = 51, locEndCol = 10}",
-                    "Loc {locFile = \"test/if/b.thrift\", locStartLine = 51, locStartCol = 10, locEndLine = 51, locEndCol = 11}",
-                    "Loc {locFile = \"test/if/b.thrift\", locStartLine = 51, locStartCol = 14, locEndLine = 51, locEndCol = 15}",
-                    "Loc {locFile = \"test/if/b.thrift\", locStartLine = 51, locStartCol = 20, locEndLine = 51, locEndCol = 21}"
+                    "Loc {locFile = \"test/if/b.thrift\", locStartLine = 53, locStartCol = 7, locEndLine = 53, locEndCol = 10}",
+                    "Loc {locFile = \"test/if/b.thrift\", locStartLine = 53, locStartCol = 10, locEndLine = 53, locEndCol = 11}",
+                    "Loc {locFile = \"test/if/b.thrift\", locStartLine = 53, locStartCol = 14, locEndLine = 53, locEndCol = 15}",
+                    "Loc {locFile = \"test/if/b.thrift\", locStartLine = 53, locStartCol = 20, locEndLine = 53, locEndCol = 21}"
                 ],
                 "type": {
                     "val_type": {
                         "anns": null,
                         "loc": [
-                            "Loc {locFile = \"test/if/b.thrift\", locStartLine = 51, locStartCol = 16, locEndLine = 51, locEndCol = 20}"
+                            "Loc {locFile = \"test/if/b.thrift\", locStartLine = 53, locStartCol = 16, locEndLine = 53, locEndCol = 20}"
                         ],
                         "type": {
                             "type": "bool"
@@ -573,7 +573,7 @@
                     "key_type": {
                         "anns": null,
                         "loc": [
-                            "Loc {locFile = \"test/if/b.thrift\", locStartLine = 51, locStartCol = 11, locEndLine = 51, locEndCol = 14}"
+                            "Loc {locFile = \"test/if/b.thrift\", locStartLine = 53, locStartCol = 11, locEndLine = 53, locEndCol = 14}"
                         ],
                         "type": {
                             "type": "i64"
@@ -584,7 +584,7 @@
             },
             "xref": [],
             "name": "map_value",
-            "loc_name": "Loc {locFile = \"test/if/b.thrift\", locStartLine = 51, locStartCol = 22, locEndLine = 51, locEndCol = 31}",
+            "loc_name": "Loc {locFile = \"test/if/b.thrift\", locStartLine = 53, locStartCol = 22, locEndLine = 53, locEndCol = 31}",
             "type": {
                 "val_type": {
                     "type": "bool"
@@ -594,7 +594,7 @@
                 },
                 "type": "map"
             },
-            "loc_keyword": "Loc {locFile = \"test/if/b.thrift\", locStartLine = 51, locStartCol = 1, locEndLine = 51, locEndCol = 6}"
+            "loc_keyword": "Loc {locFile = \"test/if/b.thrift\", locStartLine = 53, locStartCol = 1, locEndLine = 53, locEndCol = 6}"
         },
         {
             "value": {
@@ -636,14 +636,14 @@
                 "anns": {
                     "loc_ann_list": [
                         {
-                            "loc_val": "Loc {locFile = \"test/if/b.thrift\", locStartLine = 52, locStartCol = 38, locEndLine = 52, locEndCol = 47}",
+                            "loc_val": "Loc {locFile = \"test/if/b.thrift\", locStartLine = 54, locStartCol = 38, locEndLine = 54, locEndCol = 47}",
                             "tag": "hs.type",
                             "ann_type": "ValueAnn",
                             "sep": {
                                 "sep_type": "NoSep"
                             },
-                            "loc_tag": "Loc {locFile = \"test/if/b.thrift\", locStartLine = 52, locStartCol = 28, locEndLine = 52, locEndCol = 35}",
-                            "loc_equal": "Loc {locFile = \"test/if/b.thrift\", locStartLine = 52, locStartCol = 36, locEndLine = 52, locEndCol = 37}",
+                            "loc_tag": "Loc {locFile = \"test/if/b.thrift\", locStartLine = 54, locStartCol = 28, locEndLine = 54, locEndCol = 35}",
+                            "loc_equal": "Loc {locFile = \"test/if/b.thrift\", locStartLine = 54, locStartCol = 36, locEndLine = 54, locEndCol = 37}",
                             "val": {
                                 "q": "DoubleQuote",
                                 "t": "HashMap",
@@ -651,20 +651,20 @@
                             }
                         }
                     ],
-                    "loc_close": "Loc {locFile = \"test/if/b.thrift\", locStartLine = 52, locStartCol = 47, locEndLine = 52, locEndCol = 48}",
-                    "loc_open": "Loc {locFile = \"test/if/b.thrift\", locStartLine = 52, locStartCol = 27, locEndLine = 52, locEndCol = 28}"
+                    "loc_close": "Loc {locFile = \"test/if/b.thrift\", locStartLine = 54, locStartCol = 47, locEndLine = 54, locEndCol = 48}",
+                    "loc_open": "Loc {locFile = \"test/if/b.thrift\", locStartLine = 54, locStartCol = 27, locEndLine = 54, locEndCol = 28}"
                 },
                 "loc": [
-                    "Loc {locFile = \"test/if/b.thrift\", locStartLine = 52, locStartCol = 7, locEndLine = 52, locEndCol = 10}",
-                    "Loc {locFile = \"test/if/b.thrift\", locStartLine = 52, locStartCol = 10, locEndLine = 52, locEndCol = 11}",
-                    "Loc {locFile = \"test/if/b.thrift\", locStartLine = 52, locStartCol = 17, locEndLine = 52, locEndCol = 18}",
-                    "Loc {locFile = \"test/if/b.thrift\", locStartLine = 52, locStartCol = 25, locEndLine = 52, locEndCol = 26}"
+                    "Loc {locFile = \"test/if/b.thrift\", locStartLine = 54, locStartCol = 7, locEndLine = 54, locEndCol = 10}",
+                    "Loc {locFile = \"test/if/b.thrift\", locStartLine = 54, locStartCol = 10, locEndLine = 54, locEndCol = 11}",
+                    "Loc {locFile = \"test/if/b.thrift\", locStartLine = 54, locStartCol = 17, locEndLine = 54, locEndCol = 18}",
+                    "Loc {locFile = \"test/if/b.thrift\", locStartLine = 54, locStartCol = 25, locEndLine = 54, locEndCol = 26}"
                 ],
                 "type": {
                     "val_type": {
                         "anns": null,
                         "loc": [
-                            "Loc {locFile = \"test/if/b.thrift\", locStartLine = 52, locStartCol = 19, locEndLine = 52, locEndCol = 25}"
+                            "Loc {locFile = \"test/if/b.thrift\", locStartLine = 54, locStartCol = 19, locEndLine = 54, locEndCol = 25}"
                         ],
                         "type": {
                             "type": "string"
@@ -673,7 +673,7 @@
                     "key_type": {
                         "anns": null,
                         "loc": [
-                            "Loc {locFile = \"test/if/b.thrift\", locStartLine = 52, locStartCol = 11, locEndLine = 52, locEndCol = 17}"
+                            "Loc {locFile = \"test/if/b.thrift\", locStartLine = 54, locStartCol = 11, locEndLine = 54, locEndCol = 17}"
                         ],
                         "type": {
                             "type": "string"
@@ -684,7 +684,7 @@
             },
             "xref": [],
             "name": "hash_map_value",
-            "loc_name": "Loc {locFile = \"test/if/b.thrift\", locStartLine = 53, locStartCol = 3, locEndLine = 53, locEndCol = 17}",
+            "loc_name": "Loc {locFile = \"test/if/b.thrift\", locStartLine = 55, locStartCol = 3, locEndLine = 55, locEndCol = 17}",
             "type": {
                 "val_type": {
                     "type": "string"
@@ -694,7 +694,7 @@
                 },
                 "type": "map"
             },
-            "loc_keyword": "Loc {locFile = \"test/if/b.thrift\", locStartLine = 52, locStartCol = 1, locEndLine = 52, locEndCol = 6}"
+            "loc_keyword": "Loc {locFile = \"test/if/b.thrift\", locStartLine = 54, locStartCol = 1, locEndLine = 54, locEndCol = 6}"
         },
         {
             "value": {
@@ -744,7 +744,7 @@
             "ann_type": {
                 "anns": null,
                 "loc": [
-                    "Loc {locFile = \"test/if/b.thrift\", locStartLine = 55, locStartCol = 7, locEndLine = 55, locEndCol = 8}"
+                    "Loc {locFile = \"test/if/b.thrift\", locStartLine = 57, locStartCol = 7, locEndLine = 57, locEndCol = 8}"
                 ],
                 "type": {
                     "name": "B"
@@ -752,20 +752,20 @@
             },
             "xref": [
                 {
-                    "rLoc": "Loc {locFile = \"test/if/b.thrift\", locStartLine = 1, locStartCol = 8, locEndLine = 1, locEndCol = 9}",
-                    "aLoc": "Loc {locFile = \"test/if/b.thrift\", locStartLine = 55, locStartCol = 7, locEndLine = 55, locEndCol = 8}"
+                    "rLoc": "Loc {locFile = \"test/if/b.thrift\", locStartLine = 3, locStartCol = 8, locEndLine = 3, locEndCol = 9}",
+                    "aLoc": "Loc {locFile = \"test/if/b.thrift\", locStartLine = 57, locStartCol = 7, locEndLine = 57, locEndCol = 8}"
                 }
             ],
             "name": "struct_value",
-            "loc_name": "Loc {locFile = \"test/if/b.thrift\", locStartLine = 55, locStartCol = 9, locEndLine = 55, locEndCol = 21}",
+            "loc_name": "Loc {locFile = \"test/if/b.thrift\", locStartLine = 57, locStartCol = 9, locEndLine = 57, locEndCol = 21}",
             "type": {
                 "name": {
                     "name": "B"
                 },
-                "loc": "Loc {locFile = \"test/if/b.thrift\", locStartLine = 1, locStartCol = 8, locEndLine = 1, locEndCol = 9}",
+                "loc": "Loc {locFile = \"test/if/b.thrift\", locStartLine = 3, locStartCol = 8, locEndLine = 3, locEndCol = 9}",
                 "type": "struct"
             },
-            "loc_keyword": "Loc {locFile = \"test/if/b.thrift\", locStartLine = 55, locStartCol = 1, locEndLine = 55, locEndCol = 6}"
+            "loc_keyword": "Loc {locFile = \"test/if/b.thrift\", locStartLine = 57, locStartCol = 1, locEndLine = 57, locEndCol = 6}"
         },
         {
             "value": {
@@ -815,7 +815,7 @@
             "ann_type": {
                 "anns": null,
                 "loc": [
-                    "Loc {locFile = \"test/if/b.thrift\", locStartLine = 56, locStartCol = 7, locEndLine = 56, locEndCol = 8}"
+                    "Loc {locFile = \"test/if/b.thrift\", locStartLine = 58, locStartCol = 7, locEndLine = 58, locEndCol = 8}"
                 ],
                 "type": {
                     "name": "B"
@@ -823,20 +823,20 @@
             },
             "xref": [
                 {
-                    "rLoc": "Loc {locFile = \"test/if/b.thrift\", locStartLine = 1, locStartCol = 8, locEndLine = 1, locEndCol = 9}",
-                    "aLoc": "Loc {locFile = \"test/if/b.thrift\", locStartLine = 56, locStartCol = 7, locEndLine = 56, locEndCol = 8}"
+                    "rLoc": "Loc {locFile = \"test/if/b.thrift\", locStartLine = 3, locStartCol = 8, locEndLine = 3, locEndCol = 9}",
+                    "aLoc": "Loc {locFile = \"test/if/b.thrift\", locStartLine = 58, locStartCol = 7, locEndLine = 58, locEndCol = 8}"
                 }
             ],
             "name": "explicit_struct_value",
-            "loc_name": "Loc {locFile = \"test/if/b.thrift\", locStartLine = 56, locStartCol = 9, locEndLine = 56, locEndCol = 30}",
+            "loc_name": "Loc {locFile = \"test/if/b.thrift\", locStartLine = 58, locStartCol = 9, locEndLine = 58, locEndCol = 30}",
             "type": {
                 "name": {
                     "name": "B"
                 },
-                "loc": "Loc {locFile = \"test/if/b.thrift\", locStartLine = 1, locStartCol = 8, locEndLine = 1, locEndCol = 9}",
+                "loc": "Loc {locFile = \"test/if/b.thrift\", locStartLine = 3, locStartCol = 8, locEndLine = 3, locEndCol = 9}",
                 "type": "struct"
             },
-            "loc_keyword": "Loc {locFile = \"test/if/b.thrift\", locStartLine = 56, locStartCol = 1, locEndLine = 56, locEndCol = 6}"
+            "loc_keyword": "Loc {locFile = \"test/if/b.thrift\", locStartLine = 58, locStartCol = 1, locEndLine = 58, locEndCol = 6}"
         },
         {
             "value": {
@@ -849,7 +849,7 @@
                                     "name": {
                                         "name": "Number"
                                     },
-                                    "loc": "Loc {locFile = \"test/if/b.thrift\", locStartLine = 13, locStartCol = 6, locEndLine = 13, locEndCol = 12}",
+                                    "loc": "Loc {locFile = \"test/if/b.thrift\", locStartLine = 15, locStartCol = 6, locEndLine = 15, locEndCol = 12}",
                                     "type": "enum"
                                 },
                                 "type": "list"
@@ -868,7 +868,7 @@
                                     "name": {
                                         "name": "Number_Strict"
                                     },
-                                    "loc": "Loc {locFile = \"test/if/b.thrift\", locStartLine = 20, locStartCol = 6, locEndLine = 20, locEndCol = 19}",
+                                    "loc": "Loc {locFile = \"test/if/b.thrift\", locStartLine = 22, locStartCol = 6, locEndLine = 22, locEndCol = 19}",
                                     "type": "enum"
                                 },
                                 "type": "list"
@@ -886,7 +886,7 @@
                                 "name": {
                                     "name": "B"
                                 },
-                                "loc": "Loc {locFile = \"test/if/b.thrift\", locStartLine = 1, locStartCol = 8, locEndLine = 1, locEndCol = 9}",
+                                "loc": "Loc {locFile = \"test/if/b.thrift\", locStartLine = 3, locStartCol = 8, locEndLine = 3, locEndCol = 9}",
                                 "type": "struct"
                             },
                             "field_value": {
@@ -941,7 +941,7 @@
             "ann_type": {
                 "anns": null,
                 "loc": [
-                    "Loc {locFile = \"test/if/b.thrift\", locStartLine = 57, locStartCol = 7, locEndLine = 57, locEndCol = 8}"
+                    "Loc {locFile = \"test/if/b.thrift\", locStartLine = 59, locStartCol = 7, locEndLine = 59, locEndCol = 8}"
                 ],
                 "type": {
                     "name": "C"
@@ -949,20 +949,20 @@
             },
             "xref": [
                 {
-                    "rLoc": "Loc {locFile = \"test/if/b.thrift\", locStartLine = 7, locStartCol = 8, locEndLine = 7, locEndCol = 9}",
-                    "aLoc": "Loc {locFile = \"test/if/b.thrift\", locStartLine = 57, locStartCol = 7, locEndLine = 57, locEndCol = 8}"
+                    "rLoc": "Loc {locFile = \"test/if/b.thrift\", locStartLine = 9, locStartCol = 8, locEndLine = 9, locEndCol = 9}",
+                    "aLoc": "Loc {locFile = \"test/if/b.thrift\", locStartLine = 59, locStartCol = 7, locEndLine = 59, locEndCol = 8}"
                 }
             ],
             "name": "explicit_nested_struct_value",
-            "loc_name": "Loc {locFile = \"test/if/b.thrift\", locStartLine = 57, locStartCol = 9, locEndLine = 57, locEndCol = 37}",
+            "loc_name": "Loc {locFile = \"test/if/b.thrift\", locStartLine = 59, locStartCol = 9, locEndLine = 59, locEndCol = 37}",
             "type": {
                 "name": {
                     "name": "C"
                 },
-                "loc": "Loc {locFile = \"test/if/b.thrift\", locStartLine = 7, locStartCol = 8, locEndLine = 7, locEndCol = 9}",
+                "loc": "Loc {locFile = \"test/if/b.thrift\", locStartLine = 9, locStartCol = 8, locEndLine = 9, locEndCol = 9}",
                 "type": "struct"
             },
-            "loc_keyword": "Loc {locFile = \"test/if/b.thrift\", locStartLine = 57, locStartCol = 1, locEndLine = 57, locEndCol = 6}"
+            "loc_keyword": "Loc {locFile = \"test/if/b.thrift\", locStartLine = 59, locStartCol = 1, locEndLine = 59, locEndCol = 6}"
         }
     ],
     "name": "b",
@@ -975,26 +975,26 @@
                 {
                     "value": 0,
                     "name": "Zero",
-                    "loc_name": "Loc {locFile = \"test/if/b.thrift\", locStartLine = 14, locStartCol = 3, locEndLine = 14, locEndCol = 7}"
+                    "loc_name": "Loc {locFile = \"test/if/b.thrift\", locStartLine = 16, locStartCol = 3, locEndLine = 16, locEndCol = 7}"
                 },
                 {
                     "value": 1,
                     "name": "One",
-                    "loc_name": "Loc {locFile = \"test/if/b.thrift\", locStartLine = 15, locStartCol = 3, locEndLine = 15, locEndCol = 6}"
+                    "loc_name": "Loc {locFile = \"test/if/b.thrift\", locStartLine = 17, locStartCol = 3, locEndLine = 17, locEndCol = 6}"
                 },
                 {
                     "value": 2,
                     "name": "Two",
-                    "loc_name": "Loc {locFile = \"test/if/b.thrift\", locStartLine = 16, locStartCol = 3, locEndLine = 16, locEndCol = 6}"
+                    "loc_name": "Loc {locFile = \"test/if/b.thrift\", locStartLine = 18, locStartCol = 3, locEndLine = 18, locEndCol = 6}"
                 },
                 {
                     "value": 3,
                     "name": "Three",
-                    "loc_name": "Loc {locFile = \"test/if/b.thrift\", locStartLine = 17, locStartCol = 3, locEndLine = 17, locEndCol = 8}"
+                    "loc_name": "Loc {locFile = \"test/if/b.thrift\", locStartLine = 19, locStartCol = 3, locEndLine = 19, locEndCol = 8}"
                 }
             ],
-            "loc_name": "Loc {locFile = \"test/if/b.thrift\", locStartLine = 13, locStartCol = 6, locEndLine = 13, locEndCol = 12}",
-            "loc_keyword": "Loc {locFile = \"test/if/b.thrift\", locStartLine = 13, locStartCol = 1, locEndLine = 13, locEndCol = 5}"
+            "loc_name": "Loc {locFile = \"test/if/b.thrift\", locStartLine = 15, locStartCol = 6, locEndLine = 15, locEndCol = 12}",
+            "loc_keyword": "Loc {locFile = \"test/if/b.thrift\", locStartLine = 15, locStartCol = 1, locEndLine = 15, locEndCol = 5}"
         },
         {
             "is_psuedo": false,
@@ -1003,11 +1003,11 @@
                 {
                     "value": 0,
                     "name": "Zero",
-                    "loc_name": "Loc {locFile = \"test/if/b.thrift\", locStartLine = 21, locStartCol = 3, locEndLine = 21, locEndCol = 7}"
+                    "loc_name": "Loc {locFile = \"test/if/b.thrift\", locStartLine = 23, locStartCol = 3, locEndLine = 23, locEndCol = 7}"
                 }
             ],
-            "loc_name": "Loc {locFile = \"test/if/b.thrift\", locStartLine = 20, locStartCol = 6, locEndLine = 20, locEndCol = 19}",
-            "loc_keyword": "Loc {locFile = \"test/if/b.thrift\", locStartLine = 20, locStartCol = 1, locEndLine = 20, locEndCol = 5}"
+            "loc_name": "Loc {locFile = \"test/if/b.thrift\", locStartLine = 22, locStartCol = 6, locEndLine = 22, locEndCol = 19}",
+            "loc_keyword": "Loc {locFile = \"test/if/b.thrift\", locStartLine = 22, locStartCol = 1, locEndLine = 22, locEndCol = 5}"
         },
         {
             "is_psuedo": false,
@@ -1016,23 +1016,23 @@
                 {
                     "value": 5,
                     "name": "Five",
-                    "loc_name": "Loc {locFile = \"test/if/b.thrift\", locStartLine = 25, locStartCol = 3, locEndLine = 25, locEndCol = 7}"
+                    "loc_name": "Loc {locFile = \"test/if/b.thrift\", locStartLine = 27, locStartCol = 3, locEndLine = 27, locEndCol = 7}"
                 },
                 {
                     "value": 0,
                     "name": "Zero",
-                    "loc_name": "Loc {locFile = \"test/if/b.thrift\", locStartLine = 26, locStartCol = 3, locEndLine = 26, locEndCol = 7}"
+                    "loc_name": "Loc {locFile = \"test/if/b.thrift\", locStartLine = 28, locStartCol = 3, locEndLine = 28, locEndCol = 7}"
                 }
             ],
-            "loc_name": "Loc {locFile = \"test/if/b.thrift\", locStartLine = 24, locStartCol = 6, locEndLine = 24, locEndCol = 26}",
-            "loc_keyword": "Loc {locFile = \"test/if/b.thrift\", locStartLine = 24, locStartCol = 1, locEndLine = 24, locEndCol = 5}"
+            "loc_name": "Loc {locFile = \"test/if/b.thrift\", locStartLine = 26, locStartCol = 6, locEndLine = 26, locEndCol = 26}",
+            "loc_keyword": "Loc {locFile = \"test/if/b.thrift\", locStartLine = 26, locStartCol = 1, locEndLine = 26, locEndCol = 5}"
         },
         {
             "is_psuedo": false,
             "name": "Number_Empty",
             "constants": [],
-            "loc_name": "Loc {locFile = \"test/if/b.thrift\", locStartLine = 29, locStartCol = 6, locEndLine = 29, locEndCol = 18}",
-            "loc_keyword": "Loc {locFile = \"test/if/b.thrift\", locStartLine = 29, locStartCol = 1, locEndLine = 29, locEndCol = 5}"
+            "loc_name": "Loc {locFile = \"test/if/b.thrift\", locStartLine = 31, locStartCol = 6, locEndLine = 31, locEndCol = 18}",
+            "loc_keyword": "Loc {locFile = \"test/if/b.thrift\", locStartLine = 31, locStartCol = 1, locEndLine = 31, locEndCol = 5}"
         }
     ],
     "options": {

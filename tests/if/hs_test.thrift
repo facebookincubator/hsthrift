@@ -1,3 +1,5 @@
+// Copyright (c) Facebook, Inc. and its affiliates.
+
 hs_include "if/hs_test_instances.hs"
 
 typedef i64 X (hs.newtype, rust.newtype)

@@ -1,3 +1,5 @@
+// Copyright (c) Facebook, Inc. and its affiliates.
+
 enum UnsortedEnum {
   G = 7
   A = 1

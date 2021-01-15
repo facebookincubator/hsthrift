@@ -1,3 +1,5 @@
+// Copyright (c) Facebook, Inc. and its affiliates.
+
 const i32 i32Const = 99
 
 const bool boolConst = 0

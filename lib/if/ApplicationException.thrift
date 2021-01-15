@@ -1,3 +1,5 @@
+// Copyright (c) Facebook, Inc. and its affiliates.
+
 namespace hs "Thrift.Protocol"
 
 enum ApplicationExceptionType {

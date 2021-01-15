@@ -1,3 +1,5 @@
+// Copyright (c) Facebook, Inc. and its affiliates.
+
 struct X {
   # both Y and Int include <$> in their type parsers, so we need to insert parens
   # around these expressions

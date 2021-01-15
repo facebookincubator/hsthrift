@@ -1,3 +1,5 @@
+// Copyright (c) Facebook, Inc. and its affiliates.
+
 include "if/B.thrift"
 include "if/C.thrift"
 include "if/D.thrift"

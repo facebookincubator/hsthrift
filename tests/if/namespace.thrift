@@ -1,3 +1,5 @@
+// Copyright (c) Facebook, Inc. and its affiliates.
+
 include "if/namespace_included.thrift"
 
 namespace hs Thrift.Test

@@ -1,3 +1,7 @@
+// Copyright (c) Facebook, Inc. and its affiliates.
+
+# @nolint
+
 include "test/if/b.thrift"
 
 typedef i64 T

@@ -1,3 +1,5 @@
+// Copyright (c) Facebook, Inc. and its affiliates.
+
 struct B {
   1: i16 a = 1,
   2: i32 b,
