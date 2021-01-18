@@ -1,3 +1,7 @@
+// Copyright (c) Facebook, Inc. and its affiliates.
+
+# @nolint
+
 # This file is gonna be uge
 
 # HIERARCHY OF STUFF

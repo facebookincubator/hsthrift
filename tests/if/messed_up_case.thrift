@@ -1,3 +1,5 @@
+// Copyright (c) Facebook, Inc. and its affiliates.
+
 typedef i64 (hs.type = "Int") intType
 
 const string Str = ""

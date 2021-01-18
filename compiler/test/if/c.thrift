@@ -1,3 +1,5 @@
+// Copyright (c) Facebook, Inc. and its affiliates.
+
 struct FirstAnnotation { 1: string name; 2: i64 count = 1 }
 struct SecondAnnotation { 2: i64 total = 0; 3: SecondAnnotation recurse; }
 

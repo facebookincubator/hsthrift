@@ -1,3 +1,5 @@
+// Copyright (c) Facebook, Inc. and its affiliates.
+
 typedef map<string, string> hstypedef
 typedef map<string, string> hsnewtypeann (hs.newtype)
 

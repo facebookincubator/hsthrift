@@ -1,3 +1,5 @@
+// Copyright (c) Facebook, Inc. and its affiliates.
+
 const i64 intConst = 100
 const i64 int2 = intConst
 

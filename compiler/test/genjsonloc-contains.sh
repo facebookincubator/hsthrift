@@ -1,5 +1,7 @@
 #! /bin/bash -e
 
+# Copyright (c) Facebook, Inc. and its affiliates.
+
 # Compare EmitJSON WithoutLoc to EmitJSON WithLoc
 #
 # Expect EmitJSON WithLoc to be contained in EmitJSON WithoutLoc output

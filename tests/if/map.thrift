@@ -1,3 +1,5 @@
+// Copyright (c) Facebook, Inc. and its affiliates.
+
 typedef map<byte, string> Map
 
 typedef string KeyType (hs.newtype)
