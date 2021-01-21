@@ -124,9 +124,18 @@ not have IPv6 configured.
 
 ## System dependencies
 
-### Ubuntu
+### Debian / Ubuntu
 
-sudo apt install libmysqlclient-dev
+sudo apt install \
+    libgoogle-glog-dev \
+    libgflags-dev \
+    libmysqlclient-dev \
+    bison \
+    flex \
+    libzstd-dev
+
+(TODO: this list is probably incomplete, please file an issue if you
+encounter something missing)
 
 ### Fedora
 
@@ -149,7 +158,7 @@ sudo yum install \
      community-mysql-devel
 ```
 
-Also
+Also you may need:
 
 ```
 export LD_LIBRARY_PATH=/usr/local/lib:
