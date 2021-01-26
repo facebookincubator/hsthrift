@@ -5,6 +5,8 @@ module Thrift.Processor
   ( Processor(..)
   , Blame(..)
   , process
+  , processCommand
+  , msgParser
   , Some(..)
   ) where
 
@@ -61,7 +63,7 @@ process :: (Processor s, Protocol p)
             -- ^ Output bytes to put on the wire as well as the exception
             -- information for the response
 process proxy seqNum handler input = do
-  (response, exc) <- case parse msgParser input of
+  (response, exc) <- case parse (msgParser proxy) input of
     Left err -> do
       -- Parsing failed, so the protocol is broken
       let ex = ApplicationException (Text.pack err)
@@ -71,20 +73,32 @@ process proxy seqNum handler input = do
           <> buildStruct proxy ex
           <> genMsgEnd proxy
         , Just (toException ex, ClientError) )
-    Right (This cmd) -> do
-      -- Run the handler and generate its return struct, forcing evaluation
-      (builder, exc) <- respWriter proxy seqNum cmd <$> try (handler cmd)
-      builder' <- evaluate builder
-      return (builder', exc)
+    Right (This cmd) -> processCommand proxy seqNum handler cmd
   return (toStrict (toLazyByteString response), exc)
-  where
-    msgParser = do
-      MsgBegin funName msgTy _ <- parseMsgBegin proxy
-      command <- case msgTy of
-        1 -> reqParser proxy funName
-        2 -> fail $ Text.unpack $ funName <> " expected call but got reply"
-        3 -> fail $ Text.unpack $ funName <> " expected call but got exception"
-        4 -> reqParser proxy funName
-        _ -> fail $ Text.unpack $ funName <> ": invalid message type"
-      parseMsgEnd proxy
-      return command
+
+processCommand
+  :: (Processor s, Protocol p)
+  => Proxy p
+  -> SeqNum
+  -> (forall r . s r -> IO r) -- ^ Handler for user-code
+  -> s r                      -- ^ input command
+  -> IO (Builder, Maybe (SomeException, Blame))
+processCommand proxy seqNum handler cmd = do
+  -- Run the handler and generate its return struct, forcing evaluation
+  (builder, exc) <- respWriter proxy seqNum cmd <$> try (handler cmd)
+  builder' <- evaluate builder
+  return (builder', exc)
+
+msgParser
+  :: (Processor s, Protocol p)
+  => Proxy p -> Parser (Some s)
+msgParser proxy = do
+  MsgBegin funName msgTy _ <- parseMsgBegin proxy
+  command <- case msgTy of
+    1 -> reqParser proxy funName
+    2 -> fail $ Text.unpack $ funName <> " expected call but got reply"
+    3 -> fail $ Text.unpack $ funName <> " expected call but got exception"
+    4 -> reqParser proxy funName
+    _ -> fail $ Text.unpack $ funName <> ": invalid message type"
+  parseMsgEnd proxy
+  return command
