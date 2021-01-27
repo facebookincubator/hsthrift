@@ -5,6 +5,7 @@ cabal-version:       3.6
 name:                thrift-tests
 version:             0.1.0.0
 synopsis:            Tests for Haskell Thrift
+homepage:            https://github.com/facebookincubator/hsthrift
 bug-reports:         https://github.com/facebookincubator/hsthrift/issues
 license:             BSD-3-Clause
 license-file:        LICENSE
@@ -18,6 +19,16 @@ extra-source-files:  cpp/*.h, cpp/*.cpp,
                      if/gen-cpp2/*.h,
                      if/gen-cpp2/*.cpp,
                      if/gen-cpp2/*.tcc
+
+description:
+    Tests for Haskell Thrift.
+    .
+    NOTE: for build instructions and documentation, see
+    https://github.com/facebookincubator/hsthrift
+
+source-repository:
+    type: git
+    location: https://github.com/facebookincubator/hsthrift.git
 
 common fb-haskell
     default-language: Haskell2010

@@ -5,6 +5,7 @@ cabal-version:       3.6
 name:                thrift-haxl
 version:             0.1.0.0
 synopsis:            Support for using Haxl with Thrift services
+homepage:            https://github.com/facebookincubator/hsthrift
 bug-reports:         https://github.com/facebookincubator/hsthrift/issues
 license:             BSD-3-Clause
 license-file:        LICENSE
@@ -14,6 +15,17 @@ copyright:           (c) Facebook, All Rights Reserved
 category:            Thrift
 build-type:          Simple
 extra-source-files:  CHANGELOG.md
+
+description:
+    Support for making Thrift requests using the Haxl concurrency
+    framework.
+    .
+    NOTE: for build instructions and documentation, see
+    https://github.com/facebookincubator/hsthrift
+
+source-repository:
+    type: git
+    location: https://github.com/facebookincubator/hsthrift.git
 
 common fb-haskell
     default-language: Haskell2010

@@ -5,6 +5,7 @@ cabal-version:       3.6
 name:                mangle
 version:             0.1.0.0
 synopsis:            Convert C++ type signatures to their mangled form
+homepage:            https://github.com/facebookincubator/hsthrift
 bug-reports:         https://github.com/facebookincubator/hsthrift/issues
 license:             BSD-3-Clause
 license-file:        LICENSE
@@ -14,6 +15,10 @@ copyright:           (c) Facebook, All Rights Reserved
 category:            FFI
 build-type:          Simple
 extra-source-files:  CHANGELOG.md
+
+source-repository:
+    type: git
+    location: https://github.com/facebookincubator/hsthrift.git
 
 library
   exposed-modules:     Mangle, Mangle.TH
