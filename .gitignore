@@ -1,0 +1,7 @@
+*~
+*.save[0-9]*
+dist-newstyle
+gen-hs2/
+gen-cpp2/
+lib/gen-hs2/
+lib/if/gen-cpp2/

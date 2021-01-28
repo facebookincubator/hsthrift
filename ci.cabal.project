@@ -1,0 +1,19 @@
+-- Copyright (c) Facebook, Inc. and its affiliates.
+
+packages:
+    common/util/fb-util.cabal
+    common/mangle/mangle.cabal
+    compiler/thrift-compiler.cabal
+    lib/thrift-lib.cabal
+    server/thrift-server.cabal
+    tests/thrift-tests.cabal
+
+tests: true
+
+-- IPV6 is disabled in the Github Actions environment,
+-- so we make sure the appropriate tests in those packages
+-- turn to IPV4.
+package thrift-lib
+  flags: +tests_use_ipv4
+package thrift-server
+  flags: +tests_use_ipv4

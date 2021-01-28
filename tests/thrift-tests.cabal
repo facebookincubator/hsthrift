@@ -1,0 +1,284 @@
+cabal-version:       3.6
+
+-- Copyright (c) Facebook, Inc. and its affiliates.
+
+name:                thrift-tests
+version:             0.1.0.0
+synopsis:            Tests for Haskell Thrift
+homepage:            https://github.com/facebookincubator/hsthrift
+bug-reports:         https://github.com/facebookincubator/hsthrift/issues
+license:             BSD-3-Clause
+license-file:        LICENSE
+author:              Facebook, Inc.
+maintainer:          hsthrift-team@fb.com
+copyright:           (c) Facebook, All Rights Reserved
+category:            Thrift
+build-type:          Simple
+extra-source-files:  cpp/*.h, cpp/*.cpp,
+                     if/*.thrift,
+                     if/gen-cpp2/*.h,
+                     if/gen-cpp2/*.cpp,
+                     if/gen-cpp2/*.tcc
+
+description:
+    Tests for Haskell Thrift.
+    .
+    NOTE: for build instructions and documentation, see
+    https://github.com/facebookincubator/hsthrift
+
+source-repository head
+    type: git
+    location: https://github.com/facebookincubator/hsthrift.git
+
+common fb-haskell
+    default-language: Haskell2010
+    default-extensions:
+        BangPatterns
+        BinaryLiterals
+        DataKinds
+        DeriveDataTypeable
+        DeriveGeneric
+        EmptyCase
+        ExistentialQuantification
+        FlexibleContexts
+        FlexibleInstances
+        GADTs
+        GeneralizedNewtypeDeriving
+        LambdaCase
+        MultiParamTypeClasses
+        MultiWayIf
+        NoMonomorphismRestriction
+        OverloadedStrings
+        PatternSynonyms
+        RankNTypes
+        RecordWildCards
+        ScopedTypeVariables
+        StandaloneDeriving
+        TupleSections
+        TypeFamilies
+        TypeSynonymInstances
+        NondecreasingIndentation
+
+common test-common
+  hs-source-dirs: ., github/, gen-hs2/
+  other-modules: TestRunner
+  -- include-dirs: .
+  -- cxx-options: -std=c++17
+  -- cxx-sources: cpp/hs_test.cpp
+  --             if/gen-cpp2/hs_test_types.cpp
+  --             cpp/messages.cpp
+  build-depends: aeson,
+                 base,
+                 bytestring,
+                 containers,
+                 data-default,
+                 deepseq,
+                 either,
+                 hashable,
+                 hspec,
+                 hspec-contrib,
+                 HUnit ^>= 1.6.1,
+                 QuickCheck,
+                 STMonadTrans,
+                 text,
+                 thrift-compiler,
+                 thrift-lib,
+                 transformers,
+                 unordered-containers,
+                 vector
+  -- extra-libraries:
+  --       thriftmetadata
+  --       thriftcpp2
+  --       thriftprotocol
+  --       transport
+  --       concurrency
+  --       thrift-core
+  ghc-options: -threaded
+
+test-suite add-prefix
+  import: fb-haskell, test-common
+  type: exitcode-stdio-1.0
+  main-is: AddPrefixTest.hs
+  other-modules: HsPrefix.Types
+  ghc-options: -main-is AddPrefixTest
+test-suite binary-protocol
+  import: fb-haskell, test-common
+  type: exitcode-stdio-1.0
+  main-is: BinaryProtocolTest.hs
+  other-modules: Foo.Types
+  ghc-options: -main-is BinaryProtocolTest
+test-suite const-gen
+  import: fb-haskell, test-common
+  type: exitcode-stdio-1.0
+  main-is: ConstGenTest.hs
+  other-modules: Constants.Types
+  ghc-options: -main-is ConstGenTest
+test-suite const-parser
+  import: fb-haskell, test-common
+  type: exitcode-stdio-1.0
+  main-is: ConstParserTest.hs
+  other-modules: Constants.Types
+  ghc-options: -main-is ConstParserTest
+test-suite const
+  import: fb-haskell, test-common
+  type: exitcode-stdio-1.0
+  main-is: ConstTest.hs
+  other-modules: Constants.Types, Foo.Types
+  ghc-options: -main-is ConstTest
+test-suite duplicate-names
+  import: fb-haskell, test-common
+  type: exitcode-stdio-1.0
+  main-is: DuplicateNamesTest.hs
+  other-modules: Duplicate.Types
+  ghc-options: -main-is DuplicateNamesTest
+test-suite enum-const
+  import: fb-haskell, test-common
+  type: exitcode-stdio-1.0
+  main-is: EnumConstTest.hs
+  other-modules: EnumConst.Types
+  ghc-options: -main-is EnumConstTest
+test-suite enum
+  import: fb-haskell, test-common
+  type: exitcode-stdio-1.0
+  main-is: EnumTest.hs
+  other-modules: Enum.Types
+  ghc-options: -main-is EnumTest
+test-suite exception
+  import: fb-haskell, test-common
+  type: exitcode-stdio-1.0
+  main-is: ExceptionTest.hs
+  other-modules: Exception.Types, TestChannel
+  ghc-options: -main-is ExceptionTest
+test-suite flags
+  import: fb-haskell, test-common
+  type: exitcode-stdio-1.0
+  main-is: FlagsTest.hs
+  other-modules: Flags.Types
+  ghc-options: -main-is FlagsTest
+test-suite has-field
+  import: fb-haskell, test-common
+  type: exitcode-stdio-1.0
+  main-is: HasFieldTest.hs
+  other-modules: Hasfield.Types
+  ghc-options: -main-is HasFieldTest
+test-suite includes
+  import: fb-haskell, test-common
+  type: exitcode-stdio-1.0
+  main-is: IncludesTest.hs
+  other-modules: A.Types, B.Types, C.Types, D.Types, E.Types
+  ghc-options: -main-is IncludesTest
+test-suite input-checking
+  import: fb-haskell, test-common
+  type: exitcode-stdio-1.0
+  main-is: InputCheckingTest.hs
+  other-modules: Versions.Types
+  ghc-options: -main-is InputCheckingTest
+test-suite instances
+  import: fb-haskell, test-common
+  type: exitcode-stdio-1.0
+  main-is: InstancesTest.hs
+  other-modules: Monoid.Types
+  ghc-options: -main-is InstancesTest
+test-suite integration
+  import: fb-haskell, test-common
+  type: exitcode-stdio-1.0
+  main-is: IntegrationTest.hs
+  other-modules: HsTest.Types
+  include-dirs: .
+  cxx-sources: cpp/hs_test.cpp
+               if/gen-cpp2/hs_test_types.cpp
+               if/gen-cpp2/hs_test_data.cpp
+  ghc-options: -main-is IntegrationTest
+test-suite interface
+  import: fb-haskell, test-common
+  type: exitcode-stdio-1.0
+  main-is: InterfaceTest.hs
+  ghc-options: -main-is InterfaceTest
+  build-depends: haskell-src-exts, haskell-names
+test-suite json
+  import: fb-haskell, test-common
+  type: exitcode-stdio-1.0
+  main-is: JSONTest.hs
+  other-modules: Foo.Types
+  ghc-options: -main-is JSONTest
+test-suite lexer
+  import: fb-haskell, test-common
+  type: exitcode-stdio-1.0
+  main-is: LexerTest.hs
+  ghc-options: -main-is LexerTest
+  build-depends: text-show
+test-suite map
+  import: fb-haskell, test-common
+  type: exitcode-stdio-1.0
+  main-is: MapTest.hs
+  other-modules: Map.Types
+  ghc-options: -main-is MapTest
+test-suite message
+  import: fb-haskell, test-common
+  type: exitcode-stdio-1.0
+  main-is: MessageTest.hs
+  other-modules: HsTest.Types
+  include-dirs: .
+  cxx-sources: cpp/messages.cpp
+               if/gen-cpp2/hs_test_types.cpp
+               if/gen-cpp2/hs_test_data.cpp
+  ghc-options: -main-is MessageTest
+test-suite messed-up-case
+  import: fb-haskell, test-common
+  type: exitcode-stdio-1.0
+  main-is: MessedUpCaseTest.hs
+  other-modules: MessedUpCase.Types
+  ghc-options: -main-is MessedUpCaseTest
+test-suite namespace
+  import: fb-haskell, test-common
+  type: exitcode-stdio-1.0
+  main-is: NamespaceTest.hs
+  other-modules: Thrift.Test.Namespace.Types
+                 Thrift.Test.Internal.NamespaceIncluded.Types
+  ghc-options: -main-is NamespaceTest
+test-suite parens
+  import: fb-haskell, test-common
+  type: exitcode-stdio-1.0
+  main-is: ParensTest.hs
+  other-modules: Parens.Types
+  ghc-options: -main-is ParensTest
+test-suite parser
+  import: fb-haskell, test-common
+  type: exitcode-stdio-1.0
+  main-is: ParserTest.hs
+  ghc-options: -main-is ParserTest
+test-suite recursive
+  import: fb-haskell, test-common
+  type: exitcode-stdio-1.0
+  main-is: RecursiveTest.hs
+  ghc-options: -main-is RecursiveTest
+test-suite required-symbols
+  import: fb-haskell, test-common
+  type: exitcode-stdio-1.0
+  main-is: RequiredSymbolsTest.hs
+  other-modules: Huge.Types
+                 Huge.Service.Client
+  ghc-options: -main-is RequiredSymbolsTest
+test-suite scoped-enums
+  import: fb-haskell, test-common
+  type: exitcode-stdio-1.0
+  main-is: ScopedEnumsTest.hs
+  other-modules: ScopedEnums.Types
+  ghc-options: -main-is ScopedEnumsTest
+test-suite service
+  import: fb-haskell, test-common
+  type: exitcode-stdio-1.0
+  main-is: ServiceTest.hs
+  other-modules: Service.Types
+  ghc-options: -main-is ServiceTest
+test-suite typechecker
+  import: fb-haskell, test-common
+  type: exitcode-stdio-1.0
+  main-is: TypecheckerTest.hs
+  ghc-options: -main-is TypecheckerTest
+  build-depends: text-show
+test-suite typechecker-lenient
+  import: fb-haskell, test-common
+  type: exitcode-stdio-1.0
+  main-is: TypecheckerTestLenient.hs
+  ghc-options: -main-is TypecheckerTestLenient

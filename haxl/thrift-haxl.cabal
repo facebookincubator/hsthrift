@@ -1,0 +1,72 @@
+cabal-version:       3.6
+
+-- Copyright (c) Facebook, Inc. and its affiliates.
+
+name:                thrift-haxl
+version:             0.1.0.0
+synopsis:            Support for using Haxl with Thrift services
+homepage:            https://github.com/facebookincubator/hsthrift
+bug-reports:         https://github.com/facebookincubator/hsthrift/issues
+license:             BSD-3-Clause
+license-file:        LICENSE
+author:              Facebook, Inc.
+maintainer:          hsthrift-team@fb.com
+copyright:           (c) Facebook, All Rights Reserved
+category:            Thrift
+build-type:          Simple
+extra-source-files:  CHANGELOG.md
+
+description:
+    Support for making Thrift requests using the Haxl concurrency
+    framework.
+    .
+    NOTE: for build instructions and documentation, see
+    https://github.com/facebookincubator/hsthrift
+
+source-repository head
+    type: git
+    location: https://github.com/facebookincubator/hsthrift.git
+
+common fb-haskell
+    default-language: Haskell2010
+    default-extensions:
+        BangPatterns
+        BinaryLiterals
+        DataKinds
+        DeriveDataTypeable
+        DeriveGeneric
+        EmptyCase
+        ExistentialQuantification
+        FlexibleContexts
+        FlexibleInstances
+        GADTs
+        GeneralizedNewtypeDeriving
+        LambdaCase
+        MultiParamTypeClasses
+        MultiWayIf
+        NoMonomorphismRestriction
+        OverloadedStrings
+        PatternSynonyms
+        RankNTypes
+        RecordWildCards
+        ScopedTypeVariables
+        StandaloneDeriving
+        TupleSections
+        TypeFamilies
+        TypeSynonymInstances
+        NondecreasingIndentation
+
+library
+    import: fb-haskell
+    exposed-modules:
+        Haxl.DataSource.Thrift
+    build-depends:
+        thrift-lib,
+        hashable ^>=1.2.7.0,
+        haxl ^>= 2.1.0.0,
+        mtl ^>=2.2.2,
+        text-show,
+        text ^>=1.2.3.0,
+        transformers ^>=0.5.5.0,
+        unordered-containers ^>=0.2.9.0,
+        base ^>=4.11.1.0

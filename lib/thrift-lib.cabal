@@ -1,0 +1,269 @@
+cabal-version:       3.6
+
+-- Copyright (c) Facebook, Inc. and its affiliates.
+
+name:                thrift-lib
+version:             0.1.0.0
+synopsis:            Libraries for Haskell Thrift
+homepage:            https://github.com/facebookincubator/hsthrift
+bug-reports:         https://github.com/facebookincubator/hsthrift/issues
+license:             BSD-3-Clause
+license-file:        LICENSE
+author:              Facebook, Inc.
+maintainer:          hsthrift-team@fb.com
+copyright:           (c) Facebook, All Rights Reserved
+category:            Thrift
+build-type:          Simple
+extra-source-files:  CHANGELOG.md,
+                     cpp/HsChannel.h,
+                     if/*.thrift,
+                     if/gen-cpp2/*.h,
+                     if/gen-cpp2/*.cpp,
+                     if/gen-cpp2/*.tcc,
+                     test/if/*.thrift,
+                     test/if/gen-cpp2/*.h,
+                     test/if/gen-cpp2/*.cpp,
+                     test/if/gen-cpp2/*.tcc
+
+description:
+    Support for building client and server applications that
+    communicate using the Thrift protocols.
+    .
+    NOTE: for build instructions and documentation, see
+    https://github.com/facebookincubator/hsthrift
+
+source-repository head
+    type: git
+    location: https://github.com/facebookincubator/hsthrift.git
+
+common fb-haskell
+    default-language: Haskell2010
+    default-extensions:
+        BangPatterns
+        BinaryLiterals
+        DataKinds
+        DeriveDataTypeable
+        DeriveGeneric
+        EmptyCase
+        ExistentialQuantification
+        FlexibleContexts
+        FlexibleInstances
+        GADTs
+        GeneralizedNewtypeDeriving
+        LambdaCase
+        MultiParamTypeClasses
+        MultiWayIf
+        NoMonomorphismRestriction
+        OverloadedStrings
+        PatternSynonyms
+        RankNTypes
+        RecordWildCards
+        ScopedTypeVariables
+        StandaloneDeriving
+        TupleSections
+        TypeFamilies
+        TypeSynonymInstances
+        NondecreasingIndentation
+    build-tool-depends: thrift-compiler:thrift-compiler
+
+
+library
+    import: fb-haskell
+    exposed-modules:
+        Thrift.HasFields
+        Thrift.Monad
+        Thrift.CodegenTypesOnly
+        Thrift.Processor
+        Thrift.Api
+        Thrift.Codegen
+        Thrift.Channel
+        Thrift.Channel.CppChannel
+        Thrift.Channel.HeaderChannel
+        Thrift.Channel.SocketChannel
+        Thrift.Protocol
+        Thrift.Protocol.Compact
+        Thrift.Protocol.Id
+        Thrift.Protocol.JSON
+        Thrift.Protocol.Binary
+        Thrift.Protocol.Binary.Internal
+        Thrift.Protocol.JSON.Base64
+        Thrift.Protocol.JSON.String
+        Thrift.Binary.Parser
+        Thrift.Protocol.ApplicationException.Types
+        Thrift.Protocol.RpcOptions.Types
+
+    cxx-options: -std=c++17
+    cxx-sources:
+        cpp/HeaderChannel.cpp
+        cpp/HsChannel.cpp
+        if/gen-cpp2/RpcOptions_types.cpp
+        if/gen-cpp2/RpcOptions_data.cpp
+
+    hs-source-dirs: . gen-hs2
+    build-tool-depends: hsc2hs:hsc2hs
+    hsc2hs-options: --cc=g++ --lflag=-lstdc++ --cflag=-D__HSC2HS__=1 --lflag=-lboost_context --cflag=-std=c++17
+    include-dirs: .
+
+    pkgconfig-depends: libfolly, fmt, openssl, libsodium
+    extra-libraries:
+        thriftcpp2
+        thriftprotocol
+        transport
+        rpcmetadata
+        concurrency
+        thrift-core
+        async
+        wangle
+        yarpl
+        fmt
+        fizz
+        stdc++
+        -- TODO: I needed this to satisfy an undefined reference to
+        -- jump_fcontext when running hsc2hs
+        boost_context
+
+    build-depends:
+        dependent-sum >= 0.6 && <= 0.6.2.0,
+          -- TODO: Data.Some was split out into package some at 0.6.2.2,
+          -- deprecated 'This' was removed.
+        containers,
+        deepseq,
+        STMonadTrans,
+        data-default,
+        fb-util,
+        bytestring-lexing,
+        scientific,
+        ghc,
+        aeson >= 1,
+        word8,
+        aeson-pretty,
+        text-show,
+        base >=4.11.1 && <4.15,
+        transformers ^>=0.5.5.0,
+        bytestring ^>=0.10.8.2,
+        network,
+        text ^>=1.2.3.0,
+        unordered-containers ^>=0.2.9.0,
+        hashable >=1.2.7.0 && <1.4,
+        vector ^>=0.12.0.1
+
+    if flag(tests_use_ipv4)
+      -- for SocketChannel.hs
+      cpp-options: -DIPV4
+
+
+flag tests_use_ipv4
+     description: Force tests to use IPV4 whenever bringing thrift clients/servers up
+     default: False
+     manual: True
+
+common test-common
+  hs-source-dirs:
+        test,
+        test/github,
+        test/gen-hs2
+  other-modules:
+        Network
+        TestCommon
+        TestRunner
+        TestChannel
+        Math.Types
+        Math.Adder.Client
+        Math.Calculator.Client
+        Math.Adder.Service
+        Math.Calculator.Service
+        SocketServer
+        HsTest.Types
+  include-dirs: .
+  cxx-options:   -std=c++17
+  cxx-sources:   test/cpp/MathServer.cpp
+                 test/if/gen-cpp2/Calculator.cpp
+                 test/if/gen-cpp2/AdderAsyncClient.cpp
+                 test/if/gen-cpp2/Adder.cpp
+                 test/if/gen-cpp2/math_types.cpp
+                 test/if/gen-cpp2/math_metadata.cpp
+  extra-libraries:
+        thriftmetadata
+        thriftcpp2
+        thriftprotocol
+        transport
+        concurrency
+        thrift-core
+  build-depends: async ^>= 2.2,
+                 base,
+                 bytestring,
+                 dependent-sum,
+                 fb-util,
+                 filepath,
+                 hspec,
+                 hspec-contrib,
+                 HUnit ^>= 1.6.1,
+                 network,
+                 text,
+                 thrift-lib,
+                 -- vvv for HsTest.Types
+                 deepseq,
+                 transformers,
+                 aeson,
+                 data-default,
+                 unordered-containers,
+                 hashable,
+                 containers,
+                 vector,
+                 QuickCheck,
+                 STMonadTrans
+  ghc-options: -threaded
+
+  if flag(tests_use_ipv4)
+    -- for test/Network.hs
+    cpp-options: -DIPV4
+    -- for test/cpp/MathServer.cpp
+    cxx-options: -DIPV4
+
+test-suite channel
+  import: fb-haskell, test-common
+  type: exitcode-stdio-1.0
+  main-is: ChannelTest.hs
+  ghc-options: -main-is ChannelTest
+
+test-suite socket-channel
+  import: fb-haskell, test-common
+  type: exitcode-stdio-1.0
+  main-is: SocketChannelTest.hs
+  ghc-options: -main-is SocketChannelTest
+
+test-suite client
+  import: fb-haskell, test-common
+  type: exitcode-stdio-1.0
+  main-is: ClientTest.hs
+  ghc-options: -main-is ClientTest
+
+test-suite header-channel
+  import: fb-haskell, test-common
+  type: exitcode-stdio-1.0
+  main-is: HeaderChannelTest.hs
+  ghc-options: -main-is HeaderChannelTest
+
+test-suite binary-parser
+  import: fb-haskell, test-common
+  type: exitcode-stdio-1.0
+  main-is: BinaryParserTest.hs
+  ghc-options: -main-is BinaryParserTest
+
+test-suite json-parsing
+  import: fb-haskell, test-common
+  type: exitcode-stdio-1.0
+  main-is: JSONStringTest.hs
+  ghc-options: -main-is JSONStringTest
+
+test-suite json-num
+  import: fb-haskell, test-common
+  type: exitcode-stdio-1.0
+  main-is: JSONNumTest.hs
+  ghc-options: -main-is JSONNumTest
+
+test-suite json-null
+  import: fb-haskell, test-common
+  type: exitcode-stdio-1.0
+  main-is: JSONNullTest.hs
+  ghc-options: -main-is JSONNullTest
