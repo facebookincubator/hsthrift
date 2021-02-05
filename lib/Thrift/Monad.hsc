@@ -18,12 +18,9 @@ import Control.Monad.Trans.Reader
 import Data.Int
 import Data.IORef
 import Data.Proxy
-import Foreign.C
 import GHC.TypeLits
-import Thrift.Protocol.RpcOptions.Types (RpcOptions(..))
+import Thrift.Protocol.RpcOptions.Types
 import Util.Reader
-
-#include <cpp/HsChannel.h>
 
 -- Thrift Monad ----------------------------------------------------------------
 
@@ -36,21 +33,6 @@ data ThriftEnv p c s = ThriftEnv
   , thriftCounter :: Counter
   }
 
-data Priority
-  = HighImportant
-  | High
-  | Important
-  | NormalPriority
-  | BestEffort
-    deriving (Enum, Ord, Eq, Show)
-
-getCppPriority :: Priority -> Int32
-getCppPriority HighImportant = fromIntegral ((#const HIGH_IMPORTANT) :: CInt)
-getCppPriority High = fromIntegral ((#const HIGH) :: CInt)
-getCppPriority Important = fromIntegral ((#const IMPORTANT) :: CInt)
-getCppPriority NormalPriority = fromIntegral ((#const NORMAL) :: CInt)
-getCppPriority BestEffort = fromIntegral ((#const BEST_EFFORT) :: CInt)
-
 defaultRpcOptions :: RpcOptions
 defaultRpcOptions = RpcOptions
   { rpc_timeout      = 0
@@ -61,20 +43,13 @@ defaultRpcOptions = RpcOptions
   }
 
 getRpcPriority :: RpcOptions -> Maybe Priority
-getRpcPriority RpcOptions{..} = case rpc_priority of
-  Nothing -> Nothing
-  Just (#const HIGH_IMPORTANT) -> Just HighImportant
-  Just (#const HIGH) -> Just High
-  Just (#const IMPORTANT) -> Just Important
-  Just (#const NORMAL) -> Just NormalPriority
-  Just (#const BEST_EFFORT) -> Just BestEffort
-  _ -> Just NormalPriority
+getRpcPriority RpcOptions{..} = rpc_priority
 
 setRpcPriority :: RpcOptions -> Priority -> RpcOptions
 setRpcPriority opts@RpcOptions{..} prio =
   case rpc_priority of
     Just _ -> opts
-    Nothing -> opts{rpc_priority = Just $ getCppPriority prio}
+    Nothing -> opts{rpc_priority = Just prio}
 
 runThrift :: ThriftM p c s a -> c s -> IO a
 runThrift action channel = runThriftWith action channel defaultRpcOptions
