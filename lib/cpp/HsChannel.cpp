@@ -4,6 +4,9 @@
 #include <if/gen-cpp2/RpcOptions_types.h>
 #include <thrift/lib/cpp2/protocol/Serializer.h>
 
+using namespace thrift::protocol;
+using namespace apache::thrift::concurrency;
+
 std::shared_ptr<ChannelWrapper>* newWrapper(InnerChannel* channel) noexcept {
   return new std::shared_ptr<ChannelWrapper>(
       std::make_shared<ChannelWrapper>(std::move(*channel)));
@@ -12,6 +15,12 @@ std::shared_ptr<ChannelWrapper>* newWrapper(InnerChannel* channel) noexcept {
 void deleteWrapper(std::shared_ptr<ChannelWrapper>* channel) noexcept {
   delete channel;
 }
+
+static_assert((int)Priority::HighImportant == (int)HIGH_IMPORTANT);
+static_assert((int)Priority::High == (int)HIGH);
+static_assert((int)Priority::Important == (int)IMPORTANT);
+static_assert((int)Priority::NormalPriority == (int)NORMAL);
+static_assert((int)Priority::BestEffort == (int)BEST_EFFORT);
 
 apache::thrift::RpcOptions getRpcOptions(
     uint8_t* rpcOptionsPtr,

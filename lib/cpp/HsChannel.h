@@ -9,12 +9,6 @@
 
 #include <HsFFI.h>
 
-const int HIGH_IMPORTANT = apache::thrift::concurrency::HIGH_IMPORTANT;
-const int HIGH = apache::thrift::concurrency::HIGH;
-const int IMPORTANT = apache::thrift::concurrency::IMPORTANT;
-const int NORMAL = apache::thrift::concurrency::NORMAL;
-const int BEST_EFFORT = apache::thrift::concurrency::BEST_EFFORT;
-
 enum Status { SEND_ERROR, SEND_SUCCESS, RECV_ERROR, RECV_SUCCESS };
 
 struct FinishedRequest {
