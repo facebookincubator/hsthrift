@@ -5,6 +5,7 @@ module Thrift.Compiler.GenHaskell
   , writeHsCode
   , writeModule, showModule
   , ThriftModule(..)
+  , commonPragmas
   ) where
 
 import Data.List
