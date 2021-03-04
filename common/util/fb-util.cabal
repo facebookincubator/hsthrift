@@ -139,9 +139,9 @@ library
         cpp/EventBaseDataplane.cpp
         -- Util/GFlags.cpp
 
-    -- necessary because of the use of 'is_trivially_destructible_v' and friends?
     cxx-options: -std=c++17
 
+    install-includes: cpp/HsStruct.h
     include-dirs: .
     hs-source-dirs: .
 
