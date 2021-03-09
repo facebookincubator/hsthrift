@@ -7,6 +7,7 @@ packages:
     lib/thrift-lib.cabal
     server/thrift-server.cabal
     tests/thrift-tests.cabal
+    haxl/thrift-haxl.cabal
 
 tests: true
 
