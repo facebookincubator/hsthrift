@@ -8,6 +8,7 @@ module Thrift.Compiler.GenStruct
   , ParseMode(..)
   , genFieldParser
   , genBuildValue, genBuildFields, genFieldBase, genParseType
+  , getUn
   , transformValue, mkHashable, mkOrd
   ) where
 
