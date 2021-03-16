@@ -21,7 +21,6 @@ struct MockResponseChannelRequest : public ResponseChannelRequest {
   bool isActive() const override {
     return active;
   }
-  void cancel() override {}
   bool isOneway() const override {
     return false;
   }
