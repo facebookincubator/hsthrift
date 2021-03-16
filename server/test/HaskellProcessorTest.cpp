@@ -24,6 +24,9 @@ struct MockResponseChannelRequest : public ResponseChannelRequest {
   bool isOneway() const override {
     return false;
   }
+  bool tryStartProcessing() override {
+    return true;
+  }
 
   MOCK_METHOD3(
       sendReply,

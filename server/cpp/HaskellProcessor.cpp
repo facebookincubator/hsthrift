@@ -48,8 +48,10 @@ void HaskellAsyncProcessor::processSerializedRequest(
           ResponseChannelRequest::UniquePtr req) mutable {
         // Mark the request as processing, so that it won't be failed
         // with a queue timeout.
-        if (req) {
-          req->setStartedProcessing();
+        if (req && !req->getShouldStartProcessing()) {
+          // Queue timeout must have occurred. Clean up request and return.
+          HandlerCallbackBase::releaseRequest(std::move(req), eb);
+          return;
         }
 
         // EventTask only calles us if oneway || req->isActive()
