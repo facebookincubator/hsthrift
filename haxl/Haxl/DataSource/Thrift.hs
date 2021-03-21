@@ -41,7 +41,8 @@ import Thrift.Protocol.ApplicationException.Types
 
 -- Exceptions ------------------------------------------------------------------
 
-newtype ThriftTransientError a = ThriftTransientError a
+newtype ThriftTransientError a =
+  ThriftTransientError { unThriftTransientError :: a }
   deriving (Show, Eq)
 instance (Show a, Typeable a) => Exception (ThriftTransientError a) where
   toException = transientErrorToException
@@ -50,7 +51,8 @@ instance (Show a, Typeable a) => Exception (ThriftTransientError a) where
 thriftTransientError :: (Show a, Typeable a) => a -> SomeException
 thriftTransientError = toException . ThriftTransientError
 
-newtype ThriftLogicError a = ThriftLogicError a
+newtype ThriftLogicError a =
+  ThriftLogicError { unThriftLogicError :: a }
   deriving (Show, Eq)
 instance (Show a, Typeable a) => Exception (ThriftLogicError a) where
   toException = logicErrorToException
