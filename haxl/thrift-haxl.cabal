@@ -14,7 +14,6 @@ maintainer:          hsthrift-team@fb.com
 copyright:           (c) Facebook, All Rights Reserved
 category:            Thrift
 build-type:          Simple
-extra-source-files:  CHANGELOG.md
 
 description:
     Support for making Thrift requests using the Haxl concurrency
