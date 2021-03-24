@@ -278,12 +278,19 @@ unionConsts = unlines
   , "const Exp id_id = { \"EApp\" : { \"e1\" : identity, \"e2\" : identity } }"
   ]
 
+typedefException :: String
+typedefException = unlines
+  [ "exception MyException { 1: string err }"
+  , "typedef MyException MyTypedef"
+  ]
+
 typecheckTests :: Test
 typecheckTests = TestList $ map (uncurry typecheckTest)
                  [ ( "simple struct", simpleStruct )
                  , ( "complex types", complexTypes )
                  , ( "struct consts", structConstant )
                  , ( "union consts", unionConsts )
+                 , ( "typedef exception", typedefException )
                  ]
 
 typecheckTest :: String -> String -> Test
