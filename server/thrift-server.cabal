@@ -98,9 +98,7 @@ flag tests_use_ipv4
 common test-common
   hs-source-dirs: test, test/github, test/gen-hs2
 
-  other-modules: Facebook.Init
-                 Network
-                 TestRunner
+  other-modules: Network
                  CalculatorHandler
                  EchoHandler
                  Echoer.Echoer.Client
@@ -117,6 +115,7 @@ common test-common
                  bytestring,
                  data-default,
                  deepseq,
+                 fb-stubs,
                  fb-util,
                  hashable,
                  hspec,

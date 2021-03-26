@@ -61,7 +61,6 @@ common fb-haskell
 
 common test-common
   hs-source-dirs: ., github/, gen-hs2/
-  other-modules: TestRunner
   -- include-dirs: .
   -- cxx-options: -std=c++17
   -- cxx-sources: cpp/hs_test.cpp
@@ -74,6 +73,7 @@ common test-common
                  data-default,
                  deepseq,
                  either,
+                 fb-stubs,
                  hashable,
                  hspec,
                  hspec-contrib,

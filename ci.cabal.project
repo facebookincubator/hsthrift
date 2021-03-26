@@ -2,6 +2,7 @@
 
 packages:
     common/util/fb-util.cabal
+    common/github/fb-stubs.cabal
     common/mangle/mangle.cabal
     compiler/thrift-compiler.cabal
     lib/thrift-lib.cabal
