@@ -1,193 +1,6 @@
 {
-    "typedefs": [
-        {
-            "newtype": false,
-            "name": "T",
-            "type": {
-                "type": "i64"
-            }
-        }
-    ],
-    "structs": [
-        {
-            "name": "A",
-            "struct_type": "STRUCT",
-            "fields": [
-                {
-                    "default_value": {
-                        "named_constant": {
-                            "name": "a"
-                        }
-                    },
-                    "name": "a",
-                    "requiredness": "default",
-                    "id": 1,
-                    "type": {
-                        "inner_type": {
-                            "type": "i64"
-                        },
-                        "name": {
-                            "name": "T"
-                        },
-                        "type": "typedef"
-                    }
-                },
-                {
-                    "default_value": {
-                        "named_constant": {
-                            "name": "b"
-                        }
-                    },
-                    "name": "b",
-                    "requiredness": "default",
-                    "id": 2,
-                    "type": {
-                        "name": {
-                            "name": "B",
-                            "src": "b"
-                        },
-                        "type": "struct"
-                    }
-                },
-                {
-                    "default_value": {
-                        "named_constant": {
-                            "name": "bool_value",
-                            "src": "b"
-                        }
-                    },
-                    "name": "c",
-                    "requiredness": "default",
-                    "id": 3,
-                    "type": {
-                        "type": "bool"
-                    }
-                },
-                {
-                    "name": "d",
-                    "requiredness": "default",
-                    "id": 4,
-                    "type": {
-                        "inner_type": {
-                            "inner_type": {
-                                "type": "i32"
-                            },
-                            "type": "list"
-                        },
-                        "type": "list"
-                    }
-                },
-                {
-                    "name": "e",
-                    "requiredness": "default",
-                    "id": 5,
-                    "type": {
-                        "val_type": {
-                            "type": "string"
-                        },
-                        "key_type": {
-                            "type": "i32"
-                        },
-                        "type": "map"
-                    }
-                },
-                {
-                    "default_value": {
-                        "literal": {
-                            "value": {
-                                "name": "Two",
-                                "src": "b"
-                            },
-                            "type": "enum"
-                        }
-                    },
-                    "name": "f",
-                    "requiredness": "default",
-                    "id": 6,
-                    "type": {
-                        "name": {
-                            "name": "Number",
-                            "src": "b"
-                        },
-                        "type": "enum"
-                    }
-                },
-                {
-                    "name": "g",
-                    "requiredness": "optional",
-                    "id": 7,
-                    "type": {
-                        "type": "string"
-                    }
-                },
-                {
-                    "name": "h",
-                    "requiredness": "required",
-                    "id": 8,
-                    "type": {
-                        "type": "string"
-                    }
-                }
-            ]
-        },
-        {
-            "name": "X",
-            "struct_type": "EXCEPTION",
-            "fields": [
-                {
-                    "name": "reason",
-                    "requiredness": "default",
-                    "id": 1,
-                    "type": {
-                        "type": "string"
-                    }
-                }
-            ]
-        }
-    ],
-    "path": "test/if/a.thrift",
-    "unions": [
-        {
-            "name": "U",
-            "fields": [
-                {
-                    "name": "x",
-                    "id": 1,
-                    "type": {
-                        "type": "byte"
-                    }
-                },
-                {
-                    "name": "y",
-                    "id": 2,
-                    "type": {
-                        "inner_type": {
-                            "type": "string"
-                        },
-                        "type": "list"
-                    }
-                },
-                {
-                    "name": "z",
-                    "id": 3,
-                    "type": {
-                        "inner_type": {
-                            "type": "i64"
-                        },
-                        "type": "set"
-                    }
-                }
-            ]
-        }
-    ],
     "consts": [
         {
-            "value": {
-                "named_constant": {
-                    "name": "i64_value",
-                    "src": "b"
-                }
-            },
             "name": "a",
             "type": {
                 "inner_type": {
@@ -197,11 +10,25 @@
                     "name": "T"
                 },
                 "type": "typedef"
+            },
+            "value": {
+                "named_constant": {
+                    "name": "i64_value",
+                    "src": "b"
+                }
             }
         },
         {
+            "name": "u",
+            "type": {
+                "name": {
+                    "name": "U"
+                },
+                "type": "union"
+            },
             "value": {
                 "literal": {
+                    "type": "union",
                     "value": {
                         "field_name": "y",
                         "field_type": {
@@ -212,6 +39,7 @@
                         },
                         "field_value": {
                             "literal": {
+                                "type": "list",
                                 "value": [
                                     {
                                         "named_constant": {
@@ -219,25 +47,25 @@
                                             "src": "b"
                                         }
                                     }
-                                ],
-                                "type": "list"
+                                ]
                             }
                         }
-                    },
-                    "type": "union"
+                    }
                 }
-            },
-            "name": "u",
-            "type": {
-                "name": {
-                    "name": "U"
-                },
-                "type": "union"
             }
         },
         {
+            "name": "b",
+            "type": {
+                "name": {
+                    "name": "B",
+                    "src": "b"
+                },
+                "type": "struct"
+            },
             "value": {
                 "literal": {
+                    "type": "struct",
                     "value": [
                         {
                             "field_name": "a",
@@ -275,22 +103,22 @@
                                 }
                             }
                         }
-                    ],
-                    "type": "struct"
+                    ]
                 }
-            },
-            "name": "b",
+            }
+        },
+        {
+            "name": "default_d",
             "type": {
                 "name": {
                     "name": "B",
                     "src": "b"
                 },
                 "type": "struct"
-            }
-        },
-        {
+            },
             "value": {
                 "literal": {
+                    "type": "struct",
                     "value": [
                         {
                             "field_name": "a",
@@ -319,29 +147,11 @@
                                 "default": null
                             }
                         }
-                    ],
-                    "type": "struct"
+                    ]
                 }
-            },
-            "name": "default_d",
-            "type": {
-                "name": {
-                    "name": "B",
-                    "src": "b"
-                },
-                "type": "struct"
             }
         },
         {
-            "value": {
-                "literal": {
-                    "value": {
-                        "name": "Zero",
-                        "src": "b"
-                    },
-                    "type": "enum"
-                }
-            },
             "name": "zero",
             "type": {
                 "name": {
@@ -349,35 +159,46 @@
                     "src": "b"
                 },
                 "type": "enum"
+            },
+            "value": {
+                "literal": {
+                    "type": "enum",
+                    "value": {
+                        "name": "Zero",
+                        "src": "b"
+                    }
+                }
             }
         }
     ],
-    "name": "a",
+    "enums": [],
     "includes": [
         "test/if/b.thrift"
     ],
-    "enums": [],
+    "name": "a",
     "options": {
-        "path": "test/if/a.thrift",
-        "include_path": ".",
         "genfiles": null,
+        "include_path": ".",
         "out_path": "test/fixtures/gen-basic",
+        "path": "test/if/a.thrift",
         "recursive": true
     },
+    "path": "test/if/a.thrift",
     "services": [
         {
-            "name": "S",
             "functions": [
                 {
                     "args": [
                         {
-                            "name": "x",
                             "id": 1,
+                            "name": "x",
                             "type": {
                                 "type": "i32"
                             }
                         }
                     ],
+                    "name": "getNumber",
+                    "oneway": false,
                     "return_type": {
                         "name": {
                             "name": "Number",
@@ -385,19 +206,19 @@
                         },
                         "type": "enum"
                     },
-                    "throws": [],
-                    "name": "getNumber",
-                    "oneway": false
+                    "throws": []
                 },
                 {
                     "args": [],
+                    "name": "doNothing",
+                    "oneway": false,
                     "return_type": {
                         "type": "void"
                     },
                     "throws": [
                         {
-                            "name": "ex",
                             "id": 1,
+                            "name": "ex",
                             "type": {
                                 "name": {
                                     "name": "X"
@@ -405,32 +226,211 @@
                                 "type": "exception"
                             }
                         }
-                    ],
-                    "name": "doNothing",
-                    "oneway": false
+                    ]
                 }
-            ]
+            ],
+            "name": "S"
         },
         {
-            "name": "ParentService",
-            "functions": []
+            "functions": [],
+            "name": "ParentService"
         },
         {
-            "super": {
-                "name": "ParentService"
-            },
-            "name": "ChildService",
             "functions": [
                 {
                     "args": [],
+                    "name": "foo",
+                    "oneway": false,
                     "return_type": {
                         "type": "i32"
                     },
-                    "throws": [],
-                    "name": "foo",
-                    "oneway": false
+                    "throws": []
                 }
-            ]
+            ],
+            "name": "ChildService",
+            "super": {
+                "name": "ParentService"
+            }
+        }
+    ],
+    "structs": [
+        {
+            "fields": [
+                {
+                    "default_value": {
+                        "named_constant": {
+                            "name": "a"
+                        }
+                    },
+                    "id": 1,
+                    "name": "a",
+                    "requiredness": "default",
+                    "type": {
+                        "inner_type": {
+                            "type": "i64"
+                        },
+                        "name": {
+                            "name": "T"
+                        },
+                        "type": "typedef"
+                    }
+                },
+                {
+                    "default_value": {
+                        "named_constant": {
+                            "name": "b"
+                        }
+                    },
+                    "id": 2,
+                    "name": "b",
+                    "requiredness": "default",
+                    "type": {
+                        "name": {
+                            "name": "B",
+                            "src": "b"
+                        },
+                        "type": "struct"
+                    }
+                },
+                {
+                    "default_value": {
+                        "named_constant": {
+                            "name": "bool_value",
+                            "src": "b"
+                        }
+                    },
+                    "id": 3,
+                    "name": "c",
+                    "requiredness": "default",
+                    "type": {
+                        "type": "bool"
+                    }
+                },
+                {
+                    "id": 4,
+                    "name": "d",
+                    "requiredness": "default",
+                    "type": {
+                        "inner_type": {
+                            "inner_type": {
+                                "type": "i32"
+                            },
+                            "type": "list"
+                        },
+                        "type": "list"
+                    }
+                },
+                {
+                    "id": 5,
+                    "name": "e",
+                    "requiredness": "default",
+                    "type": {
+                        "key_type": {
+                            "type": "i32"
+                        },
+                        "type": "map",
+                        "val_type": {
+                            "type": "string"
+                        }
+                    }
+                },
+                {
+                    "default_value": {
+                        "literal": {
+                            "type": "enum",
+                            "value": {
+                                "name": "Two",
+                                "src": "b"
+                            }
+                        }
+                    },
+                    "id": 6,
+                    "name": "f",
+                    "requiredness": "default",
+                    "type": {
+                        "name": {
+                            "name": "Number",
+                            "src": "b"
+                        },
+                        "type": "enum"
+                    }
+                },
+                {
+                    "id": 7,
+                    "name": "g",
+                    "requiredness": "optional",
+                    "type": {
+                        "type": "string"
+                    }
+                },
+                {
+                    "id": 8,
+                    "name": "h",
+                    "requiredness": "required",
+                    "type": {
+                        "type": "string"
+                    }
+                }
+            ],
+            "name": "A",
+            "struct_type": "STRUCT"
+        },
+        {
+            "fields": [
+                {
+                    "id": 1,
+                    "name": "reason",
+                    "requiredness": "default",
+                    "type": {
+                        "type": "string"
+                    }
+                }
+            ],
+            "name": "X",
+            "struct_type": "EXCEPTION"
+        }
+    ],
+    "typedefs": [
+        {
+            "name": "T",
+            "newtype": false,
+            "type": {
+                "type": "i64"
+            }
+        }
+    ],
+    "unions": [
+        {
+            "fields": [
+                {
+                    "id": 1,
+                    "name": "x",
+                    "type": {
+                        "type": "byte"
+                    }
+                },
+                {
+                    "id": 2,
+                    "name": "y",
+                    "type": {
+                        "inner_type": {
+                            "type": "string"
+                        },
+                        "type": "list"
+                    }
+                },
+                {
+                    "id": 3,
+                    "name": "z",
+                    "type": {
+                        "inner_type": {
+                            "type": "i64"
+                        },
+                        "type": "set"
+                    }
+                }
+            ],
+            "name": "U"
         }
     ]
 }
