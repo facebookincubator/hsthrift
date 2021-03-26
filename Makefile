@@ -5,13 +5,13 @@ CABAL=cabal
 
 all:: compiler thrift-hs thrift-cpp server
 
-compiler::
+compiler:: copy-sources
 	$(CABAL) build thrift-compiler
 
-server::
+server:: copy-sources
 	$(CABAL) build thrift-server
 
-util::
+util:: copy-sources
 	$(CABAL) build fb-util
 
 thrift:: thrift-cpp thrift-hs
