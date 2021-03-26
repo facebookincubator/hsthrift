@@ -30,6 +30,7 @@ module Util.IO
   , getUserForProcess
   , getGroupForProcess
   , getUsername
+  , getUserUnixname
   , HostInfo(..)
   , copyDirectoryContents
   , copyDirectoryContents_
@@ -47,8 +48,10 @@ import Control.Monad
 import Control.Monad.Extra
 import Data.Aeson
 import Data.Aeson.Encode.Pretty
+import Data.Foldable
 import Data.List
 import Data.List.Split
+import Data.Maybe
 import Data.Text (Text)
 import qualified Data.Text as Text
 import qualified Data.Text.IO as TextIO
@@ -61,6 +64,7 @@ import System.IO.Error
 import System.IO.Unsafe
 import System.Posix.User
 import System.Process
+import System.Environment
 import Text.Printf
 import Util.String (strip)
 import qualified Data.ByteString.Lazy as B
@@ -291,6 +295,32 @@ getUsername = init <$> readProcess "id" ["-un"] ""
 -- | Get hostname using 'hostname' command line tool
 getHostname :: IO String
 getHostname = strip <$> readProcess "hostname" [] []
+
+-- Try to get a meaninful user unix name. This will not realize that the user
+-- was changed to a non-root account like mysql.
+getUserUnixname :: IO String
+getUserUnixname = do
+  user <- getUserForProcess
+  fromMaybe user <$> asum
+    [ return $ helpful $ Just user
+    , helpful <$> getTupperwareUser
+    , helpful <$> getDevserverOwner
+    ]
+  where
+    unhelpfulNames = ["root", "twsvcscm", "svcscm", "apache"]
+
+    helpful (Just name) | name `elem` unhelpfulNames = Nothing
+    helpful mname = mname
+
+    getTupperwareUser = lookupEnv "TW_JOB_USER"
+
+getDevserverOwner :: IO (Maybe String)
+getDevserverOwner = do
+  res <- Exception.try $ readFile "/etc/devserver.owners"
+    :: IO (Either Exception.SomeException String)
+  return $ case lines <$> res of
+    Right (name:_) -> Just name
+    _ -> Nothing
 
 redirectHandle :: Handle -> FilePath -> IO () -> IO ()
 redirectHandle handle file io =
