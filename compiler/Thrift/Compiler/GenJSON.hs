@@ -39,11 +39,12 @@ writeJSON
   -> IO FilePath
 writeJSON prog@Program{..} deps = do
   createDirectoryIfMissing True dir
-  LBS.writeFile path $ encodePretty $ genJSON prog deps
+  LBS.writeFile path $ prettyJSON $ genJSON prog deps
   return path
   where
     path = dir </> file
     (dir, file) = getAstPath prog
+    prettyJSON = encodePretty' defConfig { confCompare = compare }
 
 getAstPath :: Program l a -> (FilePath, FilePath)
 getAstPath Program{..} = (progOutPath, Text.unpack progName ++ ".ast")

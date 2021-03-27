@@ -1,201 +1,73 @@
 {
-    "typedefs": [
-        {
-            "newtype": false,
-            "name": "annotated_string",
-            "type": {
-                "type": "string"
-            }
-        }
-    ],
-    "structs": [
-        {
-            "name": "FirstAnnotation",
-            "struct_type": "STRUCT",
-            "fields": [
-                {
-                    "name": "name",
-                    "requiredness": "default",
-                    "id": 1,
-                    "type": {
-                        "type": "string"
-                    }
-                },
-                {
-                    "default_value": {
-                        "literal": {
-                            "string": "1",
-                            "value": 1,
-                            "type": "i64"
-                        }
-                    },
-                    "name": "count",
-                    "requiredness": "default",
-                    "id": 2,
-                    "type": {
-                        "type": "i64"
-                    }
-                }
-            ]
-        },
-        {
-            "name": "SecondAnnotation",
-            "struct_type": "STRUCT",
-            "fields": [
-                {
-                    "default_value": {
-                        "literal": {
-                            "string": "0",
-                            "value": 0,
-                            "type": "i64"
-                        }
-                    },
-                    "name": "total",
-                    "requiredness": "default",
-                    "id": 2,
-                    "type": {
-                        "type": "i64"
-                    }
-                },
-                {
-                    "name": "recurse",
-                    "requiredness": "default",
-                    "id": 3,
-                    "type": {
-                        "name": {
-                            "name": "SecondAnnotation"
-                        },
-                        "type": "struct"
-                    }
-                }
-            ]
-        },
-        {
-            "name": "MyStruct",
-            "struct_type": "STRUCT",
-            "fields": [
-                {
-                    "name": "tag",
-                    "requiredness": "default",
-                    "id": 5,
-                    "type": {
-                        "inner_type": {
-                            "type": "string"
-                        },
-                        "name": {
-                            "name": "annotated_string"
-                        },
-                        "type": "typedef"
-                    }
-                }
-            ]
-        },
-        {
-            "name": "MyException",
-            "struct_type": "EXCEPTION",
-            "fields": [
-                {
-                    "name": "message",
-                    "requiredness": "default",
-                    "id": 1,
-                    "type": {
-                        "type": "string"
-                    }
-                }
-            ]
-        }
-    ],
-    "path": "test/if/c.thrift",
-    "unions": [
-        {
-            "name": "MyUnion",
-            "fields": [
-                {
-                    "name": "int_value",
-                    "id": 1,
-                    "type": {
-                        "type": "i64"
-                    }
-                },
-                {
-                    "name": "string_value",
-                    "id": 2,
-                    "type": {
-                        "type": "string"
-                    }
-                }
-            ]
-        }
-    ],
     "consts": [
         {
+            "name": "MyConst",
+            "type": {
+                "key_type": {
+                    "type": "string"
+                },
+                "type": "map",
+                "val_type": {
+                    "type": "string"
+                }
+            },
             "value": {
                 "literal": {
+                    "type": "map",
                     "value": [
                         {
                             "key": {
                                 "literal": {
-                                    "value": "ENUMERATOR",
-                                    "type": "string"
+                                    "type": "string",
+                                    "value": "ENUMERATOR"
                                 }
                             },
                             "val": {
                                 "literal": {
-                                    "value": "value",
-                                    "type": "string"
+                                    "type": "string",
+                                    "value": "value"
                                 }
                             }
                         }
-                    ],
-                    "type": "map"
+                    ]
                 }
-            },
-            "name": "MyConst",
-            "type": {
-                "val_type": {
-                    "type": "string"
-                },
-                "key_type": {
-                    "type": "string"
-                },
-                "type": "map"
             }
         }
     ],
-    "name": "c",
-    "includes": [],
     "enums": [
         {
-            "is_psuedo": false,
-            "name": "MyEnum",
             "constants": [
                 {
-                    "value": 0,
-                    "name": "UNKNOWN"
+                    "name": "UNKNOWN",
+                    "value": 0
                 },
                 {
-                    "value": 1,
-                    "name": "FIRST"
+                    "name": "FIRST",
+                    "value": 1
                 }
-            ]
+            ],
+            "is_psuedo": false,
+            "name": "MyEnum"
         }
     ],
+    "includes": [],
+    "name": "c",
     "options": {
-        "path": "test/if/c.thrift",
-        "include_path": ".",
         "genfiles": null,
+        "include_path": ".",
         "out_path": "test/fixtures/gen-basic",
+        "path": "test/if/c.thrift",
         "recursive": true
     },
+    "path": "test/if/c.thrift",
     "services": [
         {
-            "name": "MyService",
             "functions": [
                 {
                     "args": [
                         {
-                            "name": "param",
                             "id": 2,
+                            "name": "param",
                             "type": {
                                 "inner_type": {
                                     "type": "string"
@@ -207,14 +79,142 @@
                             }
                         }
                     ],
+                    "name": "my_function",
+                    "oneway": false,
                     "return_type": {
                         "type": "i64"
                     },
-                    "throws": [],
-                    "name": "my_function",
-                    "oneway": false
+                    "throws": []
                 }
-            ]
+            ],
+            "name": "MyService"
+        }
+    ],
+    "structs": [
+        {
+            "fields": [
+                {
+                    "id": 1,
+                    "name": "name",
+                    "requiredness": "default",
+                    "type": {
+                        "type": "string"
+                    }
+                },
+                {
+                    "default_value": {
+                        "literal": {
+                            "string": "1",
+                            "type": "i64",
+                            "value": 1
+                        }
+                    },
+                    "id": 2,
+                    "name": "count",
+                    "requiredness": "default",
+                    "type": {
+                        "type": "i64"
+                    }
+                }
+            ],
+            "name": "FirstAnnotation",
+            "struct_type": "STRUCT"
+        },
+        {
+            "fields": [
+                {
+                    "default_value": {
+                        "literal": {
+                            "string": "0",
+                            "type": "i64",
+                            "value": 0
+                        }
+                    },
+                    "id": 2,
+                    "name": "total",
+                    "requiredness": "default",
+                    "type": {
+                        "type": "i64"
+                    }
+                },
+                {
+                    "id": 3,
+                    "name": "recurse",
+                    "requiredness": "default",
+                    "type": {
+                        "name": {
+                            "name": "SecondAnnotation"
+                        },
+                        "type": "struct"
+                    }
+                }
+            ],
+            "name": "SecondAnnotation",
+            "struct_type": "STRUCT"
+        },
+        {
+            "fields": [
+                {
+                    "id": 5,
+                    "name": "tag",
+                    "requiredness": "default",
+                    "type": {
+                        "inner_type": {
+                            "type": "string"
+                        },
+                        "name": {
+                            "name": "annotated_string"
+                        },
+                        "type": "typedef"
+                    }
+                }
+            ],
+            "name": "MyStruct",
+            "struct_type": "STRUCT"
+        },
+        {
+            "fields": [
+                {
+                    "id": 1,
+                    "name": "message",
+                    "requiredness": "default",
+                    "type": {
+                        "type": "string"
+                    }
+                }
+            ],
+            "name": "MyException",
+            "struct_type": "EXCEPTION"
+        }
+    ],
+    "typedefs": [
+        {
+            "name": "annotated_string",
+            "newtype": false,
+            "type": {
+                "type": "string"
+            }
+        }
+    ],
+    "unions": [
+        {
+            "fields": [
+                {
+                    "id": 1,
+                    "name": "int_value",
+                    "type": {
+                        "type": "i64"
+                    }
+                },
+                {
+                    "id": 2,
+                    "name": "string_value",
+                    "type": {
+                        "type": "string"
+                    }
+                }
+            ],
+            "name": "MyUnion"
         }
     ]
 }

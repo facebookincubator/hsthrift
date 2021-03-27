@@ -49,16 +49,19 @@ genFixtures (TheseOptions opts@Options{..}) = do
         | otherwise -> return $ map (genJSONLocThriftModule Nothing)
                               $ prog : deps
       _ -> return []
+
+    prettyJSON = encodePretty' defConfig { confCompare = compare }
+
     genJSONThriftModule ds prog = ThriftModule
       { tmPath = uncurry (</>) $ getAstPath prog
       , tmContents =
-          Text.unpack $ Text.decodeUtf8 $ encodePretty $ genJSON prog ds
+          Text.unpack $ Text.decodeUtf8 $ prettyJSON $ genJSON prog ds
       , tmModuleName = ""
       }
     genJSONLocThriftModule ds prog = ThriftModule
       { tmPath = uncurry (</>) $ getAstPath prog
       , tmContents =
-          Text.unpack $ Text.decodeUtf8 $ encodePretty $ genJSONLoc prog ds
+          Text.unpack $ Text.decodeUtf8 $ prettyJSON $ genJSONLoc prog ds
       , tmModuleName = ""
       }
 
