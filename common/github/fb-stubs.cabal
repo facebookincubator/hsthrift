@@ -1,0 +1,64 @@
+cabal-version:       3.6
+
+-- Copyright (c) Facebook, Inc. and its affiliates.
+
+name:                fb-stubs
+version:             0.1.0.0
+synopsis:            Stubs for dependencies of test code
+homepage:            https://github.com/facebookincubator/hsthrift
+bug-reports:         https://github.com/facebookincubator/hsthrift/issues
+license:             BSD-3-Clause
+license-file:        LICENSE
+author:              Facebook, Inc.
+maintainer:          hsthrift-team@fb.com
+copyright:           (c) Facebook, All Rights Reserved
+category:            Utilities
+build-type:          Simple
+
+description:
+    NOTE: for build instructions, see
+    https://github.com/facebookincubator/hsthrift
+
+source-repository head
+    type: git
+    location: https://github.com/facebookincubator/hsthrift.git
+
+common fb-haskell
+    default-language: Haskell2010
+    default-extensions:
+        BangPatterns
+        BinaryLiterals
+        DataKinds
+        DeriveDataTypeable
+        DeriveGeneric
+        EmptyCase
+        ExistentialQuantification
+        FlexibleContexts
+        FlexibleInstances
+        GADTs
+        GeneralizedNewtypeDeriving
+        LambdaCase
+        MultiParamTypeClasses
+        MultiWayIf
+        NoMonomorphismRestriction
+        OverloadedStrings
+        PatternSynonyms
+        RankNTypes
+        RecordWildCards
+        ScopedTypeVariables
+        StandaloneDeriving
+        TupleSections
+        TypeFamilies
+        TypeSynonymInstances
+        NondecreasingIndentation
+
+library
+    import: fb-haskell
+
+    exposed-modules:
+        TestRunner
+        Facebook.Init
+
+    build-depends:
+        base >=4.11.1.0 && <4.15,
+        HUnit ^>= 1.6.1

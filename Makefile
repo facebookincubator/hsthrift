@@ -98,34 +98,7 @@ thrift-cpp::
 		-o . \
 		hs_test.thrift
 
-# Copying around some common Haskell modules used
-# by many packages in their testsuites. Might
-# instead have all these common modules be exposed
-# by fb-util?
 copy-sources::
-	mkdir -p common/util/tests/github/Facebook \
-		 server/test/github/Facebook \
-		 common/mangle/tests/github \
-		 tests/github lib/test/github
-
-	cp common/github/Facebook/Init.hs \
-           common/util/tests/github/Facebook/
-	cp common/github/Facebook/Init.hs \
-           server/test/github/Facebook/
-
-	cp common/github/TestRunner.hs \
-	   common/mangle/tests/github/
-	cp common/github/TestRunner.hs \
-	   common/util/tests/github/
-	cp common/github/TestRunner.hs \
-	   tests/github/
-	cp common/github/TestRunner.hs \
-	   compiler/test/github/
-	cp common/github/TestRunner.hs \
-	   server/test/github/
-	cp common/github/TestRunner.hs \
-	   lib/test/github/
-
 	cp lib/test/Network.hs server/test/
 	cp lib/test/TestChannel.hs server/test/
 	cp lib/test/TestChannel.hs tests/

@@ -165,7 +165,6 @@ common test-common
   other-modules:
         Network
         TestCommon
-        TestRunner
         TestChannel
         Math.Types
         Math.Adder.Client
@@ -193,6 +192,7 @@ common test-common
                  base,
                  bytestring,
                  dependent-sum,
+                 fb-stubs,
                  fb-util,
                  filepath,
                  hspec,

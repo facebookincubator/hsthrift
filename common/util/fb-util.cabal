@@ -210,7 +210,7 @@ common test-common
   cxx-options: -std=c++17
   ghc-options: -threaded
   hs-source-dirs: tests, tests/github
-  other-modules: SpecRunner, TestRunner, Facebook.Init
+  other-modules: SpecRunner
   build-depends: base,
                  aeson,
                  async,
@@ -219,6 +219,7 @@ common test-common
                  containers,
                  directory,
                  fb-util,
+                 fb-stubs,
                  filepath,
                  hspec,
                  hspec-contrib,
