@@ -7,6 +7,7 @@ import TestRunner
 
 import Data.Aeson ((.=), Value(Array, Number, Bool), object)
 import qualified Data.Aeson as A
+import Data.List
 import qualified Data.Vector as Vector
 import Util.ToExp
 
@@ -34,8 +35,11 @@ tests = TestList
           , A.String "foobarbaz"
           ])
       assertEqual "object"
-        "Object (HashMap.fromList [(\"foo\", Number (-3)), (\"bar\", Bool True)])"
-        (pp $ object
+        -- the result is non-deterministic. Rather than add the
+        -- overhead of sorting the elements all the time, let's just
+        -- sort the test output.
+        (sort "Object (HashMap.fromList [(\"foo\", Number (-3)), (\"bar\", Bool True)])")
+        (sort $ pp $ object
           [ "foo" .= Number (-3)
           , "bar" .= Bool True
           ])
