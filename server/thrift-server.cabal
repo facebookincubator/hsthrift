@@ -95,21 +95,7 @@ flag tests_use_ipv4
      default: False
      manual: True
 
-common test-common
-  hs-source-dirs: test, test/github, test/gen-hs2
-
-  other-modules: Network
-                 CalculatorHandler
-                 EchoHandler
-                 Echoer.Echoer.Client
-                 Echoer.Echoer.Service
-                 Echoer.Types
-                 Math.Adder.Client
-                 Math.Adder.Service
-                 Math.Calculator.Client
-                 Math.Calculator.Service
-                 Math.Types
-                 TestChannel
+common test-deps
   build-depends: aeson,
                  base,
                  bytestring,
@@ -123,8 +109,8 @@ common test-common
                  HUnit ^>= 1.6.1,
                  STMonadTrans,
                  text,
-
                  thrift-lib,
+                 thrift-lib:test-helpers,
                  thrift-server,
                  transformers,
                  unordered-containers
@@ -132,22 +118,44 @@ common test-common
     -- for test/Network.hs
     cpp-options: -DIPV4
 
+library test-lib
+  import: fb-haskell, test-deps
+  hs-source-dirs: test/common, test/gen-hs2
+  exposed-modules:
+        CalculatorHandler
+        EchoHandler
+        Echoer.Echoer.Client
+        Echoer.Echoer.Service
+        Echoer.Types
+        Math.Adder.Client
+        Math.Adder.Service
+        Math.Calculator.Client
+        Math.Calculator.Service
+        Math.Types
+        HashMap.HashMapService.Client
+        HashMap.HashMapService.Service
+        HashMap.Types
+
+common test-common
+  import: test-deps
+  hs-source-dirs: test
+  build-depends: thrift-server:test-lib
+  ghc-options: -threaded
 
 test-suite dangling-pointer
   import: fb-haskell, test-common
   type: exitcode-stdio-1.0
   main-is: DanglingPointerTest.hs
-  ghc-options: -main-is DanglingPointerTest -threaded
-  other-modules: HashMap.HashMapService.Client,
-                 HashMap.HashMapService.Service,
-                 HashMap.Types
+  ghc-options: -main-is DanglingPointerTest
+
 test-suite handler
   import: fb-haskell, test-common
   type: exitcode-stdio-1.0
   main-is: HandlerTest.hs
   ghc-options: -main-is HandlerTest
+
 test-suite server
   import: fb-haskell, test-common
   type: exitcode-stdio-1.0
   main-is: ServerTest.hs
-  ghc-options: -main-is ServerTest -threaded
+  ghc-options: -main-is ServerTest

@@ -5,13 +5,13 @@ CABAL=cabal
 
 all:: compiler thrift-hs thrift-cpp server
 
-compiler:: copy-sources
+compiler::
 	$(CABAL) build thrift-compiler
 
-server:: copy-sources
+server::
 	$(CABAL) build thrift-server
 
-util:: copy-sources
+util::
 	$(CABAL) build fb-util
 
 thrift:: thrift-cpp thrift-hs
@@ -98,11 +98,6 @@ thrift-cpp::
 		-o . \
 		hs_test.thrift
 
-copy-sources::
-	cp lib/test/Network.hs server/test/
-	cp lib/test/TestChannel.hs server/test/
-	cp lib/test/TestChannel.hs tests/
-
 # Copying test .thrift files and their corresponding
 # generated (by thrift-compiler) .hs files around to
 # get each package directory to store everything the
@@ -112,7 +107,7 @@ copy-sources::
 # self-contained source distribution that can be
 # built and tested from the sdist archive alone,
 # as done in the Github CI.
-prepare-sdists:: copy-sources
+prepare-sdists::
 	cp -R lib/test/gen-hs2 server/test/
 	cp -R compiler/test/fixtures/gen-hs2/HsTest lib/test/gen-hs2/
 

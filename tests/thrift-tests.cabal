@@ -61,11 +61,6 @@ common fb-haskell
 
 common test-common
   hs-source-dirs: ., github/, gen-hs2/
-  -- include-dirs: .
-  -- cxx-options: -std=c++17
-  -- cxx-sources: cpp/hs_test.cpp
-  --             if/gen-cpp2/hs_test_types.cpp
-  --             cpp/messages.cpp
   build-depends: aeson,
                  base,
                  bytestring,
@@ -83,16 +78,10 @@ common test-common
                  text,
                  thrift-compiler,
                  thrift-lib,
+                 thrift-lib:test-helpers,
                  transformers,
                  unordered-containers,
                  vector
-  -- extra-libraries:
-  --       thriftmetadata
-  --       thriftcpp2
-  --       thriftprotocol
-  --       transport
-  --       concurrency
-  --       thrift-core
   ghc-options: -threaded
 
 test-suite add-prefix
@@ -147,7 +136,7 @@ test-suite exception
   import: fb-haskell, test-common
   type: exitcode-stdio-1.0
   main-is: ExceptionTest.hs
-  other-modules: Exception.Types, TestChannel
+  other-modules: Exception.Types
   ghc-options: -main-is ExceptionTest
 test-suite flags
   import: fb-haskell, test-common
