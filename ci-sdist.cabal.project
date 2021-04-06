@@ -9,3 +9,5 @@ package thrift-lib
   flags: +tests_use_ipv4
 package thrift-server
   flags: +tests_use_ipv4
+package cpp-channel
+  flags: +tests_use_ipv4

@@ -26,9 +26,19 @@ thrift-hs::
 	(cd lib && $(THRIFT_COMPILE) --hs --use-int \
 		test/if/math.thrift \
 		-o test)
+	mkdir -p cpp-channel/test/if
+	(cd lib && $(THRIFT_COMPILE) --hs --use-int \
+		test/if/math.thrift \
+		-o ../cpp-channel/test/if)
+	(cd lib && $(THRIFT_COMPILE) --hs --use-int \
+		test/if/math.thrift \
+		-o ../server/test)
 	(cd lib && $(THRIFT_COMPILE) --hs --use-int \
 		test/if/echoer.thrift \
 		-o test)
+	(cd lib && $(THRIFT_COMPILE) --hs --use-int \
+		test/if/echoer.thrift \
+		-o ../server/test)
 	(cd server && $(THRIFT_COMPILE) --hs \
 		test/if/hash_map.thrift \
 		-o test)
@@ -70,6 +80,8 @@ thrift-hs::
 	(cd tests && $(THRIFT_COMPILE) --hs \
 		if/hs_test.thrift)
 	(cd tests && $(THRIFT_COMPILE) --hs \
+		if/hs_test.thrift -o ../lib/test)
+	(cd tests && $(THRIFT_COMPILE) --hs \
 		if/map.thrift)
 	(cd tests && $(THRIFT_COMPILE) --hs \
 		if/messed_up_case.thrift)
@@ -88,11 +100,12 @@ thrift-hs::
 		if/service.thrift)
 
 thrift-cpp::
+	mkdir -p cpp-channel/if cpp-channel/test/if
 	cd lib && thrift1 -I . --gen mstch_cpp2 \
-		-o if \
+		-o ../cpp-channel/if \
 		if/RpcOptions.thrift
 	cd lib/test/if && thrift1 -I . --gen mstch_cpp2 \
-                -o . \
+                -o ../../../cpp-channel/test/if \
                 math.thrift
 	cd tests/if && thrift1 -I . --gen mstch_cpp2 \
 		-o . \
@@ -108,9 +121,6 @@ thrift-cpp::
 # built and tested from the sdist archive alone,
 # as done in the Github CI.
 prepare-sdists::
-	cp -R lib/test/gen-hs2 server/test/
-	cp -R compiler/test/fixtures/gen-hs2/HsTest lib/test/gen-hs2/
-
 	mkdir -p compiler/tests/if
 	cp tests/if/*.thrift compiler/tests/if/
 	cp tests/if/*.hs compiler/tests/if/

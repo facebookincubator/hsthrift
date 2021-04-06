@@ -58,7 +58,7 @@ jobs:
         run: cabal build all
         working-directory: ./_sdists
       - name: Run testsuites
-        run: cabal test mangle fb-util thrift-compiler thrift-lib thrift-server thrift-tests --keep-going
+        run: cabal test mangle fb-util thrift-compiler thrift-lib cpp-channel thrift-server thrift-tests --keep-going
         working-directory: ./_sdists
         # --keep-going is necessary to avoid stopping at the first failing
         # testsuite('s package?)

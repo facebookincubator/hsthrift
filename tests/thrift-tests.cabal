@@ -65,6 +65,7 @@ common test-common
                  base,
                  bytestring,
                  containers,
+                 cpp-channel,
                  data-default,
                  deepseq,
                  either,
