@@ -105,8 +105,10 @@ library
     include-dirs: .
 
     pkgconfig-depends: libfolly, fmt, openssl, libsodium
+
     extra-libraries:
         thriftcpp2
+        thriftmetadata
         thriftprotocol
         transport
         rpcmetadata
@@ -157,37 +159,28 @@ flag tests_use_ipv4
      default: False
      manual: True
 
-common test-common
-  hs-source-dirs:
-        test,
-        test/github,
-        test/gen-hs2
-  other-modules:
+-- This will be used by other packages
+library test-helpers
+  import: fb-haskell
+  visibility: public
+  hs-source-dirs: test/helpers
+  exposed-modules:
         Network
-        TestCommon
         TestChannel
-        Math.Types
-        Math.Adder.Client
-        Math.Calculator.Client
-        Math.Adder.Service
-        Math.Calculator.Service
-        SocketServer
-        HsTest.Types
-  include-dirs: .
-  cxx-options:   -std=c++17
-  cxx-sources:   test/cpp/MathServer.cpp
-                 test/if/gen-cpp2/Calculator.cpp
-                 test/if/gen-cpp2/AdderAsyncClient.cpp
-                 test/if/gen-cpp2/Adder.cpp
-                 test/if/gen-cpp2/math_types.cpp
-                 test/if/gen-cpp2/math_metadata.cpp
-  extra-libraries:
-        thriftmetadata
-        thriftcpp2
-        thriftprotocol
-        transport
-        concurrency
-        thrift-core
+  if flag(tests_use_ipv4)
+    -- for test/Network.hs
+    cpp-options: -DIPV4
+  build-depends: base,
+                 bytestring,
+                 network,
+                 thrift-lib,
+
+common test-deps
+  if flag(tests_use_ipv4)
+    -- for test/Network.hs
+    cpp-options: -DIPV4
+    -- for test/cpp/MathServer.cpp
+    cxx-options: -DIPV4
   build-depends: async ^>= 2.2,
                  base,
                  bytestring,
@@ -211,14 +204,40 @@ common test-common
                  containers,
                  vector,
                  QuickCheck,
-                 STMonadTrans
+                 STMonadTrans,
+                 thrift-lib:test-helpers,
   ghc-options: -threaded
 
-  if flag(tests_use_ipv4)
-    -- for test/Network.hs
-    cpp-options: -DIPV4
-    -- for test/cpp/MathServer.cpp
-    cxx-options: -DIPV4
+-- This is used by local tests only
+library test-lib
+  import: fb-haskell, test-deps
+  hs-source-dirs:
+        test/lib,
+        test/gen-hs2,
+  exposed-modules:
+        TestCommon
+        Math.Types
+        Math.Adder.Client
+        Math.Calculator.Client
+        Math.Adder.Service
+        Math.Calculator.Service
+        SocketServer
+        HsTest.Types
+  include-dirs: .
+  cxx-options:   -std=c++17
+  cxx-sources:   test/cpp/MathServer.cpp
+                 test/if/gen-cpp2/Calculator.cpp
+                 test/if/gen-cpp2/AdderAsyncClient.cpp
+                 test/if/gen-cpp2/Adder.cpp
+                 test/if/gen-cpp2/math_types.cpp
+                 test/if/gen-cpp2/math_metadata.cpp
+
+common test-common
+  import: test-deps
+  hs-source-dirs: test
+  build-depends:
+        thrift-lib:test-helpers,
+        thrift-lib:test-lib
 
 test-suite channel
   import: fb-haskell, test-common
