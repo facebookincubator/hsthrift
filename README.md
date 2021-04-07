@@ -69,14 +69,6 @@ packages in this repository with your freshly built compiler:
 $ make thrift-hs
 ```
 
-Before proceeding to building and testing everything, we just need to
-copy some testing related modules around that are used by several
-packages, using a simple make command:
-
-``` sh
-$ make copy-sources
-```
-
 Finally, we can issue any `cabal build`/`cabal run`/`cabal test`
 command to build/run/test a specific component or entire package.
 For instance, we could test all the packages with:
