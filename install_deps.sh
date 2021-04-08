@@ -60,7 +60,8 @@ build() {
 }
 
 clone folly https://github.com/facebook/folly.git
-PROJ_TAG=$(cd folly && git tag | sort -r | head -1)
+# PROJ_TAG=$(cd folly && git tag | sort -r | head -1)
+PROJ_TAG="v2021.03.29.00"
 echo "Using tag: $PROJ_TAG"
 (cd folly && git checkout "$PROJ_TAG")
 build folly .
