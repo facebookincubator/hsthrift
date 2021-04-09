@@ -1,6 +1,6 @@
 -- Copyright (c) Facebook, Inc. and its affiliates.
 
-{-# LANGUAGE TypeOperators #-}
+{-# LANGUAGE TypeOperators, NamedFieldPuns #-}
 {-# LANGUAGE CPP #-}
 module Thrift.Compiler.Typechecker
   ( typecheck
@@ -491,7 +491,8 @@ resolveTag THROWS_UNRESOLVED ty =
 
 resolveUnion :: forall l. Typecheckable l => Parsed Union -> Typechecked l Union
 resolveUnion u@Union{..} = do
-  alts <- resolveAlts unionAlts
+  Options{optsLenient} <- asks options
+  alts <- resolveAlts optsLenient unionAlts
   thishasEmpty <-
     fromMaybe (This HasEmpty) . listToMaybe . catMaybes <$>
     mapM resolveAnn (filterHsAnns $ getAnns unionAnns)
@@ -508,8 +509,8 @@ resolveUnion u@Union{..} = do
       , ..
       }
   where
-    resolveAlts :: [Parsed UnionAlt] -> TC l [UnionAlt 'Resolved l Loc]
-    resolveAlts alts =
+    resolveAlts :: Bool -> [Parsed UnionAlt] -> TC l [UnionAlt 'Resolved l Loc]
+    resolveAlts optsLenient alts =
       mapT resolveAlt alts
       -- Check for duplicate field ids
       <* foldM checkId Set.empty alts
@@ -520,7 +521,7 @@ resolveUnion u@Union{..} = do
               typeError (lLocation $ flId altLoc) $
               InvalidFieldId altName (fromIntegral altId)
           | otherwise = pure $ Set.insert altId ids
-        checkEmpty = when (null alts) $
+        checkEmpty = when (null alts && not optsLenient) $
           typeError (lLocation $ slKeyword unionLoc) $ EmptyUnion unionName
 
     resolveAlt :: Parsed UnionAlt -> Typechecked l UnionAlt
@@ -791,7 +792,7 @@ getEnumType opts@Options{..} enum@Enum{..}
 -- ignored.  Try to be similar here, in weird mode, by dropping errors.
 mapTWeird :: (a -> TC l b) -> [a] -> TC l [b]
 mapTWeird f xs = do
-    Options{..} <- asks options
+    Options{optsLenient} <- asks options
     if not optsLenient then
       mapT f xs
     else
@@ -836,7 +837,7 @@ typecheckConst (TList u) (UntypedConst _ ListConst{..}) =
 typecheckConst (TSet u) (UntypedConst _ ListConst{..}) =
   Literal . Set <$> mapT (typecheckConst u . leElem) lvElems
 typecheckConst ty@(TSet _) c@(UntypedConst l MapConst{mvElems=[]}) = do
-  Options{..} <- asks options
+  Options{optsLenient} <- asks options
   if optsLenient then
     return . Literal $ Set [] -- weird files use the wrong empty brackets, sigh
   else

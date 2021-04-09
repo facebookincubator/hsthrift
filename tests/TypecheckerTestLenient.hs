@@ -203,6 +203,12 @@ ignoreWrongEnumKeys = unlines
   , "}"
   ]
 
+noAltUnion :: String
+noAltUnion = unlines
+  [ "union Zero {"
+  , "}"
+  ]
+
 lenientInputs :: [(String, String)]
 lenientInputs =
   [ ( "T43181705 empty set1", emptySet1 )
@@ -212,6 +218,7 @@ lenientInputs =
   , ( "T43181363 enum Const to Int Constant", enumConstToIntConst )
   , ( "T43181635 self qualification", selfQualification )
   , ( "T45688659 ignore wrong enum keys", ignoreWrongEnumKeys )
+  , ( "T46325195 allow unions without alts", noAltUnion )
   ]
 
 lenientTests :: Test
