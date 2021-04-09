@@ -209,6 +209,12 @@ noAltUnion = unlines
   , "}"
   ]
 
+emptyListMap :: String
+emptyListMap = unlines
+  [ "const list<i32> EmptyList = {}"
+  , "const map<i32,i32> EmptyMap = []"
+  ]
+
 lenientInputs :: [(String, String)]
 lenientInputs =
   [ ( "T43181705 empty set1", emptySet1 )
@@ -219,6 +225,7 @@ lenientInputs =
   , ( "T43181635 self qualification", selfQualification )
   , ( "T45688659 ignore wrong enum keys", ignoreWrongEnumKeys )
   , ( "T46325195 allow unions without alts", noAltUnion )
+  , ( "T43181705 empty list/map", emptyListMap )
   ]
 
 lenientTests :: Test

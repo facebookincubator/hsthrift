@@ -834,28 +834,52 @@ typecheckConst TBytes (UntypedConst _ (StringConst s _)) =
 -- Recursive Types
 typecheckConst (TList u) (UntypedConst _ ListConst{..}) =
   Literal . List <$> mapT (typecheckConst u . leElem) lvElems
+typecheckConst ty@(TList _) c@(UntypedConst l MapConst{mvElems=[]})  = do
+  Options{optsLenient} <- asks options
+  if optsLenient then
+    return $ Literal $ List [] -- weird files use the wrong empty brackets, sigh
+  else
+    typeError (lLocation l) (LiteralMismatch ty c)
 typecheckConst (TSet u) (UntypedConst _ ListConst{..}) =
   Literal . Set <$> mapT (typecheckConst u . leElem) lvElems
 typecheckConst ty@(TSet _) c@(UntypedConst l MapConst{mvElems=[]}) = do
   Options{optsLenient} <- asks options
   if optsLenient then
-    return . Literal $ Set [] -- weird files use the wrong empty brackets, sigh
+    return $ Literal $ Set [] -- weird files use the wrong empty brackets, sigh
   else
     typeError (lLocation l) (LiteralMismatch ty c)
 typecheckConst (THashSet u) (UntypedConst _ ListConst{..}) =
   Literal . HashSet <$> mapT (typecheckConst u . leElem) lvElems
+typecheckConst ty@(THashSet _) c@(UntypedConst l MapConst{mvElems=[]}) = do
+  Options{optsLenient} <- asks options
+  if optsLenient then
+    return $ Literal $ HashSet [] -- weird files use the wrong empty brackets
+  else
+    typeError (lLocation l) (LiteralMismatch ty c)
 typecheckConst (TMap kt vt) (UntypedConst _ MapConst{..}) =
   Literal . Map <$> mapTWeird tcConsts mvElems
     where
       tcConsts ListElem{leElem=MapPair{..}} = (,)
         <$> typecheckConst kt mpKey
         <*> typecheckConst vt mpVal
+typecheckConst ty@(TMap _ _) c@(UntypedConst l ListConst{lvElems=[]}) = do
+  Options{optsLenient} <- asks options
+  if optsLenient then
+    return $ Literal $ Map [] -- weird files use the wrong empty brackets, sigh
+  else
+    typeError (lLocation l) (LiteralMismatch ty c)
 typecheckConst (THashMap kt vt) (UntypedConst _ MapConst{..}) =
   Literal . HashMap <$> mapT tcConsts mvElems
     where
       tcConsts ListElem{leElem=MapPair{..}} = (,)
         <$> typecheckConst kt mpKey
         <*> typecheckConst vt mpVal
+typecheckConst ty@(THashMap _ _) c@(UntypedConst l ListConst{lvElems=[]}) = do
+  Options{optsLenient} <- asks options
+  if optsLenient then
+    return $ Literal $ HashMap [] -- weird files use the wrong empty brackets
+  else
+    typeError (lLocation l) (LiteralMismatch ty c)
 
 -- Enums
 typecheckConst e@(TEnum Name{..} _loc _)
@@ -1467,7 +1491,7 @@ mkEnumMap opts@Options{..} = Map.fromList . map mkAssoc
 
 -- Build EnumInt Map -----------------------------------------------------------
 
--- | When weird mode is active (argument @--lenient@) then capture the enum
+-- | When lenient mode is active (argument @--lenient@) then capture the enum
 -- values into 'imap' so they can be used as default integer values.
 mkEnumInt:: Typecheckable l => Options l -> [Parsed Enum] -> EnumInt
 mkEnumInt opts
