@@ -4,6 +4,9 @@
 
 #include "cpp/HsStruct.h"
 
+#include <utility>
+#include <vector>
+
 struct HsVariant {
   using VariantType = HsJSON;
   using MapType = HsObject<HsJSON>;
@@ -15,6 +18,7 @@ struct HsVariant {
   using SetIterator = SetType::ConstIterator;
   using StringType = HsString;
   using Type = facebook::serialize::Type;
+  using StructHandle = int;
 
   /**
    * \defgroup as_type variant accessors
@@ -119,6 +123,10 @@ struct HsVariant {
     return ret;
   }
 
+  static MapType reserveMap(StructHandle, size_t n) {
+    return reserveMap(n);
+  }
+
   static MapType getStaticEmptyMap() {
     return createMap();
   }
@@ -137,6 +145,12 @@ struct HsVariant {
 
   static void mapSet(MapType& map, int64_t key, VariantType&& value) {
     map.add(mapKeyFromInt64(key), std::move(value));
+  }
+
+  template <typename T>
+  static void
+  mapSet(MapType& map, size_t /*idx*/, T&& key, VariantType&& value) {
+    mapSet(map, std::forward<T>(key), std::move(value));
   }
 
   // accessors
@@ -301,5 +315,11 @@ struct HsVariant {
   }
 
   static void traceSerialization(const VariantType&) {}
+
+  static StructHandle registerStruct(
+      const StringType& stableIdentifier,
+      const std::vector<std::pair<size_t, StringType>>& fields) {
+    return -1;
+  }
   /** @} */
 };
