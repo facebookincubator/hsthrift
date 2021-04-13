@@ -1,6 +1,6 @@
 // Copyright (c) Facebook, Inc. and its affiliates.
 
-#include <cpp/HsChannel.h>
+#include <common/hs/thrift/cpp-channel/cpp/HsChannel.h>
 #include <if/gen-cpp2/RpcOptions_types.h>
 #include <thrift/lib/cpp2/protocol/Serializer.h>
 

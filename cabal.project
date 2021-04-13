@@ -9,5 +9,6 @@ packages:
     compiler/thrift-compiler.cabal
     tests/thrift-tests.cabal
     haxl/thrift-haxl.cabal
+    cpp-channel/cpp-channel.cabal
 
 tests: true

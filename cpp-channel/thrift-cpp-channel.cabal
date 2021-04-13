@@ -1,0 +1,160 @@
+cabal-version:       3.6
+
+-- Copyright (c) Facebook, Inc. and its affiliates.
+
+name:                thrift-cpp-channel
+version:             0.1.0.0
+synopsis:            Thrift channel implementation based on fbthrift
+homepage:            https://github.com/facebookincubator/hsthrift
+bug-reports:         https://github.com/facebookincubator/hsthrift/issues
+license:             BSD-3-Clause
+license-file:        LICENSE
+author:              Facebook, Inc.
+maintainer:          hsthrift-team@fb.com
+copyright:           (c) Facebook, All Rights Reserved
+category:            Thrift
+build-type:          Simple
+extra-source-files:  cpp/HsChannel.h,
+                     if/gen-cpp2/*.h,
+                     if/gen-cpp2/*.cpp,
+                     if/gen-cpp2/*.tcc,
+                     test/if/gen-cpp2/*.h,
+                     test/if/gen-cpp2/*.cpp,
+                     test/if/gen-cpp2/*.tcc
+
+description:
+    Support for building client and server applications that
+    communicate using the Thrift protocols over channels
+    implemented in C++ with the fbthrift infrastructure.
+    .
+    NOTE: for build instructions and documentation, see
+    https://github.com/facebookincubator/hsthrift
+
+source-repository head
+    type: git
+    location: https://github.com/facebookincubator/hsthrift.git
+
+common fb-haskell
+    default-language: Haskell2010
+    default-extensions:
+        BangPatterns
+        BinaryLiterals
+        DataKinds
+        DeriveDataTypeable
+        DeriveGeneric
+        EmptyCase
+        ExistentialQuantification
+        FlexibleContexts
+        FlexibleInstances
+        GADTs
+        GeneralizedNewtypeDeriving
+        LambdaCase
+        MultiParamTypeClasses
+        MultiWayIf
+        NoMonomorphismRestriction
+        OverloadedStrings
+        PatternSynonyms
+        RankNTypes
+        RecordWildCards
+        ScopedTypeVariables
+        StandaloneDeriving
+        TupleSections
+        TypeFamilies
+        TypeSynonymInstances
+        NondecreasingIndentation
+
+library
+    import: fb-haskell
+    exposed-modules:
+        Thrift.Channel.CppChannel
+        Thrift.Channel.HeaderChannel
+    cxx-options: -std=c++17
+    cxx-sources:
+        cpp/HeaderChannel.cpp
+        cpp/HsChannel.cpp
+        if/gen-cpp2/RpcOptions_constants.cpp
+        if/gen-cpp2/RpcOptions_data.cpp
+        if/gen-cpp2/RpcOptions_metadata.cpp
+        if/gen-cpp2/RpcOptions_types.cpp
+
+    hs-source-dirs: .
+    build-tool-depends: hsc2hs:hsc2hs
+    hsc2hs-options: --cc=g++ --lflag=-lstdc++ --cflag=-D__HSC2HS__=1 --lflag=-lboost_context --cflag=-std=c++17
+    include-dirs: .
+
+    pkgconfig-depends: libfolly, fmt, openssl, libsodium
+    extra-libraries:
+        thriftcpp2
+        thriftmetadata
+        thriftprotocol
+        transport
+        rpcmetadata
+        concurrency
+        thrift-core
+        async
+        wangle
+        yarpl
+        fmt
+        fizz
+        stdc++
+        -- TODO: I needed this to satisfy an undefined reference to
+        -- jump_fcontext when running hsc2hs
+        boost_context
+
+    build-depends:
+        base >=4.11.1 && <4.15,
+        thrift-lib,
+        fb-util,
+        text,
+        text-show,
+        bytestring
+
+flag tests_use_ipv4
+     description: Force tests to use IPV4 whenever bringing thrift clients/servers up
+     default: False
+     manual: True
+
+test-suite header-channel
+  import: fb-haskell
+  type: exitcode-stdio-1.0
+  hs-source-dirs: test, test/if/gen-hs2
+  main-is: HeaderChannelTest.hs
+  other-modules: Math.Adder.Client
+                 Math.Calculator.Client
+                 Math.Types
+  cxx-options: -std=c++17
+  cxx-sources: test/MathServer.cpp
+               test/if/gen-cpp2/Calculator.cpp
+               test/if/gen-cpp2/AdderAsyncClient.cpp
+               test/if/gen-cpp2/Adder.cpp
+               test/if/gen-cpp2/math_types.cpp
+               test/if/gen-cpp2/math_metadata.cpp
+  extra-libraries:
+        thriftmetadata
+        thriftcpp2
+        thriftprotocol
+        transport
+        concurrency
+        thrift-core
+  if flag(tests_use_ipv4)
+    -- for test/Network.hs
+    cpp-options: -DIPV4
+    -- for test/cpp/MathServer.cpp
+    cxx-options: -DIPV4
+  ghc-options: -main-is HeaderChannelTest -threaded
+  build-depends:
+                  base,
+                  bytestring,
+                  thrift-cpp-channel:thrift-cpp-channel,
+                  fb-stubs,
+                  thrift-lib:thrift-lib,
+                  thrift-lib:test-helpers,
+                  fb-util,
+                  HUnit,
+                  transformers,
+                  data-default,
+                  aeson,
+                  hashable,
+                  unordered-containers,
+                  deepseq,
+                  STMonadTrans

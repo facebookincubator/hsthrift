@@ -76,6 +76,7 @@ common test-common
                  QuickCheck,
                  STMonadTrans,
                  text,
+                 thrift-cpp-channel,
                  thrift-compiler,
                  thrift-lib,
                  thrift-lib:test-helpers,

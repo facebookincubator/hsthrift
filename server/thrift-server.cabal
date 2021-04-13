@@ -74,6 +74,7 @@ library
   build-depends:
       fb-util,
       thrift-lib,
+      thrift-cpp-channel,
       base >=4.11.1 && <4.15,
       text ^>=1.2.3.0,
       bytestring ^>=0.10.8.2,
@@ -112,6 +113,7 @@ common test-deps
                  thrift-lib,
                  thrift-lib:test-helpers,
                  thrift-server,
+                 thrift-cpp-channel,
                  transformers,
                  unordered-containers
   if flag(tests_use_ipv4)

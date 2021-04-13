@@ -15,15 +15,8 @@ copyright:           (c) Facebook, All Rights Reserved
 category:            Thrift
 build-type:          Simple
 extra-source-files:  CHANGELOG.md,
-                     cpp/HsChannel.h,
                      if/*.thrift,
-                     if/gen-cpp2/*.h,
-                     if/gen-cpp2/*.cpp,
-                     if/gen-cpp2/*.tcc,
-                     test/if/*.thrift,
-                     test/if/gen-cpp2/*.h,
-                     test/if/gen-cpp2/*.cpp,
-                     test/if/gen-cpp2/*.tcc
+                     test/if/*.thrift
 
 description:
     Support for building client and server applications that
@@ -77,8 +70,6 @@ library
         Thrift.Api
         Thrift.Codegen
         Thrift.Channel
-        Thrift.Channel.CppChannel
-        Thrift.Channel.HeaderChannel
         Thrift.Channel.SocketChannel
         Thrift.Protocol
         Thrift.Protocol.Compact
@@ -92,37 +83,10 @@ library
         Thrift.Protocol.ApplicationException.Types
         Thrift.Protocol.RpcOptions.Types
 
-    cxx-options: -std=c++17
-    cxx-sources:
-        cpp/HeaderChannel.cpp
-        cpp/HsChannel.cpp
-        if/gen-cpp2/RpcOptions_types.cpp
-        if/gen-cpp2/RpcOptions_data.cpp
-
     hs-source-dirs: . gen-hs2
-    build-tool-depends: hsc2hs:hsc2hs
-    hsc2hs-options: --cc=g++ --lflag=-lstdc++ --cflag=-D__HSC2HS__=1 --lflag=-lboost_context --cflag=-std=c++17
-    include-dirs: .
 
-    pkgconfig-depends: libfolly, fmt, openssl, libsodium
-
-    extra-libraries:
-        thriftcpp2
-        thriftmetadata
-        thriftprotocol
-        transport
-        rpcmetadata
-        concurrency
-        thrift-core
-        async
-        wangle
-        yarpl
-        fmt
-        fizz
-        stdc++
-        -- TODO: I needed this to satisfy an undefined reference to
-        -- jump_fcontext when running hsc2hs
-        boost_context
+    -- needed for fb-utils
+    extra-libraries: stdc++
 
     build-depends:
         dependent-sum >= 0.6 && <= 0.6.2.0,
@@ -152,7 +116,6 @@ library
     if flag(tests_use_ipv4)
       -- for SocketChannel.hs
       cpp-options: -DIPV4
-
 
 flag tests_use_ipv4
      description: Force tests to use IPV4 whenever bringing thrift clients/servers up
@@ -223,14 +186,6 @@ library test-lib
         Math.Calculator.Service
         SocketServer
         HsTest.Types
-  include-dirs: .
-  cxx-options:   -std=c++17
-  cxx-sources:   test/cpp/MathServer.cpp
-                 test/if/gen-cpp2/Calculator.cpp
-                 test/if/gen-cpp2/AdderAsyncClient.cpp
-                 test/if/gen-cpp2/Adder.cpp
-                 test/if/gen-cpp2/math_types.cpp
-                 test/if/gen-cpp2/math_metadata.cpp
 
 common test-common
   import: test-deps
@@ -256,12 +211,6 @@ test-suite client
   type: exitcode-stdio-1.0
   main-is: ClientTest.hs
   ghc-options: -main-is ClientTest
-
-test-suite header-channel
-  import: fb-haskell, test-common
-  type: exitcode-stdio-1.0
-  main-is: HeaderChannelTest.hs
-  ghc-options: -main-is HeaderChannelTest
 
 test-suite binary-parser
   import: fb-haskell, test-common
