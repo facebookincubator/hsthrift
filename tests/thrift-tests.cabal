@@ -60,7 +60,7 @@ common fb-haskell
         NondecreasingIndentation
 
 common test-common
-  hs-source-dirs: ., github/, gen-hs2/
+  hs-source-dirs: ., gen-hs2/
   build-depends: aeson,
                  base,
                  bytestring,

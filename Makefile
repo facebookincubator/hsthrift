@@ -110,17 +110,3 @@ thrift-cpp::
 	cd tests/if && thrift1 -I . --gen mstch_cpp2 \
 		-o . \
 		hs_test.thrift
-
-# Copying test .thrift files and their corresponding
-# generated (by thrift-compiler) .hs files around to
-# get each package directory to store everything the
-# corresponding package needs to be built and tested.
-# In particular, calling 'cabal sdist' for any
-# package after this rule has run should result in a
-# self-contained source distribution that can be
-# built and tested from the sdist archive alone,
-# as done in the Github CI.
-prepare-sdists::
-	mkdir -p compiler/tests/if
-	cp tests/if/*.thrift compiler/tests/if/
-	cp tests/if/*.hs compiler/tests/if/

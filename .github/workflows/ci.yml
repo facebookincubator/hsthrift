@@ -41,8 +41,6 @@ jobs:
         run: cabal build --project-file=ci.cabal.project exe:thrift-compiler
       - name: Generate Haskell code from thrift files
         run: make thrift-hs
-      - name: Copy files around to make all packages standalone
-        run: make prepare-sdists
       - name: Generate source distributions for all packages
         run: cabal sdist --project-file=ci.cabal.project all
       - name: Unpack source distributions in new directory
