@@ -9,7 +9,7 @@ packages:
     server/thrift-server.cabal
     tests/thrift-tests.cabal
     haxl/thrift-haxl.cabal
-    cpp-channel/cpp-channel.cabal
+    cpp-channel/thrift-cpp-channel.cabal
 
 tests: true
 
@@ -20,5 +20,5 @@ package thrift-lib
   flags: +tests_use_ipv4
 package thrift-server
   flags: +tests_use_ipv4
-package cpp-channel
+package thrift-cpp-channel
   flags: +tests_use_ipv4
