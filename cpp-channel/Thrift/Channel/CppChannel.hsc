@@ -41,7 +41,7 @@ import Util.Log
 data CppWrappedChannel
 data CppRequestChannelPtr
 
-#include <common/hs/thrift/cpp-channel/cpp/HsChannel.h>
+#include <cpp/HsChannel.h>
 
 -- | WrappedChannel is parameterized by a phantom type that represents the
 -- specific CPP client channel we are using
