@@ -215,6 +215,18 @@ emptyListMap = unlines
   , "const map<i32,i32> EmptyMap = []"
   ]
 
+selfQualType :: String
+selfQualType = unlines
+  [ "struct Foo {"
+  , "  1: string name,"
+  , "}"
+  , "service S {"
+  , "  ttl.Foo fun("
+  , "    1: ttl.Foo param1,"
+  , "  )"
+  , "}"
+  ]
+
 lenientInputs :: [(String, String)]
 lenientInputs =
   [ ( "T43181705 empty set1", emptySet1 )
@@ -226,6 +238,7 @@ lenientInputs =
   , ( "T45688659 ignore wrong enum keys", ignoreWrongEnumKeys )
   , ( "T46325195 allow unions without alts", noAltUnion )
   , ( "T43181705 empty list/map", emptyListMap )
+  , ( "T43181635 self qualified type", selfQualType )
   ]
 
 lenientTests :: Test

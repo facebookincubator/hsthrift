@@ -105,17 +105,21 @@ typecheckModule opts@Options{..} progs tf@ThriftFile{..} = do
                 , optsLenient || progPath `elem` imports ]
     importMap = mkImportMap opts progs imports
     renamedModule = renameModule opts tf
+    thriftDeclsNew
+      | optsLenient && Map.notMember thriftName importMap =
+          unSelfQualDecls thriftName thriftDecls
+      | otherwise = thriftDecls
   -- Make Type Map
-  tmap <- mkTypemap (thriftName, opts) importMap thriftDecls
+  tmap <- mkTypemap (thriftName, opts) importMap thriftDeclsNew
   -- Make Schema, Constants, and Services Maps
   let
-    Decls{..} = partitionDecls thriftDecls
+    Decls{..} = partitionDecls thriftDeclsNew
     emap = mkEnumMap opts dEnums
     imap = mkEnumInt opts dEnums
   (smap, umap, cmap, servMap)
      <- (,,,) <$> mkSchemaMap (thriftName, opts) importMap tmap dStructs
          `collect` mkUnionMap (thriftName, opts) importMap tmap dUnions
-         `collect` mkConstMap (thriftName, opts) importMap tmap thriftDecls
+         `collect` mkConstMap (thriftName, opts) importMap tmap thriftDeclsNew
          `collect` mkServiceMap (thriftName, opts) importMap dServs
 
   -- Build the Env
@@ -131,7 +135,7 @@ typecheckModule opts@Options{..} progs tf@ThriftFile{..} = do
                 , envName    = thriftName -- for weird 'mkThriftName' case
                 }
   -- Typecheck the rest of the things
-  decls <- runTypechecker env $ mapT resolveDecl thriftDecls
+  decls <- runTypechecker env $ mapT resolveDecl thriftDeclsNew
   let prog = Program
              { progName      = thriftName
              , progHSName    = renamedModule
@@ -145,6 +149,74 @@ typecheckModule opts@Options{..} progs tf@ThriftFile{..} = do
              , progEnv       = qualify (thriftName, renamedModule) env
              }
   return $ prog : progs
+
+-- Self qualified --------------------------------------------------------------
+
+-- | Takes the current thriftName (envName, progName) and removes this
+-- from any 'TNamed' type that uses this thriftName a qualifier, i.e.
+-- removes the qualifier if it is for the current thrift module.
+--
+-- We need to do this early, otherwise building the type map fails.
+--
+-- This is only used in @--lenient@ mode.
+unSelfQualDecls :: Text -> [Parsed Decl] -> [Parsed Decl]
+unSelfQualDecls thriftName xs = map unSelfQual xs
+  where
+    self = thriftName <> "."
+
+    unSelfQual :: Parsed Decl -> Parsed Decl
+    unSelfQual p = case p of
+      D_Struct Struct{..}
+        -> D_Struct Struct{structMembers = map usqField structMembers, ..}
+      D_Union Union{..} -> D_Union Union{unionAlts = map usqAlt unionAlts, ..}
+      D_Const Const{..}
+        | Just x <- usqAnnType constType -> D_Const Const{constType=x, ..}
+      D_Typedef Typedef{..}
+        | Just x <- usqAnnType tdType -> D_Typedef Typedef{tdType=x, ..}
+      D_Service Service{..}
+        -> D_Service Service{serviceFunctions = map usqFun serviceFunctions, ..}
+      _ -> p
+
+    usqField f@Field{..}
+      | Just x <- usqAnnType fieldType = Field{fieldType=x, ..}
+      | otherwise = f
+
+    usqAlt :: UnionAlt 'Unresolved () Loc -> UnionAlt 'Unresolved () Loc
+    usqAlt a@UnionAlt{..}
+      | Just x <- usqAnnType altType = UnionAlt{altType=x, ..}
+      | otherwise = a
+
+    usqFun :: Function 'Unresolved () Loc -> Function 'Unresolved () Loc
+    usqFun Function{..}= Function
+      { funType = case funType of
+          Right (Some at) | Just x <- usqAnnType at -> Right (Some x)
+          _ -> funType
+      , funArgs = map usqField funArgs
+      , funExceptions = map usqField funExceptions
+      , .. }
+
+    usqAnnType :: forall v. AnnotatedType Loc v -> Maybe (AnnotatedType Loc v)
+    usqAnnType t@AnnotatedType{..} = (\x -> t{atType=x}) <$> usqType atType
+
+    usqType
+      :: forall v. TType 'Unresolved () Loc v
+      -> Maybe (TType 'Unresolved () Loc v)
+    usqType (TSet t) | Just x <- usqAnnType t = Just $ TSet x
+    usqType (THashSet t) | Just x <- usqAnnType t = Just $ THashSet x
+    usqType (TList t) | Just x <- usqAnnType t = Just $ TList x
+    usqType (TMap k v) = case (usqAnnType k, usqAnnType v) of
+      (Just x, Just y) -> Just $ TMap x y
+      (Just x, _) -> Just $ TMap x v
+      (_, Just y) -> Just $ TMap k y
+      _ -> Nothing
+    usqType (THashMap k v) = case (usqAnnType k, usqAnnType v) of
+      (Just x, Just y) -> Just $ THashMap x y
+      (Just x, _) -> Just $ THashMap x v
+      (_, Just y) -> Just $ THashMap k y
+      _ -> Nothing
+    usqType (TNamed input) | Just x <- Text.stripPrefix self input =
+      Just (TNamed x) -- Here is the point of unSelfQualDecls
+    usqType _ = Nothing
 
 -- Map Builders ----------------------------------------------------------------
 
