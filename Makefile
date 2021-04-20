@@ -98,6 +98,10 @@ thrift-hs::
 		if/scoped_enums.thrift)
 	(cd tests && $(THRIFT_COMPILE) --hs \
 		if/service.thrift)
+	# those files are required for thrift-compiler's tests
+	mkdir -p compiler/tests/if
+	cp tests/if/*.thrift compiler/tests/if/
+	cp tests/if/*.hs compiler/tests/if/
 
 thrift-cpp::
 	mkdir -p cpp-channel/if cpp-channel/test/if
