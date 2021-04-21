@@ -74,6 +74,13 @@ HS_STRUCT HsMaybe {
     }
   }
 
+  template <typename U>
+  /* implicit */ HsMaybe(std::optional<U> && value) {
+    if (value.has_value()) {
+      ptr = new T(std::move(value).value());
+    }
+  }
+
   HsMaybe(const HsMaybe&) = delete;
 
   HsMaybe(HsMaybe && other) noexcept : ptr(other.ptr) {
