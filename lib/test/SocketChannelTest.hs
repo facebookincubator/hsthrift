@@ -2,16 +2,17 @@
 
 module SocketChannelTest where
 
+import Network.Socket (maxListenQueue)
 import TestRunner
 import Test.HUnit hiding (State)
 
 import Thrift.Api
 import Thrift.Channel
+import Thrift.Channel.SocketChannel.Server
 import Thrift.Protocol.Id
 
 import Math.Calculator.Client
 
-import SocketServer
 import TestCommon
 
 main :: IO ()
@@ -35,4 +36,4 @@ mkClientTestSockWith
   -> Test
 mkClientTestSockWith lbl _opts action = TestLabel lbl $ TestCase $ do
   state <- initServerState
-  withServer binaryProtocolId (processCommand state) action
+  withServer binaryProtocolId Nothing maxListenQueue (processCommand state) action

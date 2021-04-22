@@ -1,9 +1,16 @@
 -- Copyright (c) Facebook, Inc. and its affiliates.
 
 {-# LANGUAGE CPP #-}
-module SocketServer
-  ( withServer
-  , runServer
+module Thrift.Channel.SocketChannel.Server
+  ( -- * High level interface to socket server implementation
+    withSocketServerOpts
+  , SocketServerOptions(..)
+  , defaultServerOptions
+  , SocketServer(..)
+
+  , -- * Lower level interface
+    withServer
+  , withServerIO
   ) where
 
 import Control.Concurrent
@@ -12,6 +19,7 @@ import Control.Exception
 import Control.Monad
 import Data.ByteString.Builder (toLazyByteString)
 import Data.ByteString.Lazy (toStrict)
+import Data.Maybe (fromMaybe)
 import Data.Proxy
 import Network.Socket
 import qualified Data.ByteString as BS
@@ -26,35 +34,77 @@ import Thrift.Protocol
 import Thrift.Protocol.ApplicationException.Types
 import Thrift.Protocol.Id
 
+-- |
+data SocketServerOptions = SocketServerOptions
+  { desiredPort    :: Maybe Int
+    -- ^ lets the OS pick a port when 'Nothing'
+  , maxQueuedConns :: Maybe Int
+    -- ^ hint for the max number of connections for 'listen',
+    --   uses Network.Socket.maxListenQueue when Nothing
+  , protocol       :: ProtocolId
+    -- ^ defaults to the binary protocol
+  } deriving (Eq, Show)
 
--- | A high level function for running a Thrift server and some
---   client computations against it, using the given handler to
---   process requests.
+-- | Default options: let the OS pick a port, use 'Network.Socket.maxListenQueue'
+--   as the maximum number of queued connections, and communicate
+--   with the binary Thrift protocol.
+defaultServerOptions :: SocketServerOptions
+defaultServerOptions = SocketServerOptions Nothing Nothing binaryProtocolId
+
+-- | Information about the running server given by 'withSocketServerOpts'
+--   to the inner computation it runs against the server.
+data SocketServer = SocketServer
+  { serverPort :: Int
+  , serverProt :: ProtocolId
+  } deriving (Eq, Show)
+
+-- | Highest level interface to the socket-based Thrift server
+--   implementation.
+withSocketServerOpts
+  :: Processor s
+  => (forall r. s r -> IO r) -- ^ server side handler
+  -> SocketServerOptions
+  -> (SocketServer -> IO ()) -- ^ computation to run while the server is up
+  -> IO ()
+withSocketServerOpts handler SocketServerOptions{..} action =
+  withProxy protocol $ \protProxy ->
+  withServerIO protProxy
+               (fmap show desiredPort)
+               (fromMaybe maxListenQueue maxQueuedConns)
+               handler $
+    \port -> action (SocketServer port protocol)
+
+-- | Run a Thrift server and some client computations against
+--   it, using the given handler to process requests.
 withServer
   :: Processor s
   => ProtocolId               -- ^ protocol to use
+  -> Maybe ServiceName        -- ^ desired port (if any)
+  -> Int                      -- ^ max. number of queued connections
   -> (forall a . s a -> IO a) -- ^ server-side request handler
   -> Thrift t ()              -- ^ client computation
   -> IO ()
-withServer protocol hndl action =
+withServer protocol mport maxQueuedConns hndl action =
   withProxy protocol $ \proxy ->
-    runServer proxy hndl $ \port ->
+    withServerIO proxy mport maxQueuedConns hndl $ \port ->
       withSocketChannel
         (SocketConfig localhost (fromIntegral port) protocol)
         action
 
 -- | Bring up a server that will handle requests with the given handler,
---   and run client computations against it. 'Int' argument is the port
---   that the server found to be available and ended up listening on.
-runServer
+--   and run client computations against it in 'IO'.
+withServerIO
   :: forall c p. (Processor c, Protocol p)
   => Proxy p
+  -> Maybe ServiceName       -- ^ desired port (if any)
+  -> Int                     -- ^ max. number of queued connections
   -> (forall r. c r -> IO r) -- ^ server handler
   -> (Int -> IO ())          -- ^ client computation
   -> IO ()
-runServer p handler client  = do
+withServerIO p mport maxQueuedConns handler client  = do
   counter <- newCounter
-  flip runTestServer (\sock -> client . fromIntegral =<< socketPort sock) $
+  flip (runServer mport maxQueuedConns)
+       (\sock -> client . fromIntegral =<< socketPort sock) $
     \clientSock -> counter >>= \seqNum ->
       handleClient seqNum counter Nothing clientSock
 
@@ -134,22 +184,25 @@ mkProtocolException :: String -> ApplicationException
 mkProtocolException err = ApplicationException (T.pack err)
   ApplicationExceptionType_ProtocolError
 
-runTestServer
-  :: (Socket -> IO ()) -- ^ server computation
-  -> (Socket -> IO ()) -- ^ client computation
+runServer
+  :: Maybe ServiceName -- ^ desired port (if any)
+  -> Int               -- ^ max. number of queued connections
+  -> (Socket -> IO ()) -- ^ server computation
+  -> (Socket -> IO ())  -- ^ client computation
   -> IO ()
-runTestServer server client = do
-  withSocketServer maxListenQueue
+runServer mport maxQueuedConns server client = do
+  withSocketServer mport maxQueuedConns
     (\servSock _sa -> client servSock)
     (\sock _sa -> server sock)
 
 withSocketServer
-  :: Int                           -- maximum number of queued connections
+  :: Maybe ServiceName             -- desired port (Nothing to bind any available port)
+  -> Int                           -- maximum number of queued connections
   -> (Socket -> SockAddr -> IO ()) -- what to do when the server is up
   -> (Socket -> SockAddr -> IO ()) -- what to do on a new client connection
   -> IO ()
-withSocketServer maxQueuedConns onServerUp onNewClient = withSocketsDo $ do
-  addr <- resolveServer localhost
+withSocketServer mport maxQueuedConns onServerUp onNewClient = withSocketsDo $ do
+  addr <- resolveServer localhost mport
   bracket (setupServerSock maxQueuedConns addr) teardownSock $ \sock ->
     withAsync (acceptLoop sock) $ \_async ->
       onServerUp sock (addrAddress addr)
@@ -166,9 +219,9 @@ setupServerSock maxQueuedConns addr = do
   listen s maxQueuedConns
   return s
 
-resolveServer :: HostName -> IO AddrInfo
-resolveServer host = do
-  results <- getAddrInfo (Just hints) (Just host) Nothing
+resolveServer :: HostName -> Maybe ServiceName -> IO AddrInfo
+resolveServer host mport = do
+  results <- getAddrInfo (Just hints) (Just host) mport
   case results of
     [] -> error "SocketServer.resolveServer: getAddrInfo returned an empty list"
     (a:_) -> return a
