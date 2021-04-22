@@ -67,6 +67,12 @@ class HaskellAsyncProcessorFactory : public AsyncProcessorFactory {
     return std::make_unique<HaskellAsyncProcessor>(callback_, oneways_);
   }
 
+  // TODO(T89004867): Call onStartServing() and onStopServing() hooks for
+  // non-C++ thrift servers
+  std::vector<ServiceHandler*> getServiceHandlers() override {
+    return {};
+  }
+
  private:
   TCallback callback_;
   const std::unordered_set<std::string>& oneways_;
