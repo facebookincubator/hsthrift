@@ -79,7 +79,7 @@ const MyEnumA constEnumA = MyEnumA.fieldB
 const MyEnumA constEnumB = 3
 
 struct Empty {
-} (cpp.noexcept_move_ctor)
+}
 
 struct ASimpleStruct {
   1: i64 boolField
@@ -87,7 +87,7 @@ struct ASimpleStruct {
 
 struct ASimpleStructNoexcept {
   1: i64 boolField
-} (cpp.noexcept_move_ctor)
+}
 
 struct MyStruct {
   1: bool MyBoolField,
@@ -103,7 +103,7 @@ struct MyStruct {
     4: "fieldC",
     9: "nothing",
   }
-} (cpp.noexcept_move_ctor)
+}
 
 union SimpleUnion {
   7: i64 intValue;
@@ -301,7 +301,6 @@ struct AnnotatedStruct {
       }
 } (
     cpp.virtual,
-    cpp2.noexcept_move_ctor,
     cpp2.noncopyable,
     cpp.declare_hash,
     cpp.declare_equal_to = 1,
@@ -401,4 +400,4 @@ union FloatUnion {
 
 struct AllRequiredNoExceptMoveCtrStruct {
   1: required i64 intField,
-} (cpp.noexcept_move_ctor)
+}

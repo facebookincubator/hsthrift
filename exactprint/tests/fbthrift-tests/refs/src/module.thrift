@@ -124,4 +124,4 @@ const StructWithRefTypeSharedConst kStructWithRefTypeSharedConst = {
 
 struct StructWithRefAndAnnotCppNoexceptMoveCtor {
   1: Empty def_field (cpp.ref),
-} (cpp.noexcept_move_ctor)
+}
