@@ -9,6 +9,7 @@ module Util.Log.Internal
   , c_glog_warning
   , c_glog_error
   , c_glog_critical
+  , c_glog_flush
   ) where
 
 import Control.Monad.IO.Class (MonadIO, liftIO)
@@ -56,6 +57,13 @@ $(mangle
   [d|
     foreign import ccall unsafe
       c_glog_critical :: CString -> CInt -> CString -> IO ()
+  |])
+
+$(mangle
+  "void glog_flush()"
+  [d|
+    foreign import ccall unsafe
+      c_glog_flush :: IO ()
   |])
 
 {-# INLINE vlogIsOn #-}

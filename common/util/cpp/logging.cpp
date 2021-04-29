@@ -33,3 +33,7 @@ void glog_error(const char* file, int line, const char* msg) noexcept {
 void glog_critical(const char* file, int line, const char* msg) noexcept {
   LOG_EXT(FATAL, file, line) << msg;
 }
+
+void glog_flush() noexcept {
+  google::FlushLogFiles(google::GLOG_VERBOSE);
+}
