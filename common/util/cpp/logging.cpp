@@ -35,5 +35,9 @@ void glog_critical(const char* file, int line, const char* msg) noexcept {
 }
 
 void glog_flush() noexcept {
+#ifdef GLOG_VERBOSE
   google::FlushLogFiles(google::GLOG_VERBOSE);
+#else
+  google::FlushLogFiles(google::GLOG_INFO);
+#endif
 }
