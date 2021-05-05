@@ -60,13 +60,11 @@ build() {
 }
 
 clone folly https://github.com/facebook/folly.git
-PROJ_TAG=$(cd folly && git tag | sort -r | head -1)
+# PROJ_TAG=$(cd folly && git tag | sort -r | head -1)
+PROJ_TAG=origin/master
 echo "Using tag: $PROJ_TAG"
 (cd folly && git checkout "$PROJ_TAG")
 build folly .
-
-clone rsocket-cpp https://github.com/rsocket/rsocket-cpp.git "$PROJ_TAG"
-build rsocket-cpp .
 
 clone fizz https://github.com/facebookincubator/fizz.git "$PROJ_TAG"
 build fizz fizz
