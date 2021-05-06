@@ -93,7 +93,6 @@ library
         thrift-core
         async
         wangle
-        yarpl
         fmt
         fizz
         stdc++
