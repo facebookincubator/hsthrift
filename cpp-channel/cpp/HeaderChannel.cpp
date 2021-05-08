@@ -12,7 +12,7 @@ HeaderClientChannel::Ptr* newHeaderChannel(
     const char* host_str,
     size_t host_len,
     size_t port,
-    uint16_t protocol_id,
+    protocol::PROTOCOL_TYPES protocol_id,
     size_t conn_timeout,
     size_t send_timeout,
     size_t recv_timeout,
@@ -22,8 +22,9 @@ HeaderClientChannel::Ptr* newHeaderChannel(
   // Construction of the socket needs to be in the event base thread
   auto f = folly::via(eb, [=, &addr] {
     auto sock = AsyncSocket::newSocket(eb, addr, conn_timeout);
-    auto chan = HeaderClientChannel::newChannel(std::move(sock));
-    chan->setProtocolId(protocol_id);
+    auto chan = HeaderClientChannel::newChannel(
+        std::move(sock),
+        HeaderClientChannel::Options().setProtocolId(protocol_id));
     chan->setTimeout(send_timeout + recv_timeout);
     chan->getTransport()->setSendTimeout(send_timeout);
     return chan;
