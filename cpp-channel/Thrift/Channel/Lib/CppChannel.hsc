@@ -3,9 +3,10 @@
 {-# LANGUAGE CPP #-}
 {-# OPTIONS_GHC -fno-warn-unused-do-bind #-}
 {-# OPTIONS_GHC -fprof-auto #-}
-module Thrift.Channel.CppChannel
-  ( WrappedChannel(..), CppRequestChannelPtr
-  , withCppChannelIO, withCppChannel, getInnerCppRequestChannel
+module Thrift.Channel.Lib.CppChannel
+  ( WrappedChannel(..), CppRequestChannelPtr, CppSocketAddress
+  , CppAsyncTransport, withCppChannelIO, withCppChannel
+  , getInnerCppRequestChannel
   ) where
 
 import Control.Concurrent
@@ -40,6 +41,8 @@ import Util.Log
 -- Things that exist in C++
 data CppWrappedChannel
 data CppRequestChannelPtr
+data CppSocketAddress
+data CppAsyncTransport
 
 #include <cpp/HsChannel.h>
 

@@ -6,12 +6,20 @@
 using namespace apache::thrift;
 using namespace folly;
 
+#pragma clang diagnostic ignored "-Wreturn-type-c-linkage"
+
 extern "C" {
+
+typedef folly::AsyncTransport::UniquePtr (*MakeTransport)(
+    const folly::SocketAddress& addr,
+    folly::EventBase* eb,
+    size_t conn_timeout);
 
 HeaderClientChannel::Ptr* newHeaderChannel(
     const char* host_str,
     size_t host_len,
     size_t port,
+    MakeTransport makeTransport,
     protocol::PROTOCOL_TYPES protocol_id,
     size_t conn_timeout,
     size_t send_timeout,
@@ -21,10 +29,11 @@ HeaderClientChannel::Ptr* newHeaderChannel(
 
   // Construction of the socket needs to be in the event base thread
   auto f = folly::via(eb, [=, &addr] {
-    auto sock = AsyncSocket::newSocket(eb, addr, conn_timeout);
+    auto transport = makeTransport(addr, eb, conn_timeout);
     auto chan = HeaderClientChannel::newChannel(
-        std::move(sock),
+        std::move(transport),
         HeaderClientChannel::Options().setProtocolId(protocol_id));
+
     chan->setTimeout(send_timeout + recv_timeout);
     chan->getTransport()->setSendTimeout(send_timeout);
     return chan;
@@ -46,5 +55,12 @@ uint16_t getRequestChannelProtocolId(
     std::unique_ptr<RequestChannel, DelayedDestruction::Destructor>*
         ch) noexcept {
   return ch->get()->getProtocolId();
+}
+
+folly::AsyncTransport::UniquePtr makeRawTransport(
+    const folly::SocketAddress& addr,
+    folly::EventBase* eb,
+    size_t conn_timeout) {
+  return AsyncSocket::newSocket(eb, addr, conn_timeout);
 }
 }
