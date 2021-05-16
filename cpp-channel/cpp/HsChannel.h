@@ -88,7 +88,13 @@ class HsCallback : public apache::thrift::RequestClientCallback {
       recv_result_->len = len;
       hs_try_putmvar(cap_, recv_mvar_);
     } else {
-      auto ioBuf = state.extractBuf();
+      auto ioBuf = apache::thrift::LegacySerializedResponse(
+                       state.protocolId(),
+                       0,
+                       state.messageType(),
+                       methodName_,
+                       state.extractSerializedResponse())
+                       .buffer;
       size_t len = ioBuf->computeChainDataLength();
       auto msg = std::unique_ptr<uint8_t, decltype(free)*>{
           reinterpret_cast<uint8_t*>(malloc(len * sizeof(uint8_t))), free};
@@ -107,12 +113,17 @@ class HsCallback : public apache::thrift::RequestClientCallback {
     delete this;
   }
 
+  void setMethodName(std::string name) {
+    methodName_ = std::move(name);
+  }
+
  private:
   int cap_;
   HsStablePtr send_mvar_;
   HsStablePtr recv_mvar_;
   FinishedRequest* send_result_;
   FinishedRequest* recv_result_;
+  std::string methodName_;
   bool requestSent_ = false;
 };
 
@@ -149,7 +160,10 @@ class ChannelWrapper {
       FinishedRequest* recv_result,
       apache::thrift::RpcOptions&& rpcOpts) {
     auto msg = folly::IOBuf::wrapBuffer(buf, len);
-    auto cob = apache::thrift::RequestClientCallback::Ptr(new HsCallback(
+    using CallbackPtr = std::unique_ptr<
+        HsCallback,
+        apache::thrift::RequestClientCallback::RequestClientCallbackDeleter>;
+    auto cob = CallbackPtr(new HsCallback(
         capability, send_mvar, recv_mvar, send_result, recv_result));
 
     auto sendRequestImpl = [protId = getProtocolType(buf[0]),
@@ -166,6 +180,7 @@ class ChannelWrapper {
       if (auto envelopeAndRequest =
               apache::thrift::EnvelopeUtil::stripRequestEnvelope(
                   std::move(msg))) {
+        cob->setMethodName(envelopeAndRequest->first.methodName);
         client->get()->sendRequestResponse(
             rpcOpts,
             envelopeAndRequest->first.methodName,
