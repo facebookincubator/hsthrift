@@ -157,6 +157,10 @@ tests = TestList $ map (uncurry3 assertMangle)
   --   "_Z7exampleN6outter1AENS_5inner1AENS_1BENS1_1BE"
   --   "void example(outter::A, outter::inner::A, outter::B, outter::inner::B)"
 
+  , eg "leading :: in namespace specification"
+    "_ZN2fb7exampleENS_1AES0_"
+    "void fb::example(::fb::A, fb::A)"
+
   , eg "std::size_t"
     "_Z13c_get_counterPN1A1B1CEPKcm"
     "int64_t c_get_counter(A::B::C*, const char*, std::size_t)"

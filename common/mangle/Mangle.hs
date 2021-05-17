@@ -205,7 +205,9 @@ instance Eq Name where
   _ == _ = False
 
 idParts :: Parser [String]
-idParts = rawId `sepBy1` word "::"
+idParts = do
+  skipMany (word "::") -- possible leading "::"
+  rawId `sepBy1` word "::"
 
 showName :: Name -> String -> String
 showName (Unqual name _) args = lengthEncode "" args [name]
