@@ -9,6 +9,7 @@
 {-# OPTIONS_GHC -fno-warn-unused-imports#-}
 {-# OPTIONS_GHC -fno-warn-overlapping-patterns#-}
 {-# OPTIONS_GHC -fno-warn-incomplete-patterns#-}
+{-# OPTIONS_GHC -fno-warn-incomplete-uni-patterns#-}
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
 module B.Types
        (B(B, b_a, b_b, b_c), C(C, c_x, c_y, c_z),

@@ -9,6 +9,7 @@
 {-# OPTIONS_GHC -fno-warn-unused-imports#-}
 {-# OPTIONS_GHC -fno-warn-overlapping-patterns#-}
 {-# OPTIONS_GHC -fno-warn-incomplete-patterns#-}
+{-# OPTIONS_GHC -fno-warn-incomplete-uni-patterns#-}
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
 module A.Types
        (T, A(A, a_a, a_b, a_c, a_d, a_e, a_f, a_g, a_h),

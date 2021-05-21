@@ -10,6 +10,7 @@
 {-# OPTIONS_GHC -fno-warn-unused-imports#-}
 {-# OPTIONS_GHC -fno-warn-overlapping-patterns#-}
 {-# OPTIONS_GHC -fno-warn-incomplete-patterns#-}
+{-# OPTIONS_GHC -fno-warn-incomplete-uni-patterns#-}
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
 module HsTest.Types
        (X(X, unX), Y, Z(Z, unZ), Foo(Foo, foo_bar, foo_baz),
@@ -68,7 +69,7 @@ import qualified Data.Vector as Vector
 import qualified Data.Vector.Storable as VectorStorable
 {-# LINE 7 "if/hs_test_instances.hs" #-}
 import Prelude ((/=), ($))
-{-# LINE 72 "test/fixtures/gen-hs2/HsTest/Types.hs" #-}
+{-# LINE 73 "test/fixtures/gen-hs2/HsTest/Types.hs" #-}
 
 newtype X = X{unX :: Int.Int64}
             deriving (Prelude.Eq, Prelude.Show, DeepSeq.NFData, Prelude.Ord)
