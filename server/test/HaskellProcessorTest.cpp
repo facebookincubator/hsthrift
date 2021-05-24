@@ -31,7 +31,7 @@ struct MockResponseChannelRequest : public ResponseChannelRequest {
   MOCK_METHOD3(
       sendReply,
       void(
-          std::unique_ptr<folly::IOBuf>&&,
+          ResponsePayload&&,
           MessageChannel::SendCallback*,
           folly::Optional<uint32_t>));
 
@@ -163,7 +163,7 @@ TEST_F(HaskellProcessorTest, respond) {
   Request req;
   EXPECT_CALL(*req, sendReply(_, _, _))
       .WillOnce(Invoke([&response](auto&& buf, auto, auto) {
-        response = buf->moveToFbString();
+        response = std::move(buf).buffer()->moveToFbString();
       }));
   EXPECT_CALL(*req, sendErrorWrapped(_, _)).Times(Exactly(0));
 
