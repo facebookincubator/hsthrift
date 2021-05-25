@@ -27,6 +27,9 @@ struct MockResponseChannelRequest : public ResponseChannelRequest {
   bool tryStartProcessing() override {
     return true;
   }
+  bool includeEnvelope() const override {
+    return true;
+  }
 
   MOCK_METHOD3(
       sendReply,
