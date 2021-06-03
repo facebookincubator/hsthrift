@@ -387,6 +387,12 @@ HS_STRUCT HsString {
     s_.append(src.s_);
     update();
   }
+
+  std::string toStdString()&& {
+    std::string res(std::move(s_));
+    update();
+    return res;
+  }
 };
 
 inline bool operator<(const HsString& lhs, const HsString& rhs) {
