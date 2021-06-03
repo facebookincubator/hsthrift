@@ -22,6 +22,18 @@ import Foreign.C.Types (CBool(..), CChar)
 import Foreign.CPP.HsStruct
 import Foreign.CPP.Marshallable.TH
 
+allocUtilsTest :: Test
+allocUtilsTest = TestLabel "allocUtilsTest" $ TestCase $ do
+  let pokeString = "pokey"
+  withDefaultCxxObject $ \p -> do
+    assign p (HsText pokeString)
+    HsText v <- peek p
+    assertEqual "poked string was set" pokeString v
+
+  withCxxObject (HsText pokeString) $ \p -> do
+    HsText v <- peek p
+    assertEqual "alloc string was set" pokeString v
+
 foreign import ccall unsafe "checkHsText"
   c_checkHsText :: Ptr HsText -> Ptr CChar -> Word -> IO CBool
 
@@ -154,4 +166,5 @@ main = testRunner $ TestList
   , mapTest
   , pairTest
   , nestedTest
+  , allocUtilsTest
   ]

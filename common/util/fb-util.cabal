@@ -68,6 +68,7 @@ library
         Foreign.CPP.HsStruct
         Foreign.CPP.HsStruct.Types
         Foreign.CPP.HsStruct.Unsafe
+        Foreign.CPP.HsStruct.Utils
         Foreign.CPP.Marshallable
         Foreign.CPP.Marshallable.TH
         Util.ASan

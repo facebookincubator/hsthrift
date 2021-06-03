@@ -2,8 +2,7 @@
 
 {-# LANGUAGE DefaultSignatures #-}
 module Foreign.CPP.Marshallable
-  ( withCxxObject
-  , makeShared
+  ( makeShared
   , toSharedPtr
   , destructAndFree
   , DefaultConstructible(..)
@@ -20,17 +19,11 @@ import System.Posix.Types
 
 import Foreign.Storable
 import Foreign.Marshal.Utils
-import Control.Exception (bracket, mask_)
-import Foreign
+import Control.Exception (mask_)
+import Foreign hiding (alloca, allocaBytes, allocaArray)
+
 
 -- Utility functions ----------------------------------------------------------
-
-withCxxObject
-  :: (Constructible a, Destructible a)
-  => a
-  -> (Ptr a -> IO b)
-  -> IO b
-withCxxObject val func = bracket (newValue val) delete func
 
 -- | Returns a 'ForeignPtr' that owns and manages a foreign object through
 -- a pointer and disposes of that object when the lifetime of the 'ForeignPtr'
