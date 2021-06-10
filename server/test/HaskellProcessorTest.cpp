@@ -53,33 +53,6 @@ struct MockThreadManager : public concurrency::ThreadManagerExecutorAdapter {
   std::shared_ptr<folly::ManualExecutor> executor;
 };
 
-class TestHaskellAsyncProcessor : public HaskellAsyncProcessor {
- public:
-  TestHaskellAsyncProcessor(
-      TCallback callback,
-      const std::unordered_set<std::string>& oneways)
-      : HaskellAsyncProcessor(std::move(callback), oneways) {}
-
-  void setExpireTasks() {
-    expire_tasks_ = true;
-  }
-
-  void unsetExpireTasks() {
-    expire_tasks_ = false;
-  }
-
- protected:
-  virtual folly::Func funcFromTask(std::shared_ptr<EventTask> task) override {
-    if (expire_tasks_) {
-      task->expired();
-    }
-    return HaskellAsyncProcessor::funcFromTask(std::move(task));
-  }
-
- private:
-  bool expire_tasks_{false};
-};
-
 struct HaskellProcessorTest : public Test {
   HaskellProcessorTest()
       : processor(callback, oneways_),
@@ -147,7 +120,7 @@ struct HaskellProcessorTest : public Test {
 
   const std::unordered_set<std::string> oneways_;
 
-  TestHaskellAsyncProcessor processor;
+  HaskellAsyncProcessor processor;
 
   folly::EventBase event_base;
   MockThreadManager thread_manager;
@@ -185,18 +158,6 @@ TEST_F(HaskellProcessorTest, not_active) {
   req->active = false;
   process(req);
   EXPECT_TRUE(req.alive());
-  event_base.loop();
-}
-
-TEST_F(HaskellProcessorTest, expired) {
-  Request req;
-  EXPECT_CALL(*req, sendReply(_, _, _)).Times(Exactly(0));
-  EXPECT_CALL(*req, sendErrorWrapped(_, _));
-
-  processor.setExpireTasks();
-
-  process(req);
-  EXPECT_FALSE(req.alive());
   event_base.loop();
 }
 
