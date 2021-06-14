@@ -38,6 +38,10 @@ struct MockResponseChannelRequest : public ResponseChannelRequest {
           MessageChannel::SendCallback*,
           folly::Optional<uint32_t>));
 
+  MOCK_METHOD2(
+      sendException,
+      void(ResponsePayload&&, MessageChannel::SendCallback*));
+
   MOCK_METHOD2(sendErrorWrapped, void(folly::exception_wrapper, std::string));
 
   bool active;
