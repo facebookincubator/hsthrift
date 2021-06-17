@@ -66,6 +66,7 @@ library
         Foreign.CPP.Addressable
         Foreign.CPP.Dynamic
         Foreign.CPP.HsStruct
+        Foreign.CPP.HsStruct.HsOption
         Foreign.CPP.HsStruct.Types
         Foreign.CPP.HsStruct.Unsafe
         Foreign.CPP.HsStruct.Utils
@@ -142,7 +143,10 @@ library
 
     cxx-options: -std=c++17
 
-    install-includes: cpp/HsStruct.h
+    install-includes:
+        cpp/HsOption.h
+        cpp/HsStruct.h
+        cpp/HsStructDefines.h
     include-dirs: .
     hs-source-dirs: .
 

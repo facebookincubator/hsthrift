@@ -22,6 +22,28 @@ import Foreign.C.Types (CBool(..), CChar)
 import Foreign.CPP.HsStruct
 import Foreign.CPP.Marshallable.TH
 
+optionTest :: Test
+optionTest = TestLabel "optionTest" $ TestCase $ do
+  withDefaultCxxObject $ \p -> do
+    HsOption v <- peek p
+    case v of
+      Just (HsText _) -> assertFailure "Should not have received anything"
+      Nothing -> return ()
+
+  let pokeString = "pokey"
+  withCxxObject (HsOption (Just $ HsText pokeString)) $ \p -> do
+    HsOption o <- peek p
+    case o of
+      Just (HsText v) -> assertEqual "alloc text was set" pokeString v
+      Nothing -> assertFailure "Should have received something"
+
+  let pokeVal = 5 :: Int64
+  withCxxObject (HsOption (Just pokeVal)) $ \p -> do
+    HsOption o <- peek p
+    case o of
+      Just v -> assertEqual "alloc int was set" pokeVal v
+      Nothing -> assertFailure "Should have received something"
+
 allocUtilsTest :: Test
 allocUtilsTest = TestLabel "allocUtilsTest" $ TestCase $ do
   let pokeString = "pokey"
@@ -167,4 +189,5 @@ main = testRunner $ TestList
   , pairTest
   , nestedTest
   , allocUtilsTest
+  , optionTest
   ]

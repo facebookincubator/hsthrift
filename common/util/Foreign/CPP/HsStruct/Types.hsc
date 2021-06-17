@@ -10,6 +10,8 @@ module Foreign.CPP.HsStruct.Types
   , HsStringPiece
   -- * HsMaybe
   , HsMaybe(..)
+  -- * HsOption
+  , HsOption(..)
   -- * HsEither
   , HsEither(..)
   -- * HsPair
@@ -51,11 +53,14 @@ import qualified Data.Map.Strict as Map
 
 import Foreign.CPP.Addressable hiding (alignment, sizeOf)
 import qualified Foreign.CPP.Addressable as Addressable
+import Foreign.CPP.HsStruct.HsOption
+import Foreign.CPP.HsStruct.Utils
 import Foreign.CPP.Marshallable.TH
 import Mangle.TH
 import Util.Text (cStringLenToText, cStringLenToTextLenient)
 
 #include <hsc.h>
+#include <cpp/HsOption.h>
 #include <cpp/HsStruct.h>
 
 -- | An abstraction over storable containers. The elements will be marshaled or
@@ -531,3 +536,15 @@ $(deriveMarshallableUnsafe "HsMapStringString" [t| HsObject HsByteString |])
 $(deriveMarshallableUnsafe "HsMapStringString" [t| HsObject HsText |])
 
 $(deriveMarshallableUnsafe "HsJSON" [t| HsJSON |])
+
+$(#{derive_hs_option_unsafe Bool} [t| Bool |])
+$(#{derive_hs_option_unsafe Int32} [t| CInt |])
+$(#{derive_hs_option_unsafe Int32} [t| Int32 |])
+$(#{derive_hs_option_unsafe Int64} [t| CLong |])
+$(#{derive_hs_option_unsafe Int64} [t| Int64 |])
+$(#{derive_hs_option_unsafe UInt32} [t| Word32 |])
+$(#{derive_hs_option_unsafe UInt64} [t| Word64 |])
+$(#{derive_hs_option_unsafe Float} [t| Float |])
+$(#{derive_hs_option_unsafe Double} [t| Double |])
+$(#{derive_hs_option_unsafe String} [t| HsText |])
+$(#{derive_hs_option_unsafe String} [t| HsByteString |])

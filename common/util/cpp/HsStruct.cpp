@@ -146,3 +146,12 @@ HS_DEFINE_MARSHALLABLE(HsMapStringDouble, HsMap<HsString, double>);
 HS_DEFINE_MARSHALLABLE(HsMapStringString, HsMap<HsString, HsString>);
 
 HS_DEFINE_MARSHALLABLE(HsJSON, HsJSON);
+
+HS_OPTION_CPP(Bool, bool);
+HS_OPTION_CPP(Int32, int32_t);
+HS_OPTION_CPP(Int64, int64_t);
+HS_OPTION_CPP(UInt32, uint32_t);
+HS_OPTION_CPP(UInt64, uint64_t);
+HS_OPTION_CPP(Float, float);
+HS_OPTION_CPP(Double, double);
+HS_OPTION_CPP(String, HsString);

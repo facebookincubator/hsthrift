@@ -3,17 +3,17 @@
 #pragma once
 
 #include <glog/logging.h>
+#include <cstddef>
 
 #include <folly/Memory.h>
 #include <folly/Optional.h>
 #include <folly/Try.h>
 #include <folly/dynamic.h>
+#include <optional>
 
-#ifdef __HSC2HS__
-#define HS_STRUCT struct
-#else
-#define HS_STRUCT class
-#endif
+#include "cpp/HsOption.h"
+#include "cpp/HsStructDefines.h"
+#include "cpp/Marshallable.h"
 
 #define HS_PEEKABLE(t)              \
   static_assert(                    \
@@ -783,3 +783,12 @@ class HsJSON {
 };
 
 HS_PEEKABLE(HsJSON);
+
+HS_OPTION_H(Bool, bool);
+HS_OPTION_H(Int32, int32_t);
+HS_OPTION_H(Int64, int64_t);
+HS_OPTION_H(UInt32, uint32_t);
+HS_OPTION_H(UInt64, uint64_t);
+HS_OPTION_H(Float, float);
+HS_OPTION_H(Double, double);
+HS_OPTION_H(String, HsString);
