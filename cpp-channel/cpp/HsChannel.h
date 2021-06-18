@@ -51,11 +51,32 @@ class HsCallback : public apache::thrift::RequestClientCallback {
     }
   }
 
+  // Note [onResponse leak]
+  //
+  // The memory containing the result is transferred from C++ to
+  // Haskell in onResponseError / onResponse.  hs_try_putmvar() wakes
+  // up the Haskell thread running CppChannel.hsc:sendCollector
+  // or CppChannel.hsc:recvCollector, which takes ownership of the
+  // memory in a ForeignPtr.
+  //
+  // This is carefully designed to not leak even if the thread making
+  // the original Thrift request is
+  // interrupted. sendCollector/recvCollector are running in a
+  // separate thread which will run and take ownership of the memory
+  // even if the original thread that made the request has gone away.
+  //
+  // However, if the program exits after onResponse/onResponseError
+  // but before the Haskell thread running sendCollector/recvCollector
+  // runs, this memory may be detected as a leak by leak-checkers such
+  // as ASAN. It's not really a leak, just an artifact of exiting at
+  // the wrong time.
+  //
   void onResponseError(folly::exception_wrapper ew) noexcept override {
     auto ex = ew.what();
     size_t len = ex.length();
     auto buf = std::unique_ptr<uint8_t, decltype(free)*>{
         reinterpret_cast<uint8_t*>(malloc(len * sizeof(uint8_t))), free};
+    // If you get a memory leak here, see Note [onResponse leak].
     std::memcpy(buf.get(), ex.data(), len);
 
     // If we have already enqueued a FinishedRequest for requestSent(), then
@@ -81,6 +102,7 @@ class HsCallback : public apache::thrift::RequestClientCallback {
       size_t len = ex.length();
       auto buf = std::unique_ptr<uint8_t, decltype(free)*>{
           reinterpret_cast<uint8_t*>(malloc(len * sizeof(uint8_t))), free};
+      // If you get a memory leak here, see Note [onResponse leak].
       std::memcpy(buf.get(), ex.data(), len);
 
       recv_result_->status = RECV_ERROR;
