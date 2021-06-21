@@ -18,6 +18,11 @@ CLEAN=NO
 THREADS=2
 BUILD_SUBDIR=_build
 
+# folly requires that the same cxx flags are used when building folly
+# and when compiling code that uses it. In Glean we use some AVX
+# intrinsics, so we have to use the same flags here.
+CXXFLAGS=-mvax2
+
 while [ "$#" -gt 0 ]; do
     case "$1" in
         --nuke) NUKE=YES;;

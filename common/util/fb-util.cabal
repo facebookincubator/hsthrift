@@ -140,7 +140,9 @@ library
         cpp/EventBaseDataplane.cpp
         -- Util/GFlags.cpp
 
-    cxx-options: -std=c++17
+    cxx-options: -std=c++17 -mavx2
+      -- -mavx2 is here because folly needs to be used with consistent
+      -- CPU options everywhere, and Glean uses -mavx2
 
     install-includes: cpp/HsStruct.h
     include-dirs: .
