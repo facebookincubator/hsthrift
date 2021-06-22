@@ -486,6 +486,12 @@ HS_STRUCT HsArray {
   size_t size() const {
     return v_.size();
   }
+
+  std::vector<T> toStdVector()&& {
+    auto res = std::move(v_);
+    clear();
+    return res;
+  }
 };
 
 using DummyHsArray = HsArray<std::nullptr_t>;
@@ -493,6 +499,23 @@ HS_PEEKABLE(DummyHsArray);
 static_assert(
     sizeof(HsArray<HsString>) == sizeof(DummyHsArray),
     "HsArray<HsString> is of the same size as DummyHsArray");
+
+#define HS_DEFINE_ARRAY_CONSTRUCTIBLE(Name, Type)                          \
+  extern "C" HsArray<Type>* vector_newHsArray##Name(size_t len) {          \
+    auto arr = new HsArray<Type>();                                        \
+    arr->reserve(len);                                                     \
+    return arr;                                                            \
+  }                                                                        \
+                                                                           \
+  extern "C" void vector_constructHsArray##Name(                           \
+      HsArray<Type>* arr, size_t len) {                                    \
+    new (arr) HsArray<Type>();                                             \
+    arr->reserve(len);                                                     \
+  }                                                                        \
+                                                                           \
+  extern "C" void vector_addHsArray##Name(HsArray<Type>* arr, Type* val) { \
+    arr->add(std::move(*val));                                             \
+  }
 
 template <typename Key, typename Value>
 HS_STRUCT HsMap {

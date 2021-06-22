@@ -134,7 +134,11 @@ HS_DEFINE_MARSHALLABLE(
 
 HS_DEFINE_MARSHALLABLE(HsString, HsString);
 
-HS_DEFINE_MARSHALLABLE(HsArrayInt, HsArray<int64_t>);
+HS_DEFINE_MARSHALLABLE(HsArrayInt32, HsArray<int32_t>);
+HS_DEFINE_MARSHALLABLE(HsArrayInt64, HsArray<int64_t>);
+HS_DEFINE_MARSHALLABLE(HsArrayUInt32, HsArray<uint32_t>);
+HS_DEFINE_MARSHALLABLE(HsArrayUInt64, HsArray<uint64_t>);
+HS_DEFINE_MARSHALLABLE(HsArrayFloat, HsArray<float>);
 HS_DEFINE_MARSHALLABLE(HsArrayDouble, HsArray<double>);
 HS_DEFINE_MARSHALLABLE(HsArrayString, HsArray<HsString>);
 
@@ -155,3 +159,12 @@ HS_OPTION_CPP(UInt64, uint64_t);
 HS_OPTION_CPP(Float, float);
 HS_OPTION_CPP(Double, double);
 HS_OPTION_CPP(String, HsString);
+
+// No bool as std::vector<bool> doesn't define Container
+HS_DEFINE_ARRAY_CONSTRUCTIBLE(Int32, int32_t);
+HS_DEFINE_ARRAY_CONSTRUCTIBLE(Int64, int64_t);
+HS_DEFINE_ARRAY_CONSTRUCTIBLE(UInt32, uint32_t);
+HS_DEFINE_ARRAY_CONSTRUCTIBLE(UInt64, uint64_t);
+HS_DEFINE_ARRAY_CONSTRUCTIBLE(Float, float);
+HS_DEFINE_ARRAY_CONSTRUCTIBLE(Double, double);
+HS_DEFINE_ARRAY_CONSTRUCTIBLE(String, HsString);

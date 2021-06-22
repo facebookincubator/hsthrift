@@ -53,6 +53,7 @@ import qualified Data.Map.Strict as Map
 
 import Foreign.CPP.Addressable hiding (alignment, sizeOf)
 import qualified Foreign.CPP.Addressable as Addressable
+import Foreign.CPP.HsStruct.HsArray
 import Foreign.CPP.HsStruct.HsOption
 import Foreign.CPP.HsStruct.Utils
 import Foreign.CPP.Marshallable.TH
@@ -345,6 +346,7 @@ instance StorableContainer HsArray where
     (a, n) <- peekDataSize p
     fmap HsArray . generateM n $ \i -> peekElemOffWith f a i
 
+-- HsList
 newtype HsList a = HsList
   { hsList :: [a]
   }
@@ -521,10 +523,26 @@ $(deriveMarshallableUnsafe "HsString" [t| HsByteString |])
 $(deriveMarshallableUnsafe "HsString" [t| HsText |])
 $(deriveMarshallableUnsafe "HsString" [t| HsLenientText |])
 
-$(deriveMarshallableUnsafe "HsArrayInt" [t| HsList Int |])
+$(deriveMarshallableUnsafe "HsArrayInt32" [t| HsList CInt |])
+$(deriveMarshallableUnsafe "HsArrayInt32" [t| HsList Int32 |])
+$(deriveMarshallableUnsafe "HsArrayInt64" [t| HsList Int |])
+$(deriveMarshallableUnsafe "HsArrayInt64" [t| HsList Int64 |])
+$(deriveMarshallableUnsafe "HsArrayUInt32" [t| HsList Word32 |])
+$(deriveMarshallableUnsafe "HsArrayUInt64" [t| HsList Word64 |])
+$(deriveMarshallableUnsafe "HsArrayFloat" [t| HsList Float |])
 $(deriveMarshallableUnsafe "HsArrayDouble" [t| HsList Double |])
 $(deriveMarshallableUnsafe "HsArrayString" [t| HsList HsByteString |])
 $(deriveMarshallableUnsafe "HsArrayString" [t| HsList HsText |])
+$(deriveMarshallableUnsafe "HsArrayInt32" [t| HsArray CInt |])
+$(deriveMarshallableUnsafe "HsArrayInt32" [t| HsArray Int32 |])
+$(deriveMarshallableUnsafe "HsArrayInt64" [t| HsArray Int |])
+$(deriveMarshallableUnsafe "HsArrayInt64" [t| HsArray Int64 |])
+$(deriveMarshallableUnsafe "HsArrayUInt32" [t| HsArray Word32 |])
+$(deriveMarshallableUnsafe "HsArrayUInt64" [t| HsArray Word64 |])
+$(deriveMarshallableUnsafe "HsArrayFloat" [t| HsArray Float |])
+$(deriveMarshallableUnsafe "HsArrayDouble" [t| HsArray Double |])
+$(deriveMarshallableUnsafe "HsArrayString" [t| HsArray HsByteString |])
+$(deriveMarshallableUnsafe "HsArrayString" [t| HsArray HsText |])
 
 $(deriveMarshallableUnsafe "HsMapIntInt" [t| HsIntMap Int |])
 $(deriveMarshallableUnsafe "HsMapIntDouble" [t| HsIntMap Double |])
@@ -548,3 +566,15 @@ $(#{derive_hs_option_unsafe Float} [t| Float |])
 $(#{derive_hs_option_unsafe Double} [t| Double |])
 $(#{derive_hs_option_unsafe String} [t| HsText |])
 $(#{derive_hs_option_unsafe String} [t| HsByteString |])
+
+-- no bool since std::vector<bool> doesn't implement Container in cpp
+$(deriveHsArrayUnsafe "Int32" [t| CInt |])
+$(deriveHsArrayUnsafe "Int32" [t| Int32 |])
+$(deriveHsArrayUnsafe "Int64" [t| CLong |])
+$(deriveHsArrayUnsafe "Int64" [t| Int64 |])
+$(deriveHsArrayUnsafe "UInt32" [t| Word32 |])
+$(deriveHsArrayUnsafe "UInt64" [t| Word64 |])
+$(deriveHsArrayUnsafe "Float" [t| Float |])
+$(deriveHsArrayUnsafe "Double" [t| Double |])
+$(deriveHsArrayUnsafe "String" [t| HsText |])
+$(deriveHsArrayUnsafe "String" [t| HsByteString |])

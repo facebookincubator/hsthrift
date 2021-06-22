@@ -22,6 +22,25 @@ import Foreign.C.Types (CBool(..), CChar)
 import Foreign.CPP.HsStruct
 import Foreign.CPP.Marshallable.TH
 
+arrayCxxTest :: Test
+arrayCxxTest = TestLabel "arrayCxxTest" $ TestCase $ do
+  withDefaultCxxObject $ \p -> do
+    HsList v <- peek p :: IO (HsList HsText)
+    assertEqual "default is empty" [] (map hsText v)
+
+  let pokey = ["1", "2", "3"]
+  withCxxObject (HsList (map HsText pokey)) $ \p -> do
+    HsList v <- peek p
+    assertEqual "list of strings" pokey (map hsText v)
+
+  withDefaultCxxObject $ \p -> do
+    HsArray v <- peek p :: IO (HsArray HsText)
+    assertEqual "default is empty" [] (map hsText (Vector.toList v))
+
+  withCxxObject (HsArray (Vector.fromList (map HsText pokey))) $ \p -> do
+    HsArray v <- peek p
+    assertEqual "array of strings" pokey (Vector.toList (Vector.map hsText v))
+
 optionTest :: Test
 optionTest = TestLabel "optionTest" $ TestCase $ do
   withDefaultCxxObject $ \p -> do
@@ -190,4 +209,5 @@ main = testRunner $ TestList
   , nestedTest
   , allocUtilsTest
   , optionTest
+  , arrayCxxTest
   ]

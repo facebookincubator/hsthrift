@@ -66,6 +66,7 @@ library
         Foreign.CPP.Addressable
         Foreign.CPP.Dynamic
         Foreign.CPP.HsStruct
+        Foreign.CPP.HsStruct.HsArray
         Foreign.CPP.HsStruct.HsOption
         Foreign.CPP.HsStruct.Types
         Foreign.CPP.HsStruct.Unsafe
