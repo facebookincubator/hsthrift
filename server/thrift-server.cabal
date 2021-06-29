@@ -69,7 +69,7 @@ library
       cpp/CppServer.cpp
       cpp/HaskellProcessor.cpp
 
-  cxx-options: -std=c++17
+  cxx-options: -std=c++17 -mavx2
 
   build-depends:
       fb-util,
