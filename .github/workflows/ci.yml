@@ -20,16 +20,20 @@ jobs:
         run: |
           echo "::set-output name=tag::$(bash .github/workflows/get_deps_tag.sh)"
         shell: bash
-      - name: Cache FB packages
-        id: cache-fb-packages
-        uses: actions/cache@v2
-        with:
-          path: /usr/local/
-          key: ${{ runner.os }}-${{ steps.get-tag.outputs.tag }}
-          restore-keys: |
-            ${{ runner.os }}-${{ steps.get-tag.outputs.tag }}
+
+      # disabling caching for now because we're cloning the deps from
+      # master. Caching is based on cloning a tag.
+      # - name: Cache FB packages
+      #   id: cache-fb-packages
+      #   uses: actions/cache@v2
+      #   with:
+      #     path: /usr/local/
+      #     key: ${{ runner.os }}-${{ steps.get-tag.outputs.tag }}
+      #     restore-keys: |
+      #       ${{ runner.os }}-${{ steps.get-tag.outputs.tag }}
+
       - name: Install folly, fizz, wangle, rsocket-cpp, fbthrift
-        if: steps.cache-fb-packages.outputs.cache-hit != 'true'
+#        if: steps.cache-fb-packages.outputs.cache-hit != 'true'
         run:  ./install_deps.sh --nuke
       - name: Install ${{ matrix.ghc }}
         run: apt-get install -y ${{ matrix.ghc }}

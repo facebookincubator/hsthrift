@@ -375,7 +375,7 @@ test-suite dynamic
   type: exitcode-stdio-1.0
   main-is: DynamicTest.hs
   cxx-sources: tests/DynamicHelper.cpp
-  cxx-options: -std=c++17
+  cxx-options: -std=c++17 -mavx2
   ghc-options: -main-is DynamicTest
 test-suite hs-struct
   import: fb-haskell, test-common
