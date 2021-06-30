@@ -75,11 +75,11 @@ genHsCode Options{..} prog@Program{..} = do
       typesModuleName :
     concat
       [ [ ThriftModule
-          (dir </> Text.unpack serviceName </> "Client.hs")
+          (dir </> Text.unpack serviceResolvedName </> "Client.hs")
           (showThriftModule clientModule)
           clientModuleName
         , ThriftModule
-          (dir </> Text.unpack serviceName </> "Service.hs")
+          (dir </> Text.unpack serviceResolvedName </> "Service.hs")
           (showThriftModule serviceModule)
           serviceModuleName
         ]
@@ -173,7 +173,7 @@ genTypesModule prog@Program{..} extensions extraHasFields =
 
 genClientModule :: Program Haskell Thrift.Loc -> HS Service -> (String, Module ())
 genClientModule prog@Program{..} service@Service{..} =
-  genModule prog (serviceName <> ".Client") pragmas exports imports decls
+  genModule prog (serviceResolvedName <> ".Client") pragmas exports imports decls
   where
     pragmas = commonPragmas opts ++
               map (LanguagePragma () . (:[]) . textToName)
@@ -198,7 +198,7 @@ genClientModule prog@Program{..} service@Service{..} =
 
 genServiceModule :: Program Haskell Thrift.Loc -> HS Service -> (String, Module ())
 genServiceModule prog@Program{..} service@Service{..} =
-  genModule prog (serviceName <> ".Service") pragmas exports imports decls
+  genModule prog (serviceResolvedName <> ".Service") pragmas exports imports decls
   where
     pragmas = commonPragmas (options progEnv) ++
               [ LanguagePragma () [textToName "GADTs"]

@@ -29,10 +29,9 @@ genClientImports this Service{..} =
 
 genClientDecls :: HS Service -> [Decl ()]
 genClientDecls Service{..} =
-  [ DataDecl () (DataType ()) Nothing (DHead () (textToName serviceName)) []
+  DataDecl () (DataType ()) Nothing (DHead () (textToName serviceResolvedName)) []
     mzero
-  ] ++
-  case serviceSuper of
+  : case serviceSuper of
     Nothing -> []
     Just Super{..} ->
       [ TypeInsDecl ()
