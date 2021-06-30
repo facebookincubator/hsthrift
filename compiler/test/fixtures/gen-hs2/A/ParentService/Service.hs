@@ -12,7 +12,7 @@
 {-# OPTIONS_GHC -fno-warn-incomplete-uni-patterns#-}
 {-# LANGUAGE GADTs #-}
 module A.ParentService.Service
-       (ParentServiceCommand(..), reqName', reqParser', respWriter',
+       (ParentServiceCommand, reqName', reqParser', respWriter',
         onewayFunctions')
        where
 import qualified A.Types as Types
