@@ -191,7 +191,7 @@ instance Typecheckable Haskell where
     Just ns -> ns <> "." <> toCamel thriftName
     Nothing -> toCamel thriftName
 
-  renameStruct _ Struct{..} = uppercase structName
+  renameStruct _ Struct{..} = toConstructorName structName
 
   renameField Options{..} ann sname Field{..} =
     case optsLangSpecific of
@@ -203,15 +203,15 @@ instance Typecheckable Haskell where
 
   renameConst _ = lowercase
 
-  renameService _ Service{..} = uppercase serviceName
+  renameService _ Service{..} = toConstructorName serviceName
 
   renameFunction _ Function{..} = lowercase $ prefix <> funName
     where
       prefix = fromMaybe "" $ getPrefix $ getAnns funAnns
 
-  renameTypedef _ Typedef{..} = uppercase tdName
+  renameTypedef _ Typedef{..} = toConstructorName tdName
 
-  renameEnum _ Enum{..} = uppercase enumName
+  renameEnum _ Enum{..} = toConstructorName enumName
 
   renameEnumAlt opts@Options{..} e@Enum{..} name =
     fixCase $ if
@@ -222,14 +222,14 @@ instance Typecheckable Haskell where
         | isPseudo opts e = lowercase
         | otherwise = uppercase
 
-  renameUnion _ Union{..} = uppercase unionName
+  renameUnion _ Union{..} = toConstructorName unionName
 
   renameUnionAlt _ Union{..} UnionAlt{..} =
-    uppercase $ fromMaybe (unionName <> "_") (getPrefix $ getAnns unionAnns) <>
+    toConstructorName $ fromMaybe (unionName <> "_") (getPrefix $ getAnns unionAnns) <>
     altName
 
   getUnionEmptyName _ Union{..} =
-    uppercase $ fromMaybe (unionName <> "_") (getPrefix $ getAnns unionAnns) <>
+    toConstructorName $ fromMaybe (unionName <> "_") (getPrefix $ getAnns unionAnns) <>
     "EMPTY"
 
   fieldsAreUnique Options{ optsLangSpecific = HsOpts{..} } = not hsoptsDupNames

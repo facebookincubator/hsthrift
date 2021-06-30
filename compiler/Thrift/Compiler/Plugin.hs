@@ -7,6 +7,8 @@ module Thrift.Compiler.Plugin
   , qualify, qualifyType
   , getPrefix
   , lowercase, uppercase, toCamel
+  , fixLeadingUnderscore
+  , toConstructorName
   , getNamespace
   , isNewtype
   , filterHsAnns, getTypeAnns
@@ -252,6 +254,15 @@ uppercase = uncurry (<>) . first Text.toUpper . Text.splitAt 1
 toCamel :: Text -> Text
 toCamel = Text.concat . map capitalize . Text.splitOn "_"
   where capitalize = uncurry (<>) . first Text.toUpper . Text.splitAt 1
+
+-- Prepend "TU" for "ThriftUnderscore"
+fixLeadingUnderscore :: Text -> Text
+fixLeadingUnderscore = uncurry (<>) . first fixUnderscore . Text.splitAt 1
+  where
+    fixUnderscore s = if s == "_" then "TU__" else s
+
+toConstructorName :: Text -> Text
+toConstructorName = fixLeadingUnderscore . uppercase
 
 -- | Select the last namespace header
 getNamespace :: Text -> [Header a] -> Maybe Text
