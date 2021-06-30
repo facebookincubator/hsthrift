@@ -20,6 +20,7 @@ import Control.Monad
 #if __GLASGOW_HASKELL__ <= 804
 import Data.Monoid ((<>))
 #endif
+import Data.Maybe (isNothing)
 import qualified Data.Set as Set
 import Data.Some
 import Data.Text (Text)
@@ -36,7 +37,9 @@ import Thrift.Compiler.Types hiding (Decl(..))
 
 genServiceExports :: HS Service -> [HS.ExportSpec ()]
 genServiceExports s@Service{..} =
-  HS.EThingWith () (EWildcard () 0) (unqualSym $ commandTypeName s) []
+  (if isEmptyService s
+  then HS.EAbs () (NoNamespace ()) (unqualSym $ commandTypeName s)
+  else HS.EThingWith () (EWildcard () 0) (unqualSym $ commandTypeName s) [])
   : map (HS.EVar () . UnQual () . Ident ())
     ["reqName'", "reqParser'", "respWriter'", "onewayFunctions'"]
 
@@ -429,3 +432,6 @@ genOneWays Service{..} =
 
 commandTypeName :: HS Service -> Text
 commandTypeName Service{..} = serviceResolvedName <> "Command"
+
+isEmptyService :: HS Service -> Bool
+isEmptyService Service{..} = null serviceFunctions && isNothing serviceSuper
