@@ -24,12 +24,14 @@ using InnerChannel = std::unique_ptr<
 class HsCallback : public apache::thrift::RequestClientCallback {
  public:
   explicit HsCallback(
+      std::shared_ptr<InnerChannel> client,
       int cap,
       HsStablePtr send_mvar,
       HsStablePtr recv_mvar,
       FinishedRequest* send_result,
       FinishedRequest* recv_result)
-      : cap_(cap),
+      : client_(std::move(client)),
+        cap_(cap),
         send_mvar_(send_mvar),
         recv_mvar_(recv_mvar),
         send_result_(send_result),
@@ -140,6 +142,7 @@ class HsCallback : public apache::thrift::RequestClientCallback {
   }
 
  private:
+  std::shared_ptr<InnerChannel> client_; // see Note [channel lifetime]
   int cap_;
   HsStablePtr send_mvar_;
   HsStablePtr recv_mvar_;
@@ -148,6 +151,25 @@ class HsCallback : public apache::thrift::RequestClientCallback {
   std::string methodName_;
   bool requestSent_ = false;
 };
+
+/* Note [channel lifetime]
+ *
+ * The ChannelWrapper implementation keeps the InnerChannel alive
+ * until all the outstanding HsCallbacks have been called. This is to
+ * support use cases that need to receive the responses to requests
+ * outside of the scope of the channel creation
+ * (e.g. withHeaderChannel).  An example is the Haxl datasource for
+ * Thrift services, which does not have a way to scope
+ * withHeaderChannel over the lifetime of the requests. Without this
+ * feature, the channel is closed on exit from the scope of
+ * withHeaderChannel, and the outstanding requests will fail.
+ *
+ * The alternative to keeping the InnerChannel alive here would be to
+ * make the client do its own reference counting, which is hard and
+ * error-prone.
+ *
+ * For a test case see thrift/cpp-channel/tests/LifetimeTest.hs
+ */
 
 class ChannelWrapper {
  public:
@@ -186,7 +208,7 @@ class ChannelWrapper {
         HsCallback,
         apache::thrift::RequestClientCallback::RequestClientCallbackDeleter>;
     auto cob = CallbackPtr(new HsCallback(
-        capability, send_mvar, recv_mvar, send_result, recv_result));
+        client_, capability, send_mvar, recv_mvar, send_result, recv_result));
 
     auto sendRequestImpl = [protId = getProtocolType(buf[0]),
                             client = client_,
@@ -234,8 +256,8 @@ class ChannelWrapper {
       FinishedRequest* send_result,
       apache::thrift::RpcOptions&& rpcOpts) {
     auto msg = folly::IOBuf::wrapBuffer(buf, len);
-    auto cob = apache::thrift::RequestClientCallback::Ptr(
-        new HsCallback(capability, send_mvar, nullptr, send_result, nullptr));
+    auto cob = apache::thrift::RequestClientCallback::Ptr(new HsCallback(
+        client_, capability, send_mvar, nullptr, send_result, nullptr));
 
     auto sendOnewayRequestImpl = [protId = getProtocolType(buf[0]),
                                   client = client_,
