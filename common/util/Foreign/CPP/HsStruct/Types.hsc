@@ -119,6 +119,28 @@ instance Integral n => Storable (HsRange a n) where
 
 type HsStringPiece = HsRange CChar Int
 
+$(mangle
+  "void ctorHsStringPiece(HsRange<char>*, const char*, size_t)"
+  [d|
+    foreign import ccall unsafe
+      c_constructHsStringPiece :: Ptr HsStringPiece -> CString -> Word -> IO ()
+  |])
+
+$(mangle
+  "HsStringPiece* newHsStringPiece(const char*, size_t)"
+  [d|
+    foreign import ccall unsafe
+      c_newHsStringPiece :: CString -> Word -> IO (Ptr HsStringPiece)
+  |])
+
+instance Constructible HsStringPiece where
+  newValue (HsRange str len) =
+    castPtr <$> c_newHsStringPiece str (fromIntegral len)
+  constructValue p (HsRange str len) =
+    c_constructHsStringPiece (castPtr p) str (fromIntegral len)
+
+instance Addressable HsStringPiece
+
 -- HsMaybe --------------------------------------------------------------------
 
 newtype HsMaybe a = HsMaybe
@@ -523,6 +545,8 @@ $(deriveMarshallableUnsafe "HsString" [t| HsByteString |])
 $(deriveMarshallableUnsafe "HsString" [t| HsText |])
 $(deriveMarshallableUnsafe "HsString" [t| HsLenientText |])
 
+$(deriveMarshallableUnsafe "HsStringPiece" [t| HsStringPiece |])
+
 $(deriveMarshallableUnsafe "HsArrayInt32" [t| HsList CInt |])
 $(deriveMarshallableUnsafe "HsArrayInt32" [t| HsList Int32 |])
 $(deriveMarshallableUnsafe "HsArrayInt64" [t| HsList Int |])
@@ -566,6 +590,7 @@ $(#{derive_hs_option_unsafe Float} [t| Float |])
 $(#{derive_hs_option_unsafe Double} [t| Double |])
 $(#{derive_hs_option_unsafe String} [t| HsText |])
 $(#{derive_hs_option_unsafe String} [t| HsByteString |])
+$(#{derive_hs_option_unsafe StringView} [t| HsStringPiece |])
 
 -- no bool since std::vector<bool> doesn't implement Container in cpp
 $(deriveHsArrayUnsafe "Int32" [t| CInt |])
@@ -578,3 +603,4 @@ $(deriveHsArrayUnsafe "Float" [t| Float |])
 $(deriveHsArrayUnsafe "Double" [t| Double |])
 $(deriveHsArrayUnsafe "String" [t| HsText |])
 $(deriveHsArrayUnsafe "String" [t| HsByteString |])
+$(deriveHsArrayUnsafe "StringView" [t| HsStringPiece |])

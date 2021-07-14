@@ -7,6 +7,7 @@ import TestRunner
 
 
 import Control.Exception
+import Data.ByteString (ByteString, useAsCStringLen)
 import Data.ByteString.Unsafe (unsafeUseAsCStringLen)
 import Data.HashMap.Strict (HashMap)
 import Data.IntMap.Strict (IntMap)
@@ -40,6 +41,20 @@ arrayCxxTest = TestLabel "arrayCxxTest" $ TestCase $ do
   withCxxObject (HsArray (Vector.fromList (map HsText pokey))) $ \p -> do
     HsArray v <- peek p
     assertEqual "array of strings" pokey (Vector.toList (Vector.map hsText v))
+
+stringPieceCxxTest :: Test
+stringPieceCxxTest = TestLabel "stringPieceCxxTest" $ TestCase $ do
+  withDefaultCxxObject $ \p -> do
+    HsRange ptr len <- peek p :: IO HsStringPiece
+    assertEqual "ptr" nullPtr ptr
+    assertEqual "len" 0 len
+
+  let pokeString = "pokey" :: ByteString
+  useAsCStringLen pokeString $ \(pPtr, pLen) ->
+    withCxxObject (HsRange pPtr pLen) $ \p -> do
+      HsRange rPtr rLen <- peek p
+      assertEqual "rPtr" pPtr rPtr
+      assertEqual "rLen" pLen rLen
 
 optionTest :: Test
 optionTest = TestLabel "optionTest" $ TestCase $ do
@@ -210,4 +225,5 @@ main = testRunner $ TestList
   , allocUtilsTest
   , optionTest
   , arrayCxxTest
+  , stringPieceCxxTest
   ]

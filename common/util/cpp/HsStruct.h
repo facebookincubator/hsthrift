@@ -4,6 +4,7 @@
 
 #include <glog/logging.h>
 #include <cstddef>
+#include <string_view>
 
 #include <folly/Memory.h>
 #include <folly/Optional.h>
@@ -36,6 +37,11 @@ HS_STRUCT HsRange {
 
   HsRange(const T* a, size_t n) : a(a), n(n) {}
 
+  template <
+      typename U = T,
+      typename = typename std::enable_if<std::is_same<U, char>::value>::type>
+  explicit HsRange(std::string_view sv) : a(sv.data()), n(sv.size()) {}
+
   const T* data() const {
     return a;
   }
@@ -46,6 +52,13 @@ HS_STRUCT HsRange {
 
   /* implicit */ operator folly::Range<const T*>() const {
     return folly::Range<const T*>(a, n);
+  }
+
+  template <
+      typename U = T,
+      typename = typename std::enable_if<std::is_same<U, char>::value>::type>
+  std::string_view toStdStringView() {
+    return std::string_view(a, n);
   }
 };
 
@@ -815,3 +828,4 @@ HS_OPTION_H(UInt64, uint64_t);
 HS_OPTION_H(Float, float);
 HS_OPTION_H(Double, double);
 HS_OPTION_H(String, HsString);
+HS_OPTION_H(StringView, HsStringPiece);

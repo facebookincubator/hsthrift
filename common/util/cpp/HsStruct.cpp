@@ -93,6 +93,18 @@ void HsJSON::destruct() {
 }
 
 /*
+ * HsStringPiece
+ */
+
+HsStringPiece* newHsStringPiece(const char* p, size_t n) noexcept {
+  return new HsStringPiece(p, n);
+}
+
+void ctorHsStringPiece(HsRange<char>* ret, const char* p, size_t n) noexcept {
+  new (ret) HsStringPiece(p, n);
+}
+
+/*
  * HsString
  */
 
@@ -133,6 +145,7 @@ HS_DEFINE_MARSHALLABLE(
     HsEither<HsString, HsArray<HsString>>);
 
 HS_DEFINE_MARSHALLABLE(HsString, HsString);
+HS_DEFINE_MARSHALLABLE(HsStringPiece, HsStringPiece);
 
 HS_DEFINE_MARSHALLABLE(HsArrayInt32, HsArray<int32_t>);
 HS_DEFINE_MARSHALLABLE(HsArrayInt64, HsArray<int64_t>);
@@ -159,6 +172,7 @@ HS_OPTION_CPP(UInt64, uint64_t);
 HS_OPTION_CPP(Float, float);
 HS_OPTION_CPP(Double, double);
 HS_OPTION_CPP(String, HsString);
+HS_OPTION_CPP(StringView, HsStringPiece);
 
 // No bool as std::vector<bool> doesn't define Container
 HS_DEFINE_ARRAY_CONSTRUCTIBLE(Int32, int32_t);
@@ -168,3 +182,4 @@ HS_DEFINE_ARRAY_CONSTRUCTIBLE(UInt64, uint64_t);
 HS_DEFINE_ARRAY_CONSTRUCTIBLE(Float, float);
 HS_DEFINE_ARRAY_CONSTRUCTIBLE(Double, double);
 HS_DEFINE_ARRAY_CONSTRUCTIBLE(String, HsString);
+HS_DEFINE_ARRAY_CONSTRUCTIBLE(StringView, HsStringPiece);
