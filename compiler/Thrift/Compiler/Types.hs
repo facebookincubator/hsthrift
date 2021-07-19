@@ -447,13 +447,13 @@ data StructLoc a = StructLoc
 
 -- Thrift Fields ---------------------------------------------------------------
 
-data FieldType = StructField | Argument | Throws
+data FieldType = StructField | Argument | ThrowsField
 
 data FieldTag u s l t where
   STRUCT_FIELD :: FieldTag 'StructField s l t
   ARGUMENT     :: FieldTag 'Argument s l t
-  THROWS_UNRESOLVED :: FieldTag 'Throws 'Unresolved l t
-  THROWS_RESOLVED   :: FieldTag 'Throws 'Resolved l (Some (ExceptionVal l))
+  THROWS_UNRESOLVED :: FieldTag 'ThrowsField 'Unresolved l t
+  THROWS_RESOLVED   :: FieldTag 'ThrowsField 'Resolved l (Some (ExceptionVal l))
 
 data Field u s l a = forall v t. Field
   { fieldId           :: FieldId
@@ -583,7 +583,7 @@ data Function (s :: Status) (l :: * {- Language -}) a = Function
   , funType         :: Either (Located a) (Some (AnnotatedType a))
   , funResolvedType :: IfResolved s (Maybe (Some (Type l)))
   , funArgs         :: [Field 'Argument s l a]
-  , funExceptions   :: [Field 'Throws s l a]
+  , funExceptions   :: [Field 'ThrowsField s l a]
   , funIsOneWay     :: Bool
   , funPriority     :: ThriftPriority
   , funLoc          :: FunLoc a

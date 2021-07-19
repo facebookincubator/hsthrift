@@ -530,7 +530,7 @@ FunType
   : AnnotatedType { Right $1 }
   | void          { Left $ getLoc $1 }
 
-Throw :: { Parsed (Field 'Throws) }
+Throw :: { Parsed (Field 'ThrowsField) }
 Throw : StructuredAnnotations intLit ':' AnnotatedType Symbol MaybeConst Annotations Separator
         { case $4 of
             This t -> Field

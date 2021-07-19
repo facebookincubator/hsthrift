@@ -465,7 +465,7 @@ genParseReply Function{..} = Do ()
       , fieldSAnns = []
       }
     structify
-      :: HS (Field 'Throws)
+      :: HS (Field 'ThrowsField)
       -> HS (Field 'StructField)
     structify Field{ fieldRequiredness = Default, ..} =
       Field{ fieldTag = STRUCT_FIELD, fieldRequiredness = Default, .. }
@@ -484,7 +484,7 @@ genParseResult ty =
    ])
   Nothing
 
-genParseException :: HS (Field 'Throws) -> Alt ()
+genParseException :: HS (Field 'ThrowsField) -> Alt ()
 genParseException Field{..} =
   Alt () (intP $ fromIntegral fieldId)
   (GuardedRhss ()

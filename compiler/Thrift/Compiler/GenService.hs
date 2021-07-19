@@ -379,7 +379,7 @@ genRespWriter s@Service{..} =
          ])
       ]
       where
-        genExceptionCase :: HS (Field 'Throws) -> GuardedRhs ()
+        genExceptionCase :: HS (Field 'ThrowsField) -> GuardedRhs ()
         genExceptionCase Field{..} =
           case fieldTag of
             THROWS_RESOLVED -> GuardedRhs ()
