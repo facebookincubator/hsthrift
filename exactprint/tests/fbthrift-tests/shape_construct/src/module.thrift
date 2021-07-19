@@ -19,8 +19,8 @@
  */
 
 enum TestEnum {
-  UNKNOWN = 0;
-  NEW_VALUE = 1;
+  UNKNOWN = 0,
+  NEW_VALUE = 1,
 }
 
 union TestUnion {
@@ -33,15 +33,15 @@ union TestUnion {
 }
 
 struct Foo {
- 1: list<string> a;
- 2: optional map<string, list<set<i32>>> b;
- 3: i64 c = 7;
- 4: optional bool d = 0;
- 5: string str_value = "hello";
+  1: list<string> a;
+  2: optional map<string, list<set<i32>>> b;
+  3: i64 c = 7;
+  4: optional bool d = 0;
+  5: string str_value = "hello";
 }
 
 struct TestStruct {
-  1: Foo foo_struct = { "c" : 99};
+  1: Foo foo_struct = {"c": 99};
   2: TestUnion union_value;
   3: TestStruct struct_of_self;
   4: list<Foo> list_of_struct_foo;
@@ -50,10 +50,10 @@ struct TestStruct {
 }
 
 exception Baz {
- 1: string message;
- 2: Foo some_field;
- 3: set<string> some_container;
- 4: i32 code;
+  1: string message;
+  2: Foo some_field;
+  3: set<string> some_container;
+  4: i32 code;
 }
 
 exception OptBaz {

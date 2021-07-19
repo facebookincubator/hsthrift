@@ -19,5 +19,5 @@
  */
 
 struct Foo {
-  1: required i32 bar
+  1: required i32 bar;
 }

@@ -18,4 +18,5 @@
  * limitations under the License.
  */
 
-service NullService {}
+service NullService {
+}

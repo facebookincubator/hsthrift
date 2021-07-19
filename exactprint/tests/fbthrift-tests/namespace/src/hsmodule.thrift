@@ -25,7 +25,5 @@ struct HsFoo {
 }
 
 service HsTestService {
-  i64 init(
-    1: i64 int1,
-  )
+  i64 init(1: i64 int1);
 }

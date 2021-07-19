@@ -20,4 +20,5 @@
 
 namespace go IncludesAlso
 
-struct Also {}
+struct Also {
+}

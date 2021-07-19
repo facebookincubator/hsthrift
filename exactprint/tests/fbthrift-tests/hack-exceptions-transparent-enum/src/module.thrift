@@ -24,6 +24,6 @@ enum MyEnum {
 }
 
 exception MyException {
-  1: string message,
-  2: MyEnum code,
+  1: string message;
+  2: MyEnum code;
 }

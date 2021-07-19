@@ -19,8 +19,8 @@
  */
 
 struct TestStruct {
-  1: i64 aLong,
-  2: string aString,
+  1: i64 aLong;
+  2: string aString;
 }
 
 service TestService {

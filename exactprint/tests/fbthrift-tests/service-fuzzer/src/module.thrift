@@ -36,5 +36,5 @@ service TestService {
     14: i64 int14,
     15: i64 int15,
     16: i64 int16,
-  )
+  );
 }

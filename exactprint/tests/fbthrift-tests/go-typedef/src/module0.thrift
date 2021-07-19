@@ -19,11 +19,11 @@
  */
 
 struct Accessory {
-    1: i32 InventoryId
-    2: string Name
+  1: i32 InventoryId;
+  2: string Name;
 }
 
 struct PartName {
-    1: i32 InventoryId
-    2: string Name
+  1: i32 InventoryId;
+  2: string Name;
 }
