@@ -113,6 +113,7 @@ typeToImport (THashSet t) =
   Set.singleton (QImport "Data.HashSet" "HashSet") `union`
   typeToImport t
 typeToImport (TList t) = typeToImport t
+typeToImport (TStream _ t) = typeToImport t
 typeToImport (TSpecial (HsVector vec t)) =
   Set.singleton (QImport (hsVectorImport vec) (hsVectorQual vec)) `union`
   typeToImport t
@@ -234,6 +235,7 @@ genType (TSpecial HsString) = qualType "Prelude" "String"
 genType (TSpecial HsByteString) = qualType "ByteString" "ByteString"
 genType TBytes  = qualType "ByteString" "ByteString"
 genType (TList ty) = TyList () (genType ty)
+genType (TStream _ ty) = TyList () (genType ty)
 genType (TSpecial (HsVector vec ty)) =
   qualType (hsVectorQual vec) "Vector" `appT` genType ty
 genType (TSet ty)  = qualType "Set" "Set" `appT` genType ty
@@ -264,6 +266,7 @@ genConst (TSpecial HsByteString) (Literal s) = stringLit $ decodeUtf8 s
 genConst TBytes (Literal s) = stringLit $ decodeUtf8 s
 -- Collection Literals
 genConst (TList ty)   (Literal (List l)) = HS.List () $ map (genConst ty) l
+genConst (TStream _ ty) (Literal (List l)) = HS.List () $ map (genConst ty) l
 genConst (TSpecial (HsVector vec ty)) (Literal (List l)) =
   qvar (hsVectorQual vec) "fromList" `app` HS.List () (map (genConst ty) l)
 genConst (TSet ty) (Literal (Set l)) =
@@ -358,6 +361,7 @@ genThriftType (TSpecial HsString) = protocolFun "getStringType"
 genThriftType (TSpecial HsByteString) = protocolFun "getStringType"
 genThriftType TBytes  = protocolFun "getStringType"
 genThriftType TList{}    = protocolFun "getListType"
+genThriftType TStream{}  = protocolFun "getListType"
 genThriftType (TSpecial HsVector{}) = protocolFun "getListType"
 genThriftType TSet{}     = protocolFun "getSetType"
 genThriftType THashSet{} = protocolFun "getSetType"
@@ -403,6 +407,7 @@ qualifyType _ (TSpecial HsString) = TSpecial HsString
 qualifyType _ (TSpecial HsByteString) = TSpecial HsByteString
 qualifyType _ TBytes  = TBytes
 qualifyType q (TList u) = TList $ qualifyType q u
+qualifyType q (TStream _ u) = TList $ qualifyType q u
 qualifyType q (TSpecial (HsVector vec u)) =
   TSpecial $ HsVector vec $ qualifyType q u
 qualifyType q (TSet u) = TSet $ qualifyType q u
@@ -451,6 +456,7 @@ qualifyLit _ (TSpecial HsString) s = s
 qualifyLit _ (TSpecial HsByteString) s = s
 -- Collections
 qualifyLit q (TList u) (List l) = List $ map (qualifyConst q u) l
+qualifyLit q (TStream _ u) (List l) = List $ map (qualifyConst q u) l
 qualifyLit q (TSpecial (HsVector _ u)) (List l) =
   List $ map (qualifyConst q u) l
 qualifyLit q (TSet u) (Set s) = Set $ map (qualifyConst q u) s

@@ -28,7 +28,8 @@ module Thrift.Compiler.Types
   , Requiredness(..), Laziness(..)
   , Union(..), UnionAlt(..), PossiblyEmpty(..), EmptyName
   , Enum(..), EnumValue(..), EnumValLoc(..)
-  , Service(..), Super(..), Function(..), FunLoc(..), ThrowsLoc(..)
+  , Service(..), Super(..), Function(..), FunLoc(..)
+  , funThrows, ThrowsLoc(..), Throws(..)
   , Type, AnnotatedType(..), TType(..), SomeAnnTy(..)
   , TypeLoc(..), GetArity, getTypeLoc
   , SCHEMA(..), Schema, USchema
@@ -606,6 +607,17 @@ data ThrowsLoc a = ThrowsLoc
   , tlCloseParen :: Located a
   }
 
+data Throws s l a = Throws
+  { throwsLoc :: ThrowsLoc a
+  , throwsFields :: [Field 'ThrowsField s l a]
+  }
+
+funThrows
+  :: Function (s :: Status) (l :: * {- Language -}) a
+  -> Maybe (Throws s l a)
+funThrows Function{funLoc=FunLoc{..}, ..} = fmap f fnlThrows
+  where f throws = Throws throws funExceptions
+
 -- Thrift Value Types ----------------------------------------------------------
 
 -- When a thrift file is parsed, all of the types are marked as 'Unresolved
@@ -678,6 +690,7 @@ data TType (s :: Status) (l :: * {- Language -}) a (t :: *) where
   TSet     :: TypeOf s l a t -> TType s l a (Set l t)
   THashSet :: TypeOf s l a t -> TType s l a (HashSet l t)
   TList    :: TypeOf s l a t -> TType s l a (List l t)
+  TStream  :: Maybe (Throws s l a) -> TypeOf s l a t -> TType s l a (List l t)
   TMap     :: TypeOf s l a k -> TypeOf s l a v -> TType s l a (Map l k v)
   THashMap :: TypeOf s l a k -> TypeOf s l a v -> TType s l a (HashMap l k v)
 

@@ -421,6 +421,7 @@ filterDecls reqSymbols symbolMap =
     typeSymbols (TSet ty)      = anTypeSymbols ty
     typeSymbols (THashSet ty)  = anTypeSymbols ty
     typeSymbols (TList ty)     = anTypeSymbols ty
+    typeSymbols (TStream _ ty) = anTypeSymbols ty
     typeSymbols (TMap k v)     = anTypeSymbols k ++ anTypeSymbols v
     typeSymbols (THashMap k v) = anTypeSymbols k ++ anTypeSymbols v
     -- Named types depend on the type they name
@@ -1183,6 +1184,8 @@ eqOrAlias (THashSet u) (THashSet v) = apply Refl <$> eqOrAlias u v
 eqOrAlias THashSet{} _ = Nothing
 eqOrAlias (TList u) (TList v) = apply Refl <$> eqOrAlias u v
 eqOrAlias TList{} _ = Nothing
+eqOrAlias (TStream _ u) (TStream _ v) = apply Refl <$> eqOrAlias u v
+eqOrAlias TStream{} _ = Nothing
 eqOrAlias (TMap k1 v1) (TMap k2 v2) =
   apply <$> (apply Refl <$> eqOrAlias k1 k2) <*> eqOrAlias v1 v2
 eqOrAlias TMap{} _ = Nothing
@@ -1426,6 +1429,7 @@ resolveType atType atLoc atAnnotations =
     TSet u     -> resolve TSet u
     THashSet u -> resolve THashSet u
     TList u    -> resolve TList u
+    TStream _ u -> resolve TList u
     TMap k v -> do
       thisrk <- resolveAnnotatedType k
       thisrv <- resolveAnnotatedType v

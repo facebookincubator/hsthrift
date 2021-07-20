@@ -204,6 +204,7 @@ qualifyType _ TText = TText
 qualifyType m (TSet u)       = TSet $ qualifyType m u
 qualifyType m (THashSet u)   = THashSet $ qualifyType m u
 qualifyType m (TList u)      = TList $ qualifyType m u
+qualifyType m (TStream w u)  = TStream w $ qualifyType m u
 qualifyType m (TMap k v)     = TMap (qualifyType m k) (qualifyType m v)
 qualifyType m (THashMap k v) = THashMap (qualifyType m k) (qualifyType m v)
 qualifyType m (TTypedef name t loc) =

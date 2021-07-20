@@ -456,7 +456,7 @@ Function :: { Parsed Function }
       , funType         = $3
       , funResolvedType = ()
       , funArgs         = $6
-      , funExceptions   = maybe [] snd $8
+      , funExceptions   = maybe [] throwsFields $8
       , funIsOneWay     = isJust $2
       , funPriority     = NormalPriority
       , funLoc          = FunLoc
@@ -464,7 +464,7 @@ Function :: { Parsed Function }
         , fnlName       = lLoc $4
         , fnlOpenParen  = getLoc $5
         , fnlCloseParen = getLoc $7
-        , fnlThrows     = fmap fst $8
+        , fnlThrows     = fmap throwsLoc $8
         , fnlSeparator  = $10
         }
       , funAnns         = $9
@@ -514,15 +514,17 @@ IsOneway
   : oneway      { Just $ getLoc $1  }
   | {- empty -} { Nothing }
 
+Throws :: { Maybe (Parsed Throws) }
 Throws
   : throws '(' list(Throw) ')'
-    { Just
-      (ThrowsLoc
-        { tlThrows     = getLoc $1
-        , tlOpenParen  = getLoc $2
-        , tlCloseParen = getLoc $4
-        },
-       $3)
+    { Just $ Throws
+      { throwsLoc = ThrowsLoc
+          { tlThrows     = getLoc $1
+          , tlOpenParen  = getLoc $2
+          , tlCloseParen = getLoc $4
+          }
+      , throwsFields = $3
+      }
     }
   | {- empty -} { Nothing }
 
@@ -647,9 +649,9 @@ Type : byte   { ThisAnnTy I8 (annTy0 $1) }
      | list '<' AnnotatedType '>'
        { case $3 of
            This t -> ThisAnnTy (TList t) (annTy1 $1 $2 $4) }
-     | stream '<' AnnotatedType '>'
+     | stream '<' AnnotatedType Throws '>'
        { case $3 of
-           This t -> ThisAnnTy (TList t) (annTy1 $1 $2 $4) }
+           This t -> ThisAnnTy (TStream $4 t) (annTy1 $1 $2 $5) }
 
 {
 

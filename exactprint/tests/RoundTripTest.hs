@@ -43,7 +43,6 @@ failingTests =
   , "common/hs/thrift/exactprint/tests/fbthrift-tests/py-future/src/test.thrift"
   , "common/hs/thrift/exactprint/tests/fbthrift-tests/sink/src/module.thrift"
   , "common/hs/thrift/exactprint/tests/fbthrift-tests/sink/src/module.thrift"
-  , "common/hs/thrift/exactprint/tests/fbthrift-tests/stream/src/module.thrift"
   , "common/hs/thrift/exactprint/tests/fbthrift-tests/visitation/src/module.thrift"
   ]
 

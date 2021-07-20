@@ -233,7 +233,7 @@ ppStructPair StructPair{..} = mconcat
 -- Functions -------------------------------------------------------------------
 
 ppFunction :: Function s l Offset -> Builder
-ppFunction Function{funLoc=FunLoc{..},..} = mconcat $
+ppFunction fun@Function{funLoc=FunLoc{..},..} = mconcat $
   [ ppSAnns funSAnns
   , case fnlOneway of { Nothing -> "" ; Just loc -> addHeader loc <> "oneway" }
   , case funType of
@@ -244,18 +244,20 @@ ppFunction Function{funLoc=FunLoc{..},..} = mconcat $
   ] ++
   map ppField funArgs ++
   [ addHeader fnlCloseParen, ")"
-  , maybe mempty ppThrows fnlThrows
+  , maybe mempty ppThrows $ funThrows fun
   , ppAnns funAnns
   , ppSeparator fnlSeparator
   ]
-  where
-    ppThrows ThrowsLoc{..} = mconcat $
-      [ addHeader tlThrows, "throws"
-      , addHeader tlOpenParen, "("
-      ] ++
-      map ppField funExceptions ++
-      [ addHeader tlCloseParen, ")"
-      ]
+
+ppThrows :: Throws s l Offset -> Builder
+ppThrows Throws{..} = mconcat $
+  [ addHeader tlThrows, "throws"
+  , addHeader tlOpenParen, "("
+  ] ++
+  map ppField throwsFields ++
+  [ addHeader tlCloseParen, ")"
+  ]
+  where ThrowsLoc{..} = throwsLoc
 
 -- Types -----------------------------------------------------------------------
 
@@ -278,6 +280,7 @@ ppType AnnotatedType{..} =
     TList u -> ppType1 atLoc "list" $ ppType u
     TSet u -> ppType1 atLoc "set" $ ppType u
     THashSet u -> ppType1 atLoc "hash_set" $ ppType u
+    TStream w u -> ppStream atLoc "stream" w $ ppType u
 
     -- Arity 2 Types
     TMap k v -> ppType2 atLoc "map" (ppType k) (ppType v)
@@ -292,6 +295,20 @@ ppType1 Arity1Loc{..} ty inner = mconcat
   [ addHeader a1Ty, ty
   , addHeader a1OpenBrace, "<"
   , inner
+  , addHeader a1CloseBrace, ">"
+  ]
+
+ppStream
+  :: TypeLoc 1 Offset
+  -> Builder
+  -> Maybe (Throws s l Offset)
+  -> Builder
+  -> Builder
+ppStream Arity1Loc{..} ty throws inner = mconcat
+  [ addHeader a1Ty, ty
+  , addHeader a1OpenBrace, "<"
+  , inner
+  , maybe mempty ppThrows throws
   , addHeader a1CloseBrace, ">"
   ]
 
