@@ -144,7 +144,6 @@ ppType TBytes  = "binary"
 ppType (TSet u)     = hcat [ "set<", ppType u, ">" ]
 ppType (THashSet u) = hcat [ "hash_set<", ppType u, ">" ]
 ppType (TList u)    = hcat [ "list<", ppType u, ">" ]
-ppType (TStream _ u) = hcat [ "stream<", ppType u, ">" ]
 ppType (TMap k v) = hcat [ "map<", ppType k, ", ", ppType v, ">" ]
 ppType (THashMap k v) = hcat [ "hash_map<", ppType k, ", ", ppType v, ">" ]
 ppType (TTypedef name _ _loc) = ppName name

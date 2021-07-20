@@ -29,7 +29,7 @@ module Thrift.Compiler.Types
   , Union(..), UnionAlt(..), PossiblyEmpty(..), EmptyName
   , Enum(..), EnumValue(..), EnumValLoc(..)
   , Service(..), Super(..), Function(..), FunLoc(..)
-  , funThrows, ThrowsLoc(..), Throws(..)
+  , funThrows, ThrowsLoc(..), Throws(..), FunctionType(..), Stream(..)
   , Type, AnnotatedType(..), TType(..), SomeAnnTy(..)
   , TypeLoc(..), GetArity, getTypeLoc
   , SCHEMA(..), Schema, USchema
@@ -581,7 +581,7 @@ type family SuperOf (s :: Status) :: * where
 data Function (s :: Status) (l :: * {- Language -}) a = Function
   { funName         :: Text
   , funResolvedName :: IfResolved s Text
-  , funType         :: Either (Located a) (Some (AnnotatedType a))
+  , funType         :: FunctionType s l a
   , funResolvedType :: IfResolved s (Maybe (Some (Type l)))
   , funArgs         :: [Field 'Argument s l a]
   , funExceptions   :: [Field 'ThrowsField s l a]
@@ -590,6 +590,17 @@ data Function (s :: Status) (l :: * {- Language -}) a = Function
   , funLoc          :: FunLoc a
   , funAnns         :: Maybe (Annotations a)
   , funSAnns        :: [StructuredAnnotation s l a]
+  }
+
+data FunctionType s l a
+  = FunType (Some (AnnotatedType a))
+  | FunTypeVoid (Located a)
+  | FunTypeStreamReturn (Stream s l a)
+
+data Stream s l a = forall v. Stream
+  { streamType :: AnnotatedType a v
+  , streamThrows :: Maybe (Throws s l a)
+  , streamLoc :: TypeLoc 1 a
   }
 
 data FunLoc a = FunLoc
@@ -613,7 +624,7 @@ data Throws s l a = Throws
   }
 
 funThrows
-  :: Function (s :: Status) (l :: * {- Language -}) a
+  :: Function s l a
   -> Maybe (Throws s l a)
 funThrows Function{funLoc=FunLoc{..}, ..} = fmap f fnlThrows
   where f throws = Throws throws funExceptions
@@ -690,7 +701,6 @@ data TType (s :: Status) (l :: * {- Language -}) a (t :: *) where
   TSet     :: TypeOf s l a t -> TType s l a (Set l t)
   THashSet :: TypeOf s l a t -> TType s l a (HashSet l t)
   TList    :: TypeOf s l a t -> TType s l a (List l t)
-  TStream  :: Maybe (Throws s l a) -> TypeOf s l a t -> TType s l a (List l t)
   TMap     :: TypeOf s l a k -> TypeOf s l a v -> TType s l a (Map l k v)
   THashMap :: TypeOf s l a k -> TypeOf s l a v -> TType s l a (HashMap l k v)
 

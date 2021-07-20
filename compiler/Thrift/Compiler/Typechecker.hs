@@ -15,7 +15,6 @@ module Thrift.Compiler.Typechecker
 
 import Prelude hiding (Enum)
 import Data.Either ( rights )
-import Data.Either.Combinators
 import Data.List hiding (uncons)
 import Data.Maybe
 import Data.Some
@@ -189,7 +188,9 @@ unSelfQualDecls thriftName xs = map unSelfQual xs
     usqFun :: Function 'Unresolved () Loc -> Function 'Unresolved () Loc
     usqFun Function{..}= Function
       { funType = case funType of
-          Right (Some at) | Just x <- usqAnnType at -> Right (Some x)
+          FunType (Some at) | Just x <- usqAnnType at -> FunType (Some x)
+          FunTypeStreamReturn Stream{..} | Just x <- usqAnnType streamType ->
+            FunTypeStreamReturn Stream{streamType=x, ..}
           _ -> funType
       , funArgs = map usqField funArgs
       , funExceptions = map usqField funExceptions
@@ -400,9 +401,15 @@ filterDecls reqSymbols symbolMap =
     funSymbols :: Parsed Function -> [Text]
     funSymbols Function{..} =
       funName :
-      either (const []) (`withSome` anTypeSymbols) funType ++
+      funTypeSymbols funType ++
       concatMap fieldSymbols funArgs ++
       concatMap fieldSymbols funExceptions
+    funTypeSymbols :: Parsed FunctionType -> [Text]
+    funTypeSymbols (FunType (This ty)) = anTypeSymbols ty
+    funTypeSymbols (FunTypeVoid _) = []
+    funTypeSymbols (FunTypeStreamReturn Stream{..}) =
+      anTypeSymbols streamType ++
+      maybe [] (concatMap fieldSymbols . throwsFields) streamThrows
 
     anTypeSymbols :: AnnotatedType Loc t -> [Text]
     anTypeSymbols AnnotatedType{..} = typeSymbols atType
@@ -421,7 +428,6 @@ filterDecls reqSymbols symbolMap =
     typeSymbols (TSet ty)      = anTypeSymbols ty
     typeSymbols (THashSet ty)  = anTypeSymbols ty
     typeSymbols (TList ty)     = anTypeSymbols ty
-    typeSymbols (TStream _ ty) = anTypeSymbols ty
     typeSymbols (TMap k v)     = anTypeSymbols k ++ anTypeSymbols v
     typeSymbols (THashMap k v) = anTypeSymbols k ++ anTypeSymbols v
     -- Named types depend on the type they name
@@ -697,15 +703,17 @@ resolveService s@Service{..} = do
 
 resolveFunction :: Typecheckable l => Parsed Function -> Typechecked l Function
 resolveFunction f@Function{..} = do
-  (rtype, args, excepts, sAnns)
-    <- (,,,) <$>
-        sequence ((`withSome` resolveAnnotatedType) <$> rightToMaybe funType)
+  (rtype, ftype, args, excepts, sAnns)
+    <- (,,,,) <$>
+        sequence (resolveFunctionTypeTy funType)
+          `collect` resolveFunctionType funName annNoPriorities funType
           `collect` resolveFields funName annNoPriorities funArgs
           `collect` resolveFields funName annNoPriorities funExceptions
           `collect` resolveStructuredAnns funSAnns
   Env{..} <- ask
-  pure Function
+  pure $ Function
     { funResolvedName = renameFunction options f
+    , funType         = ftype
     , funResolvedType = rtype
     , funArgs         = args
     , funExceptions   = excepts
@@ -718,6 +726,39 @@ resolveFunction f@Function{..} = do
     isPriority ValueAnn{..}
       | TextAnn{} <- vaVal = vaTag == "priority"
     isPriority _ = False
+
+resolveFunctionTypeTy
+  :: Typecheckable l
+  => FunctionType s () Loc
+  -> Maybe (TC l (Some (Type l)))
+resolveFunctionTypeTy (FunType (This ty)) =
+  Just $ resolveAnnotatedType ty
+resolveFunctionTypeTy (FunTypeVoid _) =
+  Nothing
+resolveFunctionTypeTy (FunTypeStreamReturn Stream{..}) =
+  Nothing -- This doesn't support stream yet
+
+resolveFunctionType
+  :: Typecheckable l
+  => Text
+  -> [Annotation Loc]
+  -> Parsed FunctionType
+  -> Typechecked l FunctionType
+resolveFunctionType _ _ (FunType (This ty)) = pure $ FunType (This ty)
+resolveFunctionType _ _ (FunTypeVoid ann) = pure $ FunTypeVoid ann
+resolveFunctionType structName ann (FunTypeStreamReturn Stream{..}) = do
+    throws <- mapM resolveThrows streamThrows
+    pure $ FunTypeStreamReturn $ Stream
+      { streamThrows = throws
+      , ..
+      }
+  where
+    resolveThrows Throws{..} = do
+      fields <- resolveFields structName ann throwsFields
+      pure $ Throws
+        { throwsFields = fields
+        , ..
+        }
 
 -- Resolve Structured Annotations ----------------------------------------------
 
@@ -1184,8 +1225,6 @@ eqOrAlias (THashSet u) (THashSet v) = apply Refl <$> eqOrAlias u v
 eqOrAlias THashSet{} _ = Nothing
 eqOrAlias (TList u) (TList v) = apply Refl <$> eqOrAlias u v
 eqOrAlias TList{} _ = Nothing
-eqOrAlias (TStream _ u) (TStream _ v) = apply Refl <$> eqOrAlias u v
-eqOrAlias TStream{} _ = Nothing
 eqOrAlias (TMap k1 v1) (TMap k2 v2) =
   apply <$> (apply Refl <$> eqOrAlias k1 k2) <*> eqOrAlias v1 v2
 eqOrAlias TMap{} _ = Nothing
@@ -1429,7 +1468,6 @@ resolveType atType atLoc atAnnotations =
     TSet u     -> resolve TSet u
     THashSet u -> resolve THashSet u
     TList u    -> resolve TList u
-    TStream _ u -> resolve TList u
     TMap k v -> do
       thisrk <- resolveAnnotatedType k
       thisrv <- resolveAnnotatedType v

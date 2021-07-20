@@ -237,8 +237,9 @@ ppFunction fun@Function{funLoc=FunLoc{..},..} = mconcat $
   [ ppSAnns funSAnns
   , case fnlOneway of { Nothing -> "" ; Just loc -> addHeader loc <> "oneway" }
   , case funType of
-     Left loc -> addHeader loc <> "void"
-     Right (This ty) -> ppType ty
+     FunType (This ty) -> ppType ty
+     FunTypeVoid loc -> addHeader loc <> "void"
+     FunTypeStreamReturn stream -> ppStream stream
   , addHeader fnlName, fromText funName
   , addHeader fnlOpenParen, "("
   ] ++
@@ -247,6 +248,17 @@ ppFunction fun@Function{funLoc=FunLoc{..},..} = mconcat $
   , maybe mempty ppThrows $ funThrows fun
   , ppAnns funAnns
   , ppSeparator fnlSeparator
+  ]
+
+ppStream
+  :: Stream s l Offset
+  -> Builder
+ppStream Stream{streamLoc=Arity1Loc{..}, ..} = mconcat
+  [ addHeader a1Ty, "stream"
+  , addHeader a1OpenBrace, "<"
+  , ppType streamType
+  , maybe mempty ppThrows streamThrows
+  , addHeader a1CloseBrace, ">"
   ]
 
 ppThrows :: Throws s l Offset -> Builder
@@ -280,7 +292,6 @@ ppType AnnotatedType{..} =
     TList u -> ppType1 atLoc "list" $ ppType u
     TSet u -> ppType1 atLoc "set" $ ppType u
     THashSet u -> ppType1 atLoc "hash_set" $ ppType u
-    TStream w u -> ppStream atLoc "stream" w $ ppType u
 
     -- Arity 2 Types
     TMap k v -> ppType2 atLoc "map" (ppType k) (ppType v)
@@ -295,20 +306,6 @@ ppType1 Arity1Loc{..} ty inner = mconcat
   [ addHeader a1Ty, ty
   , addHeader a1OpenBrace, "<"
   , inner
-  , addHeader a1CloseBrace, ">"
-  ]
-
-ppStream
-  :: TypeLoc 1 Offset
-  -> Builder
-  -> Maybe (Throws s l Offset)
-  -> Builder
-  -> Builder
-ppStream Arity1Loc{..} ty throws inner = mconcat
-  [ addHeader a1Ty, ty
-  , addHeader a1OpenBrace, "<"
-  , inner
-  , maybe mempty ppThrows throws
   , addHeader a1CloseBrace, ">"
   ]
 

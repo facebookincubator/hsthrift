@@ -529,8 +529,16 @@ Throws
   | {- empty -} { Nothing }
 
 FunType
-  : AnnotatedType { Right $1 }
-  | void          { Left $ getLoc $1 }
+  : AnnotatedType { FunType $1 }
+  | void { FunTypeVoid $ getLoc $1 }
+  | ResponseAndStreamReturnType { FunTypeStreamReturn $1 }
+
+ResponseAndStreamReturnType
+  : stream '<' AnnotatedType Throws '>'
+    { case $3 of
+        This t -> (Stream t $4 (annTy1 $1 $2 $5))
+    }
+
 
 Throw :: { Parsed (Field 'ThrowsField) }
 Throw : StructuredAnnotations intLit ':' AnnotatedType Symbol MaybeConst Annotations Separator
@@ -649,9 +657,6 @@ Type : byte   { ThisAnnTy I8 (annTy0 $1) }
      | list '<' AnnotatedType '>'
        { case $3 of
            This t -> ThisAnnTy (TList t) (annTy1 $1 $2 $4) }
-     | stream '<' AnnotatedType Throws '>'
-       { case $3 of
-           This t -> ThisAnnTy (TStream $4 t) (annTy1 $1 $2 $5) }
 
 {
 

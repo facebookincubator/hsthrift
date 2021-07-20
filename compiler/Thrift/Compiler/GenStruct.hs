@@ -186,7 +186,6 @@ fixToJSONValue (TSpecial HsByteString) = Just $ qvar "Text" "decodeUtf8"
 fixToJSONValue TText = Nothing
 fixToJSONValue TBytes = Just $ qvar "Thrift" "encodeBase64Text"
 fixToJSONValue (TList u)    = app (qvar "Prelude" "map") <$> fixToJSONValue u
-fixToJSONValue (TStream _ u) = app (qvar "Prelude" "map") <$> fixToJSONValue u
 fixToJSONValue (TSpecial (HsVector vec u)) =
   app (qvar (hsVectorQual vec) "map") <$> fixToJSONValue u
 fixToJSONValue (TSet u)     = app (qvar "Set" "map") <$> fixToJSONValue u
@@ -381,7 +380,6 @@ genBuildValue (TSpecial HsByteString) = protocolFun "genByteString"
 genBuildValue TBytes = protocolFun "genBytes"
 -- Containers
 genBuildValue (TList ty) = genBuildList ty
-genBuildValue (TStream _ ty) = genBuildList ty
 genBuildValue (TSpecial (HsVector vec ty)) =
   genBuildList ty `compose` qvar (hsVectorQual vec) "toList"
 genBuildValue (TSet ty) =
@@ -611,8 +609,6 @@ genParseType _ TBytes = protocolFun "parseBytes"
 -- Containers
 genParseType _ (TList ty) =
   infixApp "<$>" (qvar "Prelude" "snd") (genParseList ty)
-genParseType _ (TStream _ ty) =
-  infixApp "<$>" (qvar "Prelude" "snd") (genParseList ty)
 genParseType m (TSpecial (HsVector vec ty)) = insertParens m $
   infixApp "<$>"
     (qvar "Prelude" "uncurry" `app` qvar (hsVectorQual vec) "fromListN")
@@ -758,7 +754,6 @@ mkHashable = \case
     Just $ qvar "List" "sort" `compose`
     mapTransform mkHashable u (qvar "HashSet" "toList")
   (TList u) -> (qvar "Prelude" "map" `app`) <$> mkHashable u
-  (TStream _ u) -> (qvar "Prelude" "map" `app`) <$> mkHashable u
   (TSpecial (HsVector vec u)) ->
     Just $ mapTransform mkHashable u $ qvar (hsVectorQual vec) "toList"
   (TMap k v) -> Just $ mapTransformPair mkHashable k v $ qvar "Map" "toAscList"
@@ -869,7 +864,6 @@ mkOrd = \case
     Just $ qvar "List" "sort" `compose`
     mapTransform mkOrd u (qvar "HashSet" "toList")
   (TList u) -> (qvar "Prelude" "map" `app`) <$> mkOrd u
-  (TStream _ u) -> (qvar "Prelude" "map" `app`) <$> mkOrd u
   (TSpecial (HsVector vec u)) ->
     (qvar (hsVectorQual vec) "map" `app`) <$> mkOrd u
   (TMap k v) -> case (mkOrd k, mkOrd v) of

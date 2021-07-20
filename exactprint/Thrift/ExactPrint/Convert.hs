@@ -441,8 +441,12 @@ functionOffsets origin fun@Function{..} =
     (sAnns, sAnnsEnd) = foldO sAnnOffsets origin funSAnns
     onewayEnd = maybe sAnnsEnd lLocation fnlOneway
     (ty, tyEnd) = case funType of
-      Left loc -> (Left $ getOffsets onewayEnd loc, lLocation loc)
-      Right (This t) -> first (Right . This) $ computeTypeOffsets onewayEnd t
+      FunType (This t) ->
+        first (FunType . This) $ computeTypeOffsets onewayEnd t
+      FunTypeVoid loc ->
+        (FunTypeVoid $ getOffsets onewayEnd loc, lLocation loc)
+      FunTypeStreamReturn stream ->
+        first FunTypeStreamReturn $ streamOffsets onewayEnd stream
     (args, argsEnd) = foldO computeFieldOffsets (lLocation fnlOpenParen) funArgs
     (throws, exs, throwsEnd) = case funThrows fun of
       Just w -> (Just throwsLoc, throwsFields, throwsEnd')
@@ -454,6 +458,26 @@ functionOffsets origin fun@Function{..} =
     (anns, annsEnd) = annsOffsets throwsEnd funAnns
     (sep, sepEnd) = separatorOffsets annsEnd fnlSeparator
     FunLoc{..} = funLoc
+
+streamOffsets
+  :: Loc
+  -> Stream s l Loc
+  -> (Stream s l Offset, Loc)
+streamOffsets origin Stream{streamLoc=Arity1Loc{..}, ..} =
+  (Stream
+   { streamType = ty
+   , streamThrows = throws
+   , streamLoc = Arity1Loc
+     { a1Ty         = getOffsets origin a1Ty
+     , a1OpenBrace  = getOffsets (lLocation a1Ty) a1OpenBrace
+     , a1CloseBrace = getOffsets throwsEnd a1CloseBrace
+     }
+   },
+   lLocation a1CloseBrace
+  )
+  where
+    (throws, throwsEnd) = maybeThrowsOffsets tyEnd streamThrows
+    (ty, tyEnd) = computeTypeOffsets (lLocation a1OpenBrace) streamType
 
 throwsOffsets:: Loc -> Throws s l Loc -> (Throws s l Offset, Loc)
 throwsOffsets origin Throws{..} =
@@ -501,10 +525,9 @@ computeTypeOffsets origin AnnotatedType{..} = (,annsEnd) $ case atType of
   TNamed n -> arity0Offsets (TNamed n) atLoc
 
   -- Arity 1 Types
-  TList    u -> arity1Offsets TList u atLoc
-  TSet     u -> arity1Offsets TSet u atLoc
-  THashSet u -> arity1Offsets THashSet u atLoc
-  TStream w u -> streamOffsets TStream w u atLoc
+  TList     u -> arity1Offsets TList u atLoc
+  TSet      u -> arity1Offsets TSet u atLoc
+  THashSet  u -> arity1Offsets THashSet u atLoc
 
   -- Arity 2 Types
   TMap     k v -> arity2Offsets TMap k v atLoc
@@ -560,27 +583,6 @@ computeTypeOffsets origin AnnotatedType{..} = (,annsEnd) $ case atType of
       where
         (a', aEnd) = computeTypeOffsets (lLocation a2OpenBrace) a
         (b', bEnd) = computeTypeOffsets (lLocation a2Comma) b
-
-    streamOffsets
-      :: (GetArity t ~ 1, f a ~ t)
-      => (Maybe (Throws s l Offset) -> AnnotatedType Offset a ->
-            TType 'Unresolved () Offset (f a))
-      -> Maybe (Throws s l Loc)
-      -> AnnotatedType Loc a
-      -> TypeLoc 1 Loc
-      -> AnnotatedType Offset (f a)
-    streamOffsets f w a Arity1Loc{..} = AnnotatedType
-      { atType = f w' ty
-      , atLoc = Arity1Loc
-        { a1Ty         = getOffsets origin a1Ty
-        , a1OpenBrace  = getOffsets (lLocation a1Ty) a1OpenBrace
-        , a1CloseBrace = getOffsets throwsEnd a1CloseBrace
-        }
-      , atAnnotations = anns
-      }
-      where
-        (w', throwsEnd) = maybeThrowsOffsets tyEnd w
-        (ty, tyEnd) = computeTypeOffsets (lLocation a1OpenBrace) a
 
     (anns, annsEnd) = annsOffsets (getTyEnd atLoc) atAnnotations
 

@@ -362,7 +362,6 @@ genTType TBytes  = simpleType "binary"
 genTType (TSet u)       = collectionTType "set" u
 genTType (THashSet u)   = collectionTType "hash_set" u
 genTType (TList u)      = collectionTType "list" u
-genTType (TStream _ u)  = collectionTType "list" u
 genTType (TMap k v)     = mapTType "map" k v
 genTType (THashMap k v) = mapTType "hash_map" k v
 
@@ -405,7 +404,6 @@ genType TBytes  = simpleType "binary"
 genType (TSet u)       = collectionType "set" u
 genType (THashSet u)   = collectionType "hash_set" u
 genType (TList u)      = collectionType "list" u
-genType (TStream _ u)  = collectionType "list" u
 genType (TMap k v)     = mapType "map" k v
 genType (THashMap k v) = mapType "hash_map" k v
 
@@ -490,7 +488,6 @@ genLiteral ty@TBytes s = simpleLiteral ty $ toLazyText $ byteStringHex s
 genLiteral (TSet u)       (Set xs)     = listLiteral "set" u xs
 genLiteral (THashSet u)   (HashSet xs) = listLiteral "hash_set" u xs
 genLiteral (TList u)      (List xs)    = listLiteral "list" u xs
-genLiteral (TStream _ u)  (List xs)    = listLiteral "list" u xs
 genLiteral (TMap k v)     (Map xs)     = mapLiteral "map" k v xs
 genLiteral (THashMap k v) (HashMap xs) = mapLiteral "hash_map" k v xs
 
