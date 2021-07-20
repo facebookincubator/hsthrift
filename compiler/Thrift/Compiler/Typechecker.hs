@@ -189,8 +189,13 @@ unSelfQualDecls thriftName xs = map unSelfQual xs
     usqFun Function{..}= Function
       { funType = case funType of
           FunType (Some at) | Just x <- usqAnnType at -> FunType (Some x)
-          FunTypeStreamReturn Stream{..} | Just x <- usqAnnType streamType ->
-            FunTypeStreamReturn Stream{streamType=x, ..}
+          FunTypeResponseAndStreamReturn ResponseAndStreamReturn{..}
+            | Stream{..} <- rsStream
+            , Just x <- usqAnnType streamType ->
+                FunTypeResponseAndStreamReturn $ ResponseAndStreamReturn
+                  { rsStream = Stream{streamType=x, ..}
+                  , ..
+                  }
           _ -> funType
       , funArgs = map usqField funArgs
       , funExceptions = map usqField funExceptions
@@ -407,9 +412,11 @@ filterDecls reqSymbols symbolMap =
     funTypeSymbols :: Parsed FunctionType -> [Text]
     funTypeSymbols (FunType (This ty)) = anTypeSymbols ty
     funTypeSymbols (FunTypeVoid _) = []
-    funTypeSymbols (FunTypeStreamReturn Stream{..}) =
-      anTypeSymbols streamType ++
-      maybe [] (concatMap fieldSymbols . throwsFields) streamThrows
+    funTypeSymbols
+      (FunTypeResponseAndStreamReturn
+       ResponseAndStreamReturn{rsStream=Stream{..}}) =
+        anTypeSymbols streamType ++
+        maybe [] (concatMap fieldSymbols . throwsFields) streamThrows
 
     anTypeSymbols :: AnnotatedType Loc t -> [Text]
     anTypeSymbols AnnotatedType{..} = typeSymbols atType
@@ -735,7 +742,7 @@ resolveFunctionTypeTy (FunType (This ty)) =
   Just $ resolveAnnotatedType ty
 resolveFunctionTypeTy (FunTypeVoid _) =
   Nothing
-resolveFunctionTypeTy (FunTypeStreamReturn Stream{..}) =
+resolveFunctionTypeTy (FunTypeResponseAndStreamReturn _) =
   Nothing -- This doesn't support stream yet
 
 resolveFunctionType
@@ -746,19 +753,28 @@ resolveFunctionType
   -> Typechecked l FunctionType
 resolveFunctionType _ _ (FunType (This ty)) = pure $ FunType (This ty)
 resolveFunctionType _ _ (FunTypeVoid ann) = pure $ FunTypeVoid ann
-resolveFunctionType structName ann (FunTypeStreamReturn Stream{..}) = do
-    throws <- mapM resolveThrows streamThrows
-    pure $ FunTypeStreamReturn $ Stream
-      { streamThrows = throws
+resolveFunctionType
+  structName
+  ann
+  (FunTypeResponseAndStreamReturn ResponseAndStreamReturn{..}) = do
+    stream <- resolveStream rsStream
+    pure $ FunTypeResponseAndStreamReturn $ ResponseAndStreamReturn
+      { rsStream = stream
       , ..
       }
-  where
-    resolveThrows Throws{..} = do
-      fields <- resolveFields structName ann throwsFields
-      pure $ Throws
-        { throwsFields = fields
-        , ..
-        }
+    where
+      resolveStream Stream{..} = do
+        throws <- mapM resolveThrows streamThrows
+        pure $ Stream
+          { streamThrows = throws
+          , ..
+          }
+      resolveThrows Throws{..} = do
+        fields <- resolveFields structName ann throwsFields
+        pure $ Throws
+          { throwsFields = fields
+          , ..
+          }
 
 -- Resolve Structured Annotations ----------------------------------------------
 

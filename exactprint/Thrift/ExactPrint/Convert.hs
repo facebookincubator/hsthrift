@@ -445,8 +445,22 @@ functionOffsets origin fun@Function{..} =
         first (FunType . This) $ computeTypeOffsets onewayEnd t
       FunTypeVoid loc ->
         (FunTypeVoid $ getOffsets onewayEnd loc, lLocation loc)
-      FunTypeStreamReturn stream ->
-        first FunTypeStreamReturn $ streamOffsets onewayEnd stream
+      FunTypeResponseAndStreamReturn ResponseAndStreamReturn{..} ->
+        (FunTypeResponseAndStreamReturn $ ResponseAndStreamReturn
+         { rsStream = stream
+         , rsComma = comma
+         , rsReturn = ret
+         },
+         streamEnd)
+        where
+          (ret, retEnd) = case rsReturn of
+            Just r -> first Just $ computeTypeOffsets onewayEnd r
+            Nothing -> (Nothing, onewayEnd)
+          (comma, commaEnd) = case rsComma of
+            Just c -> (Just $ getOffsets retEnd c, lLocation c)
+            Nothing -> (Nothing, retEnd)
+          (stream, streamEnd) =
+            streamOffsets commaEnd rsStream
     (args, argsEnd) = foldO computeFieldOffsets (lLocation fnlOpenParen) funArgs
     (throws, exs, throwsEnd) = case funThrows fun of
       Just w -> (Just throwsLoc, throwsFields, throwsEnd')

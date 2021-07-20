@@ -239,7 +239,11 @@ ppFunction fun@Function{funLoc=FunLoc{..},..} = mconcat $
   , case funType of
      FunType (This ty) -> ppType ty
      FunTypeVoid loc -> addHeader loc <> "void"
-     FunTypeStreamReturn stream -> ppStream stream
+     FunTypeResponseAndStreamReturn ResponseAndStreamReturn{..} -> mconcat
+        [ maybe mempty ppType rsReturn
+        , maybe mempty (\comma -> addHeader comma <> ",") rsComma
+        , ppStream rsStream
+        ]
   , addHeader fnlName, fromText funName
   , addHeader fnlOpenParen, "("
   ] ++

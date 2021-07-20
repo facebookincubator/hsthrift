@@ -29,7 +29,8 @@ module Thrift.Compiler.Types
   , Union(..), UnionAlt(..), PossiblyEmpty(..), EmptyName
   , Enum(..), EnumValue(..), EnumValLoc(..)
   , Service(..), Super(..), Function(..), FunLoc(..)
-  , funThrows, ThrowsLoc(..), Throws(..), FunctionType(..), Stream(..)
+  , funThrows, ThrowsLoc(..), Throws(..), FunctionType(..)
+  , Stream(..), ResponseAndStreamReturn(..), rsTypeLoc, rsLoc
   , Type, AnnotatedType(..), TType(..), SomeAnnTy(..)
   , TypeLoc(..), GetArity, getTypeLoc
   , SCHEMA(..), Schema, USchema
@@ -595,7 +596,22 @@ data Function (s :: Status) (l :: * {- Language -}) a = Function
 data FunctionType s l a
   = FunType (Some (AnnotatedType a))
   | FunTypeVoid (Located a)
-  | FunTypeStreamReturn (Stream s l a)
+  | FunTypeResponseAndStreamReturn (ResponseAndStreamReturn s l a)
+
+data ResponseAndStreamReturn s l a = forall v. ResponseAndStreamReturn
+  { rsReturn :: Maybe (AnnotatedType a v)
+  , rsComma :: Maybe (Located a)
+  , rsStream :: Stream s l a
+  }
+
+rsTypeLoc :: ResponseAndStreamReturn s l a -> SomeTypeLoc a
+rsTypeLoc ResponseAndStreamReturn{rsStream = Stream{..}, ..} = case rsReturn of
+  Just AnnotatedType{..} -> ThisTypeLoc atLoc
+  Nothing -> ThisTypeLoc streamLoc
+
+rsLoc :: ResponseAndStreamReturn s l a -> a
+rsLoc = loc . rsTypeLoc
+  where loc (ThisTypeLoc l) = getTypeLoc l
 
 data Stream s l a = forall v. Stream
   { streamType :: AnnotatedType a v
@@ -677,6 +693,9 @@ getTypeLoc :: TypeLoc n a -> a
 getTypeLoc Arity0Loc{..} = lLocation a0Ty
 getTypeLoc Arity1Loc{..} = lLocation a1Ty
 getTypeLoc Arity2Loc{..} = lLocation a2Ty
+
+data SomeTypeLoc a =
+  forall n. ThisTypeLoc (TypeLoc n a)
 
 data SomeAnnTy s l =
   forall t. ThisAnnTy (TType s l Loc t) (TypeLoc (GetArity t) Loc)

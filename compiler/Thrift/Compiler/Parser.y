@@ -531,14 +531,25 @@ Throws
 FunType
   : AnnotatedType { FunType $1 }
   | void { FunTypeVoid $ getLoc $1 }
-  | ResponseAndStreamReturnType { FunTypeStreamReturn $1 }
+  | ResponseAndStreamReturnType { FunTypeResponseAndStreamReturn $1 }
 
 ResponseAndStreamReturnType
   : stream '<' AnnotatedType Throws '>'
     { case $3 of
-        This t -> (Stream t $4 (annTy1 $1 $2 $5))
+        This t -> ResponseAndStreamReturn
+          { rsReturn = Nothing
+          , rsComma = Nothing
+          , rsStream = (Stream t $4 (annTy1 $1 $2 $5))
+          }
     }
-
+  | AnnotatedType ',' stream '<' AnnotatedType Throws '>'
+    { case ($1, $5) of
+        (This tRet, This tStream) -> ResponseAndStreamReturn
+          { rsReturn = Just tRet
+          , rsComma = Just $ getLoc $2
+          , rsStream = (Stream tStream $6 (annTy1 $3 $4 $7))
+          }
+    }
 
 Throw :: { Parsed (Field 'ThrowsField) }
 Throw : StructuredAnnotations intLit ':' AnnotatedType Symbol MaybeConst Annotations Separator
