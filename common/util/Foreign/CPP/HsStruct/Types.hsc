@@ -14,8 +14,10 @@ module Foreign.CPP.HsStruct.Types
   , HsOption(..)
   -- * HsEither
   , HsEither(..)
+  , peekHsEitherWith
   -- * HsPair
   , HsPair(..)
+  , peekHsPairWith
   -- * HsString
   , HsString(..)
   , HsByteString(..)
@@ -255,17 +257,24 @@ instance Addressable (HsEither a b) where
   sizeOf = sizeOf1
   alignment = alignment1
 
-instance (Addressable a, Storable a) => StorableContainer (HsEither a) where
+instance Storable a => StorableContainer (HsEither a) where
   pokeWith = notPokeable "HsEither"
-  peekWith f p = do
-    isLeft <- #{peek DummyHsEither, isLeft} p :: IO CChar
-    if toBool isLeft
-    then do
-      ptr <- #{peek DummyHsEither, left} p
-      HsEither . Left <$> peek ptr
-    else do
-      ptr <- #{peek DummyHsEither, right} p
-      HsEither . Right <$> f ptr
+  peekWith = peekHsEitherWith peek
+
+peekHsEitherWith
+  :: (Ptr a -> IO x)
+  -> (Ptr b -> IO y)
+  -> Ptr (HsEither a b)
+  -> IO (HsEither x y)
+peekHsEitherWith peekLeft peekRight p = do
+  isLeft <- #{peek DummyHsEither, isLeft} p :: IO CChar
+  if toBool isLeft
+  then do
+    ptr <- #{peek DummyHsEither, left} p
+    HsEither . Left <$> peekLeft ptr
+  else do
+    ptr <- #{peek DummyHsEither, right} p
+    HsEither . Right <$> peekRight ptr
 
 instance (Constructible a, Constructible b)
   => Constructible (HsEither a b) where
@@ -304,14 +313,21 @@ instance Addressable (HsPair a b) where
   sizeOf = sizeOf1
   alignment = alignment1
 
-instance (Addressable a, Storable a) => StorableContainer (HsPair a) where
+instance Storable a => StorableContainer (HsPair a) where
   pokeWith = notPokeable "HsPair"
-  peekWith f p = do
-    ptr_a <- #{peek DummyHsPair, fst_} p
-    fs <- peek ptr_a
-    ptr_b <- #{peek DummyHsPair, snd_} p
-    sn <- f ptr_b
-    return $ HsPair (fs, sn)
+  peekWith = peekHsPairWith peek
+
+peekHsPairWith
+  :: (Ptr a -> IO x)
+  -> (Ptr b -> IO y)
+  -> Ptr (HsPair a b)
+  -> IO (HsPair x y)
+peekHsPairWith peekFirst peekSecond p = do
+  ptr_a <- #{peek DummyHsPair, fst_} p
+  fs <- peekFirst ptr_a
+  ptr_b <- #{peek DummyHsPair, snd_} p
+  sn <- peekSecond ptr_b
+  return $ HsPair (fs, sn)
 
 -- HsByteString ---------------------------------------------------------------
 
