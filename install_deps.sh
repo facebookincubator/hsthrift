@@ -59,7 +59,8 @@ build() {
     cd "$BUILD_SUBDIR"
     # cmake -DCMAKE_INSTALL_RPATH_USE_LINK_PATH=TRUE -DBUILD_SHARED_LIBS=ON -DBUILD_EXAMPLES=off -DBUILD_TESTS=off ..
     cmake -DBUILD_SHARED_LIBS=ON -DBUILD_EXAMPLES=off -DBUILD_TESTS=off ../"$subdir"
-    make -j"$THREADS" && $SUDO make install
+    make -j"$THREADS"
+    $SUDO make install
     cd ../..
     [ "$NUKE" = "NO" ] || rm -rf "$dir"
 }
