@@ -18,10 +18,13 @@ CLEAN=NO
 THREADS=2
 BUILD_SUBDIR=_build
 
-# folly requires that the same cxx flags are used when building folly
-# and when compiling code that uses it. In Glean we use some AVX
-# intrinsics, so we have to use the same flags here.
-export CXXFLAGS=-mavx2
+# folly requires certain architecture flags to be used consistently
+# when compiling the library and the application code. Getting this
+# wrong results in a link error (fortunately), see
+#   folly/container/detail/F14IntrinsicsAvailability.h
+# In Glean we use some AVX2 intrinsics, so we have to pick a compatible
+# architecture here for compiling folly.
+export CXXFLAGS=-march=corei7
 
 while [ "$#" -gt 0 ]; do
     case "$1" in
