@@ -246,6 +246,7 @@ common test-common
                  QuickCheck,
                  regex-base,
                  regex-pcre,
+                 scientific,
                  template-haskell,
                  temporary,
                  text,
