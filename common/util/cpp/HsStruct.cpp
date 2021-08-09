@@ -57,6 +57,47 @@ HsJSON::HsJSON(const folly::dynamic& value) {
   }
 }
 
+folly::dynamic HsJSON::toDynamic() && {
+  switch (type) {
+    case Type::Null:
+      return folly::dynamic();
+    case Type::Bool:
+      return folly::dynamic(static_cast<bool>(integral));
+    case Type::Integral:
+      return folly::dynamic(integral);
+    case Type::Real:
+      return folly::dynamic(real);
+    case Type::String:
+      return folly::dynamic(std::move(string).toStdString());
+    case Type::Array: {
+      auto res = folly::dynamic::array();
+      auto end = std::make_move_iterator(array.end());
+      for (auto itr = std::make_move_iterator(array.begin()); itr != end;
+           itr++) {
+        res.push_back(std::move(*itr).toDynamic());
+      }
+      return res;
+    }
+    case Type::Object:
+      folly::dynamic res = folly::dynamic::object;
+      auto items = std::move(object).take_items();
+
+      // Manual version of zipping 2 iterators together
+      auto key_itr = std::make_move_iterator(items.first.begin());
+      auto key_end = std::make_move_iterator(items.first.end());
+      auto val_itr = std::make_move_iterator(items.second.begin());
+      auto val_end = std::make_move_iterator(items.second.end());
+
+      while (key_itr != key_end && val_itr != val_end) {
+        res.insert(
+            std::move(*key_itr).toStdString(), std::move(*val_itr).toDynamic());
+        key_itr++;
+        val_itr++;
+      }
+      return res;
+  }
+}
+
 void HsJSON::construct(HsJSON&& other) {
   DCHECK(this != &other);
   type = other.type;
@@ -90,6 +131,45 @@ void HsJSON::destruct() {
   } else if (type == Type::Object) {
     object.~HsMap();
   }
+}
+
+void ctorHsJSONNull(HsJSON* p) noexcept {
+  new (p) HsJSON();
+}
+
+void ctorHsJSONBool(HsJSON* p, bool b) noexcept {
+  new (p) HsJSON(b);
+}
+
+void ctorHsJSONInt(HsJSON* p, int64_t i) noexcept {
+  new (p) HsJSON(i);
+}
+
+void ctorHsJSONDouble(HsJSON* p, double d) noexcept {
+  new (p) HsJSON(d);
+}
+
+void ctorHsJSONString(HsJSON* p, HsString* txt) noexcept {
+  new (p) HsJSON(std::move(*txt));
+}
+
+void ctorHsJSONArray(HsJSON* p, HsArray<HsJSON>* a) noexcept {
+  new (p) HsJSON(std::move(*a));
+}
+
+void ctorHsJSONObject(HsJSON* p, HsObject<HsJSON>* o) noexcept {
+  new (p) HsJSON(std::move(*o));
+}
+
+/*
+ * HsObject
+ */
+extern "C" void common_hs_ctorHsObjectJSON(
+    HsObject<HsJSON>* p,
+    HsArray<HsString>* keys,
+    HsArray<HsJSON>* vals) {
+  new (p) HsObject<HsJSON>(
+      std::move(*keys).toStdVector(), std::move(*vals).toStdVector());
 }
 
 /*
@@ -154,6 +234,7 @@ HS_DEFINE_MARSHALLABLE(HsArrayUInt64, HsArray<uint64_t>);
 HS_DEFINE_MARSHALLABLE(HsArrayFloat, HsArray<float>);
 HS_DEFINE_MARSHALLABLE(HsArrayDouble, HsArray<double>);
 HS_DEFINE_MARSHALLABLE(HsArrayString, HsArray<HsString>);
+HS_DEFINE_MARSHALLABLE(HsArrayJSON, HsArray<HsJSON>);
 
 HS_DEFINE_MARSHALLABLE(HsMapIntInt, HsMap<int64_t, int64_t>);
 HS_DEFINE_MARSHALLABLE(HsMapIntDouble, HsMap<int64_t, double>);
@@ -162,6 +243,7 @@ HS_DEFINE_MARSHALLABLE(HsMapStringInt, HsMap<HsString, int64_t>);
 HS_DEFINE_MARSHALLABLE(HsMapStringDouble, HsMap<HsString, double>);
 HS_DEFINE_MARSHALLABLE(HsMapStringString, HsMap<HsString, HsString>);
 
+HS_DEFINE_MARSHALLABLE(HsObjectJSON, HsObject<HsJSON>);
 HS_DEFINE_MARSHALLABLE(HsJSON, HsJSON);
 
 HS_OPTION_CPP(Bool, bool);
@@ -173,6 +255,7 @@ HS_OPTION_CPP(Float, float);
 HS_OPTION_CPP(Double, double);
 HS_OPTION_CPP(String, HsString);
 HS_OPTION_CPP(StringView, HsStringPiece);
+HS_OPTION_CPP(HsJSON, HsJSON);
 
 // No bool as std::vector<bool> doesn't define Container
 HS_DEFINE_ARRAY_CONSTRUCTIBLE(Int32, int32_t);
@@ -183,3 +266,4 @@ HS_DEFINE_ARRAY_CONSTRUCTIBLE(Float, float);
 HS_DEFINE_ARRAY_CONSTRUCTIBLE(Double, double);
 HS_DEFINE_ARRAY_CONSTRUCTIBLE(String, HsString);
 HS_DEFINE_ARRAY_CONSTRUCTIBLE(StringView, HsStringPiece);
+HS_DEFINE_ARRAY_CONSTRUCTIBLE(HsJSON, HsJSON);

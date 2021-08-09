@@ -462,6 +462,7 @@ HS_STRUCT HsArray {
   }
 
  public:
+  using Iterator = typename std::vector<T>::iterator;
   using ConstIterator = typename std::vector<T>::const_iterator;
 
   void reserve(size_t n) {
@@ -472,6 +473,14 @@ HS_STRUCT HsArray {
   void clear() {
     v_.clear();
     update();
+  }
+
+  Iterator begin() {
+    return v_.begin();
+  }
+
+  Iterator end() {
+    return v_.end();
   }
 
   ConstIterator begin() const {
@@ -630,6 +639,12 @@ HS_STRUCT HsMap {
     k_.clear();
     v_.clear();
     update();
+  }
+
+  std::pair<std::vector<Key>, std::vector<Value>> take_items()&& {
+    auto res = std::make_pair(std::move(k_), std::move(v_));
+    update();
+    return res;
   }
 
   template <typename Arg, typename... Args>
@@ -816,6 +831,8 @@ class HsJSON {
     DCHECK(type == Type::Object);
     return object;
   }
+
+  folly::dynamic toDynamic() &&;
 };
 
 HS_PEEKABLE(HsJSON);
@@ -829,3 +846,4 @@ HS_OPTION_H(Float, float);
 HS_OPTION_H(Double, double);
 HS_OPTION_H(String, HsString);
 HS_OPTION_H(StringView, HsStringPiece);
+HS_OPTION_H(HsJSON, HsJSON);

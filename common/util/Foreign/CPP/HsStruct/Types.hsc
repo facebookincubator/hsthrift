@@ -45,8 +45,10 @@ import qualified Data.Text.Encoding as Text (encodeUtf8)
 import Data.HashMap.Strict (HashMap)
 import Data.IntMap.Strict (IntMap)
 import Data.Map.Strict (Map)
-import Data.Scientific (fromFloatDigits)
+import Data.Scientific
+  (fromFloatDigits, floatingOrInteger, toBoundedInteger, toRealFloat)
 import Data.Vector (Vector, generateM)
+import qualified Data.Vector as Vector
 import Foreign hiding (void)
 import Foreign.C
 import qualified Data.HashMap.Strict as HashMap
@@ -486,6 +488,22 @@ mapSizeOf, mapAlignment :: a -> Int
 mapSizeOf _ = #{size DummyHsObject}
 mapAlignment _ = #{alignment DummyHsObject}
 
+foreign import ccall unsafe "common_hs_ctorHsObjectJSON"
+  c_constructHsObjectJSON
+    :: Ptr (HsObject HsJSON)
+    -> Ptr (HsArray HsText)
+    -> Ptr (HsArray HsJSON)
+    -> IO ()
+
+instance Constructible (HsObject HsJSON) where
+  newValue (HsObject _o) = error "HsObject HsJSON cannot be made on heap"
+  constructValue ptr (HsObject m) =
+    withCxxObject (HsArray (Vector.fromList (map HsText keys))) $ \keys_p ->
+    withCxxObject (HsArray (Vector.fromList vals)) $ \vals_p ->
+      c_constructHsObjectJSON ptr keys_p vals_p
+    where
+      (keys, vals) = unzip $ HashMap.toList m
+
 {-# INLINE peekMapWith #-}
 peekMapWith
   :: (Addressable a, Addressable b)
@@ -541,6 +559,72 @@ instance Storable HsJSON where
     where
     peekIntegral = #{peek HsJSON, integral} p :: IO CLong
 
+$(mangle
+  "void ctorHsJSONNull(HsJSON*)"
+  [d|
+    foreign import ccall unsafe
+      c_constructHsJSONNull :: Ptr HsJSON -> IO ()
+  |])
+
+$(mangle
+  "void ctorHsJSONBool(HsJSON*, bool)"
+  [d|
+    foreign import ccall unsafe
+      c_constructHsJSONBool :: Ptr HsJSON -> CBool -> IO ()
+  |])
+
+$(mangle
+  "void ctorHsJSONInt(HsJSON*, int64_t)"
+  [d|
+    foreign import ccall unsafe
+      c_constructHsJSONInt :: Ptr HsJSON -> CLong -> IO ()
+  |])
+
+$(mangle
+  "void ctorHsJSONDouble(HsJSON*, double)"
+  [d|
+    foreign import ccall unsafe
+      c_constructHsJSONDouble :: Ptr HsJSON -> CDouble -> IO ()
+  |])
+
+$(mangle
+  "void ctorHsJSONString(HsJSON*, HsString*)"
+  [d|
+    foreign import ccall unsafe
+      c_constructHsJSONString :: Ptr HsJSON -> Ptr HsText -> IO ()
+  |])
+
+$(mangle
+  "void ctorHsJSONArray(HsJSON*, HsArray<HsJSON>*)"
+  [d|
+    foreign import ccall unsafe
+      c_constructHsJSONArray :: Ptr HsJSON -> Ptr (HsArray HsJSON) -> IO ()
+  |])
+
+$(mangle
+  "void ctorHsJSONObject(HsJSON*, HsMap<HsString, HsJSON>*)"
+  [d|
+    foreign import ccall unsafe
+      c_constructHsJSONObject :: Ptr HsJSON -> Ptr (HsObject HsJSON) -> IO ()
+  |])
+
+instance Constructible HsJSON where
+  newValue (HsJSON _val) = error $ "HsStruct.HsJSON cannot be built on heap"
+  constructValue ptr (HsJSON val) =
+    case val of
+      Null -> c_constructHsJSONNull ptr
+      Bool b -> c_constructHsJSONBool ptr (fromBool b)
+      Number n -> case (floatingOrInteger n :: Either CDouble CLong) of
+        Left r -> c_constructHsJSONDouble ptr r
+        Right _ -> case toBoundedInteger n of
+          Just i -> c_constructHsJSONInt ptr i
+          Nothing -> c_constructHsJSONDouble ptr $ toRealFloat n
+      String txt -> withCxxObject (HsText txt) $ c_constructHsJSONString ptr
+      Array v -> withCxxObject (HsArray (Vector.map HsJSON v)) $
+        c_constructHsJSONArray ptr
+      Object o -> withCxxObject (HsObject (HsJSON <$> o)) $
+        c_constructHsJSONObject ptr
+
 $(deriveMarshallableUnsafe "HsMaybeInt" [t| HsMaybe Int |])
 $(deriveMarshallableUnsafe "HsMaybeDouble" [t| HsMaybe Double |])
 $(deriveMarshallableUnsafe "HsMaybeString" [t| HsMaybe HsByteString |])
@@ -573,6 +657,7 @@ $(deriveMarshallableUnsafe "HsArrayFloat" [t| HsList Float |])
 $(deriveMarshallableUnsafe "HsArrayDouble" [t| HsList Double |])
 $(deriveMarshallableUnsafe "HsArrayString" [t| HsList HsByteString |])
 $(deriveMarshallableUnsafe "HsArrayString" [t| HsList HsText |])
+$(deriveMarshallableUnsafe "HsArrayJSON" [t| HsList HsJSON |])
 $(deriveMarshallableUnsafe "HsArrayInt32" [t| HsArray CInt |])
 $(deriveMarshallableUnsafe "HsArrayInt32" [t| HsArray Int32 |])
 $(deriveMarshallableUnsafe "HsArrayInt64" [t| HsArray Int |])
@@ -583,6 +668,7 @@ $(deriveMarshallableUnsafe "HsArrayFloat" [t| HsArray Float |])
 $(deriveMarshallableUnsafe "HsArrayDouble" [t| HsArray Double |])
 $(deriveMarshallableUnsafe "HsArrayString" [t| HsArray HsByteString |])
 $(deriveMarshallableUnsafe "HsArrayString" [t| HsArray HsText |])
+$(deriveMarshallableUnsafe "HsArrayJSON" [t| HsArray HsJSON |])
 
 $(deriveMarshallableUnsafe "HsMapIntInt" [t| HsIntMap Int |])
 $(deriveMarshallableUnsafe "HsMapIntDouble" [t| HsIntMap Double |])
@@ -593,6 +679,7 @@ $(deriveMarshallableUnsafe "HsMapStringDouble" [t| HsObject Double |])
 $(deriveMarshallableUnsafe "HsMapStringString" [t| HsObject HsByteString |])
 $(deriveMarshallableUnsafe "HsMapStringString" [t| HsObject HsText |])
 
+$(deriveMarshallableUnsafe "HsObjectJSON" [t| HsObject HsJSON |])
 $(deriveMarshallableUnsafe "HsJSON" [t| HsJSON |])
 
 $(#{derive_hs_option_unsafe Bool} [t| Bool |])
@@ -607,6 +694,7 @@ $(#{derive_hs_option_unsafe Double} [t| Double |])
 $(#{derive_hs_option_unsafe String} [t| HsText |])
 $(#{derive_hs_option_unsafe String} [t| HsByteString |])
 $(#{derive_hs_option_unsafe StringView} [t| HsStringPiece |])
+$(#{derive_hs_option_unsafe HsJSON} [t| HsJSON |])
 
 -- no bool since std::vector<bool> doesn't implement Container in cpp
 $(deriveHsArrayUnsafe "Int32" [t| CInt |])
@@ -620,3 +708,4 @@ $(deriveHsArrayUnsafe "Double" [t| Double |])
 $(deriveHsArrayUnsafe "String" [t| HsText |])
 $(deriveHsArrayUnsafe "String" [t| HsByteString |])
 $(deriveHsArrayUnsafe "StringView" [t| HsStringPiece |])
+$(deriveHsArrayUnsafe "HsJSON" [t| HsJSON |])

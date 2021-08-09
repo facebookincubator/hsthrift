@@ -7,10 +7,12 @@ import TestRunner
 
 
 import Control.Exception
+import qualified Data.Aeson as Aeson
 import Data.ByteString (ByteString, useAsCStringLen)
 import Data.ByteString.Unsafe (unsafeUseAsCStringLen)
 import Data.HashMap.Strict (HashMap)
 import Data.IntMap.Strict (IntMap)
+import Data.Scientific (Scientific, fromFloatDigits)
 import Data.Text (Text)
 import qualified Data.Text.Encoding as Text (encodeUtf8)
 import qualified Data.HashMap.Strict as HashMap
@@ -212,6 +214,24 @@ foreign import ccall unsafe "createNested"
 foreign import ccall unsafe "destroyNested"
   destroyNested :: Ptr HsNested -> IO ()
 
+jsonRoundTrip :: Test
+jsonRoundTrip = TestLabel "json" $ TestCase $ do
+  roundTrip Aeson.Null
+  roundTrip (Aeson.Bool True)
+  roundTrip (Aeson.Bool False)
+  roundTrip (Aeson.Number (read "42" :: Scientific))
+  roundTrip (Aeson.Number (read "-42" :: Scientific))
+  roundTrip (Aeson.Number (fromFloatDigits (3.14159 :: Double)))
+  roundTrip (Aeson.String "Data.Aeson")
+  roundTrip (Aeson.Array $ Vector.fromList
+    [Aeson.Null, Aeson.Bool True, Aeson.String "VectorVector"])
+  roundTrip (Aeson.Object $ HashMap.fromList
+    [("foo", Aeson.Bool True), ("bar", Aeson.Bool False)])
+  where
+    roundTrip j = withCxxObject (HsJSON j) $ \p -> do
+      HsJSON v <- peek p
+      assertEqual "json round trip" j v
+
 main :: IO ()
 main = testRunner $ TestList
   [ pokeHsTextTest
@@ -226,4 +246,5 @@ main = testRunner $ TestList
   , optionTest
   , arrayCxxTest
   , stringPieceCxxTest
+  , jsonRoundTrip
   ]
