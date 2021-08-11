@@ -7,8 +7,8 @@ module Thrift.Monad
   , ThriftEnv(..)
   , RpcOptions(..), Priority(..)
   , defaultRpcOptions, setRpcPriority, getRpcPriority
-  , runThrift, runThriftWith, withOptions, catchThrift
-  , bracketThrift, bracketThrift_, tryThrift
+  , runThrift, runThriftWith, withOptions, withModifiedOptions
+  , catchThrift, bracketThrift, bracketThrift_, tryThrift
   , Counter, newCounter
   , type (<:), Super
   ) where
@@ -60,6 +60,11 @@ runThriftWith action channel opts =
 
 withOptions :: RpcOptions -> ThriftM p c s a -> ThriftM p c s a
 withOptions opts = withReaderT (\env -> env { thriftRpcOpts = opts })
+
+withModifiedOptions
+  :: (RpcOptions -> RpcOptions) -> ThriftM p c s a -> ThriftM p c s a
+withModifiedOptions f = withReaderT $
+  \env@ThriftEnv{..} -> env { thriftRpcOpts = f thriftRpcOpts }
 
 catchThrift
   :: Exception e => ThriftM p c s a -> (e -> ThriftM p c s a) -> ThriftM p c s a
