@@ -71,14 +71,15 @@ build() {
 clone folly https://github.com/facebook/folly.git
 # PROJ_TAG=$(cd folly && git tag | sort -r | head -1)
 PROJ_TAG=origin/master
-echo "Using tag: $PROJ_TAG"
+PROJ_TAG_ALT=origin/main
+echo "Using tags: $PROJ_TAG and $PROJ_TAG_ALT"
 (cd folly && git checkout "$PROJ_TAG")
 build folly .
 
 clone fizz https://github.com/facebookincubator/fizz.git "$PROJ_TAG"
 build fizz fizz
 
-clone wangle https://github.com/facebook/wangle.git "$PROJ_TAG"
+clone wangle https://github.com/facebook/wangle.git "$PROJ_TAG_ALT"
 build wangle wangle
 
 clone fbthrift https://github.com/facebook/fbthrift.git "$PROJ_TAG"
