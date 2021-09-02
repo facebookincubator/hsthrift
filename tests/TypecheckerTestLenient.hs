@@ -150,6 +150,7 @@ enumToIntConst = unlines
   , "}"
   , ""
   , "const i32 enumToInt = A"
+  , "const list<i32> qualifiedEnumToIntList = [Bar.A, Bar.B, Bar.C]"
   , "const list<i16> enumToIntList = [A, B, C]"
   , "const set<byte> enumToIntSet = [A, B, C]"
   , "const map<i64, bool> enumToIntMapKey = { A : true, B : false, C : true }"

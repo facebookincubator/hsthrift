@@ -99,8 +99,12 @@ lookupEnum = envLookup enumMap UnknownType
 -- | Allow enum values as default values for int fields.
 -- This is a type violation.  This is added to allow parsing these old files
 -- when @--lenient@ mode is active (see 'Options.optsLenient').
-lookupEnumInt :: ThriftName -> Loc -> TC l (Maybe Int32)
-lookupEnumInt = envLookup enumInt UnknownConst
+lookupEnumInt :: ThriftName -> Loc -> TC l Int32
+lookupEnumInt name loc = do
+  valueOrCollision <- envLookup enumInt UnknownEnumValue name loc
+  case valueOrCollision of
+    Just value -> pure value
+    Nothing -> typeError loc $ MultipleEnumValues name
 
 -- | Loc parameter of usage of ThriftName is for error messages.
 -- Loc in result is where ThriftName was defined.
@@ -159,6 +163,8 @@ data ErrorMsg l
   | UnknownType ThriftName
   | UnknownConst ThriftName
   | UnknownService ThriftName
+  | UnknownEnumValue ThriftName
+  | MultipleEnumValues ThriftName
   | forall t. LiteralMismatch (Type l t) (UntypedConst Loc)
   | forall u v. IdentMismatch (Type l u) (Type l v) ThriftName
   | UnknownField Text

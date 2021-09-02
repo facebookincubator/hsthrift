@@ -792,7 +792,7 @@ type ThriftName = Name_ 'Unresolved
 data Name_ (s :: Status)
   = UName Text
   | QName Text Text
-  deriving (Eq)
+  deriving (Eq,Show)
 
 localName :: Name_ s -> Text
 localName (UName n) = n

@@ -1088,8 +1088,17 @@ typecheckConst (TUnion n@Name{..} _loc) (UntypedConst uloc MapConst{..}) = do
     This schema -> Literal . This <$> typecheckUnion schema fname val
 
 -- Identifiers (typecheckIdentNum is not first parameter to the orT)
-typecheckConst ty (UntypedConst Located{..} (IdConst ident)) =
-  typecheckIdent ty lLocation ident `orT` typecheckIdentNum ty lLocation ident
+-- These identified are permitted to be enums in lenient mode
+typecheckConst ty (UntypedConst Located{..} (IdConst ident)) = do
+  Env{..} <- ask
+  typecheckIdent ty lLocation ident
+    `orT` typecheckIdentNum ty lLocation ident
+    `orT` case ty of
+      I8 | optsLenient options -> typecheckEnumAsInt lLocation ident
+      I16 | optsLenient options -> typecheckEnumAsInt lLocation ident
+      I32 | optsLenient options -> typecheckEnumAsInt lLocation ident
+      I64 | optsLenient options -> typecheckEnumAsInt lLocation ident
+      _ -> emptyT
 
 -- Special Types
 typecheckConst (TSpecial ty) val = typecheckSpecialConst ty val
@@ -1097,6 +1106,28 @@ typecheckConst (TSpecial ty) val = typecheckSpecialConst ty val
 -- Type Error
 typecheckConst ty val@(UntypedConst Located{..} _) =
   typeError lLocation $ LiteralMismatch ty val
+
+-- Lenient mode only. Implicit cast from a qualified enum to an int
+typecheckEnumAsInt
+  :: Integral t
+  => Loc
+  -> Text
+  -> TC l (TypedConst l t)
+typecheckEnumAsInt loc ident = do
+  name <- mkThriftName ident
+  let
+    enumValue = case name of
+      UName e -> UName <$> extractEnumValue e
+      QName q e -> QName q <$> extractEnumValue e
+    extractEnumValue text = if Text.null v
+      then Nothing
+      else Just $ Text.drop 1 v
+      where (_nm, v) = Text.breakOn "." text
+  case enumValue of
+    Nothing -> emptyT
+    Just k -> do
+      i <- lookupEnumInt k loc
+      literal $ fromIntegral i
 
 typecheckEnum
   :: Loc
@@ -1147,15 +1178,11 @@ typecheckEnumInt
    -> Text
    -> TC l (TypedConst l t)
 typecheckEnumInt loc ident = do
-  e@Env{..} <- ask
+  Env{..} <- ask
   if not (optsLenient options) then emptyT else do
     name <- mkThriftName ident
-    case runReaderT (lookupEnumInt name loc) e of
-      Right (Just i) -> literal $ fromIntegral i
-      Right Nothing -> typeError loc $ UnknownField
-        ("typecheckEnumInt ambiguous value for enum " <> ident)
-      Left{} -> typeError loc $ UnknownField
-        ("typecheckEnumInt has no value for enum " <> ident)
+    i <- lookupEnumInt name loc
+    literal $ fromIntegral i
 
 -- | There a weird casting from enum to int that happens in libadmarket.thrift
 --
