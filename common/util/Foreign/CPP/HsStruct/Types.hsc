@@ -685,6 +685,7 @@ $(deriveMarshallableUnsafe "HsObjectJSON" [t| HsObject HsJSON |])
 $(deriveMarshallableUnsafe "HsJSON" [t| HsJSON |])
 
 $(#{derive_hs_option_unsafe Bool} [t| Bool |])
+$(#{derive_hs_option_unsafe Bool} [t| CBool |])
 $(#{derive_hs_option_unsafe Int32} [t| CInt |])
 $(#{derive_hs_option_unsafe Int32} [t| Int32 |])
 $(#{derive_hs_option_unsafe Int64} [t| CLong |])
