@@ -111,7 +111,7 @@ data Pet
 
 ### Typedefs
 
-Thrift typedefs are just type synonyms in Haskell. It's also possible to generate a newtype instead by using an [[Dex/working-with-thrift-in-haskell/annotations | annotation]].
+Thrift typedefs are just type synonyms in Haskell. It's also possible to generate a newtype instead by using an [annotation](annotations.md).
 
 **Thrift:**
 
