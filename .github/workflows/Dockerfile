@@ -32,25 +32,15 @@ RUN apt-get install -y \
     curl \
     libpcre3-dev \
     libmysqlclient-dev \
-    libfftw3-dev
+    libfftw3-dev \
+    libfmt-dev \
+    libgmp-dev \
+    libtinfo-dev
 
-RUN git clone https://github.com/fmtlib/fmt.git && cd fmt && git checkout 6.1.1 && mkdir _build && cd _build && cmake -DBUILD_SHARED_LIBS=ON .. && make -j2 && make install
-RUN rm -rf fmt/
+# install ghcup
+ARG GHCUP_VERSION=0.1.16.2
+RUN curl --proto '=https' --tlsv1.2 -sSf https://downloads.haskell.org/~ghcup/$GHCUP_VERSION/x86_64-linux-ghcup-$GHCUP_VERSION > /usr/bin/ghcup && \
+    chmod +x /usr/bin/ghcup
 
-# install vanilla ghc/cabal
-RUN apt-get update
-RUN apt-get install -y software-properties-common
-RUN apt-add-repository ppa:hvr/ghc
-RUN apt-get update
-RUN apt-get install -y ghc-8.4.4 cabal-install-3.4
-ENV PATH=/opt/ghc/bin:$PATH
-RUN cabal update
-
-# build a post-3.4 cabal HEAD which includes support for the new
-# 'hsc2hs-options' field.
-RUN git clone https://github.com/haskell/cabal.git && cd cabal && git checkout f5f8d933db229d30e6fc558f5335f0a4e85d7d44
-RUN cd cabal && sed -i 's/3.5.0.0/3.6.0.0/' */*.cabal
-RUN cd cabal && cabal install cabal-install/ --allow-newer=Cabal-QuickCheck:Cabal --allow-newer=Cabal-described:Cabal --allow-newer=Cabal-tree-diff:Cabal --allow-newer=cabal-install:Cabal --allow-newer=cabal-install-solver:Cabal
-RUN rm -rf cabal/
-ENV PATH=/root/.cabal/bin:$PATH
-ENV LD_LIBRARY_PATH=/usr/local/lib:$LD_LIBRARY_PATH
+ENV PATH=/root/.ghcup/bin:$PATH
+ENV LD_LIBRARY_PATH=/usr/local/lib:/usr/lib/x86_64-linux-gnu:$LD_LIBRARY_PATH
