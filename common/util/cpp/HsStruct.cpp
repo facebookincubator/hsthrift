@@ -78,7 +78,7 @@ folly::dynamic HsJSON::toDynamic() && {
       }
       return res;
     }
-    case Type::Object:
+    case Type::Object: {
       folly::dynamic res = folly::dynamic::object;
       auto items = std::move(object).take_items();
 
@@ -95,7 +95,9 @@ folly::dynamic HsJSON::toDynamic() && {
         val_itr++;
       }
       return res;
+    }
   }
+  folly::assume_unreachable();
 }
 
 void HsJSON::construct(HsJSON&& other) {
