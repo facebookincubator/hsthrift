@@ -10,35 +10,19 @@ jobs:
         ghc: [8.4.4, 8.6.5, 8.8.4, 8.10.2]
     runs-on: ubuntu-latest
     container:
-      image: ghcr.io/facebookincubator/hsthrift/ci-base:latest
+      image: ghcr.io/facebookincubator/hsthrift/ci-base:ghcup
       options: --cpus 2
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
-      - name: Get latest FB packages tag
-        id: get-tag
-        run: |
-          echo "::set-output name=tag::$(bash .github/workflows/get_deps_tag.sh)"
-        shell: bash
-
-      # disabling caching for now because we're cloning the deps from
-      # master. Caching is based on cloning a tag.
-      # - name: Cache FB packages
-      #   id: cache-fb-packages
-      #   uses: actions/cache@v2
-      #   with:
-      #     path: /usr/local/
-      #     key: ${{ runner.os }}-${{ steps.get-tag.outputs.tag }}
-      #     restore-keys: |
-      #       ${{ runner.os }}-${{ steps.get-tag.outputs.tag }}
-
       - name: Install folly, fizz, wangle, rsocket-cpp, fbthrift
-#        if: steps.cache-fb-packages.outputs.cache-hit != 'true'
         run:  ./install_deps.sh --nuke
       - name: Install ${{ matrix.ghc }}
         run: ghcup install ghc ${{ matrix.ghc }} --set
       - name: Install cabal-install-3.6
         run: ghcup install cabal -u https://downloads.haskell.org/~cabal/cabal-install-3.6.0.0/cabal-install-3.6.0.0-x86_64-linux.tar.xz 3.6.0.0 --set
+      - name: Add GHC and cabal to PATH
+        run: echo "$HOME/.ghcup/bin" >> $GITHUB_PATH
       - name: Populate hackage index
         run: cabal update
       - name: Generate C++ code from thrift files
