@@ -76,7 +76,7 @@ echo "Using tags: $PROJ_TAG and $PROJ_TAG_ALT"
 (cd folly && git checkout "$PROJ_TAG")
 build folly .
 
-clone fizz https://github.com/facebookincubator/fizz.git "$PROJ_TAG"
+clone fizz https://github.com/facebookincubator/fizz.git "$PROJ_TAG_ALT"
 build fizz fizz
 
 clone wangle https://github.com/facebook/wangle.git "$PROJ_TAG_ALT"
