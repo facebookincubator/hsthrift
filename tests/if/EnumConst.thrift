@@ -8,15 +8,16 @@ enum X {
   E = 4,
 }
 
-const X idConst = D
+const X idConst = D;
 
-const X intConst = 2
+const X intConst = 2;
 
-enum Y { }
+enum Y {
+}
 
 enum Z {
   A = 2,
   B = 3,
 }
 
-const Z zconst = Z.A
+const Z zconst = Z.A;

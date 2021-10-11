@@ -9,5 +9,5 @@ include "if/E.thrift"
 #        E
 
 struct C {
-  1: E.E eThing
+  1: E.E eThing;
 }

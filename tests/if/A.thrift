@@ -14,8 +14,8 @@ include "if/E.thrift"
 #  D     E
 
 struct A {
-  1: B.B bThing = { "dThing": {}, "eThing": {}, "b2Thing": B.B2.X },
-  2: C.C cThing,
+  1: B.B bThing = {"dThing": {}, "eThing": {}, "b2Thing": B.B2.X};
+  2: C.C cThing;
 }
 
-const D.D dstruct = {}
+const D.D dstruct = {};

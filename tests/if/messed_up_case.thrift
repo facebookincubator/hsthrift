@@ -2,9 +2,9 @@
 
 typedef i64 (hs.type = "Int") intType
 
-const string Str = ""
+const string Str = "";
 
-const string Str2 = Str
+const string Str2 = Str;
 
 enum numbers {
   one = 0,
@@ -13,10 +13,10 @@ enum numbers {
 }
 
 struct foo {
-  1: intType Field
+  1: intType Field;
 } (hs.prefix = "")
 
-const numbers numberThing = one
-const numbers otherNumberThing = 1
+const numbers numberThing = one;
+const numbers otherNumberThing = 1;
 
-const foo fooConst = { "Field" : 999 }
+const foo fooConst = {"Field": 999};

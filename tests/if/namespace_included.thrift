@@ -3,7 +3,7 @@
 namespace hs Thrift.Test.Internal
 
 struct X {
-  1: i64 intField
+  1: i64 intField;
 }
 
 enum Y {
@@ -11,6 +11,6 @@ enum Y {
 }
 
 union Z {
-  1: X x
-  2: Y y
+  1: X x;
+  2: Y y;
 }

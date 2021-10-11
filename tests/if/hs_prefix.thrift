@@ -11,21 +11,21 @@ enum PrefixedE {
 } (hs.prefix = "PE_")
 
 struct S {
-  1: i64 A
-  2: E B = E.B
+  1: i64 A;
+  2: E B = E.B;
 }
 
 struct PrefixedS {
-  1: i64 A
-  3: PrefixedE B = PrefixedE.B
+  1: i64 A;
+  3: PrefixedE B = PrefixedE.B;
 } (hs.prefix = "ps_")
 
 union U {
-  1: E A
-  2: S B
+  1: E A;
+  2: S B;
 }
 
 union PrefixedU {
-  1: PrefixedE A
-  2: PrefixedS B
+  1: PrefixedE A;
+  2: PrefixedS B;
 } (hs.prefix = "PU_")

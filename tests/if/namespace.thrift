@@ -5,7 +5,7 @@ include "if/namespace_included.thrift"
 namespace hs Thrift.Test
 
 struct X {
-  1: i64 intField
+  1: i64 intField;
 }
 
 typedef namespace_included.X Y

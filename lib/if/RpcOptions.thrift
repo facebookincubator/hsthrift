@@ -4,11 +4,11 @@ namespace cpp2 "thrift.protocol"
 namespace hs "Thrift.Protocol"
 
 enum Priority {
-  HighImportant = 0
-  High = 1
-  Important = 2
-  NormalPriority = 3
-  BestEffort = 4
+  HighImportant = 0,
+  High = 1,
+  Important = 2,
+  NormalPriority = 3,
+  BestEffort = 4,
 } (hs.prefix = "")
 
 struct RpcOptions {

@@ -10,9 +10,9 @@ include "if/E.thrift"
 #     D     E
 
 struct B {
-  1: D.D dThing
-  2: E.E eThing
-  3: B2 b2Thing
+  1: D.D dThing;
+  2: E.E eThing;
+  3: B2 b2Thing;
 }
 
 enum B2 {

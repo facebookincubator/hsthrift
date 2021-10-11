@@ -1,12 +1,12 @@
 // Copyright (c) Facebook, Inc. and its affiliates.
 
 enum UnsortedEnum {
-  G = 7
-  A = 1
-  D = 4
-  E = 5
-  C = 3
-  B = 2
+  G = 7,
+  A = 1,
+  D = 4,
+  E = 5,
+  C = 3,
+  B = 2,
 }
 
 enum EnumWithNounknown {
