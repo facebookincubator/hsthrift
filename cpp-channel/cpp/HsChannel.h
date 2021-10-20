@@ -152,6 +152,10 @@ class HsCallback : public apache::thrift::RequestClientCallback {
   bool requestSent_ = false;
 };
 
+using CallbackPtr = std::unique_ptr<
+    HsCallback,
+    apache::thrift::RequestClientCallback::RequestClientCallbackDeleter>;
+
 /* Note [channel lifetime]
  *
  * The ChannelWrapper implementation keeps the InnerChannel alive
@@ -217,6 +221,27 @@ class ChannelWrapper {
   }
 
  private:
+  enum RequestDirection {
+    WITH_RESPONSE = 1,
+    NO_RESPONSE = 2,
+  };
+
+  void sendRequestImpl(
+      RequestDirection direction,
+      apache::thrift::protocol::PROTOCOL_TYPES protocolId,
+      CallbackPtr&& callback,
+      std::unique_ptr<folly::IOBuf>&& message,
+      apache::thrift::RpcOptions&& rpcOptions);
+
+  template <typename F>
+  void runOnClientEvbIfAvailable(F&& f) {
+    if (auto evb = client_->get()->getEventBase()) {
+      evb->add(std::forward<F>(f));
+    } else {
+      f();
+    }
+  }
+
   std::shared_ptr<InnerChannel> client_;
 };
 

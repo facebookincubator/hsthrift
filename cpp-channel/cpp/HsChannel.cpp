@@ -26,48 +26,14 @@ void ChannelWrapper::sendRequest(
     FinishedRequest* recv_result,
     apache::thrift::RpcOptions&& rpcOpts) {
   auto msg = folly::IOBuf::wrapBuffer(buf, len);
-  using CallbackPtr = std::unique_ptr<
-      HsCallback,
-      apache::thrift::RequestClientCallback::RequestClientCallbackDeleter>;
   auto cob = CallbackPtr(new HsCallback(
       client_, capability, send_mvar, recv_mvar, send_result, recv_result));
-
-  auto sendRequestImpl = [protId = getProtocolType(buf[0]),
-                          client = client_,
-                          cob = std::move(cob),
-                          msg = std::move(msg),
-                          rpcOpts = std::move(rpcOpts)]() mutable {
-    auto header = std::make_shared<apache::thrift::transport::THeader>(0);
-    header->setProtocolId(protId);
-    for (auto const& rpcHeader : rpcOpts.getWriteHeaders()) {
-      header->setHeader(rpcHeader.first, rpcHeader.second);
-    }
-
-    if (auto envelopeAndRequest =
-            apache::thrift::EnvelopeUtil::stripRequestEnvelope(
-                std::move(msg))) {
-      cob->setMethodName(envelopeAndRequest->first.methodName);
-      client->get()->sendRequestResponse(
-          rpcOpts,
-          envelopeAndRequest->first.methodName,
-          apache::thrift::SerializedRequest(
-              std::move(envelopeAndRequest->second)),
-          header,
-          std::move(cob));
-    } else {
-      cob.release()->onResponseError(
-          folly::make_exception_wrapper<
-              apache::thrift::transport::TTransportException>(
-              apache::thrift::transport::TTransportException::CORRUPTED_DATA,
-              "Unexpected problem stripping envelope"));
-    }
-  };
-
-  if (auto evb = client_->get()->getEventBase()) {
-    evb->add(std::move(sendRequestImpl));
-  } else {
-    sendRequestImpl();
-  }
+  sendRequestImpl(
+      ChannelWrapper::RequestDirection::WITH_RESPONSE,
+      getProtocolType(buf[0]),
+      std::move(cob),
+      std::move(msg),
+      std::move(rpcOpts));
 }
 
 void ChannelWrapper::sendOnewayRequest(
@@ -78,43 +44,70 @@ void ChannelWrapper::sendOnewayRequest(
     FinishedRequest* send_result,
     apache::thrift::RpcOptions&& rpcOpts) {
   auto msg = folly::IOBuf::wrapBuffer(buf, len);
-  auto cob = apache::thrift::RequestClientCallback::Ptr(new HsCallback(
+  auto cob = CallbackPtr(new HsCallback(
       client_, capability, send_mvar, nullptr, send_result, nullptr));
+  sendRequestImpl(
+      ChannelWrapper::RequestDirection::NO_RESPONSE,
+      getProtocolType(buf[0]),
+      std::move(cob),
+      std::move(msg),
+      std::move(rpcOpts));
+}
 
-  auto sendOnewayRequestImpl = [protId = getProtocolType(buf[0]),
-                                client = client_,
-                                cob = std::move(cob),
-                                msg = std::move(msg),
-                                rpcOpts = std::move(rpcOpts)]() mutable {
-    auto header = std::make_shared<apache::thrift::transport::THeader>(0);
-    header->setProtocolId(protId);
-    for (auto const& rpcHeader : rpcOpts.getWriteHeaders()) {
-      header->setHeader(rpcHeader.first, rpcHeader.second);
-    }
+void ChannelWrapper::sendRequestImpl(
+    ChannelWrapper::RequestDirection requestDirection,
+    apache::thrift::protocol::PROTOCOL_TYPES protocolId,
+    CallbackPtr&& callback,
+    std::unique_ptr<folly::IOBuf>&& message,
+    apache::thrift::RpcOptions&& rpcOptions) {
+  auto header = apache::thrift::transport::THeader(0);
+  header.setProtocolId(protocolId);
+  header.setHeaders(rpcOptions.releaseWriteHeaders());
 
-    if (auto envelopeAndRequest =
-            apache::thrift::EnvelopeUtil::stripRequestEnvelope(
-                std::move(msg))) {
-      client->get()->sendRequestNoResponse(
-          rpcOpts,
-          envelopeAndRequest->first.methodName,
-          apache::thrift::SerializedRequest(
-              std::move(envelopeAndRequest->second)),
-          header,
-          std::move(cob));
-    } else {
-      cob.release()->onResponseError(
-          folly::make_exception_wrapper<
-              apache::thrift::transport::TTransportException>(
-              apache::thrift::transport::TTransportException::CORRUPTED_DATA,
-              "Unexpected problem stripping envelope"));
-    }
-  };
-  if (auto evb = client_->get()->getEventBase()) {
-    evb->add(std::move(sendOnewayRequestImpl));
-  } else {
-    sendOnewayRequestImpl();
+  auto envelopeAndRequest =
+      apache::thrift::EnvelopeUtil::stripRequestEnvelope(std::move(message));
+  if (!envelopeAndRequest.has_value()) {
+    callback.release()->onResponseError(
+        folly::make_exception_wrapper<
+            apache::thrift::transport::TTransportException>(
+            apache::thrift::transport::TTransportException::CORRUPTED_DATA,
+            "Unexpected problem stripping envelope"));
+    return;
   }
+
+  auto envelope = std::move(envelopeAndRequest->first);
+  auto buf = std::move(envelopeAndRequest->second);
+  callback->setMethodName(envelope.methodName);
+
+  auto request = apache::thrift::SerializedRequest(std::move(buf));
+  runOnClientEvbIfAvailable([client = client_,
+                             requestDirection = requestDirection,
+                             rpcOptions = std::move(rpcOptions),
+                             request = std::move(request),
+                             header = std::move(header),
+                             envelope = std::move(envelope),
+                             callback = std::move(callback)]() mutable {
+    switch (requestDirection) {
+      case ChannelWrapper::RequestDirection::WITH_RESPONSE:
+        client->get()->sendRequestResponse(
+            std::move(rpcOptions),
+            envelope.methodName,
+            std::move(request),
+            std::make_shared<apache::thrift::transport::THeader>(
+                std::move(header)),
+            std::move(callback));
+        break;
+      case ChannelWrapper::RequestDirection::NO_RESPONSE:
+        client->get()->sendRequestNoResponse(
+            std::move(rpcOptions),
+            envelope.methodName,
+            std::move(request),
+            std::make_shared<apache::thrift::transport::THeader>(
+                std::move(header)),
+            std::move(callback));
+        break;
+    }
+  });
 }
 
 static_assert((int)Priority::HighImportant == (int)HIGH_IMPORTANT);
