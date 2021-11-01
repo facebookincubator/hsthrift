@@ -33,7 +33,7 @@ void HaskellAsyncProcessor::processSerializedRequest(
   // Immediately give reply to one-way calls
   bool oneway = oneways_.find(context->getMethodName()) != oneways_.end();
   if (oneway && !req->isOneway()) {
-    req->sendReply(std::unique_ptr<folly::IOBuf>());
+    req->sendReply(ResponsePayload{});
   }
 
   // Adds a request handler to the thrift queue.
@@ -89,15 +89,23 @@ void HaskellAsyncProcessor::processSerializedRequest(
     }
 
     if (!oneway && req && req->isActive()) {
-      std::unique_ptr<folly::IOBuf> transf;
+      apache::thrift::MessageType mtype;
+      apache::thrift::ResponsePayload payload;
       try {
         // Take ownership of the output bytes into an IOBuf
         auto outbuf =
             folly::IOBuf::takeOwnership(std::move(output_str), response.len);
 
         // Send the output bytes along
-        transf = transport::THeader::transform(
-            std::move(outbuf), context->getHeader()->getWriteTransforms());
+        apache::thrift::LegacySerializedResponse legacySerializedResponse{
+            std::move(outbuf)};
+        std::tie(mtype, payload) =
+            std::move(legacySerializedResponse)
+                .extractPayload(
+                    req->includeEnvelope(),
+                    context->getHeader()->getProtocolId(),
+                    context->getProtoSeqId());
+        payload.transform(context->getHeader()->getWriteTransforms());
       } catch (const std::exception& e) {
         if (!oneway) {
           const auto s = e.what();
@@ -113,10 +121,15 @@ void HaskellAsyncProcessor::processSerializedRequest(
         }
         return;
       }
-      rh.eb->runInEventBaseThread(
-          [req = std::move(req), transf = std::move(transf)]() mutable {
-            req->sendReply(std::move(transf));
-          });
+      rh.eb->runInEventBaseThread([mtype = mtype,
+                                   req = std::move(req),
+                                   payload = std::move(payload)]() mutable {
+        if (mtype == apache::thrift::MessageType::T_EXCEPTION) {
+          req->sendException(std::move(payload));
+        } else {
+          req->sendReply(std::move(payload));
+        }
+      });
     }
 
     // either is inactive or oneway method, simply delete req in eb thread
