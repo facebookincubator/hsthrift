@@ -141,6 +141,15 @@ class HsCallback : public apache::thrift::RequestClientCallback {
     methodName_ = std::move(name);
   }
 
+  std::string const& getMethodName() const {
+    return methodName_;
+  }
+
+  void setContextStack(
+      std::unique_ptr<apache::thrift::ContextStack>&& contextStack) {
+    contextStack_ = std::move(contextStack);
+  }
+
  private:
   std::shared_ptr<InnerChannel> client_; // see Note [channel lifetime]
   int cap_;
@@ -150,6 +159,14 @@ class HsCallback : public apache::thrift::RequestClientCallback {
   FinishedRequest* recv_result_;
   std::string methodName_;
   bool requestSent_ = false;
+
+  // Note that the contextStack_ *need* to be declared after
+  // methodName_. ContextStack contains a pointer reference
+  // to the method-name, and needs to access this pointer in its
+  // destructor. Fields are destructed in reverse order, and we need
+  // methodName_ to have a larger lifetime than the ContextStack
+  // object.
+  std::unique_ptr<apache::thrift::ContextStack> contextStack_;
 };
 
 using CallbackPtr = std::unique_ptr<
@@ -175,10 +192,10 @@ using CallbackPtr = std::unique_ptr<
  * For a test case see thrift/cpp-channel/tests/LifetimeTest.hs
  */
 
-class ChannelWrapper {
+class ChannelWrapper : public apache::thrift::TClientBase {
  public:
   explicit ChannelWrapper(InnerChannel client)
-      : client_(std::make_shared<InnerChannel>(std::move(client))){};
+      : client_(std::make_shared<InnerChannel>(std::move(client))) {}
 
   ~ChannelWrapper() {
     auto evb = client_->get()->getEventBase();

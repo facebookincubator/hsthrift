@@ -2,6 +2,7 @@
 
 #include <cpp/HsChannel.h>
 #include <if/gen-cpp2/RpcOptions_types.h>
+#include <thrift/lib/cpp/ContextStack.h>
 #include <thrift/lib/cpp2/protocol/Serializer.h>
 
 using namespace thrift::protocol;
@@ -60,9 +61,9 @@ void ChannelWrapper::sendRequestImpl(
     CallbackPtr&& callback,
     std::unique_ptr<folly::IOBuf>&& message,
     apache::thrift::RpcOptions&& rpcOptions) {
-  auto header = apache::thrift::transport::THeader(0);
-  header.setProtocolId(protocolId);
-  header.setHeaders(rpcOptions.releaseWriteHeaders());
+  auto header = std::make_shared<apache::thrift::transport::THeader>(0);
+  header->setProtocolId(protocolId);
+  header->setHeaders(rpcOptions.releaseWriteHeaders());
 
   auto envelopeAndRequest =
       apache::thrift::EnvelopeUtil::stripRequestEnvelope(std::move(message));
@@ -76,10 +77,48 @@ void ChannelWrapper::sendRequestImpl(
   }
 
   auto envelope = std::move(envelopeAndRequest->first);
-  auto buf = std::move(envelopeAndRequest->second);
   callback->setMethodName(envelope.methodName);
 
-  auto request = apache::thrift::SerializedRequest(std::move(buf));
+  // Create a new context-stack for the request, which will be used to trigger
+  // the appropriate thrift middleware to run on the request in itself (e.g.
+  // ContextProp).
+  //
+  // Note that we need to be very careful about the lifetime of the object
+  // and everything it does reference, as this can cause issues with memory
+  // leaks.
+  //
+  // This is why we're directly referencing shared-pointers as well as
+  // preserving the lifetime of the stack, and the method-name, on the callback
+  // object itself.
+  auto contextStack = apache::thrift::ContextStack::createWithClientContext(
+      handlers_,
+      "" /* service name */,
+      callback->getMethodName().c_str(),
+      *header);
+
+  if (contextStack) {
+    contextStack->preWrite();
+  }
+
+  auto request =
+      apache::thrift::SerializedRequest(std::move(envelopeAndRequest->second));
+
+  if (contextStack) {
+    apache::thrift::SerializedMessage serializedMessage;
+    serializedMessage.protocolType = envelope.protocolId;
+    serializedMessage.buffer = request.buffer.get();
+    serializedMessage.methodName = envelope.methodName;
+
+    contextStack->onWriteData(serializedMessage);
+    contextStack->postWrite(
+        folly::to_narrow(request.buffer->computeChainDataLength()));
+    contextStack->resetClientRequestContextHeader();
+  }
+
+  // Transfer ownership of the context-stack to the callback in order to
+  // preserve lifetime throughout the request
+  callback->setContextStack(std::move(contextStack));
+
   runOnClientEvbIfAvailable([client = client_,
                              requestDirection = requestDirection,
                              rpcOptions = std::move(rpcOptions),
@@ -93,8 +132,7 @@ void ChannelWrapper::sendRequestImpl(
             std::move(rpcOptions),
             envelope.methodName,
             std::move(request),
-            std::make_shared<apache::thrift::transport::THeader>(
-                std::move(header)),
+            std::move(header),
             std::move(callback));
         break;
       case ChannelWrapper::RequestDirection::NO_RESPONSE:
@@ -102,8 +140,7 @@ void ChannelWrapper::sendRequestImpl(
             std::move(rpcOptions),
             envelope.methodName,
             std::move(request),
-            std::make_shared<apache::thrift::transport::THeader>(
-                std::move(header)),
+            std::move(header),
             std::move(callback));
         break;
     }
