@@ -73,7 +73,7 @@ clone folly https://github.com/facebook/folly.git
 PROJ_TAG=origin/master
 PROJ_TAG_ALT=origin/main
 echo "Using tags: $PROJ_TAG and $PROJ_TAG_ALT"
-(cd folly && git checkout "$PROJ_TAG")
+(cd folly && git checkout "$PROJ_TAG_ALT")
 build folly .
 
 clone fizz https://github.com/facebookincubator/fizz.git "$PROJ_TAG_ALT"
@@ -82,5 +82,5 @@ build fizz fizz
 clone wangle https://github.com/facebook/wangle.git "$PROJ_TAG_ALT"
 build wangle wangle
 
-clone fbthrift https://github.com/facebook/fbthrift.git "$PROJ_TAG"
+clone fbthrift https://github.com/facebook/fbthrift.git "$PROJ_TAG_ALT"
 build fbthrift .
