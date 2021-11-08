@@ -3,6 +3,7 @@
 module Foreign.CPP.HsStruct.Unsafe
   ( unsafeMaybeRelease
   , unsafeMaybeSteal
+  , unsafeMaybePeek
   , unsafeToHsStringPiece
   ) where
 
@@ -33,6 +34,9 @@ unsafeMaybeRelease p = do
   ptr <- #{peek DummyHsMaybe, ptr} p
   #{poke DummyHsMaybe, ptr} p nullPtr
   return ptr
+
+unsafeMaybePeek :: Ptr (HsMaybe a) -> IO (Ptr a)
+unsafeMaybePeek p = #{peek DummyHsMaybe, ptr} p
 
 -- | Steals the raw pointer to the optional foreign object in 'HsMaybe'.
 -- Haskell takes over the ownership and takes the responsibility of disposing
