@@ -63,6 +63,7 @@ withBackgroundServer handler ServerOptions{..} action =
   where
     err = ServerException "failed to get event manager"
     cPort = fromIntegral $ fromMaybe 0 desiredPort
+    cNumWorkers = fromIntegral $ fromMaybe 0 numWorkerThreads
 
     -- Use the normal factory unless a custom was handed to us
     factoryFn = fromMaybe c_haskell_factory customFactoryFn
@@ -80,7 +81,8 @@ withBackgroundServer handler ServerOptions{..} action =
       useTextsAsCStringLens oneways $ \txts sizes txtlen -> do
         let
           alloc = bracket
-            (create_cpp_server cb factoryFn cPort txts sizes txtlen)
+            (create_cpp_server cb factoryFn cPort
+              cNumWorkers txts sizes txtlen)
             delete
             $ \p -> do
               (r :: Either PServer Text) <- coerce $ peek p
@@ -118,6 +120,7 @@ foreign import ccall safe "c_create_cpp_server"
   create_cpp_server :: FunPtr ProcessorCallback
                     -> FactoryFunction
                     -> CInt -- ^ port
+                    -> CInt -- ^ workers, or 0 to use the default
                     -> Ptr CString -- ^ oneway function names array
                     -> Ptr CSize -- ^ oneway function name lengths array
                     -> CSize -- ^ number of oneway functions

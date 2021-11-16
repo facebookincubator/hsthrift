@@ -34,6 +34,9 @@ data ThriftServer
 
 data ServerOptions = ServerOptions
   { desiredPort :: Maybe Int
+  , numWorkerThreads :: Maybe Int
+      -- ^ number of requests that can be executed simultaneously.
+      -- Defaults to the number of CPU cores.
   , customFactoryFn :: Maybe FactoryFunction
       -- ^ whether a custom factory should be used
   , customModifyFn :: Maybe ModifyFunction
@@ -43,6 +46,7 @@ data ServerOptions = ServerOptions
 defaultOptions :: ServerOptions
 defaultOptions = ServerOptions
   { desiredPort = Nothing
+  , numWorkerThreads = Nothing
   , customFactoryFn = Nothing
   , customModifyFn = Nothing
   }

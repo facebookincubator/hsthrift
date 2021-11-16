@@ -132,6 +132,7 @@ CreateCppServerResult* c_create_cpp_server(
     apache::thrift::TCallback callback,
     apache::thrift::TFactory factoryFn,
     int desiredPort,
+    int workers,
     const char** onewayNames,
     size_t* onewaySizes,
     size_t onewayLength) noexcept {
@@ -143,6 +144,11 @@ CreateCppServerResult* c_create_cpp_server(
 
     auto cppServer = new apache::thrift::CppServer(
         callback, factoryFn, desiredPort, std::move(oneways));
+
+    if (workers > 0) {
+      cppServer->setNumCPUWorkerThreads(workers);
+    }
+
     return new CreateCppServerResult(HsLeft, std::move(cppServer));
   } catch (const std::exception& e) {
     auto exStr = e.what();

@@ -123,6 +123,7 @@ portAlreadyBoundTest pname protId =
     serverOptions :: ServerOptions
     serverOptions = ServerOptions
       { desiredPort = Just port
+      , numWorkerThreads = Just 2
       , customFactoryFn = Nothing
       , customModifyFn = Nothing
       }
