@@ -5,7 +5,7 @@ module Util.Log
   , logInfo
   , logWarning
   , logError
-  , logCritical
+  , logFatal
   , flush
   ) where
 

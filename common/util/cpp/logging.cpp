@@ -30,7 +30,7 @@ void glog_error(const char* file, int line, const char* msg) noexcept {
   LOG_EXT(ERROR, file, line) << msg;
 }
 
-void glog_critical(const char* file, int line, const char* msg) noexcept {
+void glog_fatal(const char* file, int line, const char* msg) noexcept {
   LOG_EXT(FATAL, file, line) << msg;
 }
 

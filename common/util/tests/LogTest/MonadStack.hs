@@ -31,10 +31,10 @@ monadStack :: TestM ()
 monadStack = do
   -- regular / String messages
   L.logInfo "Log INFO in a monad stack example"
+  L.logWarning "Log WARNING in a monad stack example"
   L.logError "Log ERROR in a monad stack example"
-  L.logCritical "Log CRITICAL in a monad stack example"
 
   -- Text messages
   LT.logInfo $ Text.pack "Log INFO w/ Text in a monad stack example"
+  LT.logWarning $ Text.pack "Log WARNING w/ Text in a monad stack example"
   LT.logError $ Text.pack "Log ERROR w/ Text in a monad stack example"
-  LT.logCritical $ Text.pack "Log CRITICAL w/ Text in a monad stack example"

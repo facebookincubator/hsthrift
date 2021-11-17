@@ -8,7 +8,7 @@ module Util.Log.Internal
   , c_glog_info
   , c_glog_warning
   , c_glog_error
-  , c_glog_critical
+  , c_glog_fatal
   , c_glog_flush
   ) where
 
@@ -53,10 +53,10 @@ $(mangle
   |])
 
 $(mangle
-  "void glog_critical(const char*, int, const char*)"
+  "void glog_fatal(const char*, int, const char*)"
   [d|
     foreign import ccall unsafe
-      c_glog_critical :: CString -> CInt -> CString -> IO ()
+      c_glog_fatal :: CString -> CInt -> CString -> IO ()
   |])
 
 $(mangle
