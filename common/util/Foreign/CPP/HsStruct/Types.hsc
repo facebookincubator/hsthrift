@@ -25,6 +25,7 @@ module Foreign.CPP.HsStruct.Types
   , HsLenientText(..)
   -- * HsArray
   , HsArray(..)
+  , HsArrayStorable(..)
   , HsList(..)
   -- * HsMap
   , HsMap(..)
@@ -48,6 +49,7 @@ import Data.Map.Strict (Map)
 import Data.Scientific
   (fromFloatDigits, floatingOrInteger, toBoundedInteger, toRealFloat)
 import Data.Vector (Vector, generateM)
+import qualified Data.Vector.Storable as VS
 import qualified Data.Vector as Vector
 import Foreign hiding (void)
 import Foreign.C
@@ -385,6 +387,23 @@ instance StorableContainer HsArray where
   peekWith f p = do
     (a, n) <- peekDataSize p
     fmap HsArray . generateM n $ \i -> peekElemOffWith f a i
+
+-- | 'HsArrayStorable' is 'HsArray' with a more efficient
+-- representation, which can be passed back out to C++ without copying
+-- using Vector.Storable.unsafeWith.
+newtype HsArrayStorable a = HsArrayStorable
+  { hsArrayStorable :: VS.Vector a
+  }
+
+instance Storable a => Storable (HsArrayStorable a) where
+  sizeOf _ = #{size DummyHsArray}
+  alignment _ = #{alignment DummyHsArray}
+  poke = notPokeable "HsArrayStorable"
+  peek p = do
+    (a, n) <- peekDataSize p
+    arr <- mallocForeignPtrArray n
+    withForeignPtr arr $ \parr -> copyBytes parr a (n * sizeOf (undefined :: a))
+    return (HsArrayStorable (VS.unsafeFromForeignPtr0 arr n))
 
 -- HsList
 newtype HsList a = HsList

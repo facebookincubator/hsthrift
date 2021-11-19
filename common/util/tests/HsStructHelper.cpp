@@ -51,6 +51,11 @@ HsArray<HsString>* getArray() noexcept {
   return &ret;
 }
 
+HsArray<int64_t>* getArrayInt64() noexcept {
+  static HsArray<int64_t> ret{1, 2, 3};
+  return &ret;
+}
+
 HsIntMap<int64_t>* getIntMap() noexcept {
   static HsIntMap<int64_t> ret{{2, 4}, {3, 9}, {5, 25}, {7, 49}};
   return &ret;

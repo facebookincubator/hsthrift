@@ -19,6 +19,7 @@ import qualified Data.HashMap.Strict as HashMap
 import qualified Data.IntMap.Strict as IntMap
 import qualified Data.Map.Strict as Map
 import qualified Data.Vector as Vector
+import qualified Data.Vector.Storable as VectorStorable
 import Foreign
 import Foreign.C.Types (CBool(..), CChar)
 
@@ -161,9 +162,14 @@ arrayTest = TestLabel "Array" $ TestCase $ do
   assertEqual "[ByteString]" ["foo", "bar"] bs
   t <- fmap (map hsText . hsList) $ peek =<< getArray
   assertEqual "[Text]" ["foo", "bar"] t
+  v <- fmap hsArrayStorable $ peek =<< getArrayInt64
+  assertEqual "VectorStorable Int64" (VectorStorable.fromList [1::Int64,2,3]) v
 
 foreign import ccall unsafe "getArray"
   getArray :: IO (Ptr a)
+
+foreign import ccall unsafe "getArrayInt64"
+  getArrayInt64 :: IO (Ptr a)
 
 mapTest :: Test
 mapTest = TestLabel "Map" $ TestCase $ do
