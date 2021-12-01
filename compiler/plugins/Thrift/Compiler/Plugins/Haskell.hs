@@ -237,7 +237,7 @@ instance Typecheckable Haskell where
   enumAltsAreUnique Options{..} = True
 
   isPseudo _ Enum{..} = or
-    [ saTag == "hs.psuedoenum"
+    [ saTag == "hs.psuedoenum" || saTag == "hs.pseudoenum"
     | SimpleAnn{..} <- getAnns enumAnns
     ]
 

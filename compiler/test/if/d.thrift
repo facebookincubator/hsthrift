@@ -43,8 +43,8 @@ enum HsStructNoUnknownAnn {
   TWO = 2,
   THREE = 3,
 } (hs.nounknown)
-enum HsStructPsuedoenumAnn {
+enum HsStructPseudoenumAnn {
   ONE = 1,
   TWO = 2,
   THREE = 3,
-} (hs.psuedoenum)
+} (hs.pseudoenum)

@@ -21,13 +21,13 @@ const Z z = Z.A;
 
 enum A {
   A = 1,
-} (hs.psuedoenum)
+} (hs.pseudoenum)
 
 const A pseudo = A.A;
 
 enum B {
   B = 2,
-} (hs.psuedoenum, hs.prefix = 'enum_')
+} (hs.pseudoenum, hs.prefix = 'enum_')
 
 const B prefix = B.B;
 const B prx2 = B;

@@ -27,10 +27,10 @@ module D.Types
         HsEnum(HsEnum_ONE, HsEnum_TWO, HsEnum_THREE, HsEnum__UNKNOWN),
         HsStructNoUnknownAnn(HsStructNoUnknownAnn_ONE,
                              HsStructNoUnknownAnn_TWO, HsStructNoUnknownAnn_THREE),
-        HsStructPsuedoenumAnn(HsStructPsuedoenumAnn,
-                              unHsStructPsuedoenumAnn),
-        hsStructPsuedoenumAnn_ONE, hsStructPsuedoenumAnn_TWO,
-        hsStructPsuedoenumAnn_THREE)
+        HsStructPseudoenumAnn(HsStructPseudoenumAnn,
+                              unHsStructPseudoenumAnn),
+        hsStructPseudoenumAnn_ONE, hsStructPseudoenumAnn_TWO,
+        hsStructPseudoenumAnn_THREE)
        where
 import qualified Control.DeepSeq as DeepSeq
 import qualified Control.Exception as Exception
@@ -693,22 +693,22 @@ instance Thrift.ThriftEnum HsStructNoUnknownAnn where
 instance Prelude.Ord HsStructNoUnknownAnn where
   compare = Function.on Prelude.compare Thrift.fromThriftEnum
 
-newtype HsStructPsuedoenumAnn = HsStructPsuedoenumAnn{unHsStructPsuedoenumAnn
+newtype HsStructPseudoenumAnn = HsStructPseudoenumAnn{unHsStructPseudoenumAnn
                                                       :: Int.Int32}
                                 deriving (Prelude.Eq, Prelude.Show, DeepSeq.NFData, Prelude.Ord)
 
-instance Hashable.Hashable HsStructPsuedoenumAnn where
-  hashWithSalt __salt (HsStructPsuedoenumAnn __val)
+instance Hashable.Hashable HsStructPseudoenumAnn where
+  hashWithSalt __salt (HsStructPseudoenumAnn __val)
     = Hashable.hashWithSalt __salt __val
 
-instance Aeson.ToJSON HsStructPsuedoenumAnn where
-  toJSON (HsStructPsuedoenumAnn __val) = Aeson.toJSON __val
+instance Aeson.ToJSON HsStructPseudoenumAnn where
+  toJSON (HsStructPseudoenumAnn __val) = Aeson.toJSON __val
 
-hsStructPsuedoenumAnn_ONE :: HsStructPsuedoenumAnn
-hsStructPsuedoenumAnn_ONE = HsStructPsuedoenumAnn 1
+hsStructPseudoenumAnn_ONE :: HsStructPseudoenumAnn
+hsStructPseudoenumAnn_ONE = HsStructPseudoenumAnn 1
 
-hsStructPsuedoenumAnn_TWO :: HsStructPsuedoenumAnn
-hsStructPsuedoenumAnn_TWO = HsStructPsuedoenumAnn 2
+hsStructPseudoenumAnn_TWO :: HsStructPseudoenumAnn
+hsStructPseudoenumAnn_TWO = HsStructPseudoenumAnn 2
 
-hsStructPsuedoenumAnn_THREE :: HsStructPsuedoenumAnn
-hsStructPsuedoenumAnn_THREE = HsStructPsuedoenumAnn 3
+hsStructPseudoenumAnn_THREE :: HsStructPseudoenumAnn
+hsStructPseudoenumAnn_THREE = HsStructPseudoenumAnn 3
