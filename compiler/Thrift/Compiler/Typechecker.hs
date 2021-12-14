@@ -1086,6 +1086,20 @@ typecheckConst (TUnion n@Name{..} _loc) (UntypedConst uloc MapConst{..}) = do
       v@(UntypedConst utloc _) -> typeError (lLocation utloc) $ InvalidField v
   case thisschema of
     This schema -> Literal . This <$> typecheckUnion schema fname val
+typecheckConst
+  tyTop@(TUnion n@Name{} _loc)
+  (UntypedConst Located{..} StructConst {..}) = do
+    -- Constant structs can be used for unions as well
+    svTypeName <- mkThriftName svType
+    tschema <- lookupUnion svTypeName lLocation
+    ttyAnn <- lookupType svTypeName lLocation
+    case (tschema, ttyAnn) of
+      (This schema, This tyAnn) -> case svElems of
+        [ListElem{leElem = StructPair{..}}] -> do
+          case eqOrAlias tyTop tyAnn of
+            Just _ -> Literal . This <$> typecheckUnion schema spKey spVal
+            Nothing -> typeError lLocation $ TypeMismatch tyTop tyAnn
+        _ -> typeError lLocation $ InvalidUnion n $ length svElems
 
 -- Identifiers (typecheckIdentNum is not first parameter to the orT)
 -- These identified are permitted to be enums in lenient mode

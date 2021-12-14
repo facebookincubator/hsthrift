@@ -147,6 +147,17 @@
                         },
                         "type": "struct"
                     }
+                },
+                {
+                    "id": 4,
+                    "name": "either",
+                    "requiredness": "default",
+                    "type": {
+                        "name": {
+                            "name": "UnionAnnotation"
+                        },
+                        "type": "union"
+                    }
                 }
             ],
             "name": "SecondAnnotation",
@@ -197,6 +208,25 @@
         }
     ],
     "unions": [
+        {
+            "fields": [
+                {
+                    "id": 2,
+                    "name": "left",
+                    "type": {
+                        "type": "i64"
+                    }
+                },
+                {
+                    "id": 3,
+                    "name": "right",
+                    "type": {
+                        "type": "i64"
+                    }
+                }
+            ],
+            "name": "UnionAnnotation"
+        },
         {
             "fields": [
                 {

@@ -7,6 +7,11 @@ struct FirstAnnotation {
 struct SecondAnnotation {
   2: i64 total = 0;
   3: SecondAnnotation recurse;
+  4: UnionAnnotation either;
+}
+union UnionAnnotation {
+  2: i64 left;
+  3: i64 right;
 }
 
 @FirstAnnotation{name = "my_type"}
@@ -24,7 +29,7 @@ exception MyException {
   1: string message;
 }
 
-@SecondAnnotation{total = 1}
+@SecondAnnotation{total = 1, either = UnionAnnotation{left = 0}}
 union MyUnion {
   1: i64 int_value;
   2: string string_value;
