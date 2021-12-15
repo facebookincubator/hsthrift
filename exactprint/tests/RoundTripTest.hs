@@ -2,6 +2,7 @@
 
 module RoundTripTest (main) where
 
+import Control.Exception
 import Control.Monad
 import qualified Data.Text.Lazy as Text
 import Data.List.Extra
@@ -23,9 +24,7 @@ headerSize = 4
 failingTests :: [FilePath]
 failingTests =
   [ "common/hs/thrift/exactprint/tests/fbthrift-tests/basic/src/module.thrift"
-  , "common/hs/thrift/exactprint/tests/fbthrift-tests/basic-annotations/src/module.thrift"
   , "common/hs/thrift/exactprint/tests/fbthrift-tests/constants/src/module.thrift"
-  , "common/hs/thrift/exactprint/tests/fbthrift-tests/doctext/src/module.thrift"
   , "common/hs/thrift/exactprint/tests/fbthrift-tests/exceptions/src/module.thrift"
   , "common/hs/thrift/exactprint/tests/fbthrift-tests/fatal/src/module.thrift"
   , "common/hs/thrift/exactprint/tests/fbthrift-tests/from_map_construct/src/module.thrift"
@@ -38,7 +37,6 @@ failingTests =
   , "common/hs/thrift/exactprint/tests/fbthrift-tests/map_construct/src/module.thrift"
   , "common/hs/thrift/exactprint/tests/fbthrift-tests/php-migration/src/module.thrift"
   , "common/hs/thrift/exactprint/tests/fbthrift-tests/php-migration/src/module.thrift"
-  , "common/hs/thrift/exactprint/tests/fbthrift-tests/rust-request-context/src/module.thrift"
   , "common/hs/thrift/exactprint/tests/fbthrift-tests/py-future/src/test.thrift"
   , "common/hs/thrift/exactprint/tests/fbthrift-tests/py-future/src/test.thrift"
   , "common/hs/thrift/exactprint/tests/fbthrift-tests/sink/src/module.thrift"
@@ -61,32 +59,35 @@ traverseDir top = do
   return $ concat paths
 
 roundTripTest :: FilePath -> FilePath -> Test
-roundTripTest fbcode path = TestLabel ("Round Trip: " ++ path) $ TestCase
-  $ do
-    input <- withCurrentDirectory fbcode $ readFile path
-    -- skip header
-    let inputLines = drop headerSize $ lines input
-    case runParser parseThrift path (unlines inputLines) of
-      Left e -> fail e
-      Right parsedData -> do
-        forM_ (zip3 [1+headerSize..] inputLines outputLines) $
-          \(line, inputLine, outputLine) ->
-            assertEqual
-              ("roundtrip line mismatch: " ++ fileLineStr path line)
-              inputLine
-              outputLine
+roundTripTest fbcode path =
+  TestLabel ("Round Trip: " ++ path) $ TestCase $ roundTripTestCase fbcode path
 
-        assertEqual "roundtrip file length"
-          (length inputLines)
-          (length outputLines)
+roundTripTestCase :: FilePath -> FilePath -> IO ()
+roundTripTestCase fbcode path = do
+  input <- withCurrentDirectory fbcode $ readFile path
+  -- skip header
+  let inputLines = drop headerSize $ lines input
+  case runParser parseThrift path (unlines inputLines) of
+    Left e -> fail e
+    Right parsedData -> do
+      forM_ (zip3 [1+headerSize..] inputLines outputLines) $
+        \(line, inputLine, outputLine) ->
+          assertEqual
+            ("roundtrip line mismatch: " ++ fileLineStr path line)
+            inputLine
+            outputLine
 
-        where
-          outputLines = lines output
-          output =
-            Text.unpack $
-              exactPrintThrift $
-              computeThriftFileOffsets $
-              mkThriftFile parsedData
+      assertEqual "roundtrip file length"
+        (length inputLines)
+        (length outputLines)
+
+      where
+        outputLines = lines output
+        output =
+          Text.unpack $
+            exactPrintThrift $
+            computeThriftFileOffsets $
+            mkThriftFile parsedData
 
   where
     mkThriftFile (headers, decls) = ThriftFile
@@ -98,6 +99,16 @@ roundTripTest fbcode path = TestLabel ("Round Trip: " ++ path) $ TestCase
       , thriftComments = []
       }
 
+roundTripTestFails :: FilePath -> FilePath -> Test
+roundTripTestFails fbcode path =
+  TestLabel ("Round Trip currently fails: " ++ path) $ TestCase $ do
+  let failingTest = roundTripTestCase fbcode path
+  errored <-
+    catch (failingTest >> pure False) (\(_::SomeException) -> pure True)
+  if errored then
+    pure ()
+  else
+    assertFailure "Test succeeded. Please remove from failingTests list"
 
 roundTripTests :: IO Test
 roundTripTests = do
@@ -110,7 +121,7 @@ roundTripTests = do
   let
     testList =
       testFiles >>= \(path::String) ->
-        if | path `elem` failingTests -> []
+        if | path `elem` failingTests -> [roundTripTestFails fbcode path]
            | otherwise -> [roundTripTest fbcode path]
 
   return $ TestList testList
