@@ -5,7 +5,7 @@
 
 module Control.Concurrent.Stream
   ( streamBound
-  , streamWithState
+  , streamWithStateAndThrow
   , streamWithStateBound
   , streamWithThrow
   ) where
@@ -57,16 +57,16 @@ streamBound
 streamBound maxConcurrency producer worker = stream_ BoundThreads
   SwallowExceptions producer (replicate maxConcurrency ()) $ const worker
 
--- | Like streamWithThrow, but swallows exceptions and each worker keeps a
+-- | Like streamWithThrow, each worker keeps a
 -- state: the state can be a parameter to the worker function, or a state
 -- that you can build upon (for example the state can be an IORef of some sort)
 -- There will be a thread per worker state
-streamWithState
+streamWithStateAndThrow
   :: ((a -> IO ()) -> IO ()) -- ^ Producer
   -> [b] -- ^ Worker state
   -> (b -> a -> IO ()) -- ^ Worker
   -> IO ()
-streamWithState = stream_ UnboundThreads SwallowExceptions
+streamWithStateAndThrow = stream_ UnboundThreads ThrowExceptions
 
 -- | Like streamWithState but uses bound threads for the workers.
 streamWithStateBound
