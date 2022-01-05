@@ -25,9 +25,7 @@ BUILD_SUBDIR=_build
 # In Glean we use some AVX2 intrinsics, so we have to pick a compatible
 # architecture here for compiling folly.
 arch=$(uname -m)
-if [ "$arch" == aarch64 ] ; then
-	export CXXFLAGS=-march=native
-else
+if [ "$arch" == x86_64 ] ; then
 	export CXXFLAGS=-march=corei7
 fi
 
