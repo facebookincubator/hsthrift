@@ -21,7 +21,7 @@ timingTest bound = TestLabel "timing" $ TestCase $ do
   let
     producer add = mapM_ add [1..(10::Int)]
     sleepy _ = do threadDelay 1000000; atomicModifyIORef' count (\i -> (i+1,()))
-  (if bound then streamBound else stream) 5 producer sleepy
+  (if bound then streamBound else streamWithThrow) 5 producer sleepy
   e <- now
   let (TimeSpan d) = timeDiff e s
   assertBool "faster than sequential" (d < 5)
