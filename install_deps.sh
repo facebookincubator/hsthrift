@@ -24,7 +24,12 @@ BUILD_SUBDIR=_build
 #   folly/container/detail/F14IntrinsicsAvailability.h
 # In Glean we use some AVX2 intrinsics, so we have to pick a compatible
 # architecture here for compiling folly.
-export CXXFLAGS=-march=corei7
+arch=$(uname -m)
+if [ "$arch" == aarch64 ] ; then
+	export CXXFLAGS=-march=native
+else
+	export CXXFLAGS=-march=corei7
+fi
 
 while [ "$#" -gt 0 ]; do
     case "$1" in
