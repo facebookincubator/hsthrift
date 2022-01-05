@@ -45,10 +45,8 @@ class HsCallback : public apache::thrift::RequestClientCallback {
   }
 
   void onRequestSent() noexcept override {
-    send_result_->status = SEND_SUCCESS;
-    hs_try_putmvar(cap_, send_mvar_);
-    requestSent_ = true;
     if (!recv_result_) {
+      requestSentHelper();
       delete this;
     }
   }
@@ -81,24 +79,31 @@ class HsCallback : public apache::thrift::RequestClientCallback {
     // If you get a memory leak here, see Note [onResponse leak].
     std::memcpy(buf.get(), ex.data(), len);
 
-    // If we have already enqueued a FinishedRequest for requestSent(), then
-    // this needs to be be reported in the RECV round
-    if (requestSent_) {
-      recv_result_->status = RECV_ERROR;
-      recv_result_->buffer = buf.release();
-      recv_result_->len = len;
-      hs_try_putmvar(cap_, recv_mvar_);
-    } else {
+    bool sendError = false;
+    ew.with_exception(
+        [&](apache::thrift::transport::TTransportException const& tex) {
+          sendError = tex.getType() ==
+              apache::thrift::transport::TTransportException::NOT_OPEN;
+        });
+    if (sendError || !recv_result_) {
       send_result_->status = SEND_ERROR;
       send_result_->buffer = buf.release();
       send_result_->len = len;
       hs_try_putmvar(cap_, send_mvar_);
+    } else {
+      requestSentHelper();
+      recv_result_->status = RECV_ERROR;
+      recv_result_->buffer = buf.release();
+      recv_result_->len = len;
+      hs_try_putmvar(cap_, recv_mvar_);
     }
     delete this;
   }
 
   void onResponse(
       apache::thrift::ClientReceiveState&& state) noexcept override {
+    requestSentHelper();
+
     if (state.isException()) {
       auto ex = state.exception().what();
       size_t len = ex.length();
@@ -151,6 +156,11 @@ class HsCallback : public apache::thrift::RequestClientCallback {
   }
 
  private:
+  void requestSentHelper() {
+    send_result_->status = SEND_SUCCESS;
+    hs_try_putmvar(cap_, send_mvar_);
+  }
+
   std::shared_ptr<InnerChannel> client_; // see Note [channel lifetime]
   int cap_;
   HsStablePtr send_mvar_;
@@ -158,7 +168,6 @@ class HsCallback : public apache::thrift::RequestClientCallback {
   FinishedRequest* send_result_;
   FinishedRequest* recv_result_;
   std::string methodName_;
-  bool requestSent_ = false;
 
   // Note that the contextStack_ *need* to be declared after
   // methodName_. ContextStack contains a pointer reference
