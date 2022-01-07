@@ -40,9 +40,11 @@ module Util.IO
   , slowIO
   , isModifiedAfter
   , safeRemovePathForcibly
+  , withLazy
   ) where
 
 import Control.Concurrent
+import Control.Concurrent.Async
 import Control.Exception as Exception
 import Control.Monad
 import Control.Monad.Extra
@@ -405,3 +407,26 @@ isModifiedAfter fp1 fp2 = ifM (doesFileExist fp1 &&^ doesFileExist fp2)
 -- an external 'rm' instead.
 safeRemovePathForcibly :: FilePath -> IO ()
 safeRemovePathForcibly path = callProcess "rm" [ "-rf", path ]
+
+-- | Turn a with-style resource scoping function into one that
+-- executes lazily. The @with@ is performed the first time the
+-- supplied getter is invoked, and is released when @withLazy@
+-- returns.
+withLazy
+  :: (forall b . (a -> IO b) -> IO b)
+    -- ^ with-style function to allocate a scoped resource of type @a@
+  -> (IO a -> IO c)
+    -- ^ provides a lazy getter for the resource @a@
+  -> IO c
+withLazy wit fn = do
+  barrier <- newEmptyMVar
+  result <- newEmptyMVar
+  done <- newEmptyMVar
+  let
+    get = do _ <- tryPutMVar barrier (); readMVar result
+    go = do
+      takeMVar barrier
+      wit $ \a -> do
+        putMVar result a
+        takeMVar done
+  snd <$> concurrently go (fn get `finally` putMVar done ())
