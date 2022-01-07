@@ -23,13 +23,15 @@ module Thrift.Compiler.Types
   , TypedConst(..)
   , List(..), Set(..), HashSet(..), Map(..), HashMap(..), EnumVal(..), New(..)
   , StructVal(..), ExceptionVal(..), UnionVal(..), MembershipProof(..)
-  , Struct(..), StructType(..), StructLoc(..)
+  , Struct(..), StructType(..), StructLoc(..), ErrorClassification(..)
+  , ErrorClassificationType(..)
   , Field(..), FieldLoc(..), FieldType(..), FieldTag(..), FieldId
   , Requiredness(..), Laziness(..)
   , Union(..), UnionAlt(..), PossiblyEmpty(..), EmptyName
   , Enum(..), EnumValue(..), EnumValLoc(..)
   , Service(..), Super(..), Function(..), FunLoc(..)
   , funThrows, ThrowsLoc(..), Throws(..), FunctionType(..)
+  , RpcIdempotency(..), RpcIdempotencyType(..)
   , Stream(..), ResponseAndStreamReturn(..), rsTypeLoc, rsLoc
   , Type, AnnotatedType(..), TType(..), SomeAnnTy(..)
   , TypeLoc(..), GetArity, getTypeLoc
@@ -429,13 +431,14 @@ data MembershipProof x xs where
 -- Thrift Structs and Exceptions -----------------------------------------------
 
 data Struct s l a = Struct
-  { structName         :: Text
-  , structResolvedName :: IfResolved s Text
-  , structType         :: StructType
-  , structMembers      :: [Field 'StructField s l a]
-  , structLoc          :: StructLoc a
-  , structAnns         :: Maybe (Annotations a)
-  , structSAnns        :: [StructuredAnnotation s l a]
+  { structName           :: Text
+  , structResolvedName   :: IfResolved s Text
+  , structType           :: StructType
+  , structMembers        :: [Field 'StructField s l a]
+  , structLoc            :: StructLoc a
+  , structAnns           :: Maybe (Annotations a)
+  , structSAnns          :: [StructuredAnnotation s l a]
+  , errorClassifications :: [ErrorClassification a]
   }
 
 data StructType = StructTy | ExceptionTy
@@ -446,6 +449,14 @@ data StructLoc a = StructLoc
   , slOpenBrace  :: Located a
   , slCloseBrace :: Located a
   }
+
+data ErrorClassification a = ErrorClassification
+  { ecType       :: ErrorClassificationType
+  , ecKeywordLoc :: Located a
+  }
+
+data ErrorClassificationType =
+  EcSafe | EcTransient | EcStateful | EcPermanent | EcServer | EcClient
 
 -- Thrift Fields ---------------------------------------------------------------
 
@@ -591,6 +602,7 @@ data Function (s :: Status) (l :: * {- Language -}) a = Function
   , funLoc          :: FunLoc a
   , funAnns         :: Maybe (Annotations a)
   , funSAnns        :: [StructuredAnnotation s l a]
+  , funIdempotency  :: Maybe RpcIdempotency
   }
 
 data FunctionType s l a
@@ -620,12 +632,13 @@ data Stream s l a = forall v. Stream
   }
 
 data FunLoc a = FunLoc
-  { fnlOneway     :: Maybe (Located a)
-  , fnlName       :: Located a
-  , fnlOpenParen  :: Located a
-  , fnlCloseParen :: Located a
-  , fnlThrows     :: Maybe (ThrowsLoc a)
-  , fnlSeparator  :: Separator a
+  { fnlOneway      :: Maybe (Located a)
+  , fnlIdempotency :: Maybe (Located a)
+  , fnlName        :: Located a
+  , fnlOpenParen   :: Located a
+  , fnlCloseParen  :: Located a
+  , fnlThrows      :: Maybe (ThrowsLoc a)
+  , fnlSeparator   :: Separator a
   }
 
 data ThrowsLoc a = ThrowsLoc
@@ -644,6 +657,10 @@ funThrows
   -> Maybe (Throws s l a)
 funThrows Function{funLoc=FunLoc{..}, ..} = fmap f fnlThrows
   where f throws = Throws throws funExceptions
+
+newtype RpcIdempotency = RpcIdempotency { riType :: RpcIdempotencyType }
+
+data RpcIdempotencyType = RiReadonly | RiIdempotent
 
 -- Thrift Value Types ----------------------------------------------------------
 

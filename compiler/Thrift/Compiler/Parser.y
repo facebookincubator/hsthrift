@@ -76,21 +76,34 @@ import Thrift.Compiler.Types
        '='         { Tok EQUALS _ }
        '@'         { Tok AT _ }
        -- Tokens for unused syntax
-       binary    { Tok BINARY _ }
-       senum     { Tok SENUM _ }
-       stream    { Tok STREAM _ }
-       void      { Tok VOID _ }
-       union     { Tok UNION _ }
-       view      { Tok VIEW _ }
-       exception { Tok EXCEPTION _ }
-       service   { Tok SERVICE _ }
-       oneway    { Tok ONEWAY _ }
-       extends   { Tok EXTENDS _ }
-       throws    { Tok THROWS _ }
+       binary     { Tok BINARY _ }
+       senum      { Tok SENUM _ }
+       stream     { Tok STREAM _ }
+       void       { Tok VOID _ }
+       union      { Tok UNION _ }
+       view       { Tok VIEW _ }
+       exception  { Tok EXCEPTION _ }
+       service    { Tok SERVICE _ }
+       oneway     { Tok ONEWAY _ }
+       extends    { Tok EXTENDS _ }
+       throws     { Tok THROWS _ }
+       safe       { Tok SAFE _ }
+       transient  { Tok TRANSIENT _ }
+       stateful   { Tok STATEFUL _ }
+       permanent  { Tok PERMANENT _ }
+       server     { Tok SERVER _ }
+       client     { Tok CLIENT _ }
+       readonly   { Tok READONLY _ }
+       idempotent { Tok IDEMPOTENT _ }
 
 -- Shift/reduce conflicts
 -- - UntypedConst needs to parse both an identifier and a struct which begins with an identifier
 %expect 1
+-- - "oneway" can be both a function qualifier and an identifier, so "oneway fn_return_type"
+--   is ambiguous - we want to always treat it as a qualifier if possible though. Ditto the
+--   idempotency keywords.
+%right SKIP_ONEWAY oneway
+%right SKIP_IDEMPOTENCY readonly idempotent
 
 %%
 Thrift :: { ([Header Loc], [Parsed Decl]) }
@@ -139,20 +152,21 @@ Decl :: { Maybe (Parsed Decl) }
 
 Struct :: { Parsed Struct }
 Struct
-  : StructuredAnnotations StructType Symbol '{' list(Field) '}' Annotations
+  : StructuredAnnotations ErrorClassifications StructType Symbol '{' list(Field) '}' Annotations
     { Struct
-      { structName         = lVal $3
+      { structName         = lVal $4
       , structResolvedName = ()
-      , structType         = lVal $2
-      , structMembers      = $5
+      , structType         = lVal $3
+      , structMembers      = $6
       , structLoc          = StructLoc
-        { slKeyword    = lLoc $2
-        , slName       = lLoc $3
-        , slOpenBrace  = getLoc $4
-        , slCloseBrace = getLoc $6
+        { slKeyword    = lLoc $3
+        , slName       = lLoc $4
+        , slOpenBrace  = getLoc $5
+        , slCloseBrace = getLoc $7
         }
-      , structAnns         = $7
-      , structSAnns        = $1
+      , structAnns           = $8
+      , structSAnns          = $1
+      , errorClassifications = $2
       }
     }
 
@@ -194,6 +208,24 @@ Req : {- empty -}    { Default }
 
 MaybeConst : {- empty -}      { Nothing }
            | '=' UntypedConst { Just $ L (getLoc $1) $2 }
+
+ErrorClassifications : list(ErrorClassification) { $1 }
+
+ErrorClassification
+  : ErrorClassificationKeyword
+    { ErrorClassification
+      { ecType = lVal $1
+      , ecKeywordLoc = lLoc $1
+      }
+    }
+
+ErrorClassificationKeyword
+  : safe       { L (getLoc $1) EcSafe }
+  | transient  { L (getLoc $1) EcTransient }
+  | stateful   { L (getLoc $1) EcStateful }
+  | permanent  { L (getLoc $1) EcPermanent }
+  | server     { L (getLoc $1) EcServer }
+  | client     { L (getLoc $1) EcClient }
 
 -- Unions ----------------------------------------------------------------------
 
@@ -449,25 +481,27 @@ Service
      }
 
 Function :: { Parsed Function }
-  : StructuredAnnotations IsOneway FunType Symbol '(' list(Argument) ')' Throws Annotations Separator
+  : StructuredAnnotations IsOneway RpcIdempotency FunType Symbol '(' list(Argument) ')' Throws Annotations Separator
     { Function
-      { funName         = lVal $4
-      , funResolvedName = ()
-      , funType         = $3
-      , funResolvedType = ()
-      , funArgs         = $6
-      , funExceptions   = maybe [] throwsFields $8
-      , funIsOneWay     = isJust $2
-      , funPriority     = NormalPriority
-      , funLoc          = FunLoc
-        { fnlOneway     = $2
-        , fnlName       = lLoc $4
-        , fnlOpenParen  = getLoc $5
-        , fnlCloseParen = getLoc $7
-        , fnlThrows     = fmap throwsLoc $8
-        , fnlSeparator  = $10
+      { funName          = lVal $5
+      , funResolvedName  = ()
+      , funType          = $4
+      , funResolvedType  = ()
+      , funArgs          = $7
+      , funExceptions    = maybe [] throwsFields $9
+      , funIsOneWay      = isJust $2
+      , funIdempotency   = fmap lVal $3
+      , funPriority      = NormalPriority
+      , funLoc           = FunLoc
+        { fnlOneway      = $2
+        , fnlIdempotency = fmap lLoc $3
+        , fnlName        = lLoc $5
+        , fnlOpenParen   = getLoc $6
+        , fnlCloseParen  = getLoc $8
+        , fnlThrows      = fmap throwsLoc $9
+        , fnlSeparator   = $11
         }
-      , funAnns         = $9
+      , funAnns         = $10
       , funSAnns        = $1
       }
     }
@@ -512,7 +546,15 @@ Extends
 
 IsOneway
   : oneway      { Just $ getLoc $1  }
-  | {- empty -} { Nothing }
+  | {- empty -} %prec SKIP_ONEWAY { Nothing }
+
+RpcIdempotency
+  : RpcIdempotencyKeyword { Just $ L (lLoc $1) (RpcIdempotency (lVal $1)) }
+  | {- empty -} %prec SKIP_IDEMPOTENCY { Nothing }
+
+RpcIdempotencyKeyword
+  : readonly   { L (getLoc $1) RiReadonly }
+  | idempotent { L (getLoc $1) RiIdempotent }
 
 Throws :: { Maybe (Parsed Throws) }
 Throws
@@ -608,6 +650,16 @@ Symbol :: { L Text }
   -- view isn't actually a keyword according to the fbthrift lexer
   -- even though it probably should be
   | view { L (getLoc $1) "view" }
+  -- other "keywords" allowed in identifiers:
+  | oneway      { L (getLoc $1) "oneway" }
+  | safe        { L (getLoc $1) "safe" }
+  | transient   { L (getLoc $1) "transient" }
+  | stateful    { L (getLoc $1) "stateful" }
+  | permanent   { L (getLoc $1) "permanent" }
+  | server      { L (getLoc $1) "server" }
+  | client      { L (getLoc $1) "client" }
+  | readonly    { L (getLoc $1) "readonly" }
+  | idempotent  { L (getLoc $1) "idempotent" }
 
 stringLit : stringTok
   {% case $1 of

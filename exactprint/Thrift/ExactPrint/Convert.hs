@@ -96,13 +96,15 @@ computeStructOffsets origin Struct{..} =
           , structLoc = offsets
           , structAnns = anns
           , structSAnns = sAnns
+          , errorClassifications = eClassns
           , ..
           },
    structEnd)
   where
     (sAnns, sAnnsEnd) = foldO sAnnOffsets origin structSAnns
+    (eClassns, eClassnsEnd) = foldO eClassnOffsets sAnnsEnd errorClassifications
     (offsets, anns, structEnd) =
-      computeStructLoc sAnnsEnd structLoc structAnns fieldEnd
+      computeStructLoc eClassnsEnd structLoc structAnns fieldEnd
     (fields, fieldEnd) =
       foldO computeFieldOffsets (lLocation slOpenBrace) structMembers
     StructLoc{..} = structLoc
@@ -425,12 +427,13 @@ functionOffsets origin fun@Function{..} =
    , funArgs = args
    , funExceptions = exs
    , funLoc = FunLoc
-     { fnlOneway     = getOffsets sAnnsEnd <$> fnlOneway
-     , fnlName       = getOffsets tyEnd fnlName
-     , fnlOpenParen  = getOffsets (lLocation fnlName) fnlOpenParen
-     , fnlCloseParen = getOffsets argsEnd fnlCloseParen
-     , fnlThrows     = throws
-     , fnlSeparator  = sep
+     { fnlOneway      = getOffsets sAnnsEnd <$> fnlOneway
+     , fnlIdempotency = getOffsets onewayEnd <$> fnlIdempotency
+     , fnlName        = getOffsets tyEnd fnlName
+     , fnlOpenParen   = getOffsets (lLocation fnlName) fnlOpenParen
+     , fnlCloseParen  = getOffsets argsEnd fnlCloseParen
+     , fnlThrows      = throws
+     , fnlSeparator   = sep
      }
    , funAnns = anns
    , funSAnns = sAnns
@@ -440,11 +443,12 @@ functionOffsets origin fun@Function{..} =
   where
     (sAnns, sAnnsEnd) = foldO sAnnOffsets origin funSAnns
     onewayEnd = maybe sAnnsEnd lLocation fnlOneway
+    idempotencyEnd = maybe onewayEnd lLocation fnlIdempotency
     (ty, tyEnd) = case funType of
       FunType (This t) ->
-        first (FunType . This) $ computeTypeOffsets onewayEnd t
+        first (FunType . This) $ computeTypeOffsets idempotencyEnd t
       FunTypeVoid loc ->
-        (FunTypeVoid $ getOffsets onewayEnd loc, lLocation loc)
+        (FunTypeVoid $ getOffsets idempotencyEnd loc, lLocation loc)
       FunTypeResponseAndStreamReturn ResponseAndStreamReturn{..} ->
         (FunTypeResponseAndStreamReturn $ ResponseAndStreamReturn
          { rsStream = stream
@@ -454,8 +458,8 @@ functionOffsets origin fun@Function{..} =
          streamEnd)
         where
           (ret, retEnd) = case rsReturn of
-            Just r -> first Just $ computeTypeOffsets onewayEnd r
-            Nothing -> (Nothing, onewayEnd)
+            Just r -> first Just $ computeTypeOffsets idempotencyEnd r
+            Nothing -> (Nothing, idempotencyEnd)
           (comma, commaEnd) = case rsComma of
             Just c -> (Just $ getOffsets retEnd c, lLocation c)
             Nothing -> (Nothing, retEnd)
@@ -678,6 +682,15 @@ sAnnElemOffsets origin (Just StructuredAnnElems{..}) =
         (lLocation saOpenBrace)
         saElems
 
+eClassnOffsets
+  :: Loc
+  -> ErrorClassification Loc
+  -> (ErrorClassification Offset, Loc)
+eClassnOffsets origin ErrorClassification{..} =
+  (ErrorClassification
+   { ecKeywordLoc = getOffsets origin ecKeywordLoc
+   , .. },
+   lLocation ecKeywordLoc)
 
 -- Helpers ---------------------------------------------------------------------
 

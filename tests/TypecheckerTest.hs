@@ -193,6 +193,7 @@ mkStruct name fields = D_Struct Struct
   , structLoc = StructLoc nlc nlc nlc nlc
   , structAnns = Nothing
   , structSAnns = []
+  , errorClassifications = []
   }
 
 mkField

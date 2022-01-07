@@ -22,3 +22,8 @@ service Y extends X {
 struct TestFunc {}
 
 exception Ex {}
+
+service Q {
+  oneway void testFunc1();
+  readonly i32 testFunc2();
+}

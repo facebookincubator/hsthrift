@@ -89,6 +89,14 @@ tokens :-
   "throws"             { basicToken THROWS }
   "async"              { basicToken ASYNC }
   "cpp_include"        { basicToken CPP_INCLUDE }
+  "safe"               { basicToken SAFE }
+  "transient"          { basicToken TRANSIENT }
+  "stateful"           { basicToken STATEFUL }
+  "permanent"          { basicToken PERMANENT }
+  "server"             { basicToken SERVER }
+  "client"             { basicToken CLIENT }
+  "readonly"           { basicToken READONLY }
+  "idempotent"         { basicToken IDEMPOTENT }
 
 
   -- Literals
@@ -152,6 +160,8 @@ data TokenType
   | SENUM | STREAM | VOID | BINARY
   | UNION | VIEW | EXCEPTION | SERVICE
   | ONEWAY | EXTENDS | THROWS | ASYNC
+  | SAFE | TRANSIENT | STATEFUL | PERMANENT | SERVER | CLIENT
+  | READONLY | IDEMPOTENT
   -- Stuff we won't use ever
   | CPP_INCLUDE
   deriving (Show, Eq)
