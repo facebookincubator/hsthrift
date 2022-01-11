@@ -44,13 +44,6 @@ class HsCallback : public apache::thrift::RequestClientCallback {
     return true;
   }
 
-  void onRequestSent() noexcept override {
-    if (!recv_result_) {
-      requestSentHelper();
-      delete this;
-    }
-  }
-
   // Note [onResponse leak]
   //
   // The memory containing the result is transferred from C++ to
@@ -102,7 +95,13 @@ class HsCallback : public apache::thrift::RequestClientCallback {
 
   void onResponse(
       apache::thrift::ClientReceiveState&& state) noexcept override {
+    SCOPE_EXIT {
+      delete this;
+    };
     requestSentHelper();
+    if (!recv_result_) {
+      return;
+    }
 
     if (state.isException()) {
       auto ex = state.exception().what();
@@ -139,7 +138,6 @@ class HsCallback : public apache::thrift::RequestClientCallback {
       recv_result_->len = len;
       hs_try_putmvar(cap_, recv_mvar_);
     }
-    delete this;
   }
 
   void setMethodName(std::string name) {
