@@ -61,7 +61,9 @@ common fb-haskell
      ghc-options: -O2
 
 common fb-cpp
-  cxx-options: -std=c++17 -march=haswell
+  cxx-options: -std=c++17
+  if arch(x86_64)
+     cxx-options: -march=haswell
   if flag(opt)
      cxx-options: -O3
 
