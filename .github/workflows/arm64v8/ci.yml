@@ -10,8 +10,7 @@ jobs:
         ghc: [8.4.4]
     runs-on: ubuntu-latest
     container:
-      # todo : how do we get our Dockerfile to build e.g. ci-base-arm64v8 ?
-      image: ghcr.io/facebookincubator/hsthrift/ci-base:ghcup
+      image: ghcr.io/donsbot/hsthrift/ci-base:ghcup-arm64v8
       options: --cpus 2
     steps:
       - name: Checkout code
