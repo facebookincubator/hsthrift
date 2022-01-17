@@ -59,7 +59,7 @@ jobs:
     runs-on: ubuntu-latest
     container:
       # pull the x86-compatible arm image from the multi-arch package
-      image: ghcr.io/donsbot/hsthrift/ci-base:ghcup-arm64v8@sha256:6704d9b55d2caa85d6a7a244125e620576323db8e88fdc1a1933aac2663a5c97
+      image: ghcr.io/donsbot/hsthrift/ci-base:ghcup-arm64v8
       options: --cpus 2
     steps:
       - name: Checkout code
