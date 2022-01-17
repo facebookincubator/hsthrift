@@ -50,7 +50,6 @@ jobs:
         run: cabal test mangle fb-util thrift-compiler thrift-lib thrift-cpp-channel thrift-server thrift-tests --keep-going
         working-directory: ./_sdists
 
-  # arm64 ci
   ci-arm64:
     strategy:
       fail-fast: false
@@ -58,7 +57,6 @@ jobs:
         ghc: [8.4.4]
     runs-on: ubuntu-latest
     container:
-      # pull the x86-compatible arm image from the multi-arch package
       image: ghcr.io/donsbot/hsthrift/ci-base:ghcup-arm64v8
       options: --cpus 2
     steps:
