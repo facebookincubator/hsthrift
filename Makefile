@@ -12,7 +12,7 @@ ifeq ($(BUILD_DEPS),1)
 	PKG_CONFIG_PATH := $(subst $(space),:,$(shell find $(DEPS) -name pkgconfig -type d))
 	LD_LIBRARY_PATH := $(subst $(space),:,$(patsubst %,%/lib,$(DEPS)))
 
-	THRIFT1 := $(patsubst %,%/fbthrift/bin/thrift1,$(shell $(BUILDER) show-inst-dir fbthrift))
+	THRIFT1 := $(patsubst %,%/bin/thrift1,$(shell $(BUILDER) show-inst-dir fbthrift))
 
 	CABAL=env PKG_CONFIG_PATH="$(PKG_CONFIG_PATH)" LD_LIBRARY_PATH="$(LD_LIBRARY_PATH)" cabal $(LIBDIRS) $(INCLUDEDIRS)
 else
