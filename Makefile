@@ -1,7 +1,24 @@
 # These are a few rules to help build the open-source hsthrift. This
 # file will hopefully go away in due course.
 
-CABAL=cabal
+ifeq ($(BUILD_DEPS),1)
+	empty :=
+	space := $(empty) $(empty)
+	BUILDER := ./build.sh
+
+	DEPS := $(shell $(BUILDER) show-inst-dir hsthrift --recursive)
+	LIBDIRS := $(patsubst %,--extra-lib-dirs=%/lib,$(DEPS))
+	INCLUDEDIRS := $(patsubst %,--extra-include-dirs=%/include,$(DEPS))
+	PKG_CONFIG_PATH := $(subst $(space),:,$(shell find $(DEPS) -name pkgconfig -type d))
+	LD_LIBRARY_PATH := $(subst $(space),:,$(patsubst %,%/lib,$(DEPS)))
+
+	THRIFT1 := $(patsubst %,%/bin/thrift1,$(shell $(BUILDER) show-inst-dir fbthrift))
+
+	CABAL=env PKG_CONFIG_PATH="$(PKG_CONFIG_PATH)" LD_LIBRARY_PATH="$(LD_LIBRARY_PATH)" cabal $(LIBDIRS) $(INCLUDEDIRS)
+else
+	THRIFT1 := thrift1
+	CABAL := cabal
+endif
 
 all:: compiler thrift-hs thrift-cpp server
 
@@ -105,12 +122,12 @@ thrift-hs::
 
 thrift-cpp::
 	mkdir -p cpp-channel/if cpp-channel/test/if
-	cd lib && thrift1 -I . --gen mstch_cpp2 \
+	cd lib && $(THRIFT1) -I . --gen mstch_cpp2 \
 		-o ../cpp-channel/if \
 		if/RpcOptions.thrift
-	cd lib/test/if && thrift1 -I . --gen mstch_cpp2 \
+	cd lib/test/if && $(THRIFT1) -I . --gen mstch_cpp2 \
                 -o ../../../cpp-channel/test/if \
                 math.thrift
-	cd tests/if && thrift1 -I . --gen mstch_cpp2 \
+	cd tests/if && $(THRIFT1) -I . --gen mstch_cpp2 \
 		-o . \
 		hs_test.thrift
