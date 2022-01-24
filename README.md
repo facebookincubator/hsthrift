@@ -201,5 +201,5 @@ make all BUILD_DEPS=1
 
 and test the installation with:
 ```
-make getdeps-test BUILD_DEPS=1
+make test BUILD_DEPS=1
 ```
