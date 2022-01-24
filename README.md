@@ -183,18 +183,23 @@ tag. They are all tagged regularly with tags like
 `v2021.01.11.00`. The `install_deps.sh` script will find the most
 recent tag and update all the repos to the same tag.
 
-# Building with fbcode\_builder/getdeps.py
+# Building with getdeps.py
 
-Experimental support for building hsthrift with the official Meta getdeps.py way is available.
-This is significantly smarter than the above method, but may build newer versions of some dependencies.
-For frequent development it will be faster, as it takes care of incremental builds better.
+Support for building hsthrift with the Meta getdeps.py tool is available. This
+avoids the need for sudo access to install folly and other dependencies.
 
-To install and build all dependencies (e.g. folly, fizz, fbthrift)
+To build and install the hsthrift dependencies:
 ```
-./build.sh build --allow-system-packages fbthrift
+./build.sh build --allow-system-packages --only-deps hsthrift
 ```
 
-You can then build hsthrift with `make` as above, or use getdeps.py again:
+You can then build hsthrift with `make` as follows:
+
 ```
-./build.sh build --allow-system-packages hsthrift
+make all BUILD_DEPS=1
+```
+
+and test the installation with:
+```
+make getdeps-test BUILD_DEPS=1
 ```
