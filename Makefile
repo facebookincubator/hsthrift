@@ -23,7 +23,7 @@ ifeq ($(BUILD_DEPS),1)
 
 	CABAL=env PKG_CONFIG_PATH="$(PKG_CONFIG_PATH)" \
               LD_LIBRARY_PATH="$(LD_LIBRARY_PATH)" \
-              $(CABAL_BIN) $(LIBDIRS) $(INCLUDEDIRS)
+              $(CABAL_BIN) $(LIBDIRS) $(INCLUDEDIRS) $(CABAL_PROJECT)
 else
 	THRIFT1 := thrift1
 	CABAL := $(CABAL_BIN)
