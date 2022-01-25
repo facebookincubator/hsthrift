@@ -48,3 +48,30 @@ jobs:
       - name: Run testsuites
         run: cabal test mangle fb-util thrift-compiler thrift-lib thrift-cpp-channel thrift-server thrift-tests --keep-going
         working-directory: ./_sdists
+  # check we can build the nosudo way
+  ci-nosudo:
+    strategy:
+      fail-fast: false
+      matrix:
+        ghc: [8.10.7]
+    runs-on: ubuntu-latest
+    container:
+      image: ghcr.io/facebookincubator/hsthrift/ci-base:ghcup
+      options: --cpus 2
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - name: Install ${{ matrix.ghc }}
+        run: ghcup install ghc ${{ matrix.ghc }} --set
+      - name: Install cabal-install-3.6
+        run: ghcup install cabal -u https://downloads.haskell.org/~cabal/cabal-install-3.6.0.0/cabal-install-3.6.0.0-x86_64-linux.tar.xz 3.6.0.0 --set
+      - name: Add GHC and cabal to PATH
+        run: echo "$HOME/.ghcup/bin" >> $GITHUB_PATH
+      - name: Populate hackage index
+        run: cabal update
+      - name: Install folly, fizz, wangle, fbthrift etc
+        run: ./build.sh build --allow-system-packages --only-deps --install-prefix="$HOME/.hsthrift" hsthrift
+      - name: Build all targets
+        run: make all BUILD_DEPS=1 INSTALL_PREFIX="$HOME/.hsthrift"
+      - name: Run testsuites
+        run: make test BUILD_DEPS=1 INSTALL_PREFIX="$HOME/.hsthrift"
