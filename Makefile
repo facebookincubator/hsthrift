@@ -5,28 +5,34 @@
 CABAL_BIN := cabal
 
 ifeq ($(BUILD_DEPS),1)
-	empty :=
-	space := $(empty) $(empty)
-	BUILDER := ./build.sh
+    empty :=
+    space := $(empty) $(empty)
 
-	DEPS_INSTALLDIR := $(patsubst %/hsthrift,%,\
-		$(shell $(BUILDER) show-inst-dir hsthrift))
-	DEPS := $(shell $(BUILDER) show-inst-dir hsthrift --recursive)
-	LIBDIRS := $(patsubst %,--extra-lib-dirs=%/lib,$(DEPS))
-	INCLUDEDIRS := $(patsubst %,--extra-include-dirs=%/include,$(DEPS))
-	PKG_CONFIG_PATH := $(subst $(space),:,\
+    # set to install deps into e.g. $HOME/.glean
+    ifdef INSTALL_PREFIX
+        BUILDER := ./build.sh --install-prefix=$(INSTALL_PREFIX)
+    else
+        BUILDER := ./build.sh
+    endif
+
+    DEPS_INSTALLDIR := $(patsubst %/hsthrift,%,\
+        $(shell $(BUILDER) show-inst-dir hsthrift))
+    DEPS := $(shell $(BUILDER) show-inst-dir hsthrift --recursive)
+    LIBDIRS := $(patsubst %,--extra-lib-dirs=%/lib,$(DEPS))
+    INCLUDEDIRS := $(patsubst %,--extra-include-dirs=%/include,$(DEPS))
+    PKG_CONFIG_PATH := $(subst $(space),:,\
                 $(shell find $(DEPS_INSTALLDIR) -name pkgconfig -type d))
-	LD_LIBRARY_PATH := $(subst $(space),:,$(patsubst %,%/lib,$(DEPS)))
+    LD_LIBRARY_PATH := $(subst $(space),:,$(patsubst %,%/lib,$(DEPS)))
 
-	THRIFT1 := $(patsubst %,%/bin/thrift1,\
+    THRIFT1 := $(patsubst %,%/bin/thrift1,\
                 $(shell $(BUILDER) show-inst-dir fbthrift))
 
-	CABAL=env PKG_CONFIG_PATH="$(PKG_CONFIG_PATH)" \
-              LD_LIBRARY_PATH="$(LD_LIBRARY_PATH)" \
-              $(CABAL_BIN) $(LIBDIRS) $(INCLUDEDIRS) $(CABAL_PROJECT)
+    CABAL=env PKG_CONFIG_PATH="$(PKG_CONFIG_PATH)" \
+          LD_LIBRARY_PATH="$(LD_LIBRARY_PATH)" \
+          $(CABAL_BIN) $(LIBDIRS) $(INCLUDEDIRS) $(CABAL_PROJECT)
 else
-	THRIFT1 := thrift1
-	CABAL := $(CABAL_BIN)
+    THRIFT1 := thrift1
+    CABAL := $(CABAL_BIN)
 endif
 
 all:: compiler thrift-hs thrift-cpp server
