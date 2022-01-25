@@ -73,7 +73,5 @@ jobs:
         run: ./build.sh build --allow-system-packages --only-deps --install-prefix="$HOME/.hsthrift" hsthrift
       - name: Build all targets
         run: make all BUILD_DEPS=1 INSTALL_PREFIX="$HOME/.hsthrift"
-      - name: Install libfmt
-        run: apt-get install -y libfmt-dev
-      - name: Run testsuites
-        run: make test BUILD_DEPS=1 INSTALL_PREFIX="$HOME/.hsthrift"
+          #      - name: Run testsuites
+          #        run: make test BUILD_DEPS=1 INSTALL_PREFIX="$HOME/.hsthrift"
