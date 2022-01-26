@@ -74,4 +74,4 @@ jobs:
       - name: Build all targets
         run: env LD_LIBRARY_PATH="$HOME/.hsthrift/lib" PKG_CONFIG_PATH="$HOME/.hsthrift/lib/pkgconfig" PATH="$PATH:$HOME/.hsthrift/bin" make all
       - name: Run testsuites
-        run: env LD_LIBRARY_PATH="$HOME/.hsthrift/lib" PKG_CONFIG_PATH="$HOME/.hsthrift/lib/pkgconfig" PATH="$PATH:$HOME/.hsthrift/bin" make test
+        run: env LD_LIBRARY_PATH="$HOME/.hsthrift/lib" PKG_CONFIG_PATH="$HOME/.hsthrift/lib/pkgconfig" PATH="$PATH:$HOME/.hsthrift/bin" cabal test mangle fb-util thrift-compiler thrift-lib thrift-server thrift-tests --keep-going
