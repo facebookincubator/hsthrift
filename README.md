@@ -188,14 +188,14 @@ recent tag and update all the repos to the same tag.
 Support for building hsthrift with the Meta getdeps.py tool is available. This
 avoids the need for sudo access to install folly and other dependencies.
 
-You should have installed:
+You should have installed the libraries mentioned above, as well as:
 ```
 apt install  \
     ninja-build \
     cmake
 ```
 
-Then build and install the hsthrift source dependencies:
+Now build and install the hsthrift source dependencies:
 ```
 ./new_install_deps.sh
 
@@ -214,5 +214,5 @@ make all
 
 and test the installation with:
 ```
-make test
+cabal test all
 ```
