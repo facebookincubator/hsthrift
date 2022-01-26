@@ -69,6 +69,8 @@ jobs:
         run: echo "$HOME/.ghcup/bin" >> $GITHUB_PATH
       - name: Populate hackage index
         run: cabal update
+      - name: Install ninja
+        run: apt install ninja-build
       - name: Install folly, fizz, wangle, fbthrift
         run: ./new_install_deps.sh
       - name: Build all targets
