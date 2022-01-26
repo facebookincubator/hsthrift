@@ -27,4 +27,6 @@ for dep in $DEPS; do
 done
 
 # add these to your environment
-echo "LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:+:${INSTALL_PREFIX}/lib"
+echo "export LD_LIBRARY_PATH=${INSTALL_PREFIX}/lib"
+echo "export PKG_CONFIG_PATH=${INSTALL_PREFIX}/lib/pkgconfig"
+echo "export PATH="'$PATH'":${INSTALL_PREFIX}/bin"
