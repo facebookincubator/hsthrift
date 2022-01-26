@@ -69,9 +69,9 @@ jobs:
         run: echo "$HOME/.ghcup/bin" >> $GITHUB_PATH
       - name: Populate hackage index
         run: cabal update
-      - name: Install folly, fizz, wangle, fbthrift etc
-        run: ./build.sh build --allow-system-packages --only-deps --install-prefix="$HOME/.hsthrift" hsthrift
+      - name: Install folly, fizz, wangle, fbthrift
+        run: ./new_install_deps.sh
       - name: Build all targets
-        run: make all BUILD_DEPS=1 INSTALL_PREFIX="$HOME/.hsthrift"
-          #      - name: Run testsuites
-          #        run: make test BUILD_DEPS=1 INSTALL_PREFIX="$HOME/.hsthrift"
+        run: env LD_LIBRARY_PATH="$HOME/.hsthrift/lib" PKG_CONFIG_PATH="$HOME/.hsthrift/lib/pkgconfig" PATH="$PATH:$HOME/.hsthrift/bin" make all
+      - name: Run testsuites
+        run: env LD_LIBRARY_PATH="$HOME/.hsthrift/lib" PKG_CONFIG_PATH="$HOME/.hsthrift/lib/pkgconfig" PATH="$PATH:$HOME/.hsthrift/bin" make test
