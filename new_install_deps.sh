@@ -23,10 +23,10 @@ build() {
 
 # build in order
 for dep in $DEPS; do
-    build $dep
+    build "$dep"
 done
 
 # add these to your environment
 echo "export LD_LIBRARY_PATH=${INSTALL_PREFIX}/lib"
 echo "export PKG_CONFIG_PATH=${INSTALL_PREFIX}/lib/pkgconfig"
-echo "export PATH="'$PATH'":${INSTALL_PREFIX}/bin"
+echo "export PATH=\$PATH:${INSTALL_PREFIX}/bin"
