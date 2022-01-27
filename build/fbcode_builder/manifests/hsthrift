@@ -26,4 +26,4 @@ builder = nop
 builder = make
 
 [make.build_args]
-BUILD_DEPS=1 all
+all
