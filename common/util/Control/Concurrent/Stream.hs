@@ -4,7 +4,7 @@
 -- over a streaming source of input
 
 module Control.Concurrent.Stream
-  ( streamBound
+  ( streamBoundWithThrow
   , streamWithStateAndThrow
   , streamWithStateBound
   , streamWithThrow
@@ -46,16 +46,16 @@ streamWithThrow
 streamWithThrow maxConcurrency producer worker = stream_ UnboundThreads
   ThrowExceptions producer (replicate maxConcurrency ()) $ const worker
 
--- | Like streamWithThrow, but swallows exceptions and uses
+-- | Like streamWithThrow, and uses
 -- bound threads for the workers. See 'Control.Concurrent.forkOS'
 -- for details on bound threads.
-streamBound
+streamBoundWithThrow
   :: Int -- ^ Maximum Concurrency
   -> ((a -> IO ()) -> IO ()) -- ^ Producer
   -> (a -> IO ()) -- ^ Worker
   -> IO ()
-streamBound maxConcurrency producer worker = stream_ BoundThreads
-  SwallowExceptions producer (replicate maxConcurrency ()) $ const worker
+streamBoundWithThrow maxConcurrency producer worker = stream_ BoundThreads
+  ThrowExceptions producer (replicate maxConcurrency ()) $ const worker
 
 -- | Like streamWithThrow, each worker keeps a
 -- state: the state can be a parameter to the worker function, or a state
@@ -68,7 +68,7 @@ streamWithStateAndThrow
   -> IO ()
 streamWithStateAndThrow = stream_ UnboundThreads ThrowExceptions
 
--- | Like streamWithState but uses bound threads for the workers.
+-- | Like streamWithStateAndThrow but uses bound threads for the workers.
 streamWithStateBound
   :: ((a -> IO ()) -> IO ()) -- ^ Producer
   -> [b] -- ^ Worker state
