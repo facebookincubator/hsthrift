@@ -1,24 +1,11 @@
 # These are a few rules to help build the open-source hsthrift. This
 # file will hopefully go away in due course.
+#
 
-ifeq ($(BUILD_DEPS),1)
-	empty :=
-	space := $(empty) $(empty)
-	BUILDER := ./build.sh
+CABAL_BIN := cabal
 
-	DEPS := $(shell $(BUILDER) show-inst-dir hsthrift --recursive)
-	LIBDIRS := $(patsubst %,--extra-lib-dirs=%/lib,$(DEPS))
-	INCLUDEDIRS := $(patsubst %,--extra-include-dirs=%/include,$(DEPS))
-	PKG_CONFIG_PATH := $(subst $(space),:,$(shell find $(DEPS) -name pkgconfig -type d))
-	LD_LIBRARY_PATH := $(subst $(space),:,$(patsubst %,%/lib,$(DEPS)))
-
-	THRIFT1 := $(patsubst %,%/bin/thrift1,$(shell $(BUILDER) show-inst-dir fbthrift))
-
-	CABAL=env PKG_CONFIG_PATH="$(PKG_CONFIG_PATH)" LD_LIBRARY_PATH="$(LD_LIBRARY_PATH)" cabal $(LIBDIRS) $(INCLUDEDIRS)
-else
-	THRIFT1 := thrift1
-	CABAL := cabal
-endif
+THRIFT1 := thrift1
+CABAL := $(CABAL_BIN)
 
 all:: compiler thrift-hs thrift-cpp server
 
