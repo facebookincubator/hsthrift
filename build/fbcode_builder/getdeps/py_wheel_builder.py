@@ -100,8 +100,7 @@ class PythonWheelBuilder(BuilderBase):
     that can be used by add_fb_python_library()/add_fb_python_executable() CMake rules.
     """
 
-    def _build(self, install_dirs, reconfigure):
-        # type: (List[str], bool) -> None
+    def _build(self, install_dirs: "List[str]", reconfigure: bool) -> None:
 
         # When we are invoked, self.src_dir contains the unpacked wheel contents.
         #
@@ -171,8 +170,7 @@ class PythonWheelBuilder(BuilderBase):
         # Run the build
         self._run_cmake_build(install_dirs, reconfigure)
 
-    def _run_cmake_build(self, install_dirs, reconfigure):
-        # type: (List[str], bool) -> None
+    def _run_cmake_build(self, install_dirs: "List[str]", reconfigure: bool) -> None:
 
         cmake_builder = CMakeBuilder(
             build_opts=self.build_opts,
@@ -223,8 +221,9 @@ class PythonWheelBuilder(BuilderBase):
         with open(output_path, "w") as f:
             f.write(CMAKE_CONFIG_FILE.format(**self.template_format_dict))
 
-    def _add_sources(self, path_mapping, src_path, install_path):
-        # type: (List[str], str, str) -> None
+    def _add_sources(
+        self, path_mapping: "List[str]", src_path: str, install_path: str
+    ) -> None:
 
         s = os.lstat(src_path)
         if not stat.S_ISDIR(s.st_mode):
@@ -238,8 +237,7 @@ class PythonWheelBuilder(BuilderBase):
                 os.path.join(install_path, entry),
             )
 
-    def _parse_wheel_name(self):
-        # type: () -> WheelNameInfo
+    def _parse_wheel_name(self) -> "WheelNameInfo":
 
         # The ArchiveFetcher prepends "manifest_name-", so strip that off first.
         wheel_name = os.path.basename(self.src_dir)

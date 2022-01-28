@@ -314,10 +314,9 @@ def list_win32_subst_letters():
 
 
 def find_existing_win32_subst_for_path(
-    path,  # type: str
-    subst_mapping,  # type: typing.Mapping[str, str]
-):
-    # type: (...) -> typing.Optional[str]
+    path: str,
+    subst_mapping: "typing.Mapping[str, str]",
+) -> "typing.Optional[str]":
     path = ntpath.normcase(ntpath.normpath(path))
     for letter, target in subst_mapping.items():
         if ntpath.normcase(target) == path:
@@ -484,5 +483,5 @@ def setup_build_options(args, host_type=None):
         scratch_dir,
         host_type,
         install_dir=args.install_prefix,
-        **build_args
+        **build_args,
     )
