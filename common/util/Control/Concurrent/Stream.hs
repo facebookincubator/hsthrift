@@ -7,6 +7,7 @@ module Control.Concurrent.Stream
   ( stream
   , streamBound
   , streamWithState
+  , streamWithStateBound
   ) where
 
 import Control.Concurrent.Async
@@ -62,6 +63,14 @@ streamWithState
   -> (b -> a -> IO ()) -- ^ Worker
   -> IO ()
 streamWithState = stream_ UnboundThreads ThrowExceptions
+
+-- | Like streamWithState but uses bound threads for the workers.
+streamWithStateBound
+  :: ((a -> IO ()) -> IO ()) -- ^ Producer
+  -> [b] -- ^ Worker state
+  -> (b -> a -> IO ()) -- ^ Worker
+  -> IO ()
+streamWithStateBound = stream_ BoundThreads ThrowExceptions
 
 stream_
   :: ShouldBindThreads -- use bound threads?
