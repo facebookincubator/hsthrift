@@ -4,9 +4,9 @@
 -- over a streaming source of input
 
 module Control.Concurrent.Stream
-  ( streamBoundWithThrow
-  , streamWithStateAndThrow
-  , streamWithThrow
+  ( stream
+  , streamBound
+  , streamWithState
   ) where
 
 import Control.Concurrent.Async
@@ -29,43 +29,39 @@ data ShouldThrow = ThrowExceptions | SwallowExceptions
 -- There's no end aggregation for the output from each worker, which doesn't
 -- make this composable. We can add that in the future when needed.
 --
--- Note that these functions swallow exceptions in the workers, except for
--- `streamWithThrow`.
+-- If a worker throws a synchronous exception, it will be
+-- propagated to the caller.
 --
 -- `conduit` and `pipes` provide functionality for running consecutive stages
 -- in parallel, but nothing for running a single stage concurrently.
---
--- If a worker throws a synchronous exception, it will be
--- propagated to the caller.
-streamWithThrow
+stream
   :: Int -- ^ Maximum Concurrency
   -> ((a -> IO ()) -> IO ()) -- ^ Producer
   -> (a -> IO ()) -- ^ Worker
   -> IO ()
-streamWithThrow maxConcurrency producer worker = stream_ UnboundThreads
+stream maxConcurrency producer worker = stream_ UnboundThreads
   ThrowExceptions producer (replicate maxConcurrency ()) $ const worker
 
--- | Like streamWithThrow, and uses
--- bound threads for the workers. See 'Control.Concurrent.forkOS'
--- for details on bound threads.
-streamBoundWithThrow
+-- | Like stream, but uses bound threads for the workers.  See
+-- 'Control.Concurrent.forkOS' for details on bound threads.
+streamBound
   :: Int -- ^ Maximum Concurrency
   -> ((a -> IO ()) -> IO ()) -- ^ Producer
   -> (a -> IO ()) -- ^ Worker
   -> IO ()
-streamBoundWithThrow maxConcurrency producer worker = stream_ BoundThreads
+streamBound maxConcurrency producer worker = stream_ BoundThreads
   ThrowExceptions producer (replicate maxConcurrency ()) $ const worker
 
--- | Like streamWithThrow, each worker keeps a
--- state: the state can be a parameter to the worker function, or a state
--- that you can build upon (for example the state can be an IORef of some sort)
+-- | Like stream, but each worker keeps a state: the state can be a parameter
+-- to the worker function, or a state that you can build upon (for example the
+-- state can be an IORef of some sort)
 -- There will be a thread per worker state
-streamWithStateAndThrow
+streamWithState
   :: ((a -> IO ()) -> IO ()) -- ^ Producer
   -> [b] -- ^ Worker state
   -> (b -> a -> IO ()) -- ^ Worker
   -> IO ()
-streamWithStateAndThrow = stream_ UnboundThreads ThrowExceptions
+streamWithState = stream_ UnboundThreads ThrowExceptions
 
 stream_
   :: ShouldBindThreads -- use bound threads?
