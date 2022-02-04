@@ -9,8 +9,9 @@ RUN apt-get update
 RUN apt-get install -y \
     g++ \
     cmake \
+    ninja-build \
     bison flex \
-    git cmake \
+    git \
     libzstd-dev \
     libboost-all-dev \
     libevent-dev \
@@ -38,9 +39,10 @@ RUN apt-get install -y \
     libtinfo-dev
 
 # install ghcup
-ARG GHCUP_VERSION=0.1.16.2
+ARG GHCUP_VERSION=0.1.17.2
 RUN curl --proto '=https' --tlsv1.2 -sSf https://downloads.haskell.org/~ghcup/$GHCUP_VERSION/x86_64-linux-ghcup-$GHCUP_VERSION > /usr/bin/ghcup && \
     chmod +x /usr/bin/ghcup
 
-ENV PATH=/root/.ghcup/bin:$PATH
-ENV LD_LIBRARY_PATH=/usr/local/lib:/usr/lib/x86_64-linux-gnu:$LD_LIBRARY_PATH
+ENV PATH=/root/.ghcup/bin:/root/.hsthrift/bin:$PATH
+ENV LD_LIBRARY_PATH=/usr/local/lib:/root/.hsthrift/lib:/usr/lib/x86_64-linux-gnu:$LD_LIBRARY_PATH
+ENV PKG_CONFIG_PATH=/usr/local/lib/pkgconfig:/root/.hsthrift/lib/pkgconfig:$PKG_CONFIG_PATH
