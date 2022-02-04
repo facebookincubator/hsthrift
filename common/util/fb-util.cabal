@@ -17,6 +17,7 @@ build-type:          Simple
 extra-source-files:  CHANGELOG.md,
                      cpp/*.h,
                      tests/DynamicHelper.h,
+                     tests/HsStructHelper.h,
                      hsc.h
 
 description:
@@ -80,6 +81,7 @@ library
         Foreign.CPP.HsStruct
         Foreign.CPP.HsStruct.HsArray
         Foreign.CPP.HsStruct.HsOption
+        Foreign.CPP.HsStruct.HsStdVariant
         Foreign.CPP.HsStruct.Types
         Foreign.CPP.HsStruct.Unsafe
         Foreign.CPP.HsStruct.Utils
@@ -157,6 +159,7 @@ library
 
     install-includes:
         cpp/HsOption.h
+        cpp/HsStdVariant.h
         cpp/HsStruct.h
         cpp/HsStructDefines.h
     include-dirs: .
@@ -226,7 +229,7 @@ common test-common
   extra-libraries: stdc++
   ghc-options: -threaded
   hs-source-dirs: tests, tests/github
-  other-modules: SpecRunner
+  other-modules: SpecRunner, HsStructTestTypes
   build-depends: base,
                  aeson,
                  async,

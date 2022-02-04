@@ -68,6 +68,7 @@ import Util.Text (cStringLenToText, cStringLenToTextLenient)
 
 #include <hsc.h>
 #include <cpp/HsOption.h>
+#include <cpp/HsStdVariant.h>
 #include <cpp/HsStruct.h>
 
 -- | An abstraction over storable containers. The elements will be marshaled or

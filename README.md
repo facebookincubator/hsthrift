@@ -144,6 +144,9 @@ sudo yum install \
      libsodium \
      libzstd-devel \
      pcre-devel \
+     ncurses-devel \
+     fmt-devel \
+     gmp-devel \
      community-mysql-devel
 ```
 

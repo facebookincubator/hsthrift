@@ -1,11 +1,16 @@
 // Copyright (c) Facebook, Inc. and its affiliates.
 
+#include "tests/HsStructHelper.h"
+
 #include <map>
 #include <string>
 #include "cpp/HsStruct.h"
 
 using namespace std;
 using namespace std::string_literals;
+
+HS_STD_VARIANT_CPP(MyCppVariant);
+HS_OPTION_CPP(MyCppVariant, hs_std_variant::MyCppVariant);
 
 extern "C" {
 

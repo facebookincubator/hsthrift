@@ -26,6 +26,33 @@ import Foreign.C.Types (CBool(..), CChar)
 import Foreign.CPP.HsStruct
 import Foreign.CPP.Marshallable.TH
 
+import qualified HsStructTestTypes as TT
+
+stdVariantTest :: Test
+stdVariantTest = TestLabel "stdVariantTest" $ TestCase $ do
+  let i_val = 1337
+  withCxxObject (TT.I i_val) $ \i_p -> do
+    peeked_i <- peek i_p :: IO TT.MyVariant
+    case peeked_i of
+      TT.I peeked_i_val -> assertEqual "int roundtrip" i_val peeked_i_val
+      _ -> assertFailure "Didn't get int back from roundtrip"
+
+  let s_val = "WUT"
+  withCxxObject (TT.S (HsByteString s_val)) $ \s_p -> do
+    peeked_s <- peek s_p :: IO TT.MyVariant
+    case peeked_s of
+      TT.S (HsByteString peeked_s_val) ->
+        assertEqual "string roundtrip" s_val peeked_s_val
+      _ -> assertFailure "Didn't get string back from roundtrip"
+
+  let opt_val = TT.J (HsOption (Just (HsJSON (Aeson.Bool True))))
+  withCxxObject (HsOption (Just opt_val)) $ \j_p -> do
+    HsOption peeked_j <- peek j_p :: IO (HsOption TT.MyVariant)
+    case peeked_j of
+      Just (TT.J (HsOption (Just (HsJSON (Aeson.Bool v))))) ->
+        assertBool "Json bool roundtrip" v
+      _ -> assertFailure "Didn't get option of Json back"
+
 arrayCxxTest :: Test
 arrayCxxTest = TestLabel "arrayCxxTest" $ TestCase $ do
   withDefaultCxxObject $ \p -> do
@@ -253,4 +280,5 @@ main = testRunner $ TestList
   , arrayCxxTest
   , stringPieceCxxTest
   , jsonRoundTrip
+  , stdVariantTest
   ]
