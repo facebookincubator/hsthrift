@@ -229,7 +229,7 @@ common test-common
   extra-libraries: stdc++
   ghc-options: -threaded
   hs-source-dirs: tests, tests/github
-  other-modules: SpecRunner, HsStructTestTypes
+  other-modules: SpecRunner
   build-depends: base,
                  aeson,
                  async,
@@ -260,6 +260,14 @@ common test-common
                  unordered-containers,
                  vector,
                  vector-fftw
+
+  build-tool-depends: hsc2hs:hsc2hs
+
+  -- We use hsc2hs with C++ headers, so we need to compile the
+  -- generated code with g++. The hsc2hs-generated binary is linked
+  -- by ghc.
+  hsc2hs-options: --cc=g++ --lflag=-lstdc++ --cflag=-D__HSC2HS__=1 --cflag=-std=c++17
+
 
 test-suite stream
   import: fb-haskell, fb-cpp, test-common
@@ -397,6 +405,7 @@ test-suite hs-struct
   import: fb-haskell, fb-cpp, test-common
   type: exitcode-stdio-1.0
   main-is: HsStructTest.hs
+  other-modules: HsStructTestTypes
   cxx-sources: tests/HsStructHelper.cpp
   ghc-options: -main-is HsStructTest
 
