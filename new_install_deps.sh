@@ -11,7 +11,7 @@ THREADS=4
 # These are required source deps not satisifiable with common package systems
 # in topological order. You can pass additional deps on the command line.
 #
-DEPS="folly fizz wangle fbthrift"
+DEPS="fmt folly fizz wangle fbthrift"
 
 while [ "$#" -gt 0 ]; do
     case "$1" in

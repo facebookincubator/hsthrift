@@ -65,6 +65,8 @@ jobs:
         uses: actions/checkout@v2
       - name: Install ninja
         run: apt install ninja-build
+      - name: Drop system libfmt
+        run: apt-get remove -y libfmt-dev
       - name: Install folly, fizz, wangle, fbthrift
         run: ./new_install_deps.sh
       - name: Add fbthrift/thrift1 to PATH
