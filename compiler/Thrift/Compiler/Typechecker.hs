@@ -347,6 +347,7 @@ filterDecls reqSymbols symbolMap =
       where
         newDecl = D_Service s {serviceFunctions = filteredFuns, serviceSAnns=[]}
         filteredFuns =
+          map (\f -> f {funSAnns=[]}) $
           filter (\Function{..} -> Set.member funName symbols) $
           serviceFunctions s
     filterDecl (D_Struct s, syms, smap) _ =
