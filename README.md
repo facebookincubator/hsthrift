@@ -121,6 +121,8 @@ sudo apt install \
     libmysqlclient-dev \
     bison \
     flex \
+    ninja-build \
+    cmake \
     libzstd-dev
 
 (TODO: this list is probably incomplete, please file an issue if you
@@ -135,6 +137,7 @@ sudo yum install \
      double-conversion-devel \
      boost-devel \
      cmake \
+     ninja-build \
      glog-devel \
      gflags-devel \
      gmock-devel \
@@ -164,41 +167,14 @@ hsthrift also depends on:
 * [folly](https://github.com/facebook/folly), a library of general C++ utilities
 * [fbthrift](https://github.com/facebook/fbthrift), Facebook's Thrift compiler and support libraries.
 * Other C++ libraries required by fbthrift: [rsocket-cpp](https://github.com/rsocket/rsocket-cpp), [fizz](https://github.com/facebookincubator/fizz), [wangle](https://github.com/facebook/wangle).
+* [libfmt](https://github.com/fmtlib/fmt/releases) v8
 
 These are typically not packaged by Linux distributions, so we have to
 build and install them manually from their github repos.  We've
-provided a script in the hsthrift repository, `install_deps.sh` to do
+provided a script in the hsthrift repository, `new_install_deps.sh` to do
 that.  Run the following commands to clone the repos and build and
-install the dependencies in `/usr/local`:
+install the dependencies (pass e.g. `--threads 8` to build in parallel. Default is 4):
 
-```
-mkdir deps
-cd deps
-../install_deps --sudo
-```
-
-Note that you can repeat `../install_deps --sudo --clean` in the
-future to update, build and install all the dependencies
-again.
-
-These library repositories must be checked out with a consistent
-tag. They are all tagged regularly with tags like
-`v2021.01.11.00`. The `install_deps.sh` script will find the most
-recent tag and update all the repos to the same tag.
-
-# Building with getdeps.py
-
-Support for building hsthrift with the Meta getdeps.py tool is available. This
-avoids the need for sudo access to install folly and other dependencies.
-
-You should have installed the libraries mentioned above, as well as:
-```
-apt install  \
-    ninja-build \
-    cmake
-```
-
-Now build and install the hsthrift source dependencies:
 ```
 ./new_install_deps.sh
 
