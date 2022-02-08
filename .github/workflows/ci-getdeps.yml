@@ -1,22 +1,32 @@
-# https://docs.github.com/en/free-pro-team@latest/actions/reference/workflow-syntax-for-github-actions
-name: CI
+name: CI (getdeps)
 on: [push, pull_request]
 
 jobs:
-  ci:
+  ci-getdeps:
     strategy:
       fail-fast: false
       matrix:
-        ghc: [8.4.4, 8.6.5, 8.8.4, 8.10.2]
+        ghc: [8.10.7]
     runs-on: ubuntu-latest
     container:
       image: ghcr.io/facebookincubator/hsthrift/ci-base:ghcup
       options: --cpus 2
+    env:
+        LD_LIBRARY_PATH: "/github/home/.hsthrift/lib"
+        PKG_CONFIG_PATH: "/github/home/.hsthrift/lib/pkgconfig"
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
-      - name: Install folly, fizz, wangle, rsocket-cpp, fbthrift
-        run:  ./install_deps.sh --nuke
+      - name: Env
+        run: env
+      - name: Install ninja
+        run: apt install ninja-build
+      - name: Drop system libfmt
+        run: apt-get remove -y libfmt-dev
+      - name: Install folly, fizz, wangle, fbthrift
+        run: ./new_install_deps.sh
+      - name: Add fbthrift/thrift1 to PATH
+        run: echo "$HOME/.hsthrift/bin" >> "$GITHUB_PATH"
       - name: Install ${{ matrix.ghc }}
         run: ghcup install ghc ${{ matrix.ghc }} --set
       - name: Install cabal-install-3.6
