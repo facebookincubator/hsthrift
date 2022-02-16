@@ -72,7 +72,7 @@ class CppServer : public ThriftServer {
       std::unordered_set<std::string>&& oneways)
       : oneways_(std::move(oneways)) {
     setPort(desiredPort);
-    setProcessorFactory(
+    setInterface(
         std::unique_ptr<AsyncProcessorFactory>(factoryFn(callback, oneways_)));
   }
 
