@@ -9,6 +9,32 @@
 using namespace std;
 using namespace std::string_literals;
 
+namespace facebook::common::hs {
+
+HS_DEFINE_DESTRUCTIBLE(HsMaybeNonmovable, HsMaybe<Nonmovable>);
+
+extern "C" {
+
+HsMaybe<Nonmovable>* getHsMaybeNonmovable() noexcept {
+  // test the std::unique_ptr constrcutor
+  static HsMaybe<Nonmovable> ret(std::make_unique<Nonmovable>(9, "Crino"s));
+  return &ret;
+}
+
+HsMaybe<Nonmovable>* createHsMaybeNonmovable(
+    int64_t resource,
+    const char* str,
+    int64_t len) noexcept {
+  // test the std::in_place_t constrcutor
+  HsMaybe<Nonmovable> ret(std::in_place, resource, std::string(str, len));
+  // HsMaybe itself is still safely movable
+  return new HsMaybe<Nonmovable>(std::move(ret));
+}
+
+} // extern "C"
+
+} // namespace facebook::common::hs
+
 HS_STD_VARIANT_CPP(MyCppVariant);
 HS_OPTION_CPP(MyCppVariant, hs_std_variant::MyCppVariant);
 

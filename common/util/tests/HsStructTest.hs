@@ -24,7 +24,7 @@ import Foreign
 import Foreign.C.Types (CBool(..), CChar)
 
 import Foreign.CPP.HsStruct
-import Foreign.CPP.Marshallable.TH
+import Foreign.CPP.Marshallable
 
 import qualified HsStructTestTypes as TT
 
@@ -151,6 +151,24 @@ foreign import ccall unsafe "getNothing"
 foreign import ccall unsafe "getJust"
   getJust :: IO (Ptr (HsMaybe HsString))
 
+maybeNonmovableTest :: Test
+maybeNonmovableTest = TestLabel "HsMaybeNonmovable" $ TestCase $ do
+  HsMaybe got <- peek =<< getHsMaybeNonmovable
+  assertEqual "get" (Just $ TT.Nonmovable 9 "Crino") got
+  p <- unsafeUseAsCStringLen descritpion $ \(str, len) ->
+    mask_ $ toSharedPtr =<< createHsMaybeNonmovable 101 str len
+  HsMaybe created <- withForeignPtr p peek
+  assertEqual "created" (Just $ TT.Nonmovable 101 descritpion) created
+  where
+    descritpion = "descritpion"
+
+foreign import ccall unsafe "getHsMaybeNonmovable"
+  getHsMaybeNonmovable :: IO (Ptr (HsMaybe TT.Nonmovable))
+
+foreign import ccall unsafe "createHsMaybeNonmovable"
+  createHsMaybeNonmovable
+    :: Int -> Ptr CChar -> Int -> IO (Ptr (HsMaybe TT.Nonmovable))
+
 peekHsEitherTest :: Test
 peekHsEitherTest = TestLabel "peekHsEitherTest" $ TestCase $ do
   (left :: Either String Int) <- coerce $ peek =<< getLeft
@@ -269,6 +287,7 @@ main :: IO ()
 main = testRunner $ TestList
   [ pokeHsTextTest
   , maybeTest
+  , maybeNonmovableTest
   , peekHsEitherTest
   , pokeHsEitherTest
   , arrayTest

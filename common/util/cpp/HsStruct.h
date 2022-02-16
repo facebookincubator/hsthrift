@@ -81,6 +81,8 @@ HS_STRUCT HsMaybe {
 
   /* implicit */ HsMaybe(T && value) : ptr(new T(std::move(value))) {}
 
+  /* implicit */ HsMaybe(std::unique_ptr<T> && value) : ptr(value.release()) {}
+
   template <typename U>
   /* implicit */ HsMaybe(folly::Optional<U> && value) {
     if (value.hasValue()) {
@@ -94,6 +96,10 @@ HS_STRUCT HsMaybe {
       ptr = new T(std::move(value).value());
     }
   }
+
+  template <typename... Args>
+  explicit HsMaybe(std::in_place_t, Args && ... args)
+      : ptr(new T(std::forward<Args>(args)...)) {}
 
   HsMaybe(const HsMaybe&) = delete;
 
