@@ -121,6 +121,18 @@ HS_STRUCT HsMaybe {
   ~HsMaybe() {
     delete ptr;
   }
+
+  bool hasValue() const {
+    return ptr != nullptr;
+  }
+
+  const T& value() const {
+    if (hasValue()) {
+      return *ptr;
+    } else {
+      throw std::logic_error("HsMaybe does not have value");
+    }
+  }
 };
 
 using DummyHsMaybe = HsMaybe<std::nullptr_t>;
