@@ -161,10 +161,18 @@ void createDynamicObject(
  *  - nullptr, and *err points to an error message. The caller owns the
  *    memory for the error message, and is responsible for freeing it.
  */
-const folly::dynamic*
-parseJSON(const char* str, int64_t len, char** err) noexcept {
+const folly::dynamic* parseJSON(
+    const char* str,
+    int64_t len,
+    int recursion_limit,
+    char** err) noexcept {
+  json::serialization_opts opts;
+  if (recursion_limit != -1) {
+    opts.recursion_limit = recursion_limit;
+  }
+
   try {
-    auto d = parseJson(folly::StringPiece(str, len));
+    auto d = parseJson(folly::StringPiece(str, len), opts);
     return new folly::dynamic(std::move(d));
   } catch (const std::exception& e) {
     *err = strdup(e.what());

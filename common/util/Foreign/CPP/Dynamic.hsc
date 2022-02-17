@@ -5,7 +5,7 @@
 -- and in the other direction.
 --
 
-{-# LANGUAGE TemplateHaskell, QuasiQuotes #-}
+{-# LANGUAGE TemplateHaskell, QuasiQuotes, DeriveGeneric #-}
 
 {-# OPTIONS -fno-warn-unused-imports #-} -- broken on this module
 module Foreign.CPP.Dynamic
@@ -16,17 +16,21 @@ module Foreign.CPP.Dynamic
   , destroyDynamic
   , withDynamic
   , parseJSON
+  , parseJSONWithOptions
+  , JSONOptions(..)
   ) where
 
 import Control.Monad (when)
 import Data.ByteString (ByteString)
 import Data.ByteString.Unsafe
+import Data.Default
 import qualified Data.ByteString as B
 import Foreign.C
 import Foreign hiding (alloca, allocaBytes, allocaArray)
 -- Custom alloca and friends
 import Util.Memory
 import Util.ByteString
+import GHC.Generics
 
 import Control.Applicative ((<$>))
 import Control.Exception (bracket)
@@ -128,18 +132,19 @@ $(mangle
   |])
 
 $(mangle
-  "folly::dynamic* facebook::hs::parseJSON(const char*, int64_t, char **)"
+  "folly::dynamic* facebook::hs::parseJSON(const char*, int64_t, int, char **)"
   [d|
     foreign import ccall unsafe
-      c_parseJSON :: CString -> CLong -> Ptr (Ptr CChar) -> IO (Ptr Dynamic)
+      c_parseJSON :: CString -> CLong -> CInt -> Ptr (Ptr CChar)
+        -> IO (Ptr Dynamic)
   |])
 
 
 $(mangle
-  "folly::dynamic* facebook::hs::parseJSON(const char*, int64_t, char **)"
+  "folly::dynamic* facebook::hs::parseJSON(const char*, int64_t, int, char **)"
   [d|
     foreign import ccall safe
-      c_parseJSON_safe :: CString -> CLong -> Ptr (Ptr CChar)
+      c_parseJSON_safe :: CString -> CLong -> CInt -> Ptr (Ptr CChar)
         -> IO (Ptr Dynamic)
   |])
 
@@ -171,10 +176,20 @@ destroyDynamic p = destruct p >> free p
 withDynamic :: Value -> (Ptr Dynamic -> IO a) -> IO a
 withDynamic v = bracket (createDynamic v) destroyDynamic
 
+newtype JSONOptions = JSONOptions
+  { json_recursionLimit :: Maybe Int
+  }
+  deriving Generic
+
+instance Default JSONOptions
+
 -- | Parse JSON using folly::parseJson(), which is typically about 2x
 -- faster than Aeson's family of JSON parsing functions.
 parseJSON :: ByteString -> IO (Either Text Value)
-parseJSON bs =
+parseJSON = parseJSONWithOptions def
+
+parseJSONWithOptions :: JSONOptions -> ByteString -> IO (Either Text Value)
+parseJSONWithOptions JSONOptions{..} bs =
   unsafeUseAsCStringLen bs $ \(cstr, clen) ->
   Foreign.with nullPtr $ \perr -> do
     let
@@ -186,8 +201,10 @@ parseJSON bs =
         -- conservative: 100K parses in about 0.2ms
         | B.length bs > 10*1024 = c_parseJSON_safe
         | otherwise = c_parseJSON
+
+      rec = maybe (-1) fromIntegral json_recursionLimit
     bracket
-      (ffi cstr (fromIntegral clen) perr)
+      (ffi cstr (fromIntegral clen) rec perr)
       cleanup $ \pdynamic -> do
         if pdynamic == nullPtr
           then fmap Left $ cStringToText =<< peek perr
