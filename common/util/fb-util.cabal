@@ -167,20 +167,20 @@ library
 
     build-depends:
         atomic-primops,
-        bytestring-lexing,
-        mangle,
         aeson,
         attoparsec,
+        bytestring-lexing,
+        concurrent-extra,
         exceptions,
         ghc,
-        lifted-base,
-        monad-control,
-        primitive,
         HUnit ^>= 1.6.1,
         json,
         lens,
+        lifted-base,
+        mangle,
+        monad-control,
+        primitive,
         text-show,
-        concurrent-extra,
         optparse-applicative,
         extra,
         aeson-pretty,
@@ -213,7 +213,8 @@ library
         integer-gmp ^>=1.0.2.0,
         mtl ^>=2.2.2,
         array ^>=0.5.2.0,
-        prettyprinter >=1.2.1 && <1.7
+        prettyprinter >=1.2.1 && <1.7,
+        data-default,
 
     build-tool-depends: hsc2hs:hsc2hs
 
