@@ -59,7 +59,7 @@ service UserFetcher {
 
 This defines a service called `UserFetcher` with a single RPC what takes in a 64-bit integer user ID and returns information about the user. Running the Thrift Compiler in the same way as we did above will now result in two additonal files getting create called `User.UserFetcher.Client` and `User.UserFetcher.Server`. The client contains all the code that you need to make RPC calls to a running `UserFetcher` server. The server file contains stubs so that you can create your own implementation of the server functions.
 
-For more detailed examples of how to create servers and clients, see the code in `[lib/test/SocketChannelTest.hs](../lib/test/SocketChannelTest.hs)`.
+For more detailed examples of how to create servers and clients, see the code in [`lib/test/SocketChannelTest.hs`](../lib/test/SocketChannelTest.hs).
 
 ## More Details
 
