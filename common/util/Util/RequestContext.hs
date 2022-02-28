@@ -1,24 +1,24 @@
 -- Copyright (c) Facebook, Inc. and its affiliates.
-
 {-# LANGUAGE TemplateHaskell #-}
-module Util.RequestContext
-  ( RequestContext
-  , saveRequestContext
-  , setRequestContext
-  , forkIOWithRequestContext
-  , forkOnWithRequestContext
-  ) where
+
+module Util.RequestContext (
+  RequestContext,
+  CRequestContextPtr,
+  saveRequestContext,
+  setRequestContext,
+  forkIOWithRequestContext,
+  forkOnWithRequestContext,
+) where
 
 import Control.Concurrent
 import Control.Exception
-import Foreign.Ptr
-import Foreign.ForeignPtr
-
 import Foreign.CPP.Marshallable.TH
+import Foreign.ForeignPtr
+import Foreign.Ptr
 
 data CRequestContextPtr
 
-$(deriveDestructibleUnsafe "RequestContextPtr" [t| CRequestContextPtr |])
+$(deriveDestructibleUnsafe "RequestContextPtr" [t|CRequestContextPtr|])
 
 type RequestContext = ForeignPtr CRequestContextPtr
 
