@@ -1,15 +1,16 @@
 #
 # This produces an image that can be used to build on arm64/aarch64
 #
-FROM arm64v8/ubuntu:20.04
+FROM arm64v8/ubuntu:22.04
 ENV TZ=Europe/London
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 RUN apt-get update
 RUN apt-get install -y \
-    g++ \
+    g++-9 gcc-9 llvm \
     cmake \
+    ninja-build \
     bison flex \
-    git cmake \
+    git \
     libzstd-dev \
     libboost-all-dev \
     libevent-dev \
@@ -32,14 +33,26 @@ RUN apt-get install -y \
     libpcre3-dev \
     libmysqlclient-dev \
     libfftw3-dev \
-    libfmt-dev \
     libgmp-dev \
     libtinfo-dev
+
+# set default C compiler
+RUN apt-get remove -y gcc-11
+RUN update-alternatives --install /usr/bin/cc cc /usr/bin/gcc-9 10
+RUN update-alternatives --set cc /usr/bin/gcc-9
+RUN update-alternatives --install /usr/bin/c++ c++ /usr/bin/g++-9 10
+RUN update-alternatives --set c++ /usr/bin/g++-9
+# needed for hsc2hs
+RUN update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-9 10
+# needed for ghc
+RUN update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-9 10
 
 # install ghcup
 ARG GHCUP_VERSION=0.1.17.4
 RUN curl --proto '=https' --tlsv1.2 -sSf https://downloads.haskell.org/~ghcup/$GHCUP_VERSION/aarch64-linux-ghcup-$GHCUP_VERSION > /usr/bin/ghcup && \
     chmod +x /usr/bin/ghcup
 
-ENV PATH=/root/.ghcup/bin:$PATH
-ENV LD_LIBRARY_PATH=/usr/local/lib:/usr/lib/x86_64-linux-gnu:$LD_LIBRARY_PATH
+ARG GITHUB_HOME=/github/home
+ENV PATH=$GITHUB_HOME/.ghcup/bin:$GITHUB_HOME/.hsthrift/bin:$PATH
+ENV LD_LIBRARY_PATH=$GITHUB_HOME/.hsthrift/lib:/usr/lib/aarch64-linux-gnu:$LD_LIBRARY_PATH
+ENV PKG_CONFIG_PATH=$GITHUB_HOME/.hsthrift/lib/pkgconfig:$PKG_CONFIG_PATH
