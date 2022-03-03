@@ -65,7 +65,7 @@ class HaskellAsyncProcessorFactory : public AsyncProcessorFactory {
 
   // TODO(T89004867): Call onStartServing() and onStopServing() hooks for
   // non-C++ thrift servers
-  std::vector<ServiceHandler*> getServiceHandlers() override {
+  std::vector<ServiceHandlerBase*> getServiceHandlers() override {
     return {};
   }
 
