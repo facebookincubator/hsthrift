@@ -31,19 +31,18 @@ struct MockResponseChannelRequest : public ResponseChannelRequest {
     return true;
   }
 
-  MOCK_METHOD(
-      void,
+  MOCK_METHOD3(
       sendReply,
-      (ResponsePayload&&,
-       MessageChannel::SendCallback*,
-       folly::Optional<uint32_t>));
+      void(
+          ResponsePayload&&,
+          MessageChannel::SendCallback*,
+          folly::Optional<uint32_t>));
 
-  MOCK_METHOD(
-      void,
+  MOCK_METHOD2(
       sendException,
-      (ResponsePayload&&, MessageChannel::SendCallback*));
+      void(ResponsePayload&&, MessageChannel::SendCallback*));
 
-  MOCK_METHOD(void, sendErrorWrapped, (folly::exception_wrapper, std::string));
+  MOCK_METHOD2(sendErrorWrapped, void(folly::exception_wrapper, std::string));
 
   bool active;
   size_t& destroyed;
