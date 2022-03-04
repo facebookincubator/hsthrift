@@ -4,6 +4,7 @@
 
 module Util.AllocLimit
   ( limitAllocs
+  , limitAllocsThrow
   , withAllocLimit
   , withSavedAllocLimit
   , withAllocCounter
@@ -18,14 +19,17 @@ import Control.Exception
 -- action exceeds the limit, then 'Nothing' will be returned.
 limitAllocs :: Int64 -> IO a -> IO (Maybe a)
 limitAllocs limit action =
-  handle errorHandler $ Just <$> withAllocLimit limit action
- where
-  -- like handleAllExceptions but only handles AllocationLimitExceeded
-  errorHandler :: AllocationLimitExceeded -> IO (Maybe a)
-  errorHandler _ =
-    handle errorHandler $ do
-      allowInterrupt -- let any pending async exceptions throw
-      return Nothing
+  handle (\AllocationLimitExceeded -> return Nothing) $
+    Just <$> limitAllocsThrow limit action
+
+-- | Impose an allocation limit on the given 'IO' action.  If the
+-- action exceeds the limit, then 'AllocationLimitExceeded' will be
+-- thrown.
+limitAllocsThrow :: Int64 -> IO a -> IO a
+limitAllocsThrow limit action = do
+  e <- handleAllExceptions (return . Left) $
+    Right <$> withSavedAllocLimit limit action
+  either throwIO return e
 
 -- | Impose an allocation limit on the given 'IO' action.  If the
 -- action exceeds the limit, then 'AllocationLimitExceeded' will be
