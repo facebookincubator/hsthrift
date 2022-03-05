@@ -17,6 +17,13 @@ if [ "$arch" == x86_64 ] ; then
     export CXXFLAGS=-march=corei7
 fi
 
+# if the C++ compiler is clang, we need fbthrift to build with -fsized-deallocation
+# this is a janky way to make that happen until we work out how to patch fbthrift
+clang=$(cc --version | sed -n 's/^.*\(clang\).*$/\1/p')
+if [ -n "$clang" ] ; then
+    export CXXFLAGS="$CXXFLAGS -fsized-deallocation"
+fi
+
 # N.B. we always need shared libs, but this only checks build is the first arg
 if [ "$1" = "build" ]; then
     set -- "$@" --extra-cmake-defines='{"BUILD_SHARED_LIBS": "ON", "BUILD_EXAMPLES": "off", "BUILD_TESTS": "off", "CMAKE_INSTALL_RPATH_USE_LINK_PATH": "TRUE", "EVENT__BUILD_SHARED_LIBRARIES": "ON"}'
