@@ -91,7 +91,7 @@ library
 
     hs-source-dirs: .
     build-tool-depends: hsc2hs:hsc2hs
-    hsc2hs-options: --cc=g++ --lflag=-lstdc++ --cflag=-D__HSC2HS__=1 --lflag=-lboost_context --cflag=-std=c++17
+    hsc2hs-options: --cc=g++ --lflag=-lstdc++ --cflag=-D__HSC2HS__=1 --lflag=-lboost_context --lflag=-latomic --cflag=-std=c++17
     include-dirs: .
 
     pkgconfig-depends: libfolly, fmt, openssl, libsodium
@@ -111,6 +111,8 @@ library
         -- TODO: I needed this to satisfy an undefined reference to
         -- jump_fcontext when running hsc2hs
         boost_context
+        -- __atomic_is_lock_free (-latomic) missing with clang
+        atomic
 
     build-depends:
         base >=4.11.1 && <4.15,
