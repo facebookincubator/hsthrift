@@ -32,6 +32,11 @@ for dep in $DEPS; do
 done
 
 # add these to your environment
-echo "export LD_LIBRARY_PATH=${INSTALL_PREFIX}/lib"
-echo "export PKG_CONFIG_PATH=${INSTALL_PREFIX}/lib/pkgconfig"
+if [ -d "${INSTALL_PREFIX}/lib64" ]; then
+    echo "export LD_LIBRARY_PATH=${INSTALL_PREFIX}/lib:${INSTALL_PREFIX}/lib64"
+    echo "export PKG_CONFIG_PATH=${INSTALL_PREFIX}/lib/pkgconfig:${INSTALL_PREFIX}/lib64/pkgconfig"
+else
+    echo "export LD_LIBRARY_PATH=${INSTALL_PREFIX}/lib"
+    echo "export PKG_CONFIG_PATH=${INSTALL_PREFIX}/lib/pkgconfig"
+fi
 echo "export PATH=\$PATH:${INSTALL_PREFIX}/bin"
