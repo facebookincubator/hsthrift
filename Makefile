@@ -20,7 +20,7 @@ util::
 
 thrift:: thrift-cpp thrift-hs
 
-THRIFT_COMPILE := $(shell $(CABAL) list-bin exe:thrift-compiler)
+THRIFT_COMPILE := $(shell $(CABAL) -v0 list-bin exe:thrift-compiler)
 
 thrift-hs::
 	(cd lib && $(THRIFT_COMPILE) --hs \
