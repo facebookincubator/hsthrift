@@ -34,12 +34,11 @@ RUN apt-get install -y \
     libpcre3-dev \
     libmysqlclient-dev \
     libfftw3-dev \
-    libfmt-dev \
     libgmp-dev \
     libtinfo-dev
 
 # install ghcup
-ARG GHCUP_VERSION=0.1.17.2
+ARG GHCUP_VERSION=0.1.17.4
 RUN curl --proto '=https' --tlsv1.2 -sSf https://downloads.haskell.org/~ghcup/$GHCUP_VERSION/x86_64-linux-ghcup-$GHCUP_VERSION > /usr/bin/ghcup && \
     chmod +x /usr/bin/ghcup
 
