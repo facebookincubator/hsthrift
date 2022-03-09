@@ -113,8 +113,10 @@ void createDynamic(dynamic* ret, DType ty, DValue* val) noexcept {
       new (ret) dynamic(val->string);
       break;
     case dynamic::ARRAY:
+      #pragma GCC diagnostic ignored "-Wterminate"
       throw std::invalid_argument("call writeDynamicArray for dynamic::ARRAY");
     case dynamic::OBJECT:
+      #pragma GCC diagnostic ignored "-Wterminate"
       throw std::invalid_argument(
           "call writeDynamicObject for dynamic::OBJECT");
     default:
