@@ -22,7 +22,7 @@ thrift:: thrift-cpp thrift-hs
 
 THRIFT_COMPILE := $(shell $(CABAL) -v0 list-bin exe:thrift-compiler)
 
-thrift-hs::
+thrift-hs:: compiler
 	(cd lib && $(THRIFT_COMPILE) --hs \
 		if/RpcOptions.thrift)
 	(cd lib && $(THRIFT_COMPILE) --hs \
