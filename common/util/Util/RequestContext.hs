@@ -6,11 +6,16 @@ module Util.RequestContext (
   CRequestContextPtr,
   saveRequestContext,
   setRequestContext,
+  withRequestContext,
+  finalizeRequestContext,
   forkIOWithRequestContext,
   forkOnWithRequestContext,
+  RequestContextHolder(..),
+  DefaultRequestContextHolder,
 ) where
 
 import Control.Concurrent
+import Control.DeepSeq
 import Control.Exception
 import Foreign.CPP.Marshallable.TH
 import Foreign.ForeignPtr
@@ -20,13 +25,22 @@ data CRequestContextPtr
 
 $(deriveDestructibleUnsafe "RequestContextPtr" [t|CRequestContextPtr|])
 
-type RequestContext = ForeignPtr CRequestContextPtr
+newtype RequestContext = RequestContext (ForeignPtr CRequestContextPtr)
+
+instance NFData RequestContext where
+  rnf (RequestContext rc) = rc `seq` ()
 
 saveRequestContext :: IO RequestContext
-saveRequestContext = mask_ $ toSharedPtr =<< c_saveContext
+saveRequestContext = mask_ $ fmap RequestContext $ toSharedPtr =<< c_saveContext
 
 setRequestContext :: RequestContext -> IO ()
-setRequestContext = flip withForeignPtr c_setContext
+setRequestContext (RequestContext rc) = withForeignPtr rc c_setContext
+
+withRequestContext :: RequestContext -> (Ptr CRequestContextPtr -> IO a) -> IO a
+withRequestContext (RequestContext rc) = withForeignPtr rc
+
+finalizeRequestContext :: RequestContext -> IO ()
+finalizeRequestContext (RequestContext rc) = finalizeForeignPtr rc
 
 foreign import ccall unsafe "hs_request_context_saveContext"
   c_saveContext :: IO (Ptr CRequestContextPtr)
@@ -40,7 +54,7 @@ restorableRequestContext = do
   rc <- saveRequestContext
   return $ do
     setRequestContext rc
-    finalizeForeignPtr rc
+    finalizeRequestContext rc
 
 forkIOWithRequestContext :: IO () -> IO ThreadId
 forkIOWithRequestContext f = do
@@ -51,3 +65,18 @@ forkOnWithRequestContext :: Int -> IO () -> IO ThreadId
 forkOnWithRequestContext cap f = do
   restore <- restorableRequestContext
   forkOn cap $ restore >> f
+
+class RequestContextHolder a where
+  trySaveRequestContextFrom :: a -> IO (Maybe RequestContext)
+  trySetRequestContextTo :: Maybe RequestContext -> a -> IO a
+
+data DefaultRequestContextHolder = DefaultRequestContextHolder
+  deriving (Eq, Show)
+
+instance RequestContextHolder DefaultRequestContextHolder where
+  trySaveRequestContextFrom _ = Just <$> saveRequestContext
+  trySetRequestContextTo rc a = mapM_ setRequestContext rc *> return a
+
+instance RequestContextHolder () where
+  trySaveRequestContextFrom _ = return Nothing
+  trySetRequestContextTo _ = return
