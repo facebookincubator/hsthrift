@@ -171,7 +171,6 @@ common test-deps
                  QuickCheck,
                  STMonadTrans,
                  thrift-lib:test-helpers,
-  ghc-options: -threaded
 
 -- This is used by local tests only
 library test-lib
