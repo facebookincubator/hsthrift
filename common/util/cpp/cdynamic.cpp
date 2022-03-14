@@ -113,9 +113,10 @@ void createDynamic(dynamic* ret, DType ty, DValue* val) noexcept {
       new (ret) dynamic(val->string);
       break;
     case dynamic::ARRAY:
-      throw std::invalid_argument("call writeDynamicArray for dynamic::ARRAY");
+      folly::terminate_with<std::invalid_argument>(
+          "call writeDynamicArray for dynamic::ARRAY");
     case dynamic::OBJECT:
-      throw std::invalid_argument(
+      folly::terminate_with<std::invalid_argument>(
           "call writeDynamicObject for dynamic::OBJECT");
     default:
       __builtin_unreachable();
