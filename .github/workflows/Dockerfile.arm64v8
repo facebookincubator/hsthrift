@@ -46,9 +46,10 @@ RUN update-alternatives --set c++ /usr/bin/g++-9
 RUN update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-9 10
 # needed for ghc
 RUN update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-9 10
+RUN apt-get -y autoremove
 
 # install ghcup
-ARG GHCUP_VERSION=0.1.17.4
+ARG GHCUP_VERSION=0.1.17.5
 RUN curl --proto '=https' --tlsv1.2 -sSf https://downloads.haskell.org/~ghcup/$GHCUP_VERSION/aarch64-linux-ghcup-$GHCUP_VERSION > /usr/bin/ghcup && \
     chmod +x /usr/bin/ghcup
 
@@ -56,3 +57,9 @@ ARG GITHUB_HOME=/github/home
 ENV PATH=$GITHUB_HOME/.ghcup/bin:$GITHUB_HOME/.hsthrift/bin:$PATH
 ENV LD_LIBRARY_PATH=$GITHUB_HOME/.hsthrift/lib:/usr/lib/aarch64-linux-gnu:$LD_LIBRARY_PATH
 ENV PKG_CONFIG_PATH=$GITHUB_HOME/.hsthrift/lib/pkgconfig:$PKG_CONFIG_PATH
+
+# build rocksdb 7 from source and install
+# we use the hsthrift build manifest for consistency
+RUN git clone https://github.com/facebookincubator/hsthrift
+RUN cd hsthrift && ./build.sh build --no-deps --install-dir /usr/ --num-jobs 8 rocksdb
+RUN rm -rf /tmp/fbcode_builder_getdeps-ZhsthriftZbuildZfbcode_builder-root/ && rm -rf /hsthrift/
