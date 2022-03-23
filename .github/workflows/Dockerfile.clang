@@ -2,12 +2,12 @@
 # This produces the image that is used for running the github actions
 # CI jobs.
 #
-FROM ubuntu:20.04
+FROM ubuntu:22.04
 ENV TZ=Europe/London
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 RUN apt-get update
 RUN apt-get install -y \
-    clang-11 llvm \
+    clang-12 llvm-12 \
     cmake \
     ninja-build \
     bison flex \
@@ -37,18 +37,19 @@ RUN apt-get install -y \
     libgmp-dev \
     libtinfo-dev
 
-# set default C compiler
-RUN apt-get remove -y gcc
-RUN update-alternatives --install /usr/bin/cc cc /usr/bin/clang-11 10
-RUN update-alternatives --set cc /usr/bin/clang-11
-RUN update-alternatives --install /usr/bin/c++ c++ /usr/bin/clang++-11 10
-RUN update-alternatives --set c++ /usr/bin/clang++-11
-# needed for hsc2hs
-RUN update-alternatives --install /usr/bin/g++ g++ /usr/bin/clang++-11 10
-# needed for ghc
-RUN update-alternatives --install /usr/bin/gcc gcc /usr/bin/clang-11 10
-
 # clean up
+
+# set default C compiler
+ARG CLANG_VERSION=12
+RUN apt-get remove -y gcc-11
+RUN update-alternatives --install /usr/bin/cc cc /usr/bin/clang-$CLANG_VERSION 10
+RUN update-alternatives --set cc /usr/bin/clang-$CLANG_VERSION
+RUN update-alternatives --install /usr/bin/c++ c++ /usr/bin/clang++-$CLANG_VERSION 10
+RUN update-alternatives --set c++ /usr/bin/clang++-$CLANG_VERSION
+# needed for hsc2hs
+RUN update-alternatives --install /usr/bin/g++ g++ /usr/bin/clang++-$CLANG_VERSION 10
+# needed for ghc
+RUN update-alternatives --install /usr/bin/gcc gcc /usr/bin/clang-$CLANG_VERSION 10
 RUN apt-get -y autoremove
 
 # install ghcup
