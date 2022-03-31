@@ -26,7 +26,7 @@ fi
 
 # N.B. we always need shared libs, but this only checks build is the first arg
 if [ "$1" = "build" ]; then
-    set -- "$@" --extra-cmake-defines='{"BUILD_SHARED_LIBS": "ON", "BUILD_EXAMPLES": "off", "BUILD_TESTS": "off", "CMAKE_INSTALL_RPATH_USE_LINK_PATH": "TRUE", "EVENT__BUILD_SHARED_LIBRARIES": "ON"}'
+    set -- "$@" --extra-cmake-defines='{"BUILD_SHARED_LIBS": "ON", "BUILD_EXAMPLES": "off", "BUILD_TESTS": "off", "CMAKE_INSTALL_RPATH_USE_LINK_PATH": "TRUE", "EVENT__BUILD_SHARED_LIBRARIES": "ON", "BOOST_LINK_STATIC": "OFF"}'
 fi
 
 for getdeps in "${GETDEPS_PATHS[@]}"; do
