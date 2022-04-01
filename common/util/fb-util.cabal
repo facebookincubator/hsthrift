@@ -108,6 +108,7 @@ library
         Util.EventBase
         Util.Executor
         Util.Fd
+        Util.FFI
         Util.FilePath
         Util.Function
         Util.Graph
