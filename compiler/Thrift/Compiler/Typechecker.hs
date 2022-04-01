@@ -351,15 +351,23 @@ filterDecls reqSymbols symbolMap =
           filter (\Function{..} -> Set.member funName symbols) $
           serviceFunctions s
     filterDecl (D_Struct s, syms, smap) _ =
-      (D_Struct s {structSAnns=[]}, syms, smap)
+      (D_Struct s
+        { structSAnns = []
+        , structMembers = map filterField $ structMembers s
+        }, syms, smap)
     filterDecl (D_Union u, syms, smap) _ =
-      (D_Union u {unionSAnns=[]}, syms, smap)
+      (D_Union u
+        { unionSAnns = []
+        , unionAlts = map filterAlt $ unionAlts u
+        }, syms, smap)
     filterDecl (D_Typedef t, syms, smap) _ =
       (D_Typedef t {tdSAnns=[]}, syms, smap)
     filterDecl (D_Enum e, syms, smap) _ =
       (D_Enum e {enumSAnns=[]}, syms, smap)
     filterDecl (D_Const c, syms, smap) _ =
       (D_Const c {constSAnns=[]}, syms, smap)
+    filterField field = field {fieldSAnns=[]}
+    filterAlt alt = alt {altSAnns=[]}
     addSym symbol (syms, smap)
       | Text.null name = (Set.insert symbol syms, smap)
       | otherwise = (syms, Map.insertWith Set.union prefix nameSet smap)
