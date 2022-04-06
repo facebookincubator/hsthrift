@@ -4,6 +4,7 @@
 module Util.RequestContext (
   RequestContext,
   CRequestContextPtr,
+  createRequestContext,
   saveRequestContext,
   setRequestContext,
   withRequestContext,
@@ -30,10 +31,14 @@ newtype RequestContext = RequestContext (ForeignPtr CRequestContextPtr)
 instance NFData RequestContext where
   rnf (RequestContext rc) = rc `seq` ()
 
+createRequestContext :: IO (Ptr CRequestContextPtr) -> IO RequestContext
+createRequestContext create =
+  mask_ $ fmap RequestContext $ toSharedPtr =<< create
+
 -- | 'saveRequestContext' should only be used in bound thread created by
 -- 'forkOS', 'main' or @foreign export@.
 saveRequestContext :: IO RequestContext
-saveRequestContext = mask_ $ fmap RequestContext $ toSharedPtr =<< c_saveContext
+saveRequestContext = createRequestContext c_saveContext
 
 -- | 'setRequestContext' should only be used in bound thread created by
 -- 'forkOS', 'main' or @foreign export@.

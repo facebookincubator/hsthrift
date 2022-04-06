@@ -1,8 +1,8 @@
+#include "cpp/RequestContext.h"
+
 #include <folly/io/async/Request.h>
 
 #include "cpp/Destructible.h"
-
-using RequestContextPtr = std::shared_ptr<folly::RequestContext>;
 
 HS_DEFINE_DESTRUCTIBLE(RequestContextPtr, RequestContextPtr);
 
