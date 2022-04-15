@@ -7,8 +7,10 @@ module Util.RequestContext (
   createRequestContext,
   saveRequestContext,
   setRequestContext,
+  createShallowCopyRequestContext,
   withRequestContext,
   finalizeRequestContext,
+  withShallowCopyRequestContextScopeGuard,
   forkIOWithRequestContext,
   forkOnWithRequestContext,
   RequestContextHolder(..),
@@ -45,17 +47,39 @@ saveRequestContext = createRequestContext c_saveContext
 setRequestContext :: RequestContext -> IO ()
 setRequestContext (RequestContext rc) = withForeignPtr rc c_setContext
 
+-- | Creates a **shallow** copy of the 'RequestContext'. This allows to
+-- overwrite a specific RequestData pointer.
+createShallowCopyRequestContext :: RequestContext -> IO RequestContext
+createShallowCopyRequestContext (RequestContext rc) =
+  withForeignPtr rc $ createRequestContext . c_createShallowCopy
+
 withRequestContext :: RequestContext -> (Ptr CRequestContextPtr -> IO a) -> IO a
 withRequestContext (RequestContext rc) = withForeignPtr rc
 
 finalizeRequestContext :: RequestContext -> IO ()
 finalizeRequestContext (RequestContext rc) = finalizeForeignPtr rc
 
+-- | 'withShallowCopyRequestContextScopeGuard' should only be used in bound
+-- thread created by 'forkOS', 'main' or '@foreign export@'. This allows to
+-- overwrite a specific RequestData pointer for the scope's duration, without
+-- breaking others.
+withShallowCopyRequestContextScopeGuard :: IO a -> IO a
+withShallowCopyRequestContextScopeGuard f = do
+  rc <- saveRequestContext
+  flip finally (setRequestContext rc >> finalizeRequestContext rc) $ do
+    shallowCopy <- createShallowCopyRequestContext rc
+    setRequestContext shallowCopy
+    finalizeRequestContext shallowCopy
+    f
+
 foreign import ccall unsafe "hs_request_context_saveContext"
   c_saveContext :: IO (Ptr CRequestContextPtr)
 
 foreign import ccall unsafe "hs_request_context_setContext"
   c_setContext :: Ptr CRequestContextPtr -> IO ()
+
+foreign import ccall unsafe "hs_request_context_createShallowCopy"
+  c_createShallowCopy :: Ptr CRequestContextPtr -> IO (Ptr CRequestContextPtr)
 
 -- The returned 'IO ()' can only be called at most once.
 restorableRequestContext :: IO (IO ())

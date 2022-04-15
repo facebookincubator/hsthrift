@@ -16,4 +16,13 @@ void hs_request_context_setContext(RequestContextPtr* ptr) noexcept {
   folly::RequestContext::setContext(*ptr);
 }
 
+RequestContextPtr* hs_request_context_createShallowCopy(
+    RequestContextPtr* ptr) noexcept {
+  if (*ptr) {
+    return new RequestContextPtr(folly::RequestContext::copyAsChild(**ptr));
+  } else {
+    return new RequestContextPtr(std::make_shared<folly::RequestContext>(0));
+  }
+}
+
 } // extern "C"
