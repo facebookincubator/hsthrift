@@ -9,7 +9,11 @@ HS_DEFINE_DESTRUCTIBLE(RequestContextPtr, RequestContextPtr);
 extern "C" {
 
 RequestContextPtr* hs_request_context_saveContext() noexcept {
-  return new RequestContextPtr(folly::RequestContext::saveContext());
+  auto rc = folly::RequestContext::saveContext();
+  if (!rc) {
+    rc = std::make_shared<folly::RequestContext>(0);
+  }
+  return new RequestContextPtr(std::move(rc));
 }
 
 void hs_request_context_setContext(RequestContextPtr* ptr) noexcept {
@@ -18,11 +22,7 @@ void hs_request_context_setContext(RequestContextPtr* ptr) noexcept {
 
 RequestContextPtr* hs_request_context_createShallowCopy(
     RequestContextPtr* ptr) noexcept {
-  if (*ptr) {
-    return new RequestContextPtr(folly::RequestContext::copyAsChild(**ptr));
-  } else {
-    return new RequestContextPtr(std::make_shared<folly::RequestContext>(0));
-  }
+  return new RequestContextPtr(folly::RequestContext::copyAsChild(**ptr));
 }
 
 } // extern "C"

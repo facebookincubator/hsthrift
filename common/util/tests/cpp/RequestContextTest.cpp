@@ -24,9 +24,6 @@ int64_t hs_request_context_getTestValue(RequestContextPtr* p) noexcept {
 void hs_request_context_setTestValue(
     RequestContextPtr* p,
     int64_t value) noexcept {
-  if (!*p) {
-    *p = std::make_shared<folly::RequestContext>();
-  }
   (*p)->overwriteContextData(
       kRequestToken, std::make_unique<TestRequestData>(value));
 }
