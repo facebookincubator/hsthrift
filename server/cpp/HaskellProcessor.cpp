@@ -138,7 +138,11 @@ void HaskellAsyncProcessor::processSerializedRequest(
     }
   };
 
-  const auto pri = apache::thrift::concurrency::NORMAL;
+  const auto priorityFromHeaders = context->getCallPriority();
+  const auto pri = (priorityFromHeaders != concurrency::PRIORITY::N_PRIORITIES)
+      ? priorityFromHeaders
+      : apache::thrift::concurrency::NORMAL;
+
   const auto source =
       apache::thrift::concurrency::ThreadManager::Source::UPSTREAM;
   // the ThreadManager can prioritise upstream jobs differently
