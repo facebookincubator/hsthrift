@@ -76,6 +76,7 @@ import Thrift.Compiler.Types
        '='         { Tok EQUALS _ }
        '@'         { Tok AT _ }
        -- Tokens for unused syntax
+       package    { Tok PACKAGE _ }
        binary     { Tok BINARY _ }
        senum      { Tok SENUM _ }
        stream     { Tok STREAM _ }
@@ -127,6 +128,14 @@ Header :: { Maybe (Header Loc) }
       , nmLangLoc    = lLoc $2
       , nmNameLoc    = lLoc $3
       , nmQuoteType  = lRep $3
+      }
+    }
+  | package stringLit
+    { Just HPackage
+      { pkgUri = lParsed $2
+      , pkgKeywordLoc = getLoc $1
+      , pkgUriLoc     = lLoc $2
+      , pkgQuoteType  = lRep $2
       }
     }
 
@@ -660,6 +669,7 @@ Symbol :: { L Text }
   | client      { L (getLoc $1) "client" }
   | readonly    { L (getLoc $1) "readonly" }
   | idempotent  { L (getLoc $1) "idempotent" }
+  | package     { L (getLoc $1) "package" }
 
 stringLit : stringTok
   {% case $1 of

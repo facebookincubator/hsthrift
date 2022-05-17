@@ -65,6 +65,11 @@ ppHeader HNamespace{..} = mconcat
   , addHeader nmNameLoc
   , maybe fromText (flip ppStr) nmQuoteType nmName
   ]
+ppHeader HPackage {..} = mconcat
+  [ addHeader pkgKeywordLoc, "package"
+  , addHeader pkgUriLoc
+  , ppStr pkgUri pkgQuoteType
+  ]
 
 -- Decls -----------------------------------------------------------------------
 

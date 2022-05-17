@@ -269,6 +269,7 @@ getNamespace :: Text -> [Header a] -> Maybe Text
 getNamespace l = foldl' getNS Nothing
   where
     getNS ns HInclude{} = ns
+    getNS ns HPackage{} = ns
     getNS ns HNamespace{..}
       | nmLang == l = Just nmName
       | otherwise   = ns

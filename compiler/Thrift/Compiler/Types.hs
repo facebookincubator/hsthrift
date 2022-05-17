@@ -103,6 +103,12 @@ data Header a
     , nmNameLoc    :: Located a
     , nmQuoteType  :: Maybe QuoteType
     }
+  | HPackage
+    { pkgUri         :: Text
+    , pkgKeywordLoc  :: Located a
+    , pkgUriLoc      :: Located a
+    , pkgQuoteType   :: QuoteType
+    }
 
 data IncludeType = Include | HsInclude | CppInclude
 

@@ -71,6 +71,7 @@ tokens :-
   "void"               { basicToken VOID }
   "true"               { basicToken TRUE }
   "false"              { basicToken FALSE }
+  "package"            { basicToken PACKAGE }
   "namespace"          { basicToken NAMESPACE }
   "include"            { basicToken INCLUDE }
   "hs_include"         { basicToken HS_INCLUDE }
@@ -162,6 +163,7 @@ data TokenType
   | ONEWAY | EXTENDS | THROWS | ASYNC
   | SAFE | TRANSIENT | STATEFUL | PERMANENT | SERVER | CLIENT
   | READONLY | IDEMPOTENT
+  | PACKAGE
   -- Stuff we won't use ever
   | CPP_INCLUDE
   deriving (Show, Eq)

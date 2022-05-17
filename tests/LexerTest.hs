@@ -82,6 +82,7 @@ ppT (STRING_LIT s qt) = q ++ s ++ q
   where q = case qt of { SingleQuote -> "'" ; DoubleQuote -> "\"" }
 ppT (SYMBOL s) = s
 ppT NAMESPACE = "namespace"
+ppT PACKAGE = "package"
 ppT INCLUDE = "include"
 ppT HS_INCLUDE = "hs_include"
 ppT HASH_MAP = "hash_map"

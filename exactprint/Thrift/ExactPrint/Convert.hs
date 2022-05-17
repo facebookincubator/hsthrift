@@ -76,6 +76,12 @@ computeHeaderOffsets origin HNamespace{..} =
               , ..
               },
    lLocation nmNameLoc)
+computeHeaderOffsets origin HPackage{..} =
+  (HPackage { pkgKeywordLoc = getOffsets origin pkgKeywordLoc
+            , pkgUriLoc    = getOffsets (lLocation pkgKeywordLoc) pkgUriLoc
+            , ..
+            },
+   lLocation pkgUriLoc)
 
 -- Decls -----------------------------------------------------------------------
 
