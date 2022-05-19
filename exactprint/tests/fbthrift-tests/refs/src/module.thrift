@@ -3,7 +3,7 @@
 // source: thrift/compiler/test/fixtures/*
 // @generated
 /*
- * Copyright (c) Facebook, Inc. and its affiliates.
+ * Copyright (c) Meta Platforms, Inc. and affiliates.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,6 +18,7 @@
  * limitations under the License.
  */
 
+namespace java2 test.fixtures.refs
 namespace java.swift test.fixtures.refs
 
 enum MyEnum {
@@ -38,6 +39,10 @@ struct MyField {
   4: optional MyEnum opt_enum_value (cpp.ref = "true", cpp2.ref = "true");
   5: MyEnum enum_value (cpp.ref = "true", cpp2.ref = "true");
   6: required MyEnum req_enum_value (cpp.ref = "true", cpp2.ref = "true");
+
+  7: optional string opt_str_value (cpp.ref = "true", cpp2.ref = "true");
+  8: string str_value (cpp.ref = "true", cpp2.ref = "true");
+  9: required string req_str_value (cpp.ref = "true", cpp2.ref = "true");
 }
 
 struct MyStruct {
@@ -94,13 +99,18 @@ enum TypedEnum {
   VAL2 = 1,
 } (cpp.enum_type = "short")
 
-struct Empty {
-}
+struct Empty {}
 
 struct StructWithRef {
   1: Empty def_field (cpp.ref);
   2: optional Empty opt_field (cpp.ref);
   3: required Empty req_field (cpp.ref);
+}
+
+struct StructWithBox {
+  1: optional string a (thrift.box);
+  2: optional list<i64> b (thrift.box);
+  3: optional StructWithRef c (thrift.box);
 }
 
 const StructWithRef kStructWithRef = {
@@ -147,4 +157,27 @@ const StructWithRefTypeSharedConst kStructWithRefTypeSharedConst = {
 
 struct StructWithRefAndAnnotCppNoexceptMoveCtor {
   1: Empty def_field (cpp.ref);
+}
+
+struct StructWithString {
+  1: string def_unique_string_ref = "..." (
+    cpp.ref_type = "unique",
+    cpp2.ref_type = "unique",
+  );
+  2: string def_shared_string_ref = "..." (
+    cpp.ref_type = "shared",
+    cpp2.ref_type = "shared",
+  );
+  3: string def_shared_string_const_ref = "..." (
+    cpp.ref_type = "shared_const",
+    cpp2.ref_type = "shared_const",
+  );
+  4: string unique_string_ref (
+    cpp.ref_type = "unique",
+    cpp2.ref_type = "unique",
+  );
+  5: string shared_string_ref (
+    cpp.ref_type = "shared",
+    cpp2.ref_type = "shared",
+  );
 }

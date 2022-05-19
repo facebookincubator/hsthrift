@@ -3,7 +3,7 @@
 // source: thrift/compiler/test/fixtures/*
 // @generated
 /*
- * Copyright (c) Facebook, Inc. and its affiliates.
+ * Copyright (c) Meta Platforms, Inc. and affiliates.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,6 +22,7 @@ namespace cpp MODULE2
 namespace cpp2 module2
 namespace java module2
 namespace py module2
+namespace java2 test.fixtures.module2
 namespace java.swift test.fixtures.module2
 
 include "module0.thrift"

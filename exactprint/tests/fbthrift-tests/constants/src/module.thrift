@@ -3,7 +3,7 @@
 // source: thrift/compiler/test/fixtures/*
 // @generated
 /*
- * Copyright (c) Facebook, Inc. and its affiliates.
+ * Copyright (c) Meta Platforms, Inc. and affiliates.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,7 +18,9 @@
  * limitations under the License.
  */
 
+namespace java2 test.fixtures.constants
 namespace java.swift test.fixtures.constants
+namespace java2.constants test.fixtures.constants.ModuleConstants
 namespace java.swift.constants test.fixtures.constants.ModuleConstants
 
 const i32 myInt = 1337;
@@ -62,6 +64,7 @@ struct Internship {
   2: string title;
   3: optional Company employer;
   4: optional double compensation;
+  5: optional string school;
 }
 
 typedef string MyStringIdentifier
@@ -77,6 +80,7 @@ const Internship instagram = {
   "title": "Software Engineer",
   "employer": Company.INSTAGRAM,
   "compensation": 1200.0,
+  "school": "Monters University",
 };
 
 const Internship partial_const = {"weeks": 8, "title": "Some Job"};
@@ -230,11 +234,35 @@ const i32 zero32 = 0;
 const i64 zero64 = 0;
 const double zero_dot_zero = 0.0;
 const string empty_string = "";
-const list<i32> empty_int_list = {};
-const list<string> empty_string_list = {};
-const set<i32> empty_int_set = {};
-const set<string> empty_string_set = {};
+const list<i32> empty_int_list = [];
+const list<string> empty_string_list = [];
+const set<i32> empty_int_set = [];
+const set<string> empty_string_set = [];
 const map<i32, i32> empty_int_int_map = {};
 const map<i32, string> empty_int_string_map = {};
 const map<string, i32> empty_string_int_map = {};
 const map<string, string> empty_string_string_map = {};
+
+const i64 maxIntDec = 9223372036854775807;
+const i64 maxIntOct = 0777777777777777777777;
+const i64 maxIntHex = 0x7FFFFFFFFFFFFFFF;
+const i64 maxIntBin = 0b111111111111111111111111111111111111111111111111111111111111111;
+const double maxDub = 1.7976931348623157e308;
+const double minDub = 2.2250738585072014e-308;
+const double minSDub = 4.9406564584124654e-324;
+
+const i64 maxPIntDec = +9223372036854775807;
+const i64 maxPIntOct = +0777777777777777777777;
+const i64 maxPIntHex = +0X7FFFFFFFFFFFFFFF;
+const i64 maxPIntBin = +0B111111111111111111111111111111111111111111111111111111111111111;
+const double maxPDub = +1.7976931348623157E+308;
+const double minPDub = +2.2250738585072014E-308;
+const double minPSDub = +4.9406564584124654E-324;
+
+const i64 minIntDec = -9223372036854775808;
+const i64 minIntOct = -01000000000000000000000;
+const i64 minIntHex = -0x8000000000000000;
+const i64 minIntBin = -0b1000000000000000000000000000000000000000000000000000000000000000;
+const double maxNDub = -1.7976931348623157e+308;
+const double minNDub = -2.2250738585072014e-308;
+const double minNSDub = -4.9406564584124654e-324;

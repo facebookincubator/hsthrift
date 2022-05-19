@@ -3,7 +3,7 @@
 // source: thrift/compiler/test/fixtures/*
 // @generated
 /*
- * Copyright (c) Facebook, Inc. and its affiliates.
+ * Copyright (c) Meta Platforms, Inc. and affiliates.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,22 +19,27 @@
  */
 
 namespace java test.fixtures.interactions
+namespace java2 test.fixtures.interactions
 namespace java.swift test.fixtures.interactions
 namespace py test.fixtures.interactions
 namespace py3 test.fixtures.interactions
 
+exception CustomException {
+  1: string message;
+}
+
 interaction MyInteraction {
-  i32 frobnicate();
+  i32 frobnicate() throws (1: CustomException ex);
   oneway void ping();
   stream<bool> truthify();
-  set<float>, sink<string, binary> encode();
+  set<i32>, sink<string, binary> encode();
 }
 
 interaction MyInteractionFast {
   i32 frobnicate();
   oneway void ping();
   stream<bool> truthify();
-  set<float>, sink<string, binary> encode();
+  set<i32>, sink<string, binary> encode();
 } (process_in_event_base)
 
 interaction SerialInteraction {
@@ -46,4 +51,8 @@ service MyService {
   performs MyInteractionFast;
   performs SerialInteraction;
   void foo();
+
+  MyInteraction interact(1: i32 arg);
+  MyInteractionFast, i32 interactFast();
+  SerialInteraction, i32, stream<i32> serialize();
 }

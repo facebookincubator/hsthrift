@@ -3,7 +3,7 @@
 // source: thrift/compiler/test/fixtures/*
 // @generated
 /*
- * Copyright (c) Facebook, Inc. and its affiliates.
+ * Copyright (c) Meta Platforms, Inc. and affiliates.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,6 +22,7 @@ namespace cpp MODULE0
 namespace cpp2 module0
 namespace java module0
 namespace py module0
+namespace java2 test.fixtures.module0
 namespace java.swift test.fixtures.module0
 
 struct Struct {

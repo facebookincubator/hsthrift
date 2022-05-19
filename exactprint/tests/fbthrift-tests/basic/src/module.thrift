@@ -3,7 +3,7 @@
 // source: thrift/compiler/test/fixtures/*
 // @generated
 /*
- * Copyright (c) Facebook, Inc. and its affiliates.
+ * Copyright (c) Meta Platforms, Inc. and affiliates.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,9 +18,14 @@
  * limitations under the License.
  */
 
+package "test.dev/fixtures/basic"
+
 namespace android test.fixtures.basic
 namespace java test.fixtures.basic
+namespace java2 test.fixtures.basic
 namespace java.swift test.fixtures.basic
+
+include "thrift/annotation/hack.thrift"
 
 enum MyEnum {
   MyValue1 = 0,
@@ -36,15 +41,20 @@ struct MyStruct {
   5: bool oneway;
   6: bool readonly;
   7: bool idempotent;
+  @hack.SkipCodegen{reason = "Invalid key type"}
+  8: set<float> floatSet;
+  @hack.SkipCodegen{reason = "skip field codegen for deprecation"}
+  9: string no_hack_codegen_field;
 }
 
-struct MyDataItem {
-}
+struct MyDataItem {}
 
 union MyUnion {
   1: MyEnum myEnum;
   2: MyStruct myStruct;
   3: MyDataItem myDataItem;
+  @hack.SkipCodegen{reason = "Invalid key type"}
+  4: set<float> floatSet;
 }
 
 service MyService {
@@ -57,6 +67,12 @@ service MyService {
   readonly string getDataById(1: i64 id);
   idempotent void deleteDataById(1: i64 id);
   oneway void lobDataById(1: i64 id, 2: string data);
+
+  @hack.SkipCodegen{reason = "Invalid key type"}
+  set<float> invalid_return_for_hack();
+
+  @hack.SkipCodegen{reason = "Skip function deprecation"}
+  void rpc_skipped_codegen();
 }
 
 service DbMixedStackArguments {

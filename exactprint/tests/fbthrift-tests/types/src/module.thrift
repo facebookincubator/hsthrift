@@ -3,7 +3,7 @@
 // source: thrift/compiler/test/fixtures/*
 // @generated
 /*
- * Copyright (c) Facebook, Inc. and its affiliates.
+ * Copyright (c) Meta Platforms, Inc. and affiliates.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -117,8 +117,7 @@ struct MyStruct {
   4: MyDataItem data;
 } (cpp.noncomparable)
 
-struct MyDataItem {
-} (cpp.noncomparable)
+struct MyDataItem {} (cpp.noncomparable)
 
 struct Renaming {
   1: i64 foo (cpp.name = 'bar');
@@ -147,12 +146,11 @@ struct ForwardUsageByRef {
   1: optional ForwardUsageRoot foo;
 }
 
-struct NoexceptMoveEmpty {
-} (cpp.noexcept_move)
+struct NoexceptMoveEmpty {}
 
 struct NoexceptMoveSimpleStruct {
   1: i64 boolField;
-} (cpp.noexcept_move)
+}
 
 enum MyEnumA {
   fieldA = 1,
@@ -170,12 +168,12 @@ struct NoexceptMoveComplexStruct {
   7: required binary MyBinaryField3;
   8: list<binary> MyBinaryListField4;
   9: map<MyEnumA, string> MyMapEnumAndInt = {1: "fieldA", 4: "fieldC"};
-} (cpp.noexcept_move)
+}
 
 union NoExceptMoveUnion {
   1: string string_field;
   2: i32 i32_field;
-} (cpp.noexcept_move)
+}
 
 # Allocator-aware struct with allocator-aware fields
 struct AllocatorAware {
@@ -184,6 +182,8 @@ struct AllocatorAware {
   3: map<i32, i32> (cpp.use_allocator) aa_map;
   4: string (cpp.use_allocator) aa_string;
   5: i32 not_a_container;
+  6: i32 (cpp.use_allocator) aa_unique (cpp.ref_type = "unique");
+  7: i32 (cpp.use_allocator) aa_shared (cpp.ref_type = "shared");
 } (cpp.allocator = "some_allocator")
 
 # Allocator-aware struct with no allocator-aware fields

@@ -3,7 +3,7 @@
 // source: thrift/compiler/test/fixtures/*
 // @generated
 /*
- * Copyright (c) Facebook, Inc. and its affiliates.
+ * Copyright (c) Meta Platforms, Inc. and affiliates.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,109 +20,163 @@
 
 namespace android test.fixtures.adapter
 namespace java test.fixtures.adapter
+namespace java2 test.fixtures.adapter
 namespace java.swift test.fixtures.adapter
 
+include "thrift/annotation/cpp.thrift"
+include "thrift/annotation/python.thrift"
+include "thrift/annotation/thrift.thrift"
+include "thrift/annotation/hack.thrift"
+
+@hack.Adapter{name = '\Adapter2'}
 typedef set<string> (
-  hack.adapter = '\Adapter2',
   cpp.adapter = 'my::Adapter2',
   py.adapter = 'my.Adapter2',
 ) SetWithAdapter
-typedef list<
-  string (
-    hack.adapter = '\Adapter1',
-    cpp.adapter = 'my::Adapter1',
-    py.adapter = 'my.Adapter1',
-  )
-> ListWithElemAdapter
+@hack.Adapter{name = '\Adapter1'}
+typedef string (
+  cpp.adapter = 'my::Adapter1',
+  py.adapter = 'my.Adapter1',
+) StringWithAdapter
+typedef list<StringWithAdapter> ListWithElemAdapter
+@hack.Adapter{name = '\Adapter2'}
+typedef ListWithElemAdapter ListWithElemAdapter_withAdapter
+
+@cpp.Adapter{name = "my::Adapter1"}
+@python.Adapter{
+  name = "my.module.Adapter2",
+  typeHint = "my.another.module.AdaptedType2",
+}
+typedef i64 MyI64
+
+@hack.Adapter{name = '\Adapter1'}
+typedef i32 MyI32
 
 struct Foo {
-  1: i32 (
-    hack.adapter = '\Adapter1',
-    cpp.adapter = 'my::Adapter1',
-    py.adapter = 'my.Adapter1',
-  ) intField;
+  @hack.Adapter{name = '\Adapter1'}
+  1: i32 (cpp.adapter = 'my::Adapter1', py.adapter = 'my.Adapter1') intField;
+  @hack.Adapter{name = '\Adapter1'}
   2: optional i32 (
-    hack.adapter = '\Adapter1',
     cpp.adapter = 'my::Adapter1',
     py.adapter = 'my.Adapter1',
   ) optionalIntField;
+  @hack.Adapter{name = '\Adapter1'}
   3: i32 (
-    hack.adapter = '\Adapter1',
     cpp.adapter = 'my::Adapter1',
     py.adapter = 'my.Adapter1',
   ) intFieldWithDefault = 13;
   4: SetWithAdapter setField;
   5: optional SetWithAdapter optionalSetField;
+  @hack.Adapter{name = '\Adapter3'}
   6: map<
     string,
-    ListWithElemAdapter (
-      hack.adapter = '\Adapter2',
+    ListWithElemAdapter_withAdapter (
       cpp.adapter = 'my::Adapter2',
       py.adapter = 'my.Adapter2',
     )
-  > (
-    hack.adapter = '\Adapter3',
-    cpp.adapter = 'my::Adapter3',
-    py.adapter = 'my.Adapter3',
-  ) mapField;
+  > (cpp.adapter = 'my::Adapter3', py.adapter = 'my.Adapter3') mapField;
+  @hack.Adapter{name = '\Adapter3'}
   7: optional map<
     string,
-    ListWithElemAdapter (
-      hack.adapter = '\Adapter2',
+    ListWithElemAdapter_withAdapter (
       cpp.adapter = 'my::Adapter2',
       py.adapter = 'my.Adapter2',
     )
-  > (
-    hack.adapter = '\Adapter3',
-    cpp.adapter = 'my::Adapter3',
-    py.adapter = 'my.Adapter3',
-  ) optionalMapField;
-}
-
-struct Bar {
-  1: Foo (
-    hack.adapter = '\Adapter1',
+  > (cpp.adapter = 'my::Adapter3', py.adapter = 'my.Adapter3') optionalMapField;
+  @hack.Adapter{name = '\Adapter1'}
+  8: binary (
     cpp.adapter = 'my::Adapter1',
     py.adapter = 'my.Adapter1',
-  ) structField;
+  ) binaryField;
+  9: MyI64 longField;
+  @cpp.Adapter{name = "my::Adapter2"}
+  @python.Adapter{name = "my.Adapter3", typeHint = "my.AdaptedType3"}
+  10: MyI64 adaptedLongField;
+} (
+  thrift.uri = "facebook.com/thrift/compiler/test/fixtures/adapter/src/module/Foo",
+)
+
+union Baz {
+  @hack.Adapter{name = '\Adapter1'}
+  1: i32 (cpp.adapter = 'my::Adapter1', py.adapter = 'my.Adapter1') intField;
+  4: SetWithAdapter setField;
+  @hack.Adapter{name = '\Adapter3'}
+  6: map<
+    string,
+    ListWithElemAdapter_withAdapter (
+      cpp.adapter = 'my::Adapter2',
+      py.adapter = 'my.Adapter2',
+    )
+  > (cpp.adapter = 'my::Adapter3', py.adapter = 'my.Adapter3') mapField;
+  @hack.Adapter{name = '\Adapter1'}
+  8: binary (
+    cpp.adapter = 'my::Adapter1',
+    py.adapter = 'my.Adapter1',
+  ) binaryField;
+  9: MyI64 longField;
+}
+
+@hack.Adapter{name = '\Adapter1'}
+typedef Foo FooWithAdapter
+
+struct Bar {
+  @hack.Adapter{name = '\Adapter1'}
+  1: Foo (cpp.adapter = 'my::Adapter1', py.adapter = 'my.Adapter1') structField;
+  @hack.Adapter{name = '\Adapter1'}
   2: optional Foo (
-    hack.adapter = '\Adapter1',
     cpp.adapter = 'my::Adapter1',
     py.adapter = 'my.Adapter1',
   ) optionalStructField;
   3: list<
-    Foo (
-      hack.adapter = '\Adapter1',
-      cpp.adapter = 'my::Adapter1',
-      py.adapter = 'my.Adapter1',
-    )
+    FooWithAdapter (cpp.adapter = 'my::Adapter1', py.adapter = 'my.Adapter1')
   > structListField;
   4: optional list<
-    Foo (
-      hack.adapter = '\Adapter1',
-      cpp.adapter = 'my::Adapter1',
-      py.adapter = 'my.Adapter1',
-    )
+    FooWithAdapter (cpp.adapter = 'my::Adapter1', py.adapter = 'my.Adapter1')
   > optionalStructListField;
+  @hack.Adapter{name = '\Adapter1'}
+  5: Baz (cpp.adapter = 'my::Adapter1', py.adapter = 'my.Adapter1') unionField;
+  @hack.Adapter{name = '\Adapter1'}
+  6: optional Baz (
+    cpp.adapter = 'my::Adapter1',
+    py.adapter = 'my.Adapter1',
+  ) optionalUnionField;
 }
 
+struct StructWithFieldAdapter {
+  @cpp.Adapter{name = "my::Adapter1"}
+  @python.Adapter{name = "my.Adapter1", typeHint = "my.AdaptedType1"}
+  1: i32 field;
+  @cpp.Adapter{name = "my::Adapter1"}
+  @cpp.Ref{type = cpp.RefType.Shared}
+  2: i32 shared_field;
+  @cpp.Adapter{name = "my::Adapter1"}
+  @cpp.Ref{type = cpp.RefType.Shared}
+  3: optional i32 opt_shared_field;
+  @cpp.Adapter{name = "my::Adapter1"}
+  @thrift.Box
+  4: optional i32 opt_boxed_field;
+}
+
+@hack.Adapter{name = '\Adapter2'}
 typedef Bar (
-  hack.adapter = '\Adapter2',
   cpp.adapter = 'my::Adapter2',
   py.adapter = 'my.Adapter2',
 ) StructWithAdapter
 
+@hack.Adapter{name = '\Adapter2'}
+typedef Baz (
+  cpp.adapter = 'my::Adapter2',
+  py.adapter = 'my.Adapter2',
+) UnionWithAdapter
+
 service Service {
-  i32 (
-    hack.adapter = '\Adapter1',
-    cpp.adapter = 'my::Adapter1',
-    py.adapter = 'my.Adapter1',
-  ) func(
-    1: string (
-      hack.adapter = '\Adapter2',
+  MyI32 (cpp.adapter = 'my::Adapter1', py.adapter = 'my.Adapter1') func(
+    1: StringWithAdapter (
       cpp.adapter = 'my::Adapter2',
       py.adapter = 'my.Adapter2',
     ) arg1,
-    2: Foo arg2,
+    @cpp.Adapter{name = "my::Adapter2"}
+    2: string arg2,
+    3: Foo arg3,
   );
 }

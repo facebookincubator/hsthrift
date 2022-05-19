@@ -3,7 +3,7 @@
 // source: thrift/compiler/test/fixtures/*
 // @generated
 /*
- * Copyright (c) Facebook, Inc. and its affiliates.
+ * Copyright (c) Meta Platforms, Inc. and affiliates.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,10 +18,10 @@
  * limitations under the License.
  */
 
+namespace java2 test.fixtures.stream
 namespace java.swift test.fixtures.stream
 
-exception FooEx {
-}
+exception FooEx {}
 
 service PubSubStreamingService {
   stream<i32> returnstream(1: i32 i32_from, 2: i32 i32_to);

@@ -3,7 +3,7 @@
 // source: thrift/compiler/test/fixtures/*
 // @generated
 /*
- * Copyright (c) Facebook, Inc. and its affiliates.
+ * Copyright (c) Meta Platforms, Inc. and affiliates.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,6 +18,7 @@
  * limitations under the License.
  */
 
+namespace java2 test.fixtures.annotation
 namespace java.swift test.fixtures.annotation
 
 typedef map<i32, i64> (java.swift.type = "com.foo.FastIntLongMap") FMap
@@ -46,7 +47,3 @@ struct MyMapping {
   3: map<string, string (java.swift.binary_string)> binaryMap;
   4: map<string, binary> regularBinary;
 }
-
-service MyAnnotationService {
-  void ping();
-} (java.swift.disable_reactive)

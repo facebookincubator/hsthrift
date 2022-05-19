@@ -3,7 +3,7 @@
 // source: thrift/compiler/test/fixtures/*
 // @generated
 /*
- * Copyright (c) Facebook, Inc. and its affiliates.
+ * Copyright (c) Meta Platforms, Inc. and affiliates.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -35,8 +35,7 @@ struct MyStruct {
   4: MyEnum myEnum;
 }
 
-struct MyDataItem {
-}
+struct MyDataItem {}
 
 union MyUnion {
   1: MyEnum myEnum;
@@ -44,7 +43,10 @@ union MyUnion {
   3: MyDataItem myDataItem;
 }
 
-exception MyException {
+exception MyException {}
+
+interaction MyInteraction {
+  void ping();
 }
 
 service MyService {
@@ -57,4 +59,5 @@ service MyService {
   stream<MyStruct> streamById(1: i64 id);
   stream<MyStruct throws (1: MyException e)> streamByIdWithException(1: i64 id);
   MyDataItem, stream<MyStruct> streamByIdWithResponse(1: i64 id);
+  performs MyInteraction;
 } (rust.request_context)

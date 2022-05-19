@@ -3,7 +3,7 @@
 // source: thrift/compiler/test/fixtures/*
 // @generated
 /*
- * Copyright (c) Facebook, Inc. and its affiliates.
+ * Copyright (c) Meta Platforms, Inc. and affiliates.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,37 +19,65 @@
  */
 
 namespace java test.fixtures.basicannotations
+namespace java2 test.fixtures.basicannotations
 namespace java.swift test.fixtures.basicannotations
 
 enum MyEnum {
   MyValue1 = 0,
   MyValue2 = 1,
   DOMAIN = 2 (cpp.name = 'REALM'),
-}
+} (cpp.name = "YourEnum", cpp.adapter = "StaticCast")
 
 struct MyStructNestedAnnotation {
   1: string name;
 }
 
+union MyUnion {} (cpp.name = "YourUnion", cpp.adapter = "StaticCast")
+safe exception MyException {} (
+  cpp.name = "YourException",
+  cpp.adapter = "StaticCast",
+)
+
+# We intentionally keep field IDs out of order to check whether this case is handled correctly
 struct MyStruct {
   # glibc has macros with this name, Thrift should be able to prevent collisions
-  1: i64 major (cpp.name = 'majorVer');
+  2: i64 major (cpp.name = 'majorVer');
   # package is a reserved keyword in Java, Thrift should be able to handle this
-  2: string package (java.swift.name = '_package');
+  1: string package (java.swift.name = '_package');
   # should generate valid code even with double quotes in an annotation
   3: string annotation_with_quote (go.tag = 'tag:"somevalue"');
   4: string class_ (java.swift.name = 'class_');
   5: string annotation_with_trailing_comma (custom = 'test');
   6: string empty_annotations ();
-} (android.generate_builder, cpp.internal.deprecated._data.method)
+  7: MyEnum my_enum;
+  8: list<string> (cpp.type = "std::deque<std::string>") cpp_type_annotation;
+  9: MyUnion my_union;
+} (
+  cpp.name = "YourStruct",
+  cpp.adapter = "StaticCast",
+  android.generate_builder,
+  cpp.internal.deprecated._data.method,
+  thrift.uri = "facebook.com/thrift/compiler/test/fixtures/basic-annotations/src/module/MyStruct",
+  hack.attributes = "\SomeClass(\AnotherClass::class)",
+)
+
+const MyStruct myStruct = {
+  "major": 42,
+  "package": "package",
+  "my_enum": MyEnum.DOMAIN,
+};
 
 service MyService {
-  void ping();
+  void ping() throws (1: MyException myExcept);
   string getRandomData();
   bool hasDataById(1: i64 id);
   string getDataById(1: i64 id);
-  void putDataById(1: i64 id, 2: string data);
-  oneway void lobDataById(1: i64 id, 2: string data);
+  void putDataById(
+    1: i64 id,
+    @MyStructNestedAnnotation{name = "argument"}
+    2: string data,
+  );
+  oneway void lobDataById(1: i64 id, 2: string data (cpp.name = "dataStr"));
   void doNothing() (cpp.name = 'cppDoNothing');
 }
 
@@ -66,3 +94,12 @@ struct SecretStruct {
   1: i64 id;
   2: string password (java.sensitive);
 }
+
+interaction BadInteraction {
+  void foo();
+} (cpp.name = "GoodInteraction")
+
+service BadService {
+  performs BadInteraction;
+  i32 bar();
+} (cpp.name = "GoodService")

@@ -3,7 +3,7 @@
 // source: thrift/compiler/test/fixtures/*
 // @generated
 /*
- * Copyright (c) Facebook, Inc. and its affiliates.
+ * Copyright (c) Meta Platforms, Inc. and affiliates.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,6 +28,7 @@ namespace py3 test_py.cpp_reflection
 
 include "reflection_dep_B.thrift"
 include "reflection_dep_C.thrift"
+include "thrift/annotation/cpp.thrift"
 
 cpp_include "thrift/test/fatal_custom_types.h"
 
@@ -137,6 +138,7 @@ struct structC {
   30: map<structA, structB> o3;
 }
 
+@cpp.TriviallyRelocatable
 struct struct1 {
   1: required i32 field0;
   2: optional string field1;
@@ -402,4 +404,9 @@ struct struct_with_indirections {
   3: HasANumber number;
   4: HasAResult result;
   5: HasAPhrase phrase;
+}
+
+struct StructWithFieldAdapter {
+  @cpp.Adapter{name = "my::Adapter1"}
+  1: i32 field;
 }

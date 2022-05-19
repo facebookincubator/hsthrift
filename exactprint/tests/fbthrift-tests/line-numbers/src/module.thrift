@@ -3,7 +3,7 @@
 // source: thrift/compiler/test/fixtures/*
 // @generated
 /*
- * Copyright (c) Facebook, Inc. and its affiliates.
+ * Copyright (c) Meta Platforms, Inc. and affiliates.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,21 +18,27 @@
  * limitations under the License.
  */
 
-// Definitions intentionally spans mutliple lines to test for corner cases
+struct MyAnnot {}
+
 const i64 fortyTwo = 42;
 
 typedef map<i64, string> MyMapTypedef
 
 struct MyStruct {
   1: i64 MyIntField;
-  2: string MyStringField;
+  @MyAnnot
+  2: string MyStringField (annotation);
 }
 
 enum MyEnum {
   VALUE1 = 1,
-  VALUE2 = 2,
+  @MyAnnot
+  VALUE2 = 2 (annotation),
 }
 
 service MyService {
   void ping();
+
+  @MyAnnot
+  void pong() (annotation);
 }

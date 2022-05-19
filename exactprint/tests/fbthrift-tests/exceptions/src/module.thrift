@@ -3,7 +3,7 @@
 // source: thrift/compiler/test/fixtures/*
 // @generated
 /*
- * Copyright (c) Facebook, Inc. and its affiliates.
+ * Copyright (c) Meta Platforms, Inc. and affiliates.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,6 +18,7 @@
  * limitations under the License.
  */
 
+namespace java2 test.fixtures.exceptions
 namespace java.swift test.fixtures.exceptions
 
 transient server exception Fiery {
@@ -50,5 +51,4 @@ service Raiser {
   string get500() throws (1: Fiery f, 2: Banal b, 3: Serious s);
 }
 
-safe permanent client exception Banal {
-}
+safe permanent client exception Banal {}
