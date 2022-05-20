@@ -1,7 +1,5 @@
 #include "cpp/RequestContext.h"
 
-#include <folly/io/async/Request.h>
-
 #include "cpp/Destructible.h"
 
 HS_DEFINE_DESTRUCTIBLE(RequestContextPtr, RequestContextPtr);
