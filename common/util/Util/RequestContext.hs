@@ -12,13 +12,10 @@ module Util.RequestContext (
   withRequestContext,
   finalizeRequestContext,
   withShallowCopyRequestContextScopeGuard,
-  forkIOWithRequestContext,
-  forkOnWithRequestContext,
   RequestContextHolder(..),
   DefaultRequestContextHolder,
 ) where
 
-import Control.Concurrent
 import Control.DeepSeq
 import Control.Exception
 import Foreign.CPP.Marshallable.TH
@@ -92,24 +89,6 @@ foreign import ccall unsafe "hs_request_context_cloneContext"
 
 foreign import ccall unsafe "hs_request_context_createShallowCopy"
   c_createShallowCopy :: Ptr CRequestContextPtr -> IO (Ptr CRequestContextPtr)
-
--- The returned 'IO ()' can only be called at most once.
-restorableRequestContext :: IO (IO ())
-restorableRequestContext = do
-  rc <- saveRequestContext
-  return $ do
-    setRequestContext rc
-    finalizeRequestContext rc
-
-forkIOWithRequestContext :: IO () -> IO ThreadId
-forkIOWithRequestContext f = do
-  restore <- restorableRequestContext
-  forkIO $ restore >> f
-
-forkOnWithRequestContext :: Int -> IO () -> IO ThreadId
-forkOnWithRequestContext cap f = do
-  restore <- restorableRequestContext
-  forkOn cap $ restore >> f
 
 class RequestContextHolder a where
   trySaveRequestContextFrom :: a -> IO (Maybe RequestContext)
