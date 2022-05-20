@@ -42,6 +42,9 @@ failingTests =
   , "common/hs/thrift/exactprint/tests/fbthrift-tests/sink/src/module.thrift"
   , "common/hs/thrift/exactprint/tests/fbthrift-tests/sink/src/module.thrift"
   , "common/hs/thrift/exactprint/tests/fbthrift-tests/visitation/src/module.thrift"
+  , "common/hs/thrift/exactprint/tests/fbthrift-tests/basic-structured-annotations/src/module.thrift"
+  , "common/hs/thrift/exactprint/tests/fbthrift-tests/rust-request-context/src/module.thrift"
+  , "common/hs/thrift/exactprint/tests/fbthrift-tests/basic-annotations/src/module.thrift"
   ]
 
 fileLineStr :: FilePath -> Int -> String
