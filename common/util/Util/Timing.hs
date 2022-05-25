@@ -18,13 +18,14 @@ import Data.Int
 import Text.Printf
 import GHC.Stats
 import GHC.Conc
+import System.IO (stderr)
 
 -- | Runs an 'IO' operation and prints how long it took. Also returns
 -- the timing value for use.
 reportAndShowTime :: String -> IO a -> IO (Double, Int64, a)
 reportAndShowTime name io = do
   (t, b, a) <- timeIt io
-  printf "%s: %s, %s\n" name (showTime t) (showAllocs b)
+  hPrintf stderr "%s: %s, %s\n" name (showTime t) (showAllocs b)
   return (t, b, a)
 
 -- | Runs an 'IO' operation and reports how long it took. Useful for
