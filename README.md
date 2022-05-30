@@ -118,7 +118,6 @@ not have IPv6 configured.
 sudo apt install \
     libgoogle-glog-dev \
     libgflags-dev \
-    libmysqlclient-dev \
     bison \
     flex \
     ninja-build \
@@ -149,8 +148,7 @@ sudo yum install \
      pcre-devel \
      ncurses-devel \
      fmt-devel \
-     gmp-devel \
-     community-mysql-devel
+     gmp-devel
 ```
 
 Also you may need:

@@ -1,5 +1,6 @@
 -- Copyright (c) Facebook, Inc. and its affiliates.
 
+{-# LANGUAGE CPP #-}
 module Util.TimeSec
   ( Time(..)
   , TimeSpan(..)
@@ -18,7 +19,9 @@ module Util.TimeSec
   , PPTimeSpanGranularity(..)
   ) where
 
+#ifdef FACEBOOK
 import Database.MySQL.Simple.Param
+#endif
 import Data.Aeson
 import Data.Text (Text)
 import qualified Data.Text as Text
@@ -39,8 +42,10 @@ newtype Time = Time { timeInSeconds :: Int }
 instance NFData   Time
 instance Hashable Time
 
+#ifdef FACEBOOK
 instance Param Time where
   render = render . timeInSeconds
+#endif
 
 -- | 'TimeSpan' means a time difference, duration in seconds,
 -- as opposed to 'Time', which is a specific point in time
