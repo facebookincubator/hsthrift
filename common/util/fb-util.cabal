@@ -191,7 +191,6 @@ library
         aeson-pretty,
         either,
         QuickCheck,
-        mysql-simple,
         scientific,
         haskell-src-exts,
         stm,

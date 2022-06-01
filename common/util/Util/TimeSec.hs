@@ -18,7 +18,6 @@ module Util.TimeSec
   , PPTimeSpanGranularity(..)
   ) where
 
-import Database.MySQL.Simple.Param
 import Data.Aeson
 import Data.Text (Text)
 import qualified Data.Text as Text
@@ -38,9 +37,6 @@ newtype Time = Time { timeInSeconds :: Int }
 
 instance NFData   Time
 instance Hashable Time
-
-instance Param Time where
-  render = render . timeInSeconds
 
 -- | 'TimeSpan' means a time difference, duration in seconds,
 -- as opposed to 'Time', which is a specific point in time
