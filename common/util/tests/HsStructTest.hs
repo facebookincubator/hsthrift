@@ -72,6 +72,14 @@ arrayCxxTest = TestLabel "arrayCxxTest" $ TestCase $ do
     HsArray v <- peek p
     assertEqual "array of strings" pokey (Vector.toList (Vector.map hsText v))
 
+  let booley = fmap toCBool [False, True, True, False, False, True]
+  withCxxObject (HsArray (Vector.fromList booley)) $ \p -> do
+    HsArray v <- peek p
+    assertEqual "array of bool" booley (Vector.toList v)
+
+toCBool :: Bool -> CBool
+toCBool = fromBool
+
 stringPieceCxxTest :: Test
 stringPieceCxxTest = TestLabel "stringPieceCxxTest" $ TestCase $ do
   withDefaultCxxObject $ \p -> do
@@ -209,12 +217,20 @@ arrayTest = TestLabel "Array" $ TestCase $ do
   assertEqual "[Text]" ["foo", "bar"] t
   v <- fmap hsArrayStorable $ peek =<< getArrayInt64
   assertEqual "VectorStorable Int64" (VectorStorable.fromList [1::Int64,2,3]) v
+  bv <- fmap hsArray $ peek =<< getArrayCBool
+  assertEqual "CBool Size" 1 (sizeOf (CBool 0))
+  assertEqual "CBool Align" 1 (alignment (CBool 1))
+  let expected = fmap toCBool [True, False, True, True, True, False]
+  assertEqual "Vector Bool" (Vector.fromList expected) bv
 
 foreign import ccall unsafe "getArray"
   getArray :: IO (Ptr a)
 
 foreign import ccall unsafe "getArrayInt64"
   getArrayInt64 :: IO (Ptr a)
+
+foreign import ccall unsafe "getArrayCBool"
+  getArrayCBool :: IO (Ptr a)
 
 mapTest :: Test
 mapTest = TestLabel "Map" $ TestCase $ do

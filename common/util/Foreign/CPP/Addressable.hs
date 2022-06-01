@@ -75,6 +75,7 @@ instance Addressable CShort
 instance Addressable CUChar
 instance Addressable CSChar
 instance Addressable CChar
+instance Addressable CBool
 instance Addressable IntPtr
 instance Addressable WordPtr
 instance Addressable Fd

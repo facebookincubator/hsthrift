@@ -435,6 +435,7 @@ HS_PEEKABLE(HsString);
 
 template <typename T>
 HS_STRUCT HsArray {
+  static_assert(!std::is_same_v<T, bool>, "Use HsArray<uint8_t> instead");
   std::vector<T> v_;
   const T* a = v_.data();
   size_t n = v_.size();
@@ -540,6 +541,7 @@ HS_PEEKABLE(DummyHsArray);
 static_assert(
     sizeof(HsArray<HsString>) == sizeof(DummyHsArray),
     "HsArray<HsString> is of the same size as DummyHsArray");
+static_assert(sizeof(HsArray<uint8_t>) == sizeof(DummyHsArray));
 
 #define HS_DEFINE_ARRAY_CONSTRUCTIBLE(Name, Type)                          \
   extern "C" HsArray<Type>* vector_newHsArray##Name(size_t len) {          \

@@ -87,6 +87,13 @@ HsArray<int64_t>* getArrayInt64() noexcept {
   return &ret;
 }
 
+// HsArrayBool uses bytes because std::vector<bool> does
+// not use a contiguous array representation
+HsArray<uint8_t>* getArrayCBool() noexcept {
+  static HsArray<uint8_t> ret{true, false, true, true, true, false};
+  return &ret;
+}
+
 HsIntMap<int64_t>* getIntMap() noexcept {
   static HsIntMap<int64_t> ret{{2, 4}, {3, 9}, {5, 25}, {7, 49}};
   return &ret;

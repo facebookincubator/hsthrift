@@ -231,6 +231,7 @@ HS_DEFINE_MARSHALLABLE(HsStringPiece, HsStringPiece);
 
 HS_DEFINE_MARSHALLABLE(HsArrayInt32, HsArray<int32_t>);
 HS_DEFINE_MARSHALLABLE(HsArrayInt64, HsArray<int64_t>);
+HS_DEFINE_MARSHALLABLE(HsArrayUInt8, HsArray<uint8_t>);
 HS_DEFINE_MARSHALLABLE(HsArrayUInt32, HsArray<uint32_t>);
 HS_DEFINE_MARSHALLABLE(HsArrayUInt64, HsArray<uint64_t>);
 HS_DEFINE_MARSHALLABLE(HsArrayFloat, HsArray<float>);
@@ -259,9 +260,11 @@ HS_OPTION_CPP(String, HsString);
 HS_OPTION_CPP(StringView, HsStringPiece);
 HS_OPTION_CPP(HsJSON, HsJSON);
 
-// No bool as std::vector<bool> doesn't define Container
 HS_DEFINE_ARRAY_CONSTRUCTIBLE(Int32, int32_t);
 HS_DEFINE_ARRAY_CONSTRUCTIBLE(Int64, int64_t);
+// std::vector<bool> doesn't guarantee contiguous memory layout,
+// so use HsArray<uint8_t> to store one bool per byte
+HS_DEFINE_ARRAY_CONSTRUCTIBLE(UInt8, uint8_t);
 HS_DEFINE_ARRAY_CONSTRUCTIBLE(UInt32, uint32_t);
 HS_DEFINE_ARRAY_CONSTRUCTIBLE(UInt64, uint64_t);
 HS_DEFINE_ARRAY_CONSTRUCTIBLE(Float, float);

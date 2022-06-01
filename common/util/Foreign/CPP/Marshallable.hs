@@ -121,6 +121,7 @@ instance Constructible CShort
 instance Constructible CUChar
 instance Constructible CSChar
 instance Constructible CChar
+instance Constructible CBool
 instance Constructible IntPtr
 instance Constructible WordPtr
 instance Constructible Fd
