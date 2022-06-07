@@ -160,18 +160,16 @@ apache::thrift::RpcOptions getRpcOptions(
   auto tRpcOpts = apache::thrift::BinarySerializer::deserialize<
       thrift::protocol::RpcOptions>(
       folly::ByteRange(rpcOptionsPtr, rpcOptionsLen));
-  rpcOpts.setTimeout(std::chrono::milliseconds(*tRpcOpts.timeout_ref()));
+  rpcOpts.setTimeout(std::chrono::milliseconds(*tRpcOpts.timeout()));
   auto priority = tRpcOpts.get_priority() == nullptr
       ? apache::thrift::RpcOptions::PRIORITY::NORMAL
       : static_cast<apache::thrift::RpcOptions::PRIORITY>(
-            tRpcOpts.priority_ref().value_unchecked());
+            tRpcOpts.priority().value_unchecked());
   rpcOpts.setPriority(priority);
-  rpcOpts.setChunkTimeout(
-      std::chrono::milliseconds(*tRpcOpts.chunkTimeout_ref()));
-  rpcOpts.setQueueTimeout(
-      std::chrono::milliseconds(*tRpcOpts.queueTimeout_ref()));
+  rpcOpts.setChunkTimeout(std::chrono::milliseconds(*tRpcOpts.chunkTimeout()));
+  rpcOpts.setQueueTimeout(std::chrono::milliseconds(*tRpcOpts.queueTimeout()));
   if (tRpcOpts.get_headers() != nullptr) {
-    for (auto const& header : tRpcOpts.headers_ref().value_unchecked()) {
+    for (auto const& header : tRpcOpts.headers().value_unchecked()) {
       rpcOpts.setWriteHeader(header.first, header.second);
     }
   }
