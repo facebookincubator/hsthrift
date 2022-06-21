@@ -18,11 +18,6 @@ void hs_request_context_setContext(RequestContextPtr* ptr) noexcept {
   folly::RequestContext::setContext(*ptr);
 }
 
-RequestContextPtr* hs_request_context_cloneContext(
-    RequestContextPtr* ptr) noexcept {
-  return new RequestContextPtr(*ptr);
-}
-
 RequestContextPtr* hs_request_context_createShallowCopy(
     RequestContextPtr* ptr) noexcept {
   return new RequestContextPtr(folly::RequestContext::copyAsChild(**ptr));

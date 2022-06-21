@@ -7,7 +7,6 @@ module Util.RequestContext (
   createRequestContext,
   saveRequestContext,
   setRequestContext,
-  cloneRequestContext,
   createShallowCopyRequestContext,
   withRequestContext,
   finalizeRequestContext,
@@ -45,14 +44,6 @@ saveRequestContext = createRequestContext c_saveContext
 setRequestContext :: RequestContext -> IO ()
 setRequestContext (RequestContext rc) = withForeignPtr rc c_setContext
 
--- | Creates a copy of the 'RequestContext' pointer pointing to the same
--- underlying 'RequestContext'. This has the same behavior as @return . id@
--- in most cases expect that we can intentionally prevent same heap object
--- from being referenced by different code, thread or capability as needed.
-cloneRequestContext :: RequestContext -> IO RequestContext
-cloneRequestContext (RequestContext rc) =
-  withForeignPtr rc $ createRequestContext . c_cloneContext
-
 -- | Creates a **shallow** copy of the 'RequestContext'. This allows to
 -- overwrite a specific RequestData pointer.
 createShallowCopyRequestContext :: RequestContext -> IO RequestContext
@@ -83,9 +74,6 @@ foreign import ccall unsafe "hs_request_context_saveContext"
 
 foreign import ccall unsafe "hs_request_context_setContext"
   c_setContext :: Ptr CRequestContextPtr -> IO ()
-
-foreign import ccall unsafe "hs_request_context_cloneContext"
-  c_cloneContext :: Ptr CRequestContextPtr -> IO (Ptr CRequestContextPtr)
 
 foreign import ccall unsafe "hs_request_context_createShallowCopy"
   c_createShallowCopy :: Ptr CRequestContextPtr -> IO (Ptr CRequestContextPtr)
