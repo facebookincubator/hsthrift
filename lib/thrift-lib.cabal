@@ -83,6 +83,7 @@ library
         Thrift.Binary.Parser
         Thrift.Protocol.ApplicationException.Types
         Thrift.Protocol.RpcOptions.Types
+        Thrift.Util
 
     hs-source-dirs: . gen-hs2
 
