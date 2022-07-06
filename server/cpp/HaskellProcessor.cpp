@@ -18,20 +18,17 @@ HaskellAsyncProcessor::HaskellAsyncProcessor(
     const std::unordered_set<std::string>& oneways)
     : callback_(callback), oneways_(oneways) {}
 
-void HaskellAsyncProcessor::processSerializedCompressedRequestWithMetadata(
-    apache::thrift::ResponseChannelRequest::UniquePtr req,
-    apache::thrift::SerializedCompressedRequest&& serializedCompressedRequest,
-    const apache::thrift::AsyncProcessorFactory::MethodMetadata&,
-    apache::thrift::protocol::PROTOCOL_TYPES protType,
-    apache::thrift::Cpp2RequestContext* context,
+void HaskellAsyncProcessor::processSerializedRequest(
+    ResponseChannelRequest::UniquePtr req,
+    apache::thrift::SerializedRequest&& serializedRequest,
+    protocol::PROTOCOL_TYPES protType,
+    Cpp2RequestContext* context,
     folly::EventBase* eb,
-    apache::thrift::concurrency::ThreadManager* tm) {
+    concurrency::ThreadManager* tm) {
   // General note: we only want communicate (via req->sendReply or
   // req->sendErrorWrapped) and destroy req on eb's thread. We assume that we
   // are on eb's thread now but the EventTask that we create further below won't
   // necessarily be.
-
-  auto serializedRequest = std::move(serializedCompressedRequest).uncompress();
 
   // Immediately give reply to one-way calls
   bool oneway = oneways_.find(context->getMethodName()) != oneways_.end();
@@ -154,23 +151,6 @@ void HaskellAsyncProcessor::processSerializedCompressedRequestWithMetadata(
   // the queue.
   auto ka = tm->getKeepAlive(pri, source);
   ka->add(std::move(task));
-}
-
-void HaskellAsyncProcessor::processSerializedRequest(
-    ResponseChannelRequest::UniquePtr req,
-    apache::thrift::SerializedRequest&& serializedRequest,
-    protocol::PROTOCOL_TYPES protType,
-    Cpp2RequestContext* context,
-    folly::EventBase* eb,
-    concurrency::ThreadManager* tm) {
-  processSerializedCompressedRequestWithMetadata(
-      std::move(req),
-      apache::thrift::SerializedCompressedRequest(std::move(serializedRequest)),
-      apache::thrift::AsyncProcessorFactory::MethodMetadata(),
-      protType,
-      context,
-      eb,
-      tm);
 }
 
 } // namespace thrift
