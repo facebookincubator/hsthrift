@@ -29,6 +29,8 @@ import Control.Exception.Lifted
 import Control.Monad
 import Control.Monad.Trans.Control
 
+import GHC.Stack (HasCallStack, withFrozenCallStack)
+
 import Util.Log
 
 -- | Catch all exceptions *except* asynchronous exceptions
@@ -104,27 +106,27 @@ tryFinally inner after =
 -- | Execute an action and invoke a function if it throws any exception. The
 -- exception is then rethrown. Any exceptions from the function are ignored
 -- (but logged).
-onSomeException :: IO a -> (SomeException -> IO ()) -> IO a
+onSomeException :: HasCallStack => IO a -> (SomeException -> IO ()) -> IO a
 onSomeException io f = io `catch` \exc -> do
-  swallow $ f exc
+  withFrozenCallStack $ swallow $ f exc
   throwIO exc
 
 -- | Execute an action and do something with its result even if it throws a
 -- synchronous exception. Any exceptions from the function are ignored
 -- (but logged).
-afterwards :: IO a -> (Either SomeException a -> IO ()) -> IO a
+afterwards :: HasCallStack => IO a -> (Either SomeException a -> IO ()) -> IO a
 afterwards io f = do
   r <- tryAll io
-  swallow $ f r
+  withFrozenCallStack $ swallow $ f r
   case r of
     Right result -> return result
     Left exc -> throwIO exc
 
 -- | Execute an action and drop its result or any synchronous
 -- exception it throws.  Exceptions are logged.
-swallow :: IO a -> IO ()
-swallow io = void io `catchAll` \exc ->
-  logError $ "swallowing exception: " ++ show exc
+swallow :: HasCallStack => IO a -> IO ()
+swallow io = void io `catchAll` \exc -> do
+  withFrozenCallStack $ logError $ "swallowing exception: " ++ show exc
 
 -- | Log and rethrow all synchronous exceptions arising from an
 -- IO computation.

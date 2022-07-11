@@ -9,6 +9,7 @@ import Data.Int
 
 import Util.Control.Exception (swallow)
 import Util.Timing (timeIt)
+import GHC.Stack (HasCallStack, withFrozenCallStack)
 
 -- | Logs which can log success, failure and time elapsed
 class ActionLog l where
@@ -20,7 +21,7 @@ class ActionLog l where
 -- | Run an action logging success, failure, time elapsed and data about
 -- result.
 loggingAction
-  :: (ActionLog l, Monoid l)
+  :: (ActionLog l, Monoid l, HasCallStack)
   => (l -> IO ())
      -- ^ How to write the log. Typically calls the `runLog` for your
      -- `Logger` instance, and it can augment `l` with additional
@@ -35,7 +36,8 @@ loggingAction log res io =
     (time,alloc,result) <- timeIt $ try $ restore io
     let
       logOutcome o =
-        swallow $ log $ timeLog time `mappend` allocLog alloc `mappend` o
+        withFrozenCallStack $
+          swallow $ log $ timeLog time `mappend` allocLog alloc `mappend` o
     case result of
       Right x -> do
         logOutcome $ successLog `mappend` res x
