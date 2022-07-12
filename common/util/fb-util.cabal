@@ -231,7 +231,7 @@ library
     -- by ghc, because we depend on a Haskell package (mangle).
     hsc2hs-options: --cc=g++ --lflag=-lstdc++ --cflag=-D__HSC2HS__=1 --cflag=-std=c++17
 
-    pkgconfig-depends: libfolly, libglog
+    pkgconfig-depends: libfolly, libglog, libevent, fmt
     extra-libraries: double-conversion, gflags
 
 common test-common
