@@ -112,7 +112,7 @@ library
         Util.FilePath
         Util.Function
         Util.Graph
-        Util.GFlags
+        -- Util.GFlags
         Util.HSE
         Util.HUnit
         Util.HashMap.Strict
