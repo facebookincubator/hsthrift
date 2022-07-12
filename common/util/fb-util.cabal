@@ -102,7 +102,7 @@ library
         Util.Control.Exception
         Util.Control.Monad
         Util.Defer
-        Util.Dll
+        -- Util.Dll
         Util.Encoding
         Util.Err
         Util.EventBase
