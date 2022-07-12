@@ -157,6 +157,7 @@ library
         cpp/HsStruct.cpp
         cpp/IOBuf.cpp
         cpp/EventBaseDataplane.cpp
+        cpp/Executor.cpp
         Util/AsanAlloc.cpp
         -- Util/GFlags.cpp
 
