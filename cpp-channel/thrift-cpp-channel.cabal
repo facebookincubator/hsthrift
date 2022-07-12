@@ -94,11 +94,16 @@ library
     hsc2hs-options: --cc=g++ --lflag=-lstdc++ --cflag=-D__HSC2HS__=1 --lflag=-lboost_context --lflag=-latomic --cflag=-std=c++17
     include-dirs: .
 
-    pkgconfig-depends: libfolly, fmt, openssl, libsodium
+    pkgconfig-depends: fmt, openssl, libsodium, libzstd, zlib
     extra-libraries:
         thriftcpp2
         thriftmetadata
         thriftprotocol
+        -- Note that the order here matters, as thriftanyrep and thrifttyperep
+        -- depend on thrifttype.
+        thrifttyperep
+        thriftanyrep
+        thrifttype
         transport
         rpcmetadata
         concurrency
