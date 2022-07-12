@@ -157,6 +157,7 @@ library
         cpp/HsStruct.cpp
         cpp/IOBuf.cpp
         cpp/EventBaseDataplane.cpp
+        Util/AsanAlloc.cpp
         -- Util/GFlags.cpp
 
     install-includes:
@@ -167,6 +168,8 @@ library
         cpp/ffi.h
         cpp/memory.h
         cpp/wrap.h
+        Util/AsanAlloc.h
+  
     include-dirs: .
     hs-source-dirs: .
 
