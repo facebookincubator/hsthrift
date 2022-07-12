@@ -14,6 +14,7 @@ jobs:
     env:
         LD_LIBRARY_PATH: "/github/home/.hsthrift/lib"
         PKG_CONFIG_PATH: "/github/home/.hsthrift/lib/pkgconfig"
+        LD_BIND_NOW: 1
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
