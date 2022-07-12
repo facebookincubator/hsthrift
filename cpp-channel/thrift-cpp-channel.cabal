@@ -99,6 +99,11 @@ library
         thriftcpp2
         thriftmetadata
         thriftprotocol
+        -- Note that the order here matters, as thriftanyrep and thrifttyperep
+        -- depend on thrifttype.
+        thrifttyperep
+        thriftanyrep
+        thrifttype
         transport
         rpcmetadata
         concurrency
