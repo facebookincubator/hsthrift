@@ -57,9 +57,22 @@ class HaskellAsyncProcessor : public AsyncProcessor {
       folly::EventBase* eb,
       concurrency::ThreadManager* tm) override;
 
+  void executeRequest(
+      ServerRequest&& request,
+      const AsyncProcessorFactory::MethodMetadata& methodMetadata) override;
+
  protected:
   TCallback callback_;
   const std::unordered_set<std::string>& oneways_;
+
+ private:
+  void run(
+      apache::thrift::ResponseChannelRequest::UniquePtr req,
+      apache::thrift::LegacySerializedRequest&& legacySerializedRequest,
+      apache::thrift::Cpp2RequestContext* context,
+      folly::EventBase* eb,
+      TCallback cb,
+      bool oneway);
 };
 
 class HaskellAsyncProcessorFactory : public AsyncProcessorFactory {
@@ -71,6 +84,15 @@ class HaskellAsyncProcessorFactory : public AsyncProcessorFactory {
 
   std::unique_ptr<AsyncProcessor> getProcessor() override {
     return std::make_unique<HaskellAsyncProcessor>(callback_, oneways_);
+  }
+
+  CreateMethodMetadataResult createMethodMetadata() override {
+    WildcardMethodMetadataMap wildcardMap;
+    wildcardMap.wildcardMetadata = std::make_shared<WildcardMethodMetadata>(
+        MethodMetadata::ExecutorType::ANY);
+    wildcardMap.knownMethods = {};
+
+    return wildcardMap;
   }
 
   // TODO(T89004867): Call onStartServing() and onStopServing() hooks for
