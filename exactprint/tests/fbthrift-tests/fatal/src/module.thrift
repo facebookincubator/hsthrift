@@ -29,6 +29,7 @@ namespace py3 test_py.cpp_reflection
 include "reflection_dep_B.thrift"
 include "reflection_dep_C.thrift"
 include "thrift/annotation/cpp.thrift"
+include "thrift/annotation/thrift.thrift"
 
 cpp_include "thrift/test/fatal_custom_types.h"
 
@@ -56,6 +57,7 @@ enum enum3 {
   _now.with.an.underscore = "_now.with.an.underscore",
 )
 
+@cpp.ScopedEnumAsUnionType
 union union1 {
   1: i32 ui;
   3: double ud;
@@ -159,6 +161,7 @@ struct struct2 {
 }
 
 struct struct3 {
+  @thrift.TerseWrite
   1: i32 fieldA;
   2: string fieldB;
   3: enum1 fieldC;
@@ -409,4 +412,11 @@ struct struct_with_indirections {
 struct StructWithFieldAdapter {
   @cpp.Adapter{name = "my::Adapter1"}
   1: i32 field;
+}
+
+@cpp.Adapter{name = "my::Adapter1"}
+typedef i32 I32
+
+union UnionWithTypedefFieldAdapter {
+  1: I32 field;
 }

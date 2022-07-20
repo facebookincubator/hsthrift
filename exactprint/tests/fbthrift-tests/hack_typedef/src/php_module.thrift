@@ -17,18 +17,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+include "php_include.thrift"
 
-package "test.dev/foo/php/ns"
+namespace php include_typedef
 
-namespace php foo.php.ns
+typedef i32 MyI32
+typedef php_include.IncludedMyI32 IncludedMyI32
+typedef php_include.IncludedFoo IncludedFoo
 
-enum Status {
-  Unknown = 0,
-}
-
-struct TestStruct {
-  1: string str_value;
-}
-
-service FooHackService {
+struct Foo {
+  1: MyI32 i_field;
+  2: i32 i_field2;
 }

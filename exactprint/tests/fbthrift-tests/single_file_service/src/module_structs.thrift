@@ -18,17 +18,6 @@
  * limitations under the License.
  */
 
-package "test.dev/foo/php/ns"
-
-namespace php foo.php.ns
-
-enum Status {
-  Unknown = 0,
-}
-
-struct TestStruct {
-  1: string str_value;
-}
-
-service FooHackService {
+struct Foo {
+  1: optional i32 value;
 }

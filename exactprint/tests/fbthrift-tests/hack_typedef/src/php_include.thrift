@@ -18,17 +18,11 @@
  * limitations under the License.
  */
 
-package "test.dev/foo/php/ns"
+namespace php include_typedef
 
-namespace php foo.php.ns
+typedef i32 IncludedMyI32
 
-enum Status {
-  Unknown = 0,
-}
-
-struct TestStruct {
-  1: string str_value;
-}
-
-service FooHackService {
+struct IncludedFoo {
+  1: IncludedMyI32 i_field;
+  2: i32 i_field2;
 }

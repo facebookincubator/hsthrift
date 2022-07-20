@@ -20,7 +20,7 @@
 
 include "thrift/annotation/thrift.thrift"
 
-@thrift.NoLegacy
+@thrift.NoLegacyAPIs
 package "test.dev/fixtures/no-legacy-apis"
 
 namespace cpp2 test.fixtures.basic

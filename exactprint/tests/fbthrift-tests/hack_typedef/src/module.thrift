@@ -18,17 +18,14 @@
  * limitations under the License.
  */
 
-package "test.dev/foo/php/ns"
+include "include.thrift"
 
-namespace php foo.php.ns
+namespace hack module_typedef
 
-enum Status {
-  Unknown = 0,
-}
+typedef i32 MyI32
 
-struct TestStruct {
-  1: string str_value;
-}
-
-service FooHackService {
+struct Foo {
+  1: include.MyI32 i_field;
+  2: MyI32 i_field2;
+  3: i32 i_field3;
 }

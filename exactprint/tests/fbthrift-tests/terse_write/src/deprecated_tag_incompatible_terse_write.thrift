@@ -21,7 +21,7 @@
 include "thrift/annotation/cpp.thrift"
 include "thrift/annotation/thrift.thrift"
 
-package "facebook.com/thrift/test/terse_write"
+package "facebook.com/thrift/test/terse_write/deprecated_tag_incompatible"
 
 enum MyEnum {
   ME0 = 0,
@@ -129,8 +129,3 @@ struct AdaptedFields {
   @cpp.Adapter{name = "my::Adapter"}
   3: MyInteger field3;
 }
-
-@thrift.TerseWrite
-exception TerseException {
-  1: string msg;
-} (message = 'msg')
