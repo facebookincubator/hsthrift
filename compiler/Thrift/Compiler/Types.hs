@@ -7,7 +7,7 @@
 {-# LANGUAGE TypeOperators #-}
 module Thrift.Compiler.Types
   ( Status(..), IfResolved, Parsed
-  , Program(..), Header(..), IncludeType(..), Decl(..), SpliceFile
+  , Program(..), Header(..), ParsedStatement(..), IncludeType(..), Decl(..), SpliceFile
   , Loc(..), noLoc, nlc, Comment(..), Located(..)
   , Separator(..), getSepLoc
   , Annotations(..), Annotation(..), AnnValue(..), getAnns, annLoc
@@ -86,6 +86,10 @@ data Program (l :: * {- Language -}) a = Program
   , progComments  :: [Comment a]
   , progEnv       :: Env l
   }
+
+data ParsedStatement
+  = StatementHeader (Header Loc)
+  | StatementDecl (Parsed Decl)
 
 data Header a
   = HInclude

@@ -26,7 +26,7 @@ import Thrift.Compiler.Types
 
 }
 
-%name parseThrift
+%name parseStatements
 %tokentype { Token }
 %lexer { lexWrap } { EOF }
 %monad { Parser } { bind } { return }
@@ -107,8 +107,12 @@ import Thrift.Compiler.Types
 %right SKIP_IDEMPOTENCY readonly idempotent
 
 %%
-Thrift :: { ([Header Loc], [Parsed Decl]) }
-Thrift : list(Header) list(Decl) { (catMaybes $1, catMaybes $2) }
+Thrift :: { [ParsedStatement] }
+Thrift : list(Statement) { catMaybes $1 }
+
+Statement :: { Maybe ParsedStatement }
+  : Header { fmap StatementHeader $1 }
+  | Decl { fmap StatementDecl $1 }
 
 Header :: { Maybe (Header Loc) }
   : Include stringLit
@@ -130,12 +134,12 @@ Header :: { Maybe (Header Loc) }
       , nmQuoteType  = lRep $3
       }
     }
-  | package stringLit
+  | StructuredAnnotations package stringLit
     { Just HPackage
-      { pkgUri = lParsed $2
-      , pkgKeywordLoc = getLoc $1
-      , pkgUriLoc     = lLoc $2
-      , pkgQuoteType  = lRep $2
+      { pkgUri = lParsed $3
+      , pkgKeywordLoc = getLoc $2
+      , pkgUriLoc     = lLoc $3
+      , pkgQuoteType  = lRep $3
       }
     }
 
@@ -781,10 +785,39 @@ bind = (>>=)
 lexWrap :: (Token -> Parser a) -> Parser a
 lexWrap k = alexMonadScan >>= k
 
-parseString :: FilePath -> String -> Either String (ThriftFile () Loc)
-parseString file = fmap mkThriftFile . runFullParser parseThrift file
+parseThrift :: Parser ([Header Loc], [Parsed Decl])
+parseThrift = do
+  statements <- parseStatements
+  splitStatements [] [] statements
   where
-    mkThriftFile ((headers, decls), comments) =
+    splitStatements
+      :: [Header Loc]
+      -> [Parsed Decl]
+      -> [ParsedStatement]
+      -> Parser ([Header Loc], [Parsed Decl])
+    splitStatements headers [] (StatementHeader header : statements) =
+      splitStatements (header:headers) [] statements
+    splitStatements _ decl (StatementHeader header : _) =
+      alexError $ concat
+        [locFile, ":", show locStartLine, ":", show locStartCol, ": unexpected header"]
+      where
+        Located{lLocation=Loc{..}} = case header of
+          HInclude{incKeywordLoc=incKeywordLoc} -> incKeywordLoc
+          HNamespace{nmKeywordLoc=nmKeywordLoc} -> nmKeywordLoc
+          HPackage{pkgKeywordLoc=pkgKeywordLoc} -> pkgKeywordLoc
+    splitStatements headers decls (StatementDecl decl : statements) =
+      splitStatements headers (decl:decls) statements
+    splitStatements headers decls [] =
+      pure ((reverse headers), (reverse decls))
+
+
+parseString :: FilePath -> String -> Either String (ThriftFile () Loc)
+parseString file string = do
+  ((headers, decls), comments) <- runFullParser parseThrift file string
+  pure $ mkThriftFile (headers, decls, comments)
+
+  where
+    mkThriftFile (headers, decls, comments) =
       ThriftFile
       { thriftName    = getModuleName file
       , thriftPath    = file
