@@ -18,10 +18,37 @@
  * limitations under the License.
  */
 
-namespace java.swift test.fixtures.includes.transitive
+include "thrift/annotation/thrift.thrift"
 
-struct Foo {
-  1: i64 a = 2;
+@thrift.NoLegacy
+package "test.dev/fixtures/nolegacy"
+
+enum TestEnum {
+  Value1 = 0,
+  Value2 = 1,
 }
 
-const Foo ExampleFoo = {a: 2};
+exception TestError {
+  1: TestEnum test_enum;
+  2: i32 code;
+}
+
+struct TestMixin {
+  1: string field1;
+}
+
+struct TestStruct {
+  1: string bar = "baz";
+  2: optional string baropt;
+  3: TestError test_error;
+  4: TestMixin test_mixin (cpp.mixin);
+}
+
+union TestUnion {
+  1: TestEnum enumVal;
+  2: TestStruct structVal;
+}
+
+service MyService {
+  TestStruct query(1: TestUnion val);
+}

@@ -24,7 +24,6 @@ package "test.dev/namespace_from_package/module"
 // namespace py3 test.namespace_from_package
 // namespace hack namespace_from_package.module
 // namespace php namespace_from_package.module
-// namespace java2 dev.test.namespace_from_package.module
 // namespace java.swift dev.test.namespace_from_package.module
 namespace java dev.test.namespace_from_package.module_deprecated
 namespace py.asyncio test.namespace_from_package.module

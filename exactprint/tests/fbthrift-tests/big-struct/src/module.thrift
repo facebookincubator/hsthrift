@@ -18,7 +18,6 @@
  * limitations under the License.
  */
 
-namespace java2 test.fixtures.basic
 namespace java.swift test.fixtures.basic
 
 struct MyNomralStruct {

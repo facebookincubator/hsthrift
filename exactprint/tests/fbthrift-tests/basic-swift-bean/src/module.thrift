@@ -18,7 +18,6 @@
  * limitations under the License.
  */
 
-namespace java2 test.fixtures.basic_swift_bean
 namespace java.swift test.fixtures.basic_swift_bean
 
 enum MyEnum {

@@ -18,7 +18,6 @@
  * limitations under the License.
  */
 
-namespace java2 test.fixtures.complex_struct
 namespace java.swift test.fixtures.complex_struct
 
 typedef string stringTypedef

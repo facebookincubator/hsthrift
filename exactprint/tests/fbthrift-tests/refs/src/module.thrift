@@ -18,7 +18,6 @@
  * limitations under the License.
  */
 
-namespace java2 test.fixtures.refs
 namespace java.swift test.fixtures.refs
 
 enum MyEnum {

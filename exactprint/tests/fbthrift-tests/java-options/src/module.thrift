@@ -18,10 +18,46 @@
  * limitations under the License.
  */
 
-namespace java.swift test.fixtures.includes.transitive
+package "test.dev/fixtures/basic"
 
-struct Foo {
-  1: i64 a = 2;
+namespace java.swift test.fixtures.basic
+
+const i64 kConstantValue = 0xBEEF;
+
+enum MyEnum {
+  MyValue1 = 0,
+  MyValue2 = 1,
 }
 
-const Foo ExampleFoo = {a: 2};
+struct MyStruct {
+  1: i64 MyIntField;
+  2: string MyStringField;
+  # use the type before it is defined. Thrift should be able to handle this
+  3: MyDataItem MyDataField;
+  4: MyEnum myEnum;
+  5: bool oneway;
+  6: bool readonly;
+  7: bool idempotent;
+  8: set<float> floatSet;
+  9: string no_hack_codegen_field;
+}
+
+struct MyDataItem {}
+
+union MyUnion {
+  1: MyEnum myEnum;
+  2: MyStruct myStruct;
+  3: MyDataItem myDataItem;
+  4: set<float> floatSet;
+}
+
+service MyService {
+  void ping();
+  string getRandomData();
+  void sink(1: i64 sink);
+}
+
+service DbMixedStackArguments {
+  binary getDataByKey0(1: string key);
+  binary getDataByKey1(1: string key);
+}

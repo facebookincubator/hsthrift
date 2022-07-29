@@ -18,7 +18,6 @@
  * limitations under the License.
  */
 
-namespace java2 test.fixtures.swift.toobigenum
 namespace java.swift test.fixtures.swift.toobigenum
 namespace java test.fixtures.toobigenum
 namespace cpp2 test.fixtures.toobigenum

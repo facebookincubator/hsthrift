@@ -20,13 +20,15 @@
 
 namespace android test.fixtures.adapter
 namespace java test.fixtures.adapter
-namespace java2 test.fixtures.adapter
 namespace java.swift test.fixtures.adapter
 
 include "thrift/annotation/cpp.thrift"
 include "thrift/annotation/python.thrift"
 include "thrift/annotation/thrift.thrift"
 include "thrift/annotation/hack.thrift"
+
+@thrift.Experimental
+package "facebook.com/thrift/test"
 
 @hack.Adapter{name = '\Adapter2'}
 @cpp.Adapter{name = 'my::Adapter2'}
@@ -128,6 +130,10 @@ struct Bar {
 }
 
 @cpp.Adapter{name = "my::Adapter"}
+@python.Adapter{
+  name = "my.module.Adapter",
+  typeHint = "my.another.module.AdaptedType",
+}
 struct DirectlyAdapted {
   1: i32 field;
 }
@@ -182,3 +188,16 @@ service Service {
     3: Foo arg3,
   );
 }
+
+@cpp.Adapter{name = "MyVarAdapter"}
+const i32 var1 = 10;
+
+@cpp.Adapter{name = "MyVarAdapter"}
+const string var2 = "20";
+
+struct MyStruct {
+  1: i32 field;
+}
+
+@cpp.Adapter{name = "MyVarAdapter"}
+const MyStruct var3 = MyStruct{field = 30};

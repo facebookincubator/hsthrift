@@ -19,7 +19,6 @@
  */
 
 include "includes.thrift"
-namespace java2 test.fixtures.includes
 namespace java.swift test.fixtures.includes
 
 struct MyStruct {

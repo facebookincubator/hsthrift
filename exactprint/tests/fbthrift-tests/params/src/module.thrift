@@ -18,7 +18,6 @@
  * limitations under the License.
  */
 
-namespace java2 test.fixtures.params
 namespace java.swift test.fixtures.params
 
 service NestedContainers {

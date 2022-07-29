@@ -20,7 +20,6 @@
 
 namespace java.swift test.fixtures.swift.enumstrict
 namespace java test.fixtures.enumstrict
-namespace java2 test.fixtures.enumstrict
 namespace cpp2 test.fixtures.enumstrict
 namespace py3 test.fixtures.enumstrict
 

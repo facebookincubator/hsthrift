@@ -18,7 +18,6 @@
  * limitations under the License.
  */
 
-namespace java2 test.fixtures.shapes
 namespace java.swift test.fixtures.shapes
 namespace hack test.fixtures
 

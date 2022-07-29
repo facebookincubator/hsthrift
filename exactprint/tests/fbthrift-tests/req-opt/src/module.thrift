@@ -18,7 +18,6 @@
  * limitations under the License.
  */
 
-namespace java2 test.fixtures.req_opt
 namespace java.swift test.fixtures.req_opt
 namespace cocoa example
 

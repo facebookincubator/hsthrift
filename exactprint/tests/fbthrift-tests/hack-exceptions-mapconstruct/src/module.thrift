@@ -14,6 +14,10 @@
 // generated-by : fbcode/common/hs/thrift/exactprint/tests/sync-fbthrift-tests.sh
 // source: thrift/compiler/test/fixtures/*
 // @generated
+// THIS FILE IS COPIED FROM FBTHRIFT, DO NOT MODIFY ITS CONTENTS DIRECTLY
+// generated-by : fbcode/common/hs/thrift/exactprint/tests/sync-fbthrift-tests.sh
+// source: thrift/compiler/test/fixtures/*
+// @generated
 /*
  * Copyright (c) Facebook, Inc. and its affiliates.
  *

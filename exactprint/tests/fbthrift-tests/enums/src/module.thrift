@@ -24,7 +24,6 @@ package "test.dev/fixtures/enums"
 
 namespace android test.fixtures.enums
 namespace java test.fixtures.enums
-namespace java2 test.fixtures.enums
 namespace java.swift test.fixtures.enums
 
 @thrift.GenDefaultEnumValue
