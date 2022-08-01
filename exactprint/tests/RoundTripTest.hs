@@ -23,7 +23,8 @@ headerSize = 4
 -- error message
 failingTests :: [FilePath]
 failingTests =
-  [ "common/hs/thrift/exactprint/tests/fbthrift-tests/basic/src/module.thrift"
+  [ "common/hs/thrift/exactprint/tests/fbthrift-tests/adapter/src/module.thrift"
+  , "common/hs/thrift/exactprint/tests/fbthrift-tests/basic/src/module.thrift"
   , "common/hs/thrift/exactprint/tests/fbthrift-tests/basic-annotations/src/module.thrift"
   , "common/hs/thrift/exactprint/tests/fbthrift-tests/basic-structured-annotations/src/module.thrift"
   , "common/hs/thrift/exactprint/tests/fbthrift-tests/constants/src/module.thrift"
@@ -37,6 +38,7 @@ failingTests =
   , "common/hs/thrift/exactprint/tests/fbthrift-tests/json_experimental/src/ThriftdocTest.thrift"
   , "common/hs/thrift/exactprint/tests/fbthrift-tests/map_construct/src/module.thrift"
   , "common/hs/thrift/exactprint/tests/fbthrift-tests/map_construct/src/module.thrift"
+  , "common/hs/thrift/exactprint/tests/fbthrift-tests/nolegacy/src/module.thrift"
   , "common/hs/thrift/exactprint/tests/fbthrift-tests/no-legacy-apis/src/module.thrift"
   , "common/hs/thrift/exactprint/tests/fbthrift-tests/patch/src/module.thrift"
   , "common/hs/thrift/exactprint/tests/fbthrift-tests/php-migration/src/module.thrift"
@@ -129,8 +131,10 @@ roundTripTests = do
   let
     testList =
       testFiles >>= \(path::String) ->
-        if | path `elem` failingTests -> [roundTripTestFails fbcode path]
-           | otherwise -> [roundTripTest fbcode path]
+        if path `elem` failingTests then
+          [roundTripTestFails fbcode path]
+        else
+          [roundTripTest fbcode path]
 
   return $ TestList testList
 
