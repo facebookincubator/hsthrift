@@ -123,10 +123,6 @@ void HaskellAsyncProcessor::executeRequest(
   auto* eb = apache::thrift::detail::ServerRequestHelper::eventBase(request);
 
   bool oneway = oneways_.find(context->getMethodName()) != oneways_.end();
-  if (oneway && !req->isOneway()) {
-    eb->runInEventBaseThread(
-        [req = std::move(req)] { req->sendReply(ResponsePayload{}); });
-  }
 
   auto legacySerializedRequest = apache::thrift::LegacySerializedRequest(
       protType,
