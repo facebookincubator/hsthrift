@@ -144,7 +144,7 @@ parseThriftFile baseDir path = do
       Right x -> return x
 
 -- | Select the last hs_include header (there should be at most one)
-parseHsInclude :: FilePath -> [Header a] -> IO SpliceFile
+parseHsInclude :: FilePath -> [Header s l a] -> IO SpliceFile
 parseHsInclude baseDir headers = case foldl' getInc Nothing headers of
   Nothing -> return Nothing
   Just path -> Just <$> do

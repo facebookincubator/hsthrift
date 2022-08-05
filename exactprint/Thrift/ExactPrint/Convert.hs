@@ -62,7 +62,7 @@ absoluteOrigin = Loc
 
 -- Headers ---------------------------------------------------------------------
 
-computeHeaderOffsets :: Loc -> Header Loc -> (Header Offset, Loc)
+computeHeaderOffsets :: Loc -> Header s l Loc -> (Header s l Offset, Loc)
 computeHeaderOffsets origin HInclude{..} =
   (HInclude { incKeywordLoc = getOffsets origin incKeywordLoc
             , incPathLoc    = getOffsets (lLocation incKeywordLoc) incPathLoc
@@ -77,11 +77,14 @@ computeHeaderOffsets origin HNamespace{..} =
               },
    lLocation nmNameLoc)
 computeHeaderOffsets origin HPackage{..} =
-  (HPackage { pkgKeywordLoc = getOffsets origin pkgKeywordLoc
+  (HPackage { pkgSAnns = sAnns
+            , pkgKeywordLoc = getOffsets sAnnsEnd pkgKeywordLoc
             , pkgUriLoc    = getOffsets (lLocation pkgKeywordLoc) pkgUriLoc
             , ..
             },
    lLocation pkgUriLoc)
+  where
+    (sAnns, sAnnsEnd) = foldO sAnnOffsets origin pkgSAnns
 
 -- Decls -----------------------------------------------------------------------
 

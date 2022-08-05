@@ -19,7 +19,7 @@ import Thrift.Compiler.Types as T
 import Thrift.Compiler.Typechecker
 import Thrift.Compiler.Typechecker.Monad
 
-mkModuleMap :: Text -> ([Header Loc], [Parsed Decl]) -> ModuleMap
+mkModuleMap :: Text -> ([Parsed Header], [Parsed Decl]) -> ModuleMap
 mkModuleMap name (headers, decls) =
   let path = Text.unpack name ++ ".thrift"
   in Map.singleton path ThriftFile

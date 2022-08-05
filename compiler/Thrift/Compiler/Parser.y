@@ -114,7 +114,7 @@ Statement :: { Maybe ParsedStatement }
   : Header { fmap StatementHeader $1 }
   | Decl { fmap StatementDecl $1 }
 
-Header :: { Maybe (Header Loc) }
+Header :: { Maybe (Parsed Header) }
   : Include stringLit
     { Just HInclude
       { incPath = Text.unpack (lParsed $2)
@@ -140,6 +140,7 @@ Header :: { Maybe (Header Loc) }
       , pkgKeywordLoc = getLoc $2
       , pkgUriLoc     = lLoc $3
       , pkgQuoteType  = lRep $3
+      , pkgSAnns      = $1
       }
     }
 
@@ -742,7 +743,7 @@ Type : byte   { ThisAnnTy I8 (annTy0 $1) }
 data ThriftFile a l = ThriftFile
   { thriftName    :: Text
   , thriftPath    :: FilePath
-  , thriftHeaders :: [Header l]
+  , thriftHeaders :: [Header 'Unresolved () l]
   , thriftDecls   :: [Decl 'Unresolved () l]
   , thriftSplice  :: a
   , thriftComments :: [Comment l]
@@ -785,16 +786,16 @@ bind = (>>=)
 lexWrap :: (Token -> Parser a) -> Parser a
 lexWrap k = alexMonadScan >>= k
 
-parseThrift :: Parser ([Header Loc], [Parsed Decl])
+parseThrift :: Parser ([Parsed Header], [Parsed Decl])
 parseThrift = do
   statements <- parseStatements
   splitStatements [] [] statements
   where
     splitStatements
-      :: [Header Loc]
+      :: [Parsed Header]
       -> [Parsed Decl]
       -> [ParsedStatement]
-      -> Parser ([Header Loc], [Parsed Decl])
+      -> Parser ([Parsed Header], [Parsed Decl])
     splitStatements headers [] (StatementHeader header : statements) =
       splitStatements (header:headers) [] statements
     splitStatements _ decl (StatementHeader header : _) =

@@ -265,7 +265,7 @@ toConstructorName :: Text -> Text
 toConstructorName = fixLeadingUnderscore . uppercase
 
 -- | Select the last namespace header
-getNamespace :: Text -> [Header a] -> Maybe Text
+getNamespace :: Text -> [Header s l a] -> Maybe Text
 getNamespace l = foldl' getNS Nothing
   where
     getNS ns HInclude{} = ns

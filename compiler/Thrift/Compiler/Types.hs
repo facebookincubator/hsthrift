@@ -81,17 +81,17 @@ data Program (l :: * {- Language -}) a = Program
   , progOutPath   :: FilePath
   , progInstances :: SpliceFile
   , progIncludes  :: [Program l a]
-  , progHeaders   :: [Header a]
+  , progHeaders   :: [Header 'Resolved l a]
   , progDecls     :: [Decl 'Resolved l a]
   , progComments  :: [Comment a]
   , progEnv       :: Env l
   }
 
 data ParsedStatement
-  = StatementHeader (Header Loc)
+  = StatementHeader (Parsed Header)
   | StatementDecl (Parsed Decl)
 
-data Header a
+data Header s l a
   = HInclude
     { incPath       :: FilePath
     , incType       :: IncludeType
@@ -112,6 +112,7 @@ data Header a
     , pkgKeywordLoc  :: Located a
     , pkgUriLoc      :: Located a
     , pkgQuoteType   :: QuoteType
+    , pkgSAnns       :: [StructuredAnnotation s l a]
     }
 
 data IncludeType = Include | HsInclude | CppInclude

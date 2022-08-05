@@ -23,10 +23,8 @@ headerSize = 4
 -- error message
 failingTests :: [FilePath]
 failingTests =
-  [ "common/hs/thrift/exactprint/tests/fbthrift-tests/adapter/src/module.thrift"
-  , "common/hs/thrift/exactprint/tests/fbthrift-tests/basic/src/module.thrift"
+  [ "common/hs/thrift/exactprint/tests/fbthrift-tests/basic/src/module.thrift"
   , "common/hs/thrift/exactprint/tests/fbthrift-tests/basic-annotations/src/module.thrift"
-  , "common/hs/thrift/exactprint/tests/fbthrift-tests/basic-structured-annotations/src/module.thrift"
   , "common/hs/thrift/exactprint/tests/fbthrift-tests/constants/src/module.thrift"
   , "common/hs/thrift/exactprint/tests/fbthrift-tests/exceptions/src/module.thrift"
   , "common/hs/thrift/exactprint/tests/fbthrift-tests/fatal/src/module.thrift"
@@ -38,9 +36,6 @@ failingTests =
   , "common/hs/thrift/exactprint/tests/fbthrift-tests/json_experimental/src/ThriftdocTest.thrift"
   , "common/hs/thrift/exactprint/tests/fbthrift-tests/map_construct/src/module.thrift"
   , "common/hs/thrift/exactprint/tests/fbthrift-tests/map_construct/src/module.thrift"
-  , "common/hs/thrift/exactprint/tests/fbthrift-tests/nolegacy/src/module.thrift"
-  , "common/hs/thrift/exactprint/tests/fbthrift-tests/no-legacy-apis/src/module.thrift"
-  , "common/hs/thrift/exactprint/tests/fbthrift-tests/patch/src/module.thrift"
   , "common/hs/thrift/exactprint/tests/fbthrift-tests/php-migration/src/module.thrift"
   , "common/hs/thrift/exactprint/tests/fbthrift-tests/php-migration/src/module.thrift"
   , "common/hs/thrift/exactprint/tests/fbthrift-tests/py-cpp-transport/src/module.thrift"

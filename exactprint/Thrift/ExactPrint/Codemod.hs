@@ -39,7 +39,7 @@ roundTripWith f input = case runParser parseThrift "" input of
     Left es -> error $ concatMap renderTypeError es
     Right (prog,_) -> Text.unpack $ exactPrint $ f $ computeOffsets prog
 
-mkModuleMap :: ([Header Loc], [Parsed Decl]) -> ModuleMap
+mkModuleMap :: ([Parsed Header], [Parsed Decl]) -> ModuleMap
 mkModuleMap (headers, decls) =
   Map.singleton "" ThriftFile
     { thriftName = ""

@@ -90,7 +90,7 @@ parseAndTypecheck input =
     Right tFile ->
       mapLeft TypeErrors $ typecheck (defaultOptions NoOpts) (mkModuleMap tFile)
 
-mkModuleMap :: ([Header Loc], [Parsed Decl]) -> ModuleMap
+mkModuleMap :: ([Parsed Header], [Parsed Decl]) -> ModuleMap
 mkModuleMap (headers, decls) =
   Map.singleton "" ThriftFile
     { thriftName = ""

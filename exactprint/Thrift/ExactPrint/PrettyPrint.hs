@@ -49,7 +49,7 @@ roundTrip path = do
 
 -- Headers ---------------------------------------------------------------------
 
-ppHeader :: Header Offset -> Builder
+ppHeader :: Header s l Offset -> Builder
 ppHeader HInclude{..} = mconcat
   [ addHeader incKeywordLoc
   , case incType of
@@ -66,7 +66,8 @@ ppHeader HNamespace{..} = mconcat
   , maybe fromText (flip ppStr) nmQuoteType nmName
   ]
 ppHeader HPackage {..} = mconcat
-  [ addHeader pkgKeywordLoc, "package"
+  [ ppSAnns pkgSAnns
+  , addHeader pkgKeywordLoc, "package"
   , addHeader pkgUriLoc
   , ppStr pkgUri pkgQuoteType
   ]

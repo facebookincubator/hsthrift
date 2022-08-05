@@ -28,7 +28,7 @@ mkThrift decls =  Map.singleton "" ThriftFile
                   , thriftComments = []
                   }
 
-mkModuleMap :: ([Header Loc], [Parsed Decl]) -> ModuleMap
+mkModuleMap :: ([Parsed Header], [Parsed Decl]) -> ModuleMap
 mkModuleMap (headers, decls) =
   Map.singleton "" ThriftFile
     { thriftName = ""

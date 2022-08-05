@@ -134,6 +134,7 @@ typecheckModule opts@Options{..} progs tf@ThriftFile{..} = do
                 , envName    = thriftName -- for weird 'mkThriftName' case
                 }
   -- Typecheck the rest of the things
+  headers <- runTypechecker env $ mapT typecheckHeader thriftHeaders
   decls <- runTypechecker env $ mapT resolveDecl thriftDeclsNew
   let prog = Program
              { progName      = thriftName
@@ -142,12 +143,22 @@ typecheckModule opts@Options{..} progs tf@ThriftFile{..} = do
              , progOutPath   = optsOutPath
              , progInstances = thriftSplice
              , progIncludes  = includes
-             , progHeaders   = thriftHeaders
+             , progHeaders   = headers
              , progDecls     = decls
              , progComments  = thriftComments
              , progEnv       = qualify (thriftName, renamedModule) env
              }
   return $ prog : progs
+
+typecheckHeader
+  :: Typecheckable l
+  => Header 'Unresolved () Loc
+  -> TC l (Header 'Resolved  l Loc)
+typecheckHeader HInclude{..} = pure $ HInclude{..}
+typecheckHeader HNamespace{..} = pure $ HNamespace{..}
+typecheckHeader HPackage{..} = do
+  sAnns <- resolveStructuredAnns pkgSAnns
+  pure $ HPackage{pkgSAnns = sAnns, ..}
 
 -- Self qualified --------------------------------------------------------------
 
