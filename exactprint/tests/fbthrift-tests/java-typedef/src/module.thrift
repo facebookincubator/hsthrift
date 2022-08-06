@@ -3,7 +3,7 @@
 // source: thrift/compiler/test/fixtures/*
 // @generated
 /*
- * Copyright (c) Facebook, Inc. and its affiliates.
+ * Copyright (c) Meta Platforms, Inc. and affiliates.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,30 +18,8 @@
  * limitations under the License.
  */
 
-struct Foo {
-  1: list<string> a;
-  2: optional map<string, list<set<i32>>> b;
-  3: i64 c = 7;
-  4: optional bool d;
-}
+namespace java.swift com.facebook.thrift.test
 
-service Bar {
-  list<Foo> baz(
-    1: set<i32> a,
-    2: list<map<i32, set<string>>> b,
-    3: Foo d,
-    4: i64 e = 4,
-    5: list<Foo> f,
-  );
-}
-
-exception Baz {
-  1: string message;
-  2: Foo some_field;
-  3: set<string> some_container;
-  4: i32 code;
-}
-
-exception OptBaz {
-  1: optional string message;
-}
+typedef i16 SomeId
+typedef string SomeString
+typedef map<SomeId, SomeString> SomeMap
