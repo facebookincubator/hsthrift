@@ -35,7 +35,8 @@ RUN apt-get install -y \
     libmysqlclient-dev \
     libfftw3-dev \
     libgmp-dev \
-    libtinfo-dev
+    libtinfo-dev \
+    libgmock-dev
 
 # install ghcup
 ARG GHCUP_VERSION=0.1.17.4
