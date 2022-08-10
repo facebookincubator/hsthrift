@@ -14,7 +14,7 @@ GETDEPS_PATHS=(
 # architecture here for compiling folly.
 arch=$(uname -m)
 if [ "$arch" == x86_64 ] ; then
-    export CXXFLAGS=-march=corei7
+    export CXXFLAGS=-march=haswell
 fi
 
 # if the C++ compiler is clang, we need fbthrift to build with -fsized-deallocation
