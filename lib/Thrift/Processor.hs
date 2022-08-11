@@ -8,6 +8,7 @@ module Thrift.Processor
   , processCommand
   , msgParser
   , Some(..)
+  , MethodInfo(..)
   ) where
 
 #if __GLASGOW_HASKELL__ > 804
@@ -21,6 +22,7 @@ import Data.ByteString.Builder
 import Data.ByteString.Lazy (toStrict)
 import Data.Int
 import Data.Some
+import Data.Map (Map)
 #if __GLASGOW_HASKELL == 804
 import Data.Monoid ((<>))
 #endif
@@ -30,9 +32,15 @@ import qualified Data.Text as Text
 
 import Thrift.Protocol
 import Thrift.Protocol.ApplicationException.Types
+import Thrift.Monad (Priority(..))
 
 data Blame = ClientError | ServerError
   deriving (Eq,Ord,Enum,Bounded,Read,Show)
+
+data MethodInfo = MethodInfo
+  { methodPriority :: Priority
+  , methodIsOneway :: Bool
+  }
 
 -- | Class of types that can handle parsing + running thrift requests
 class Processor s where
@@ -49,8 +57,9 @@ class Processor s where
     -> s a
     -> Either SomeException a
     -> (Builder, Maybe (SomeException, Blame))
-  -- | Oneway methods of this processor
-  onewayFns :: Proxy s -> [Text]
+  -- | Static information about a method
+  methodsInfo :: Proxy s -> Map Text MethodInfo
+  methodsInfo = const mempty
 
 -- | `process` should be called once for each received request
 process :: (Processor s, Protocol p)

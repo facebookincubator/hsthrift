@@ -69,11 +69,11 @@ class CppServer : public ThriftServer {
       TCallback callback,
       TFactory factoryFn,
       int desiredPort,
-      std::unordered_set<std::string>&& oneways)
-      : oneways_(std::move(oneways)) {
+      AsyncProcessorFactory::MethodMetadataMap&& metadataMap)
+      : metadataMap_(std::move(metadataMap)) {
     setPort(desiredPort);
-    setInterface(
-        std::unique_ptr<AsyncProcessorFactory>(factoryFn(callback, oneways_)));
+    setInterface(std::unique_ptr<AsyncProcessorFactory>(
+        factoryFn(callback, metadataMap_)));
   }
 
   // Start serving traffic
@@ -106,7 +106,7 @@ class CppServer : public ThriftServer {
 
  private:
   std::shared_ptr<CppEventHandler> eHandler_;
-  std::unordered_set<std::string> oneways_;
+  AsyncProcessorFactory::MethodMetadataMap metadataMap_;
 };
 } // namespace thrift
 } // namespace apache
@@ -118,8 +118,10 @@ extern "C" {
 
 apache::thrift::AsyncProcessorFactory* c_haskell_factory(
     apache::thrift::TCallback callback,
-    const std::unordered_set<std::string>& oneways) noexcept {
-  return new apache::thrift::HaskellAsyncProcessorFactory(callback, oneways);
+    apache::thrift::AsyncProcessorFactory::MethodMetadataMap&
+        metadataMap) noexcept {
+  return new apache::thrift::HaskellAsyncProcessorFactory(
+      callback, metadataMap);
 }
 
 using CreateCppServerResult = HsEither<apache::thrift::CppServer*, HsString>;
@@ -133,17 +135,32 @@ CreateCppServerResult* c_create_cpp_server(
     apache::thrift::TFactory factoryFn,
     int desiredPort,
     int workers,
-    const char** onewayNames,
-    size_t* onewaySizes,
-    size_t onewayLength) noexcept {
+    const apache::thrift::concurrency::PRIORITY* methodPriorities,
+    const bool* methodOneways,
+    const char** methodNames,
+    size_t* methodNamesSizes,
+    size_t methodsLength) noexcept {
   try {
-    std::unordered_set<std::string> oneways;
-    for (size_t i = 0; i < onewayLength; i++) {
-      oneways.emplace(std::string(onewayNames[i], onewaySizes[i]));
+    apache::thrift::AsyncProcessorFactory::MethodMetadataMap metadataMap{};
+    for (size_t i = 0; i < methodsLength; i++) {
+      auto name = std::string(methodNames[i], methodNamesSizes[i]);
+      auto metadata = std::make_shared<
+          apache::thrift::AsyncProcessorFactory::MethodMetadata>(
+          apache::thrift::AsyncProcessorFactory::MethodMetadata::ExecutorType::
+              ANY,
+          apache::thrift::AsyncProcessorFactory::MethodMetadata::
+              InteractionType::UNKNOWN,
+          // we don't support streaming responses for now
+          methodOneways[i]
+              ? apache::thrift::RpcKind::SINGLE_REQUEST_NO_RESPONSE
+              : apache::thrift::RpcKind::SINGLE_REQUEST_SINGLE_RESPONSE,
+          methodPriorities[i]);
+
+      metadataMap.emplace(name, metadata);
     }
 
     auto cppServer = new apache::thrift::CppServer(
-        callback, factoryFn, desiredPort, std::move(oneways));
+        callback, factoryFn, desiredPort, std::move(metadataMap));
 
     if (workers > 0) {
       cppServer->setNumCPUWorkerThreads(workers);

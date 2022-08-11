@@ -11,8 +11,8 @@
 namespace apache {
 namespace thrift {
 
-// Given a callback and set of oneway functions, build a factory
+// Given a callback and map of metadata, build a factory
 using TFactory =
-    AsyncProcessorFactory* (*)(TCallback, std::unordered_set<std::string>&);
+    AsyncProcessorFactory* (*)(TCallback, AsyncProcessorFactory::MethodMetadataMap&);
 } // namespace thrift
 } // namespace apache

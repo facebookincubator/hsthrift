@@ -15,8 +15,8 @@ const std::string kUexw = "uexw";
 
 HaskellAsyncProcessor::HaskellAsyncProcessor(
     TCallback callback,
-    const std::unordered_set<std::string>& oneways)
-    : callback_(callback), oneways_(oneways) {}
+    AsyncProcessorFactory::MethodMetadataMap& metadataMap)
+    : callback_(callback), metadataMap_(metadataMap) {}
 
 void HaskellAsyncProcessor::run(
     apache::thrift::ResponseChannelRequest::UniquePtr req,
@@ -109,9 +109,16 @@ void HaskellAsyncProcessor::run(
   }
 }
 
+bool isOneway(const AsyncProcessorFactory::MethodMetadata& meta) {
+  if (auto rpc = meta.rpcKind) {
+    return rpc == apache::thrift::RpcKind::SINGLE_REQUEST_NO_RESPONSE;
+  }
+  return false;
+}
+
 void HaskellAsyncProcessor::executeRequest(
     ServerRequest&& request,
-    const AsyncProcessorFactory::MethodMetadata& methodMetadata) {
+    const AsyncProcessorFactory::MethodMetadata& meta) {
   using ServerRequestHelper = apache::thrift::detail::ServerRequestHelper;
 
   auto context = request.requestContext();
@@ -122,7 +129,7 @@ void HaskellAsyncProcessor::executeRequest(
   auto serializedRequest = std::move(serializedCompressedRequest).uncompress();
   auto* eb = apache::thrift::detail::ServerRequestHelper::eventBase(request);
 
-  bool oneway = oneways_.find(context->getMethodName()) != oneways_.end();
+  bool oneway = isOneway(meta);
 
   auto legacySerializedRequest = apache::thrift::LegacySerializedRequest(
       protType,
@@ -141,7 +148,7 @@ void HaskellAsyncProcessor::executeRequest(
 void HaskellAsyncProcessor::processSerializedCompressedRequestWithMetadata(
     apache::thrift::ResponseChannelRequest::UniquePtr req,
     apache::thrift::SerializedCompressedRequest&& serializedCompressedRequest,
-    const apache::thrift::AsyncProcessorFactory::MethodMetadata&,
+    const apache::thrift::AsyncProcessorFactory::MethodMetadata& meta,
     apache::thrift::protocol::PROTOCOL_TYPES protType,
     apache::thrift::Cpp2RequestContext* context,
     folly::EventBase* eb,
@@ -153,8 +160,8 @@ void HaskellAsyncProcessor::processSerializedCompressedRequestWithMetadata(
 
   auto serializedRequest = std::move(serializedCompressedRequest).uncompress();
 
+  bool oneway = isOneway(meta);
   // Immediately give reply to one-way calls
-  bool oneway = oneways_.find(context->getMethodName()) != oneways_.end();
   if (oneway && !req->isOneway()) {
     req->sendReply(ResponsePayload{});
   }
@@ -181,9 +188,11 @@ void HaskellAsyncProcessor::processSerializedCompressedRequestWithMetadata(
   };
 
   const auto priorityFromHeaders = context->getCallPriority();
-  const auto pri = (priorityFromHeaders != concurrency::PRIORITY::N_PRIORITIES)
-      ? priorityFromHeaders
-      : apache::thrift::concurrency::NORMAL;
+  const bool hasPriorityOverride =
+      priorityFromHeaders != concurrency::PRIORITY::N_PRIORITIES;
+  const auto pri = hasPriorityOverride ? priorityFromHeaders
+      : meta.priority.has_value()      ? meta.priority.value()
+                                       : apache::thrift::concurrency::NORMAL;
 
   const auto source =
       apache::thrift::concurrency::ThreadManager::Source::UPSTREAM;
@@ -202,10 +211,15 @@ void HaskellAsyncProcessor::processSerializedRequest(
     Cpp2RequestContext* context,
     folly::EventBase* eb,
     concurrency::ThreadManager* tm) {
+  const auto found = metadataMap_.find(context->getMethodName());
+  const auto metadata = found != metadataMap_.end()
+      ? *found->second
+      : apache::thrift::AsyncProcessorFactory::MethodMetadata();
+
   processSerializedCompressedRequestWithMetadata(
       std::move(req),
       apache::thrift::SerializedCompressedRequest(std::move(serializedRequest)),
-      apache::thrift::AsyncProcessorFactory::MethodMetadata(),
+      metadata,
       protType,
       context,
       eb,

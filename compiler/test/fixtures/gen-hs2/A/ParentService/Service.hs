@@ -13,7 +13,7 @@
 {-# LANGUAGE GADTs #-}
 module A.ParentService.Service
        (ParentServiceCommand, reqName', reqParser', respWriter',
-        onewayFunctions')
+        methodsInfo')
        where
 import qualified A.Types as Types
 import qualified B.Types as B
@@ -24,6 +24,7 @@ import qualified Data.ByteString.Builder as Builder
 import qualified Data.Default as Default
 import qualified Data.HashMap.Strict as HashMap
 import qualified Data.Int as Int
+import qualified Data.Map.Strict as Map
 import qualified Data.Proxy as Proxy
 import qualified Data.Text as Text
 import qualified Prelude as Prelude
@@ -42,7 +43,7 @@ instance Thrift.Processor ParentServiceCommand where
   reqName = reqName'
   reqParser = reqParser'
   respWriter = respWriter'
-  onewayFns _ = onewayFunctions'
+  methodsInfo _ = methodsInfo'
 
 reqName' :: ParentServiceCommand a -> Text.Text
 reqName' _ = "unknown function"
@@ -65,5 +66,5 @@ respWriter' ::
                        Prelude.Maybe (Exception.SomeException, Thrift.Blame))
 respWriter' _ = Prelude.errorWithoutStackTrace ("unknown function")
 
-onewayFunctions' :: [Text.Text]
-onewayFunctions' = []
+methodsInfo' :: Map.Map Text.Text Thrift.MethodInfo
+methodsInfo' = Map.fromList []

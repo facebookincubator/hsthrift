@@ -13,7 +13,7 @@
 {-# LANGUAGE GADTs #-}
 module Namespace.E.TU__Service.Service
        (TU__ServiceCommand(..), reqName', reqParser', respWriter',
-        onewayFunctions')
+        methodsInfo')
        where
 import qualified Control.Exception as Exception
 import qualified Control.Monad.ST.Trans as ST
@@ -22,6 +22,7 @@ import qualified Data.ByteString.Builder as Builder
 import qualified Data.Default as Default
 import qualified Data.HashMap.Strict as HashMap
 import qualified Data.Int as Int
+import qualified Data.Map.Strict as Map
 import qualified Data.Proxy as Proxy
 import qualified Data.Text as Text
 import qualified Namespace.E.Types as Types
@@ -43,7 +44,7 @@ instance Thrift.Processor TU__ServiceCommand where
   reqName = reqName'
   reqParser = reqParser'
   respWriter = respWriter'
-  onewayFns _ = onewayFunctions'
+  methodsInfo _ = methodsInfo'
 
 reqName' :: TU__ServiceCommand a -> Text.Text
 reqName' (GetNumber __field__x) = "getNumber"
@@ -161,5 +162,10 @@ respWriter' _proxy _seqNum DoNothing{} _r
           Prelude.Right _result -> (2, Thrift.genStruct _proxy [],
                                     Prelude.Nothing)
 
-onewayFunctions' :: [Text.Text]
-onewayFunctions' = []
+methodsInfo' :: Map.Map Text.Text Thrift.MethodInfo
+methodsInfo'
+  = Map.fromList
+      [("getNumber",
+        Thrift.MethodInfo Thrift.NormalPriority Prelude.False),
+       ("doNothing",
+        Thrift.MethodInfo Thrift.NormalPriority Prelude.False)]

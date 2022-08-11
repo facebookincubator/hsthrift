@@ -13,7 +13,7 @@
 {-# LANGUAGE GADTs #-}
 module A.ChildService.Service
        (ChildServiceCommand(..), reqName', reqParser', respWriter',
-        onewayFunctions')
+        methodsInfo')
        where
 import qualified A.ParentService.Service as ParentService
 import qualified A.Types as Types
@@ -25,6 +25,7 @@ import qualified Data.ByteString.Builder as Builder
 import qualified Data.Default as Default
 import qualified Data.HashMap.Strict as HashMap
 import qualified Data.Int as Int
+import qualified Data.Map.Strict as Map
 import qualified Data.Proxy as Proxy
 import qualified Data.Text as Text
 import qualified Prelude as Prelude
@@ -46,7 +47,7 @@ instance Thrift.Processor ChildServiceCommand where
   reqName = reqName'
   reqParser = reqParser'
   respWriter = respWriter'
-  onewayFns _ = onewayFunctions'
+  methodsInfo _ = methodsInfo'
 
 reqName' :: ChildServiceCommand a -> Text.Text
 reqName' Foo = "foo"
@@ -112,5 +113,9 @@ respWriter' _proxy _seqNum Foo{} _r
 respWriter' _proxy _seqNum (SuperParentService _x) _r
   = ParentService.respWriter' _proxy _seqNum _x _r
 
-onewayFunctions' :: [Text.Text]
-onewayFunctions' = [] ++ ParentService.onewayFunctions'
+methodsInfo' :: Map.Map Text.Text Thrift.MethodInfo
+methodsInfo'
+  = Map.union
+      (Map.fromList
+         [("foo", Thrift.MethodInfo Thrift.NormalPriority Prelude.False)])
+      ParentService.methodsInfo'

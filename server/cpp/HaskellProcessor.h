@@ -5,6 +5,7 @@
 #include <memory>
 #include <unordered_set>
 
+#include <folly/MapUtil.h>
 #include <folly/Memory.h>
 #include <folly/io/IOBuf.h>
 #include <folly/io/async/EventBase.h>
@@ -37,7 +38,7 @@ class HaskellAsyncProcessor : public AsyncProcessor {
  public:
   HaskellAsyncProcessor(
       TCallback callback,
-      const std::unordered_set<std::string>& oneways);
+      AsyncProcessorFactory::MethodMetadataMap& metadataMap);
 
   void processSerializedCompressedRequestWithMetadata(
       apache::thrift::ResponseChannelRequest::UniquePtr req,
@@ -63,7 +64,7 @@ class HaskellAsyncProcessor : public AsyncProcessor {
 
  protected:
   TCallback callback_;
-  const std::unordered_set<std::string>& oneways_;
+  AsyncProcessorFactory::MethodMetadataMap& metadataMap_;
 
  private:
   void run(
@@ -79,18 +80,18 @@ class HaskellAsyncProcessorFactory : public AsyncProcessorFactory {
  public:
   explicit HaskellAsyncProcessorFactory(
       TCallback callback,
-      const std::unordered_set<std::string>& oneways)
-      : callback_(callback), oneways_(oneways) {}
+      AsyncProcessorFactory::MethodMetadataMap& metadataMap)
+      : callback_(callback), metadataMap_(metadataMap) {}
 
   std::unique_ptr<AsyncProcessor> getProcessor() override {
-    return std::make_unique<HaskellAsyncProcessor>(callback_, oneways_);
+    return std::make_unique<HaskellAsyncProcessor>(callback_, metadataMap_);
   }
 
   CreateMethodMetadataResult createMethodMetadata() override {
     WildcardMethodMetadataMap wildcardMap;
     wildcardMap.wildcardMetadata = std::make_shared<WildcardMethodMetadata>(
         MethodMetadata::ExecutorType::ANY);
-    wildcardMap.knownMethods = {};
+    wildcardMap.knownMethods = metadataMap_;
 
     return wildcardMap;
   }
@@ -103,7 +104,7 @@ class HaskellAsyncProcessorFactory : public AsyncProcessorFactory {
 
  private:
   TCallback callback_;
-  const std::unordered_set<std::string>& oneways_;
+  AsyncProcessorFactory::MethodMetadataMap& metadataMap_;
 };
 
 } // namespace thrift

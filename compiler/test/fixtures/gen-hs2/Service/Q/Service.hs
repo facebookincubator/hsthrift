@@ -12,7 +12,7 @@
 {-# OPTIONS_GHC -fno-warn-incomplete-uni-patterns#-}
 {-# LANGUAGE GADTs #-}
 module Service.Q.Service
-       (QCommand(..), reqName', reqParser', respWriter', onewayFunctions')
+       (QCommand(..), reqName', reqParser', respWriter', methodsInfo')
        where
 import qualified Control.Exception as Exception
 import qualified Control.Monad.ST.Trans as ST
@@ -21,6 +21,7 @@ import qualified Data.ByteString.Builder as Builder
 import qualified Data.Default as Default
 import qualified Data.HashMap.Strict as HashMap
 import qualified Data.Int as Int
+import qualified Data.Map.Strict as Map
 import qualified Data.Proxy as Proxy
 import qualified Data.Text as Text
 import qualified Prelude as Prelude
@@ -42,7 +43,7 @@ instance Thrift.Processor QCommand where
   reqName = reqName'
   reqParser = reqParser'
   respWriter = respWriter'
-  onewayFns _ = onewayFunctions'
+  methodsInfo _ = methodsInfo'
 
 reqName' :: QCommand a -> Text.Text
 reqName' TestFunc1 = "testFunc1"
@@ -144,5 +145,10 @@ respWriter' _proxy _seqNum TestFunc2{} _r
                                          _result],
                                     Prelude.Nothing)
 
-onewayFunctions' :: [Text.Text]
-onewayFunctions' = ["testFunc1"]
+methodsInfo' :: Map.Map Text.Text Thrift.MethodInfo
+methodsInfo'
+  = Map.fromList
+      [("testFunc1",
+        Thrift.MethodInfo Thrift.NormalPriority Prelude.True),
+       ("testFunc2",
+        Thrift.MethodInfo Thrift.NormalPriority Prelude.False)]

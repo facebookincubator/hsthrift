@@ -13,6 +13,7 @@ import Control.Concurrent.Async
 import Control.Concurrent.MVar
 import Control.Exception
 import Control.Monad
+import qualified Data.Map as Map
 import Data.Maybe
 #if __GLASGOW_HASKELL == 804
 import Data.Monoid ((<>))
@@ -30,6 +31,7 @@ import Util.Text
 import Thrift.Server.ProcessorCallback
 import Thrift.Server.Types
 import Thrift.Processor
+import Thrift.Monad (Priority(..))
 
 -- -----------------------------------------------------------------------------
 -- Server data types
@@ -71,20 +73,33 @@ withBackgroundServer handler ServerOptions{..} action =
     -- Function to modify the ThriftServer
     modifyFn = fromMaybe nullFunPtr customModifyFn
 
-    -- Set the instance to pull oneway functions from
-    oneways = onewayFns (undefined :: Proxy s)
-
     throwEx prefix = throwIO . ServerException . ((prefix <> ": ") <>)
+
+    infos = methodsInfo (undefined :: Proxy s)
+    names = Map.keys infos
+    oneways = methodIsOneway <$> Map.elems infos
+    priorities = asInt . methodPriority <$> Map.elems infos
+      where
+        asInt = \case
+          HighImportant -> 0
+          High -> 1
+          Important -> 2
+          NormalPriority -> 3
+          BestEffort -> 4
+          _ -> 5
 
     -- Creates a PServer to run `act` on
     withCServer cb act =
-      useTextsAsCStringLens oneways $ \txts sizes txtlen -> do
+      useTextsAsCStringLens names $ \names_ptr names_sizes names_len ->
+      withArray priorities $ \priorities_ptr ->
+      withArray oneways $ \oneways_pts -> do
         let
-          alloc = bracket
-            (create_cpp_server cb factoryFn cPort
-              cNumWorkers txts sizes txtlen)
-            delete
-            $ \p -> do
+          alloc =
+            let create = create_cpp_server cb factoryFn cPort cNumWorkers
+                  priorities_ptr oneways_pts
+                  names_ptr names_sizes names_len
+            in
+            bracket create delete $ \p -> do
               (r :: Either PServer Text) <- coerce $ peek p
               case r of
                 Left ps -> return ps
@@ -121,9 +136,11 @@ foreign import ccall safe "c_create_cpp_server"
                     -> FactoryFunction
                     -> CInt -- ^ port
                     -> CInt -- ^ workers, or 0 to use the default
-                    -> Ptr CString -- ^ oneway function names array
-                    -> Ptr CSize -- ^ oneway function name lengths array
-                    -> CSize -- ^ number of oneway functions
+                    -> Ptr Int -- ^ method priorities array
+                    -> Ptr Bool -- ^ one way methods
+                    -> Ptr CString -- ^ method names array
+                    -> Ptr CSize -- ^ method names lengths array
+                    -> CSize -- ^ number of methods
                     -> IO (Ptr (HsEither PServer HsText))
 
 foreign import ccall safe "c_destroy_cpp_server"

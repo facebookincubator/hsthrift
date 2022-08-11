@@ -60,7 +60,9 @@ struct MockThreadManager : public concurrency::ThreadManagerExecutorAdapter {
 
 struct HaskellProcessorTest : public Test {
   HaskellProcessorTest()
-      : processor(callback, oneways_),
+      : metadataMap_(
+            std::make_shared<AsyncProcessorFactory::MethodMetadataMap>()),
+        processor(callback, *metadataMap_),
         header(std::make_unique<transport::THeader>()),
         conn_context(std::make_unique<Cpp2ConnContext>()),
         request_context(std::make_unique<Cpp2RequestContext>(
@@ -123,7 +125,7 @@ struct HaskellProcessorTest : public Test {
 
   static const folly::fbstring response;
 
-  const std::unordered_set<std::string> oneways_;
+  std::shared_ptr<AsyncProcessorFactory::MethodMetadataMap> metadataMap_;
 
   HaskellAsyncProcessor processor;
 

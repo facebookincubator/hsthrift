@@ -41,7 +41,7 @@ genServiceExports s@Service{..} =
   then HS.EAbs () (NoNamespace ()) (unqualSym $ commandTypeName s)
   else HS.EThingWith () (EWildcard () 0) (unqualSym $ commandTypeName s) [])
   : map (HS.EVar () . UnQual () . Ident ())
-    ["reqName'", "reqParser'", "respWriter'", "onewayFunctions'"]
+    ["reqName'", "reqParser'", "respWriter'", "methodsInfo'"]
 
 genServiceImports :: Text.Text -> HS Service -> Set.Set Import
 genServiceImports this Service{..} =
@@ -64,6 +64,7 @@ genServiceImports this Service{..} =
       , QImport "Data.ByteString.Builder" "Builder"
       , QImport "Data.Default" "Default"
       , QImport "Data.HashMap.Strict" "HashMap"
+      , QImport "Data.Map.Strict" "Map"
       , QImport "Data.Int" "Int"
       , QImport "Data.Proxy" "Proxy"
       , QImport "Data.Text" "Text"
@@ -90,7 +91,7 @@ genServiceDecls s@Service{..} =
   [ genReqName s
   , genReqParser s
   , genRespWriter s
-  , genOneWays s
+  , genMethodsInfo s
   ]
 
   where
@@ -100,18 +101,19 @@ genServiceDecls s@Service{..} =
          (HS.IHCon () $ qualSym "Thrift" "Processor")
          (HS.TyCon () $ unqualSym $ commandTypeName s)
       )
-      (Just $ (flip map
-         [ "reqName"
-         , "reqParser"
-         , "respWriter"
-         ] $ \fn ->
-         HS.InsDecl () $ HS.FunBind () [ HS.Match () (textToName fn) []
-           (HS.UnGuardedRhs () $ con (fn <> "'")) Nothing
-         ]) ++ [
-         HS.InsDecl () $ HS.FunBind () [
-           HS.Match () (textToName "onewayFns") [HS.PWildCard ()]
-             (HS.UnGuardedRhs () $ var "onewayFunctions'") Nothing
-         ]])
+      (Just $ classFuns ++ additional)
+
+    classFuns = flip map [ "reqName" , "reqParser" , "respWriter" ] $ \fn ->
+      HS.InsDecl () $ HS.FunBind () [ HS.Match () (textToName fn) []
+        (HS.UnGuardedRhs () $ con (fn <> "'")) Nothing
+      ]
+
+    additional =
+      [ HS.InsDecl () $ HS.FunBind ()
+        [ HS.Match () (textToName "methodsInfo") [HS.PWildCard ()]
+          (HS.UnGuardedRhs () $ var "methodsInfo'") Nothing
+        ]
+      ]
 
 -- | Generates a GADT for all functions that the service can implement
 -- If extending a service, adds a "Super<Name>" constructor to forward
@@ -412,23 +414,45 @@ genRespWriter s@Service{..} =
         genResp (Just (This t)) =
           [ genFieldBase t "" 0 (intLit (0 :: Int)) (var "_result") ]
 
-genOneWays :: HS Service -> [HS.Decl ()]
-genOneWays Service{..} =
-  [ HS.TypeSig () [textToName "onewayFunctions'"] $
-    HS.TyList () (qualType "Text" "Text")
+genMethodsInfo :: HS Service -> [HS.Decl ()]
+genMethodsInfo service =
+  [ signature
   , HS.FunBind ()
-    [ HS.Match () (textToName "onewayFunctions'") []
-      (HS.UnGuardedRhs () $ genList $ (fst . supResolvedName) <$> serviceSuper)
-      Nothing
+    [ HS.Match () (textToName methodsInfo') []
+        (HS.UnGuardedRhs () infos) Nothing
     ]
   ]
   where
-    genList Nothing = onewayFns
-    genList (Just Name{..}) =
-      infixApp "++" onewayFns (qvar (localName resolvedName) "onewayFunctions'")
+    signature = HS.TypeSig () [textToName methodsInfo'] $
+      qualType "Map" "Map"
+        `appT` qualType "Text" "Text"
+        `appT` HS.TyCon () (qualSym "Thrift" "MethodInfo")
 
-    onewayFns = HS.List () $
-      map (stringLit . funName) $ filter funIsOneWay serviceFunctions
+    methodsInfo' = "methodsInfo'"
+
+    superMethodsInfo :: Maybe (HS.Exp ())
+    superMethodsInfo = do
+      (Name{..}, _) <- supResolvedName <$> serviceSuper service
+      return $ qvar (localName resolvedName) methodsInfo'
+
+    instanceMethodsInfo = qvar "Map" "fromList" `app`
+      listE (genInfoTuple <$> serviceFunctions service)
+
+    infos = case superMethodsInfo of
+      Nothing -> instanceMethodsInfo
+      Just s -> qvar "Map" "union" `app` instanceMethodsInfo `app` s
+
+    genInfoTuple f@Function{..} =
+      Tuple () Boxed
+        [ stringLit funName
+        , genOneMethodInfo f
+        ]
+
+    genOneMethodInfo :: HS Function -> HS.Exp ()
+    genOneMethodInfo Function{..} =
+      qcon "Thrift" "MethodInfo"
+        `app` qcon "Thrift" (Text.pack $ show funPriority)
+        `app` qcon "Prelude" (Text.pack $ show funIsOneWay)
 
 commandTypeName :: HS Service -> Text
 commandTypeName Service{..} = serviceResolvedName <> "Command"

@@ -12,7 +12,7 @@
 {-# OPTIONS_GHC -fno-warn-incomplete-uni-patterns#-}
 {-# LANGUAGE GADTs #-}
 module A.S.Service
-       (SCommand(..), reqName', reqParser', respWriter', onewayFunctions')
+       (SCommand(..), reqName', reqParser', respWriter', methodsInfo')
        where
 import qualified A.Types as Types
 import qualified B.Types as B
@@ -23,6 +23,7 @@ import qualified Data.ByteString.Builder as Builder
 import qualified Data.Default as Default
 import qualified Data.HashMap.Strict as HashMap
 import qualified Data.Int as Int
+import qualified Data.Map.Strict as Map
 import qualified Data.Proxy as Proxy
 import qualified Data.Text as Text
 import qualified Prelude as Prelude
@@ -43,7 +44,7 @@ instance Thrift.Processor SCommand where
   reqName = reqName'
   reqParser = reqParser'
   respWriter = respWriter'
-  onewayFns _ = onewayFunctions'
+  methodsInfo _ = methodsInfo'
 
 reqName' :: SCommand a -> Text.Text
 reqName' (GetNumber __field__x) = "getNumber"
@@ -160,5 +161,10 @@ respWriter' _proxy _seqNum DoNothing{} _r
           Prelude.Right _result -> (2, Thrift.genStruct _proxy [],
                                     Prelude.Nothing)
 
-onewayFunctions' :: [Text.Text]
-onewayFunctions' = []
+methodsInfo' :: Map.Map Text.Text Thrift.MethodInfo
+methodsInfo'
+  = Map.fromList
+      [("getNumber",
+        Thrift.MethodInfo Thrift.NormalPriority Prelude.False),
+       ("doNothing",
+        Thrift.MethodInfo Thrift.NormalPriority Prelude.False)]

@@ -12,7 +12,7 @@
 {-# OPTIONS_GHC -fno-warn-incomplete-uni-patterns#-}
 {-# LANGUAGE GADTs #-}
 module Service.X.Service
-       (XCommand(..), reqName', reqParser', respWriter', onewayFunctions')
+       (XCommand(..), reqName', reqParser', respWriter', methodsInfo')
        where
 import qualified Control.Exception as Exception
 import qualified Control.Monad.ST.Trans as ST
@@ -21,6 +21,7 @@ import qualified Data.ByteString.Builder as Builder
 import qualified Data.Default as Default
 import qualified Data.HashMap.Strict as HashMap
 import qualified Data.Int as Int
+import qualified Data.Map.Strict as Map
 import qualified Data.Proxy as Proxy
 import qualified Data.Text as Text
 import qualified Prelude as Prelude
@@ -41,7 +42,7 @@ instance Thrift.Processor XCommand where
   reqName = reqName'
   reqParser = reqParser'
   respWriter = respWriter'
-  onewayFns _ = onewayFunctions'
+  methodsInfo _ = methodsInfo'
 
 reqName' :: XCommand a -> Text.Text
 reqName' TestFunc = "testFunc"
@@ -104,5 +105,7 @@ respWriter' _proxy _seqNum TestFunc{} _r
                                          _result],
                                     Prelude.Nothing)
 
-onewayFunctions' :: [Text.Text]
-onewayFunctions' = []
+methodsInfo' :: Map.Map Text.Text Thrift.MethodInfo
+methodsInfo'
+  = Map.fromList
+      [("testFunc", Thrift.MethodInfo Thrift.High Prelude.False)]

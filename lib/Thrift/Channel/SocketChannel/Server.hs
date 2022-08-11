@@ -20,6 +20,7 @@ import Control.Monad
 import Data.ByteString.Builder (toLazyByteString)
 import Data.ByteString.Lazy (toStrict)
 import Data.Maybe (fromMaybe)
+import qualified Data.Map as Map
 import Data.Proxy
 import Network.Socket
 import qualified Data.ByteString as BS
@@ -151,7 +152,9 @@ withServerIO p mport maxQueuedConns handler client  = do
                   _ <- sendBS sock (toStrict $ toLazyByteString response)
                   return (Nothing, seqNum')
                 Nothing -> do
-                  unless (reqName cmd `elem` onewayFns (Proxy :: Proxy c)) $
+                  let info = Map.lookup (reqName cmd) (methodsInfo (Proxy :: Proxy c))
+                      isOneway = maybe False methodIsOneway info
+                  unless isOneway $
                     void $ sendBS sock (toStrict $ toLazyByteString response)
                   if BS.null leftover
                     then return (Nothing, seqNum')
