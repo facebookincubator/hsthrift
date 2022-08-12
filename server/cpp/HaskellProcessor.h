@@ -73,7 +73,8 @@ class HaskellAsyncProcessor : public AsyncProcessor {
       apache::thrift::Cpp2RequestContext* context,
       folly::EventBase* eb,
       TCallback cb,
-      bool oneway);
+      bool oneway,
+      bool fromExecuteRequest);
 };
 
 class HaskellAsyncProcessorFactory : public AsyncProcessorFactory {

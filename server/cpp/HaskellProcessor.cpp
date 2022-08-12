@@ -24,10 +24,11 @@ void HaskellAsyncProcessor::run(
     apache::thrift::Cpp2RequestContext* context,
     folly::EventBase* eb,
     TCallback cb,
-    bool oneway) {
+    bool oneway,
+    bool fromExecuteRequest) {
   // Mark the request as processing, so that it won't be failed
   // with a queue timeout.
-  if (req && !req->getShouldStartProcessing()) {
+  if (!fromExecuteRequest && req && !req->getShouldStartProcessing()) {
     // Queue timeout must have occurred. Clean up request and return.
     HandlerCallbackBase::releaseRequest(std::move(req), eb);
     return;
@@ -142,7 +143,8 @@ void HaskellAsyncProcessor::executeRequest(
       context,
       eb,
       callback_,
-      oneway);
+      oneway,
+      true /* fromExecuteRequest  */);
 }
 
 void HaskellAsyncProcessor::processSerializedCompressedRequestWithMetadata(
@@ -184,7 +186,8 @@ void HaskellAsyncProcessor::processSerializedCompressedRequestWithMetadata(
         context,
         eb,
         cb,
-        oneway);
+        oneway,
+        false /* fromExecuteRequest  */);
   };
 
   const auto priorityFromHeaders = context->getCallPriority();
