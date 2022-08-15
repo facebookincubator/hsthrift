@@ -811,7 +811,7 @@ resolveStructuredAnn
 resolveStructuredAnn StructuredAnn{..} = do
   thisty <- resolveType (TNamed saType) saTypeLoc Nothing
   saTypeName <- mkThriftName saType
-  thisschema <- lookupSchema saTypeName lLocation
+  thisschema <- lookupSchemaRec saTypeName lLocation
   case (thisty, thisschema) of
     (This ty, This schema) -> do
       val <- typecheckStruct lLocation schema =<<
@@ -835,6 +835,15 @@ resolveStructuredAnn StructuredAnn{..} = do
       -- locEndLine defLoc == locStartLine loc
       | locEndCol defLoc <= locStartCol loc = True
       | otherwise = False
+    lookupSchemaRec :: ThriftName -> Loc -> TC l (Some (Schema l))
+    lookupSchemaRec name loc = do
+      thisty <- lookupType name loc
+      case thisty of
+        This ty -> do
+          let nm = case getAliasedType ty of
+                TStruct Name{..} _ -> sourceName
+                _ -> name
+          lookupSchema nm loc
 
 -- Build the Constant Map ------------------------------------------------------
 
