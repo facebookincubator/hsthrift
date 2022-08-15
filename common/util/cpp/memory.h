@@ -58,7 +58,7 @@ struct malloced_array {
     return get()[i];
   }
 
-  void prune(size_t k) {
+  void prune(size_t k) noexcept {
     assert(k <= n);
     n = k;
   }
