@@ -17,6 +17,12 @@ if [ "$arch" == x86_64 ] ; then
     export CXXFLAGS=-march=haswell
 fi
 
+# when CMAKE_LIBRARY_ARCHITECTURE is not set folly defaults to sse4/x86_64 flavor
+# don't do that on arm
+if [ "$arch" == aarch64 ] ; then
+    APPEND_EXTRA_CMAKE_DEFINES='"CMAKE_LIBRARY_ARCHITECTURE": "aarch64",'
+fi
+
 # if the C++ compiler is clang, we need fbthrift to build with -fsized-deallocation
 # this is a janky way to make that happen until we work out how to patch fbthrift
 clang=$(cc --version | sed -n 's/^.*\(clang\).*$/\1/p')
@@ -26,7 +32,7 @@ fi
 
 # N.B. we always need shared libs, but this only checks build is the first arg
 if [ "$1" = "build" ]; then
-    set -- "$@" --extra-cmake-defines='{"BUILD_SHARED_LIBS": "ON", "BUILD_EXAMPLES": "off", "BUILD_TESTS": "off", "CMAKE_INSTALL_RPATH_USE_LINK_PATH": "TRUE", "EVENT__BUILD_SHARED_LIBRARIES": "ON", "BOOST_LINK_STATIC": "OFF"}'
+    set -- "$@" --extra-cmake-defines='{'"${APPEND_EXTRA_CMAKE_DEFINES}"'"BUILD_SHARED_LIBS": "ON", "BUILD_EXAMPLES": "off", "BUILD_TESTS": "off", "CMAKE_INSTALL_RPATH_USE_LINK_PATH": "TRUE", "EVENT__BUILD_SHARED_LIBRARIES": "ON", "BOOST_LINK_STATIC": "OFF"}'
 fi
 
 for getdeps in "${GETDEPS_PATHS[@]}"; do
