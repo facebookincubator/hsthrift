@@ -1,6 +1,7 @@
 // Copyright (c) Facebook, Inc. and its affiliates.
 
 #include "cpp/HaskellProcessor.h"
+#include <glog/logging.h>
 
 #include <thrift/lib/cpp2/util/LegacyRequestExpiryGuard.h>
 
@@ -196,6 +197,8 @@ void HaskellAsyncProcessor::processSerializedCompressedRequestWithMetadata(
   const auto pri = hasPriorityOverride ? priorityFromHeaders
       : meta.priority.has_value()      ? meta.priority.value()
                                        : apache::thrift::concurrency::NORMAL;
+
+  DVLOG(5) << "Request priority: " << pri << " " << context->getMethodName();
 
   const auto source =
       apache::thrift::concurrency::ThreadManager::Source::UPSTREAM;

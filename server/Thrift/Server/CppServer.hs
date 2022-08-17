@@ -31,7 +31,7 @@ import Util.Text
 import Thrift.Server.ProcessorCallback
 import Thrift.Server.Types
 import Thrift.Processor
-import Thrift.Monad (Priority(..))
+import Thrift.Protocol
 
 -- -----------------------------------------------------------------------------
 -- Server data types
@@ -78,15 +78,8 @@ withBackgroundServer handler ServerOptions{..} action =
     infos = methodsInfo (undefined :: Proxy s)
     names = Map.keys infos
     oneways = methodIsOneway <$> Map.elems infos
-    priorities = asInt . methodPriority <$> Map.elems infos
-      where
-        asInt = \case
-          HighImportant -> 0
-          High -> 1
-          Important -> 2
-          NormalPriority -> 3
-          BestEffort -> 4
-          _ -> 5
+    priorities =
+      fromIntegral . fromThriftEnum . methodPriority <$> Map.elems infos
 
     -- Creates a PServer to run `act` on
     withCServer cb act =
@@ -136,7 +129,7 @@ foreign import ccall safe "c_create_cpp_server"
                     -> FactoryFunction
                     -> CInt -- ^ port
                     -> CInt -- ^ workers, or 0 to use the default
-                    -> Ptr Int -- ^ method priorities array
+                    -> Ptr CInt -- ^ method priorities array
                     -> Ptr Bool -- ^ one way methods
                     -> Ptr CString -- ^ method names array
                     -> Ptr CSize -- ^ method names lengths array

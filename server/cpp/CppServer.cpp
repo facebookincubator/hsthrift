@@ -9,6 +9,7 @@
 #include <folly/Memory.h>
 #include <folly/io/IOBuf.h>
 #include <folly/io/async/EventBase.h>
+#include <glog/logging.h>
 
 #include <thrift/lib/cpp/TApplicationException.h>
 #include <thrift/lib/cpp2/async/AsyncProcessor.h>
@@ -144,6 +145,7 @@ CreateCppServerResult* c_create_cpp_server(
     apache::thrift::AsyncProcessorFactory::MethodMetadataMap metadataMap{};
     for (size_t i = 0; i < methodsLength; i++) {
       auto name = std::string(methodNames[i], methodNamesSizes[i]);
+      auto priority = methodPriorities[i];
       auto metadata = std::make_shared<
           apache::thrift::AsyncProcessorFactory::MethodMetadata>(
           apache::thrift::AsyncProcessorFactory::MethodMetadata::ExecutorType::
@@ -154,8 +156,9 @@ CreateCppServerResult* c_create_cpp_server(
           methodOneways[i]
               ? apache::thrift::RpcKind::SINGLE_REQUEST_NO_RESPONSE
               : apache::thrift::RpcKind::SINGLE_REQUEST_SINGLE_RESPONSE,
-          methodPriorities[i]);
+          priority);
 
+      DVLOG(5) << "Method priority: " << priority << " " << name;
       metadataMap.emplace(name, metadata);
     }
 
