@@ -59,6 +59,11 @@ common fb-haskell
         TypeSynonymInstances
         NondecreasingIndentation
 
+common fb-cpp
+  cxx-options: -std=c++17
+  if arch(x86_64)
+     cxx-options: -march=haswell
+
 common test-common
   hs-source-dirs: ., gen-hs2/
   build-depends: aeson,
@@ -170,7 +175,7 @@ test-suite instances
   other-modules: Monoid.Types
   ghc-options: -main-is InstancesTest
 test-suite integration
-  import: fb-haskell, test-common
+  import: fb-haskell, fb-cpp, test-common
   type: exitcode-stdio-1.0
   main-is: IntegrationTest.hs
   other-modules: HsTest.Types
@@ -204,7 +209,7 @@ test-suite map
   other-modules: Map.Types
   ghc-options: -main-is MapTest
 test-suite message
-  import: fb-haskell, test-common
+  import: fb-haskell, fb-cpp, test-common
   type: exitcode-stdio-1.0
   main-is: MessageTest.hs
   other-modules: HsTest.Types
