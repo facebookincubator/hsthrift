@@ -11,6 +11,7 @@ import Data.ByteString (ByteString, useAsCStringLen)
 import Data.ByteString.Unsafe (unsafeUseAsCStringLen)
 import Data.HashMap.Strict (HashMap)
 import qualified Data.HashMap.Strict as HashMap
+import qualified Data.HashSet as HashSet
 import Data.IntMap.Strict (IntMap)
 import qualified Data.IntMap.Strict as IntMap
 import qualified Data.Map.Strict as Map
@@ -77,6 +78,40 @@ arrayCxxTest = TestLabel "arrayCxxTest" $
     withCxxObject (HsArray (Vector.fromList booley)) $ \p -> do
       HsArray v <- peek p
       assertEqual "array of bool" booley (Vector.toList v)
+
+setCxxTest :: Test
+setCxxTest = TestLabel "setCxxTest" $
+  TestCase $ do
+    withDefaultCxxObject $ \p -> do
+      HsHashSet s <- peek p :: IO (HsHashSet HsText)
+      assertEqual
+        "default is empty"
+        HashSet.empty
+        (HashSet.fromList $ map hsText s)
+
+    let pokey = ["1", "2", "3", "2"]
+    let pokeySet = HashSet.fromList pokey
+    withCxxObject (HsHashSet $ map HsText pokey) $ \p -> do
+      HsHashSet s <- peek p
+      assertEqual
+        "set of strings"
+        pokeySet
+        (HashSet.fromList $ map hsText s)
+
+    let pokeyInt :: [Int] = [1, 2, 3, 2]
+    let pokeyIntSet = HashSet.fromList pokeyInt
+    withCxxObject (HsHashSet pokeyInt) $ \p -> do
+      HsHashSet s <- peek p
+      assertEqual "set of ints" pokeyIntSet (HashSet.fromList s)
+
+    let pokeyDouble :: [Double] = [1.0, 2.0, 3.0, 2.0]
+    let pokeyDoubleSet = HashSet.fromList pokeyDouble
+    withCxxObject (HsHashSet pokeyDouble) $ \p -> do
+      HsHashSet s <- peek p
+      assertEqual
+        "set of doubles"
+        pokeyDoubleSet
+        (HashSet.fromList s)
 
 toCBool :: Bool -> CBool
 toCBool = fromBool
@@ -240,6 +275,27 @@ foreign import ccall unsafe "getArrayInt64"
 foreign import ccall unsafe "getArrayCBool"
   getArrayCBool :: IO (Ptr a)
 
+setTest :: Test
+setTest = TestLabel "Set" $
+  TestCase $ do
+    s <- fmap (fmap hsString . hsHashSet) $ peek =<< getSet
+    assertEqual
+      "HashSet String"
+      (HashSet.fromList ["foo", "bar"])
+      (HashSet.fromList s)
+
+    si :: [Int64] <- fmap hsHashSet $ peek =<< getSetInt64
+    assertEqual
+      "HashSet Int64"
+      (HashSet.fromList [1, 2, 3])
+      (HashSet.fromList si)
+
+foreign import ccall unsafe "getSet"
+  getSet :: IO (Ptr a)
+
+foreign import ccall unsafe "getSetInt64"
+  getSetInt64 :: IO (Ptr a)
+
 mapTest :: Test
 mapTest = TestLabel "Map" $
   TestCase $ do
@@ -336,6 +392,8 @@ main =
       , allocUtilsTest
       , optionTest
       , arrayCxxTest
+      , setCxxTest
+      , setTest
       , stringPieceCxxTest
       , jsonRoundTrip
       , stdVariantTest

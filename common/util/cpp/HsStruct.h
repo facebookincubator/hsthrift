@@ -560,6 +560,143 @@ static_assert(sizeof(HsArray<uint8_t>) == sizeof(DummyHsArray));
     arr->add(std::move(*val));                                             \
   }
 
+template <typename Key>
+HS_STRUCT HsSet {
+  std::vector<Key> k_;
+  const Key* keys = k_.data();
+  size_t n = k_.size();
+
+ public:
+  HsSet() {}
+
+  /* implicit */ HsSet(std::vector<Key> && k) : k_(std::move(k)) {}
+
+  /* implicit */ HsSet(std::unordered_set<Key> && s) {
+    std::vector<Key> k;
+    k.reserve(s.size());
+    while (!s.empty()) {
+      auto nh = s.extract(s.begin());
+      k.insert(std::move(nh.value()));
+    }
+    this->k_ = k;
+    update();
+  }
+
+  template <typename InputIterator>
+  /* implicit */ HsSet(InputIterator first, InputIterator last) {
+    reserve(std::distance(first, last));
+    for (auto it = first; it != last; ++it) {
+      auto val = *it;
+      add(std::move(val));
+    }
+    update();
+  }
+
+  template <typename Container>
+  /* implicit */ HsSet(Container && c)
+      : HsSet(
+            std::make_move_iterator(c.begin()),
+            std::make_move_iterator(c.end())) {}
+
+  /* implicit */ HsSet(std::initializer_list<Key> init)
+      : HsSet(init.begin(), init.end()) {}
+
+  HsSet(const HsSet&) = delete;
+
+  HsSet(HsSet && other) noexcept : k_(std::move(other.k_)) {
+    update();
+  }
+
+  HsSet& operator=(const HsSet&) = delete;
+
+  HsSet& operator=(HsSet&& other) noexcept {
+    if (this != &other) {
+      k_ = std::move(other.k_);
+      update();
+    }
+
+    return *this;
+  }
+
+ private:
+  void update() {
+    keys = k_.data();
+    n = k_.size();
+  }
+
+ public:
+  struct ConstIterator {
+    const HsSet& object;
+    size_t index = 0;
+
+    explicit ConstIterator(const HsSet& object) : object(object) {}
+
+    bool isValid() const {
+      return index < object.n;
+    }
+
+    void next() {
+      ++index;
+    }
+
+    const Key& get() const {
+      DCHECK(isValid());
+      return object.keys[index];
+    }
+
+    ConstIterator getIterator() const {
+      return ConstIterator(*this);
+    }
+  };
+
+  void reserve(size_t n) {
+    k_.reserve(n);
+    update();
+  }
+
+  void clear() {
+    k_.clear();
+    update();
+  }
+
+  std::vector<Key> toStdVector()&& {
+    auto res = std::move(k_);
+    update();
+    return res;
+  }
+
+  std::unordered_set<Key> toStdUnorderedSet()&& {
+    auto k = std::move(k_);
+    std::unordered_set<Key> res(
+        std::make_move_iterator(k.begin()), std::make_move_iterator(k.end()));
+    update();
+    return res;
+  }
+
+  template <typename Arg>
+  void add(Arg && arg) {
+    k_.emplace_back(std::forward<Arg>(arg));
+    update();
+  }
+};
+
+using DummyHsSet = HsSet<std::nullptr_t>;
+HS_PEEKABLE(DummyHsSet);
+static_assert(
+    sizeof(HsSet<HsString>) == sizeof(DummyHsSet),
+    "HsSet<HsString> is of the same size as DummyHsSet");
+static_assert(sizeof(HsSet<uint8_t>) == sizeof(DummyHsSet));
+
+#define HS_DEFINE_SET_CONSTRUCTIBLE(Name, Type)                            \
+  extern "C" void set_constructHsSet##Name(HsSet<Type>* set, size_t len) { \
+    new (set) HsSet<Type>();                                               \
+    set->reserve(len);                                                     \
+  }                                                                        \
+                                                                           \
+  extern "C" void set_addHsSet##Name(HsSet<Type>* set, Type* val) {        \
+    set->add(std::move(*val));                                             \
+  }
+
 template <typename Key, typename Value>
 HS_STRUCT HsMap {
   std::vector<Key> k_;

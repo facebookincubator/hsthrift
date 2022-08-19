@@ -32,6 +32,7 @@ module Foreign.CPP.HsStruct.Types
   , HsIntMap(..)
   , HsHashMap(..)
   , HsObject(..)
+  , HsHashSet(..)
   -- * HsJSON
   , HsJSON(..)
   ) where
@@ -40,7 +41,7 @@ import Control.DeepSeq (NFData)
 import Data.Aeson (Value(..))
 import Data.ByteString (ByteString, packCStringLen)
 import Data.ByteString.Unsafe (unsafeUseAsCStringLen)
-import Data.Hashable (Hashable)
+import Data.Hashable (Hashable, hashWithSalt)
 import Data.Text (Text)
 import qualified Data.Text.Encoding as Text (encodeUtf8)
 import Data.HashMap.Strict (HashMap)
@@ -60,6 +61,7 @@ import qualified Data.Map.Strict as Map
 import Foreign.CPP.Addressable hiding (alignment, sizeOf)
 import qualified Foreign.CPP.Addressable as Addressable
 import Foreign.CPP.HsStruct.HsArray
+import Foreign.CPP.HsStruct.HsSet
 import Foreign.CPP.HsStruct.HsOption
 import Foreign.CPP.HsStruct.Utils
 import Foreign.CPP.Marshallable.TH
@@ -232,6 +234,12 @@ instance Storable HsText where
   alignment _ = #{alignment HsString}
   poke = error "HsStruct.HsText: poke not implemented"
   peek p = fmap HsText $ uncurry cStringLenToText =<< peekStrLen p
+
+instance Eq HsText where
+  (HsText a) == (HsText b) = a == b
+
+instance Hashable HsText where
+  hashWithSalt i (HsText a) = hashWithSalt i a
 
 -- HsEither -------------------------------------------------------------------
 
@@ -435,6 +443,43 @@ peekDataSize p = do
   (a :: Ptr a) <- #{peek DummyHsArray, a} p
   (n :: CSize) <- #{peek DummyHsArray, n} p
   return (a, fromIntegral n)
+
+-- HsSet
+newtype HsHashSet a = HsHashSet
+  -- Contains a List as a transport for the internal datatype that may not be
+  -- immediately hashable in haskell (i.e. CLong is not hashable, but the end
+  -- type of Int is)
+  { hsHashSet :: [a]
+  }
+
+instance Addressable1 HsHashSet where
+  sizeOf1 = setSizeOf
+  alignment1 = setAlignment
+
+instance Addressable (HsHashSet a) where
+  sizeOf = sizeOf1
+  alignment = alignment1
+
+instance StorableContainer HsHashSet where
+  pokeWith = notPokeable "HsHashSet"
+  peekWith f p = do
+    (a, n) <- peekSetDataSize p
+    let go !i !acc
+          | i < 0 = return acc
+          | otherwise = do
+              e <- peekElemOffWith f a i
+              go (i - 1) (e : acc)
+    HsHashSet <$> go (n - 1) []
+
+peekSetDataSize :: Ptr b -> IO (Ptr a, Int)
+peekSetDataSize p = do
+  (a :: Ptr a) <- #{peek DummyHsSet, keys} p
+  (n :: CSize) <- #{peek DummyHsSet, n} p
+  return (a, fromIntegral n)
+
+setSizeOf, setAlignment :: a -> Int
+setSizeOf _ = #{size DummyHsSet}
+setAlignment _ = #{alignment DummyHsSet}
 
 -- HsMap
 newtype HsMap k v = HsMap
@@ -696,6 +741,21 @@ $(deriveMarshallableUnsafe "HsArrayString" [t| HsArray HsByteString |])
 $(deriveMarshallableUnsafe "HsArrayString" [t| HsArray HsText |])
 $(deriveMarshallableUnsafe "HsArrayJSON" [t| HsArray HsJSON |])
 
+$(deriveMarshallableUnsafe "HsSetInt32" [t| HsHashSet CInt |])
+$(deriveMarshallableUnsafe "HsSetInt32" [t| HsHashSet Int32 |])
+$(deriveMarshallableUnsafe "HsSetInt64" [t| HsHashSet Int |])
+$(deriveMarshallableUnsafe "HsSetInt64" [t| HsHashSet Int64 |])
+$(deriveMarshallableUnsafe "HsSetInt64" [t| HsHashSet CLong |])
+$(deriveMarshallableUnsafe "HsSetUInt8" [t| HsHashSet CBool |])
+$(deriveMarshallableUnsafe "HsSetUInt8" [t| HsHashSet Word8 |])
+$(deriveMarshallableUnsafe "HsSetUInt32" [t| HsHashSet Word32 |])
+$(deriveMarshallableUnsafe "HsSetUInt64" [t| HsHashSet Word64 |])
+$(deriveMarshallableUnsafe "HsSetFloat" [t| HsHashSet Float |])
+$(deriveMarshallableUnsafe "HsSetDouble" [t| HsHashSet Double |])
+$(deriveMarshallableUnsafe "HsSetString" [t| HsHashSet HsByteString |])
+$(deriveMarshallableUnsafe "HsSetString" [t| HsHashSet HsText |])
+$(deriveMarshallableUnsafe "HsSetJSON" [t| HsHashSet HsJSON |])
+
 $(deriveMarshallableUnsafe "HsMapIntInt" [t| HsIntMap Int |])
 $(deriveMarshallableUnsafe "HsMapIntDouble" [t| HsIntMap Double |])
 $(deriveMarshallableUnsafe "HsMapIntString" [t| HsIntMap HsByteString |])
@@ -741,3 +801,18 @@ $(deriveHsArrayUnsafe "String" [t| HsText |])
 $(deriveHsArrayUnsafe "String" [t| HsByteString |])
 $(deriveHsArrayUnsafe "StringView" [t| HsStringPiece |])
 $(deriveHsArrayUnsafe "HsJSON" [t| HsJSON |])
+
+$(deriveHsHashSetUnsafe "Int32" [t| CInt |])
+$(deriveHsHashSetUnsafe "Int32" [t| Int32 |])
+$(deriveHsHashSetUnsafe "Int64" [t| Int |])
+$(deriveHsHashSetUnsafe "Int64" [t| Int64 |])
+$(deriveHsHashSetUnsafe "Int64" [t| CLong |])
+$(deriveHsHashSetUnsafe "UInt8" [t| CBool |])
+$(deriveHsHashSetUnsafe "UInt8" [t| Word8 |])
+$(deriveHsHashSetUnsafe "UInt32" [t| Word32 |])
+$(deriveHsHashSetUnsafe "UInt64" [t| Word64 |])
+$(deriveHsHashSetUnsafe "Float" [t| Float |])
+$(deriveHsHashSetUnsafe "Double" [t| Double |])
+$(deriveHsHashSetUnsafe "String" [t| HsByteString |])
+$(deriveHsHashSetUnsafe "String" [t| HsText |])
+$(deriveHsHashSetUnsafe "HsJSON" [t| HsJSON |])

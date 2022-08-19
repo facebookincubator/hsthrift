@@ -94,6 +94,16 @@ HsArray<uint8_t>* getArrayCBool() noexcept {
   return &ret;
 }
 
+HsSet<HsString>* getSet() noexcept {
+  static HsSet<HsString> ret{"foo"s, "bar"s};
+  return &ret;
+}
+
+HsSet<int64_t>* getSetInt64() noexcept {
+  static HsSet<int64_t> ret{1, 2, 3};
+  return &ret;
+}
+
 HsIntMap<int64_t>* getIntMap() noexcept {
   static HsIntMap<int64_t> ret{{2, 4}, {3, 9}, {5, 25}, {7, 49}};
   return &ret;
