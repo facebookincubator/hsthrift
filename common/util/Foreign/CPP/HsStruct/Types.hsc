@@ -18,6 +18,8 @@ module Foreign.CPP.HsStruct.Types
   -- * HsPair
   , HsPair(..)
   , peekHsPairWith
+  -- * HsStdTuple
+  , HsStdTuple(..)
   -- * HsString
   , HsString(..)
   , HsByteString(..)
@@ -63,6 +65,7 @@ import qualified Foreign.CPP.Addressable as Addressable
 import Foreign.CPP.HsStruct.HsArray
 import Foreign.CPP.HsStruct.HsSet
 import Foreign.CPP.HsStruct.HsOption
+import Foreign.CPP.HsStruct.HsStdTuple
 import Foreign.CPP.HsStruct.Utils
 import Foreign.CPP.Marshallable.TH
 import Mangle.TH
@@ -70,6 +73,7 @@ import Util.Text (cStringLenToText, cStringLenToTextLenient)
 
 #include <hsc.h>
 #include <cpp/HsOption.h>
+#include <cpp/HsStdTuple.h>
 #include <cpp/HsStdVariant.h>
 #include <cpp/HsStruct.h>
 

@@ -4,6 +4,7 @@
 
 #include <map>
 #include <string>
+#include <tuple>
 #include "cpp/HsStruct.h"
 
 using namespace std;
@@ -12,6 +13,7 @@ using namespace std::string_literals;
 namespace facebook::common::hs {
 
 HS_DEFINE_DESTRUCTIBLE(HsMaybeNonmovable, HsMaybe<Nonmovable>);
+HS_STD_TUPLE_CPP(CppTupleIntJSONOnlyMovable);
 
 extern "C" {
 
@@ -29,6 +31,14 @@ HsMaybe<Nonmovable>* createHsMaybeNonmovable(
   HsMaybe<Nonmovable> ret(std::in_place, resource, std::string(str, len));
   // HsMaybe itself is still safely movable
   return new HsMaybe<Nonmovable>(std::move(ret));
+}
+
+void fillCppTuple(hs_std_tuple::CppTupleIntJSONOnlyMovable* t) noexcept {
+  *t = hs_std_tuple::CppTupleIntJSONOnlyMovable(std::make_tuple(
+      42,
+      true,
+      facebook::common::hs::OnlyMovable(8),
+      HsEither<HsString, int64_t>(HsLeft, HsString("wut"s))));
 }
 
 } // extern "C"

@@ -1,9 +1,11 @@
 -- Copyright (c) Facebook, Inc. and its affiliates.
 
 {-# LANGUAGE TemplateHaskell #-}
+{-# OPTIONS_GHC -fno-warn-orphans #-}
 
 module HsStructTestTypes
   ( Nonmovable(..)
+  , OnlyMovable(..)
   , MyVariant(..)
   ) where
 
@@ -14,13 +16,16 @@ import Foreign
 import Foreign.C.Types
 import Foreign.CPP.HsStruct
 import Foreign.CPP.HsStruct.HsOption
+import Foreign.CPP.HsStruct.HsStdTuple
 import Foreign.CPP.HsStruct.HsStdVariant
 import Foreign.CPP.Marshallable.TH
 
+#include <cpp/HsStdTuple.h>
 #include <cpp/HsStdVariant.h>
 #include <hsc.h>
 #include <tests/HsStructHelper.h>
 
+#{verbatim using facebook::common::hs::OnlyMovable;}
 #{verbatim using facebook::common::hs::Nonmovable;}
 
 data Nonmovable = Nonmovable Int ByteString
@@ -39,6 +44,20 @@ instance Storable Nonmovable where
 
 $(deriveDestructibleUnsafe "HsMaybeNonmovable" [t| HsMaybe Nonmovable |])
 
+data OnlyMovable = OnlyMovable Int
+  deriving (Eq, Show)
+
+instance Addressable OnlyMovable
+
+instance Storable OnlyMovable where
+  sizeOf _ = #{size OnlyMovable}
+  alignment _ = #{alignment OnlyMovable}
+  poke p (OnlyMovable r) = #{poke OnlyMovable, r_} p r
+  peek p = do
+    resource <- #{peek OnlyMovable, r_} p
+    return $ OnlyMovable resource
+
+
 data MyVariant
   = I Int32
   | S HsByteString
@@ -46,3 +65,5 @@ data MyVariant
 
 $(#{derive_hs_std_variant_unsafe MyCppVariant} "MyVariant" [t| MyVariant |])
 $(#{derive_hs_option_unsafe MyCppVariant} [t| MyVariant |])
+
+$(#{derive_hs_std_tuple_unsafe CppTupleIntJSONOnlyMovable} [t| (Int32, HsJSON, OnlyMovable, HsEither HsText Int) |])

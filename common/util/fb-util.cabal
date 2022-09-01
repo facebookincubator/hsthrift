@@ -82,6 +82,7 @@ library
         Foreign.CPP.HsStruct.HsArray
         Foreign.CPP.HsStruct.HsOption
         Foreign.CPP.HsStruct.HsSet
+        Foreign.CPP.HsStruct.HsStdTuple
         Foreign.CPP.HsStruct.HsStdVariant
         Foreign.CPP.HsStruct.Types
         Foreign.CPP.HsStruct.Unsafe
@@ -165,6 +166,7 @@ library
 
     install-includes:
         cpp/HsOption.h
+        cpp/HsStdTuple.h
         cpp/HsStdVariant.h
         cpp/HsStruct.h
         cpp/HsStructDefines.h

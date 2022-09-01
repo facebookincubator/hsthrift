@@ -28,6 +28,35 @@ import Foreign.CPP.Marshallable
 
 import qualified HsStructTestTypes as TT
 
+foreign import ccall unsafe "fillCppTuple"
+  c_fillCppTuple :: Ptr (HsStdTuple (Int32, HsJSON, TT.OnlyMovable, HsEither HsText Int)) -> IO ()
+
+stdTupleTest :: Test
+stdTupleTest = TestLabel "stdTupleTest" $ TestCase $ do
+  withCxxObject (HsStdTuple t_val) (testTuple "tuple roundtrip")
+
+  withDefaultCxxObject $ \ptr -> do
+    c_fillCppTuple ptr
+    testTuple "peeked" ptr
+
+  where
+    i_val = 42 :: Int32
+    j_val = Aeson.Bool True
+    n_val = TT.OnlyMovable 8
+    e_val = Left (HsText "wut") :: Either HsText Int
+    t_val = (i_val, HsJSON j_val, n_val, HsEither e_val)
+
+    testTuple pref ptr = do
+      (HsStdTuple (peeked_i, HsJSON peeked_j, peeked_n, HsEither peeked_e)) <-
+        peek ptr
+      assertEqual (pref ++ " int") i_val peeked_i
+      assertEqual (pref ++ " json") j_val peeked_j
+      assertEqual (pref ++ " OnlyMovable") n_val peeked_n
+      case (e_val, peeked_e) of
+        (Left (HsText a), Left (HsText b)) ->
+          assertEqual (pref ++ " Either") a b
+        _ -> assertFailure (pref ++ " Either peeking failed")
+
 stdVariantTest :: Test
 stdVariantTest = TestLabel "stdVariantTest" $
   TestCase $ do
@@ -397,4 +426,5 @@ main =
       , stringPieceCxxTest
       , jsonRoundTrip
       , stdVariantTest
+      , stdTupleTest
       ]

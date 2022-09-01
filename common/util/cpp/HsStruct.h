@@ -13,6 +13,7 @@
 #include <optional>
 
 #include "cpp/HsOption.h"
+#include "cpp/HsStdTuple.h"
 #include "cpp/HsStdVariant.h"
 #include "cpp/HsStructDefines.h"
 #include "cpp/Marshallable.h"
