@@ -846,6 +846,17 @@ HS_STRUCT HsMap {
   }
 };
 
+#define HS_DEFINE_MAP_CONSTRUCTIBLE(Name, KeyType, ValType)       \
+  extern "C" void map_constructHsMap##Name(                       \
+      HsMap<KeyType, ValType>* map, size_t len) {                 \
+    new (map) HsMap<KeyType, ValType>();                          \
+    map->reserve(len);                                            \
+  }                                                               \
+  extern "C" void map_addHsMap##Name(                             \
+      HsMap<KeyType, ValType>* map, KeyType* key, ValType* val) { \
+    map->add(std::move(*key), std::move(*val));                   \
+  }
+
 template <typename T>
 using HsIntMap = HsMap<int64_t, T>;
 using DummyHsIntMap = HsIntMap<std::nullptr_t>;

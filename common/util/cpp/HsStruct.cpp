@@ -252,6 +252,8 @@ HS_DEFINE_MARSHALLABLE(HsSetJSON, HsSet<HsJSON>);
 HS_DEFINE_MARSHALLABLE(HsMapIntInt, HsMap<int64_t, int64_t>);
 HS_DEFINE_MARSHALLABLE(HsMapIntDouble, HsMap<int64_t, double>);
 HS_DEFINE_MARSHALLABLE(HsMapIntString, HsMap<int64_t, HsString>);
+HS_DEFINE_MARSHALLABLE(HsMapInt32String, HsMap<int32_t, HsString>);
+HS_DEFINE_MARSHALLABLE(HsMapDoubleInt32, HsMap<double, int32_t>);
 HS_DEFINE_MARSHALLABLE(HsMapStringInt, HsMap<HsString, int64_t>);
 HS_DEFINE_MARSHALLABLE(HsMapStringDouble, HsMap<HsString, double>);
 HS_DEFINE_MARSHALLABLE(HsMapStringString, HsMap<HsString, HsString>);
@@ -283,10 +285,17 @@ HS_DEFINE_ARRAY_CONSTRUCTIBLE(String, HsString);
 HS_DEFINE_ARRAY_CONSTRUCTIBLE(StringView, HsStringPiece);
 HS_DEFINE_ARRAY_CONSTRUCTIBLE(HsJSON, HsJSON);
 
+HS_DEFINE_MAP_CONSTRUCTIBLE(IntInt, int64_t, int64_t);
+HS_DEFINE_MAP_CONSTRUCTIBLE(Int32Int32, int32_t, int32_t);
+HS_DEFINE_MAP_CONSTRUCTIBLE(Int32Double, int32_t, double);
+HS_DEFINE_MAP_CONSTRUCTIBLE(Int32String, int32_t, HsString);
+HS_DEFINE_MAP_CONSTRUCTIBLE(DoubleInt32, double, int32_t);
+HS_DEFINE_MAP_CONSTRUCTIBLE(StringInt32, HsString, int32_t);
+HS_DEFINE_MAP_CONSTRUCTIBLE(StringDouble, HsString, double);
+HS_DEFINE_MAP_CONSTRUCTIBLE(StringString, HsString, HsString);
+
 HS_DEFINE_SET_CONSTRUCTIBLE(Int32, int32_t);
 HS_DEFINE_SET_CONSTRUCTIBLE(Int64, int64_t);
-// std::vector<bool> doesn't guarantee contiguous memory layout,
-// so use HsArray<uint8_t> to store one bool per byte
 HS_DEFINE_SET_CONSTRUCTIBLE(UInt8, uint8_t);
 HS_DEFINE_SET_CONSTRUCTIBLE(UInt32, uint32_t);
 HS_DEFINE_SET_CONSTRUCTIBLE(UInt64, uint64_t);

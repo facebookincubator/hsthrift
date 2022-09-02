@@ -18,6 +18,7 @@ import qualified Data.Map.Strict as Map
 import Data.Scientific (Scientific, fromFloatDigits)
 import Data.Text (Text)
 import qualified Data.Text.Encoding as Text (encodeUtf8)
+import Data.Tuple.Extra ((***))
 import qualified Data.Vector as Vector
 import qualified Data.Vector.Storable as VectorStorable
 import Foreign
@@ -140,6 +141,57 @@ setCxxTest = TestLabel "setCxxTest" $
       assertEqual
         "set of doubles"
         pokeyDoubleSet
+        s
+
+mapCxxTest :: Test
+mapCxxTest = TestLabel "mapCxxTest" $
+  TestCase $ do
+    let map_kv = \kf vf -> HashMap.fromList . map (kf *** vf) . HashMap.toList
+    withDefaultCxxObject $ \p -> do
+      HsHashMap s <- peek p :: IO (HsHashMap HsText HsText)
+      assertEqual
+        "default is empty"
+        HashMap.empty
+        (map_kv hsText hsText s)
+
+    let pokey :: [(Text, Text)] =
+          [("1", "a"), ("2", "b"), ("3", "c")]
+    let pokeyMap = HashMap.fromList pokey
+    withCxxObject (HsHashMap $ map_kv HsText HsText pokeyMap) $ \p -> do
+      HsHashMap s <- peek p
+      assertEqual
+        "map from strings to strings"
+        pokeyMap
+        (map_kv hsText hsText s)
+
+    let pokeyDuplicate :: [(Text, Text)] =
+          [("1", "a"), ("2", "b"), ("3", "c"), ("2", "d")]
+    let pokeyDuplicateMap = HashMap.fromList pokeyDuplicate
+    withCxxObject (HsHashMap $ map_kv HsText HsText pokeyDuplicateMap) $ \p ->
+      do
+        HsHashMap s <- peek p
+        assertEqual
+          "map from strings to strings with duplicates"
+          pokeyDuplicateMap
+          (map_kv hsText hsText s)
+
+    let pokeyInt :: [(Int32, Text)] = [(1, "a"), (2, "b"), (3, "c"), (2, "d")]
+    let pokeyIntMap = HashMap.fromList pokeyInt
+    withCxxObject (HsHashMap $ map_kv id HsText pokeyIntMap) $ \p -> do
+      HsHashMap s <- peek p
+      assertEqual
+        "map from ints to strings with duplicates"
+        pokeyIntMap
+        (map_kv id hsText s)
+
+    let pokeyDouble :: [(Double, Int32)] =
+          [(1.0, 19), (2.0, 29), (3.0, 39), (2.0, 9)]
+    let pokeyDoubleMap = HashMap.fromList pokeyDouble
+    withCxxObject (HsHashMap pokeyDoubleMap) $ \p -> do
+      HsHashMap s <- peek p
+      assertEqual
+        "map from doubles to ints with duplicates"
+        pokeyDoubleMap
         s
 
 toCBool :: Bool -> CBool
@@ -332,13 +384,19 @@ mapTest = TestLabel "Map" $
     assertEqual "Map Int Int" (Map.fromList assocs) m
     HsIntMap im <- peek =<< getIntMap
     assertEqual "IntMap Int" (IntMap.fromList assocs) im
-    HsHashMap hm <- peek =<< getIntMap
-    assertEqual "HashMap Int Int" (HashMap.fromList assocs) hm
+    HsHashMap hm <- peek =<< getIntHashMap
+    assertEqual
+      "HashMap Int Int"
+      (HashMap.fromList assocs)
+      hm
   where
     assocs = [(2, 4), (3, 9), (5, 25), (7, 49)] :: [(Int, Int)]
 
 foreign import ccall unsafe "getIntMap"
   getIntMap :: IO (Ptr a)
+
+foreign import ccall unsafe "getIntHashMap"
+  getIntHashMap :: IO (Ptr a)
 
 pairTest :: Test
 pairTest = TestLabel "Pair" $
@@ -415,6 +473,7 @@ main =
       , peekHsEitherTest
       , pokeHsEitherTest
       , arrayTest
+      , mapCxxTest
       , mapTest
       , pairTest
       , nestedTest

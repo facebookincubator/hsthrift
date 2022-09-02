@@ -119,6 +119,11 @@ HsIntMap<int64_t>* getIntMap() noexcept {
   return &ret;
 }
 
+HsMap<int64_t, int64_t>* getIntHashMap() noexcept {
+  static HsMap<int64_t, int64_t> ret{{2, 4}, {3, 9}, {5, 25}, {7, 49}};
+  return &ret;
+}
+
 HsPair<HsString, int64_t>* getPair() noexcept {
   static auto ret = HsPair<HsString, int64_t>("foo"s, 3);
   return &ret;

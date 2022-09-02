@@ -65,6 +65,7 @@ import Foreign.CPP.Addressable hiding (alignment, sizeOf)
 import qualified Foreign.CPP.Addressable as Addressable
 import Foreign.CPP.HsStruct.HsArray
 import Foreign.CPP.HsStruct.HsSet
+import Foreign.CPP.HsStruct.HsMap
 import Foreign.CPP.HsStruct.HsOption
 import Foreign.CPP.HsStruct.HsStdTuple
 import Foreign.CPP.HsStruct.Utils
@@ -539,8 +540,8 @@ instance Addressable (HsHashMap k v) where
   sizeOf = sizeOf1
   alignment = alignment1
 
-instance (Addressable k, Eq k, Hashable k, Storable k) =>
-    StorableContainer (HsHashMap k) where
+instance (Addressable k, Eq k, Hashable k, Storable k)
+  => StorableContainer (HsHashMap k) where
   pokeWith = notPokeable "HsHashMap"
   peekWith f p = HsHashMap <$> peekMapWith HashMap.empty HashMap.insert peek f p
 
@@ -788,6 +789,11 @@ $(deriveMarshallableUnsafe "HsMapStringDouble" [t| HsObject Double |])
 $(deriveMarshallableUnsafe "HsMapStringString" [t| HsObject HsByteString |])
 $(deriveMarshallableUnsafe "HsMapStringString" [t| HsObject HsText |])
 
+$(deriveMarshallableUnsafe "HsMapIntInt" [t| HsHashMap Int Int |])
+$(deriveMarshallableUnsafe "HsMapInt32String" [t| HsHashMap Int32 HsText |])
+$(deriveMarshallableUnsafe "HsMapDoubleInt32" [t| HsHashMap Double Int32 |])
+$(deriveMarshallableUnsafe "HsMapStringString" [t| HsHashMap HsText HsText |])
+
 $(deriveMarshallableUnsafe "HsObjectJSON" [t| HsObject HsJSON |])
 $(deriveMarshallableUnsafe "HsJSON" [t| HsJSON |])
 
@@ -845,3 +851,19 @@ $(deriveHsHashSetUnsafe "Double" [t| Double |])
 $(deriveHsHashSetUnsafe "String" [t| HsByteString |])
 $(deriveHsHashSetUnsafe "String" [t| HsText |])
 $(deriveHsHashSetUnsafe "HsJSON" [t| HsJSON |])
+
+-- O(n^2) derivations, try to derive just what you need
+$(deriveHsHashMapUnsafe "IntInt" [t| Int |] [t| Int |])
+$(deriveHsHashMapUnsafe "Int32Int32" [t| Int32 |] [t| Int32 |])
+$(deriveHsHashMapUnsafe "Int32Double" [t| Int32 |] [t| Double |])
+$(deriveHsHashMapUnsafe "Int32String" [t| Int32 |] [t| HsByteString |])
+$(deriveHsHashMapUnsafe "Int32String" [t| Int32 |] [t| HsText |])
+$(deriveHsHashMapUnsafe "DoubleInt32" [t| Double |] [t| Int32 |])
+$(deriveHsHashMapUnsafe "StringInt32" [t| HsByteString |] [t| Int32 |])
+$(deriveHsHashMapUnsafe "StringInt32" [t| HsText |] [t| Int32 |])
+$(deriveHsHashMapUnsafe "StringDouble" [t| HsText |] [t| Double |])
+$(deriveHsHashMapUnsafe "StringDouble" [t| HsByteString |] [t| Double |])
+$(deriveHsHashMapUnsafe "StringString" [t| HsText |] [t| HsText |])
+$(deriveHsHashMapUnsafe "StringString" [t| HsText |] [t| HsByteString |])
+$(deriveHsHashMapUnsafe "StringString" [t| HsByteString |] [t| HsText |])
+$(deriveHsHashMapUnsafe "StringString" [t| HsByteString |] [t| HsByteString |])

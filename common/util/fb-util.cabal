@@ -83,6 +83,7 @@ library
         Foreign.CPP.HsStruct.HsOption
         Foreign.CPP.HsStruct.HsSet
         Foreign.CPP.HsStruct.HsStdTuple
+        Foreign.CPP.HsStruct.HsMap
         Foreign.CPP.HsStruct.HsStdVariant
         Foreign.CPP.HsStruct.Types
         Foreign.CPP.HsStruct.Unsafe
