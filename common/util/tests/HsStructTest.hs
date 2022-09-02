@@ -116,31 +116,31 @@ setCxxTest = TestLabel "setCxxTest" $
       assertEqual
         "default is empty"
         HashSet.empty
-        (HashSet.fromList $ map hsText s)
+        (HashSet.map hsText s)
 
     let pokey = ["1", "2", "3", "2"]
     let pokeySet = HashSet.fromList pokey
-    withCxxObject (HsHashSet $ map HsText pokey) $ \p -> do
+    withCxxObject (HsHashSet $ HashSet.map HsText pokeySet) $ \p -> do
       HsHashSet s <- peek p
       assertEqual
         "set of strings"
         pokeySet
-        (HashSet.fromList $ map hsText s)
+        (HashSet.map hsText s)
 
     let pokeyInt :: [Int] = [1, 2, 3, 2]
     let pokeyIntSet = HashSet.fromList pokeyInt
-    withCxxObject (HsHashSet pokeyInt) $ \p -> do
+    withCxxObject (HsHashSet pokeyIntSet) $ \p -> do
       HsHashSet s <- peek p
-      assertEqual "set of ints" pokeyIntSet (HashSet.fromList s)
+      assertEqual "set of ints" pokeyIntSet s
 
     let pokeyDouble :: [Double] = [1.0, 2.0, 3.0, 2.0]
     let pokeyDoubleSet = HashSet.fromList pokeyDouble
-    withCxxObject (HsHashSet pokeyDouble) $ \p -> do
+    withCxxObject (HsHashSet pokeyDoubleSet) $ \p -> do
       HsHashSet s <- peek p
       assertEqual
         "set of doubles"
         pokeyDoubleSet
-        (HashSet.fromList s)
+        s
 
 toCBool :: Bool -> CBool
 toCBool = fromBool
@@ -307,17 +307,17 @@ foreign import ccall unsafe "getArrayCBool"
 setTest :: Test
 setTest = TestLabel "Set" $
   TestCase $ do
-    s <- fmap (fmap hsString . hsHashSet) $ peek =<< getSet
+    s :: HsHashSet HsText <- peek =<< getSet
     assertEqual
       "HashSet String"
       (HashSet.fromList ["foo", "bar"])
-      (HashSet.fromList s)
+      (HashSet.map hsText $ hsHashSet s)
 
-    si :: [Int64] <- fmap hsHashSet $ peek =<< getSetInt64
+    si :: HsHashSet Int64 <- peek =<< getSetInt64
     assertEqual
       "HashSet Int64"
       (HashSet.fromList [1, 2, 3])
-      (HashSet.fromList si)
+      (hsHashSet si)
 
 foreign import ccall unsafe "getSet"
   getSet :: IO (Ptr a)

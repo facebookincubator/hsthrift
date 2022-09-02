@@ -47,6 +47,7 @@ import Data.Hashable (Hashable, hashWithSalt)
 import Data.Text (Text)
 import qualified Data.Text.Encoding as Text (encodeUtf8)
 import Data.HashMap.Strict (HashMap)
+import qualified Data.HashSet as HashSet
 import Data.IntMap.Strict (IntMap)
 import Data.Map.Strict (Map)
 import Data.Scientific
@@ -453,7 +454,7 @@ newtype HsHashSet a = HsHashSet
   -- Contains a List as a transport for the internal datatype that may not be
   -- immediately hashable in haskell (i.e. CLong is not hashable, but the end
   -- type of Int is)
-  { hsHashSet :: [a]
+  { hsHashSet :: HashSet.HashSet a
   }
 
 instance Addressable1 HsHashSet where
@@ -464,22 +465,30 @@ instance Addressable (HsHashSet a) where
   sizeOf = sizeOf1
   alignment = alignment1
 
-instance StorableContainer HsHashSet where
-  pokeWith = notPokeable "HsHashSet"
-  peekWith f p = do
-    (a, n) <- peekSetDataSize p
-    let go !i !acc
-          | i < 0 = return acc
-          | otherwise = do
-              e <- peekElemOffWith f a i
-              go (i - 1) (e : acc)
-    HsHashSet <$> go (n - 1) []
+instance (Addressable a, Eq a, Hashable a, Storable a)
+  => Storable (HsHashSet a) where
+  sizeOf = sizeOf1
+  alignment = alignment1
+  poke = notPokeable "HsHashSet"
+  peek p = HsHashSet <$> peekSetWith HashSet.empty HashSet.insert peek p
 
-peekSetDataSize :: Ptr b -> IO (Ptr a, Int)
-peekSetDataSize p = do
+{-# INLINE peekSetWith #-}
+peekSetWith
+  :: (Addressable a)
+  => s
+  -> (k -> s -> s)
+  -> (Ptr a -> IO k)
+  -> Ptr b
+  -> IO s
+peekSetWith empty insert f p = do
   (a :: Ptr a) <- #{peek DummyHsSet, keys} p
-  (n :: CSize) <- #{peek DummyHsSet, n} p
-  return (a, fromIntegral n)
+  (n :: Int) <- (fromIntegral :: CSize -> Int) <$> #{peek DummyHsSet, n} p
+  let go !i !hs
+        | i >= n = return hs
+        | otherwise = do
+            k <- peekElemOffWith f a i
+            go (i + 1) $ insert k hs
+  go 0 empty
 
 setSizeOf, setAlignment :: a -> Int
 setSizeOf _ = #{size DummyHsSet}
