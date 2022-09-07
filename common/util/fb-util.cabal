@@ -422,6 +422,7 @@ test-suite hs-struct
   other-modules: HsStructTestTypes
   cxx-sources: tests/HsStructHelper.cpp
   ghc-options: -main-is HsStructTest
+  build-depends: extra
 
 -- TODO: commented out because of a linker problem
 -- test-suite gflags
