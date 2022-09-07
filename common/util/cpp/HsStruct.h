@@ -1008,6 +1008,7 @@ class HsJSON {
 HS_PEEKABLE(HsJSON);
 
 HS_OPTION_H(Bool, bool);
+HS_OPTION_H(Int16, int16_t);
 HS_OPTION_H(Int32, int32_t);
 HS_OPTION_H(Int64, int64_t);
 HS_OPTION_H(UInt32, uint32_t);
