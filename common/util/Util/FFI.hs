@@ -18,9 +18,6 @@ import System.IO.Unsafe (unsafePerformIO)
 import Control.Exception
 import Control.Monad
 
-foreign import ccall unsafe "&hs_ffi_free_error" hs_ffi_free_error
-  :: FunPtr (CString -> IO ())
-
 newtype FFIError = FFIError (ForeignPtr CChar)
 
 ffiErrorMessage :: FFIError -> String
@@ -39,7 +36,13 @@ call :: IO CString -> IO ()
 call f = do
   p <- f
   when (p /= nullPtr) $ do
-    fp <- newForeignPtr hs_ffi_free_error p
+    fp <- do
+      b <- peek p
+      -- A '\1' prefix indicates that we shouldn't free the string (e.g.,
+      -- because it's static) - cf. ffi::wrap.
+      if b /= toEnum 1
+        then newForeignPtr finalizerFree p
+        else newForeignPtr_ (p `plusPtr` 1)
     throwIO $ FFIError fp
 
 infixr 5 :>
