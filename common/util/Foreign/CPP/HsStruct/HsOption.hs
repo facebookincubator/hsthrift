@@ -11,7 +11,7 @@ import Foreign
 import Language.Haskell.TH
 
 import Foreign.CPP.Addressable
-import Foreign.CPP.Marshallable.TH
+import Foreign.CPP.Marshallable
 
 -- HsOption --------------------------------------------------------------------
 
@@ -78,9 +78,6 @@ deriveHsOptionUnsafe cppType sizeVal alignmentVal hsType = do
     [t| Storable $optionType |]
     [sizeOfFn, alignmentFn, pokeFn, peekFn]
 
-  --  $(deriveMarshallableUnsafe "<NAME>" [t| HsOption <TYPE> |])
-  marshallable <- deriveMarshallableUnsafe cppName optionType
-
   let
     cppCtorName = "option_ctorHsOption" ++ cppType
     -- cppCtor = "void " ++ cppCtorName ++ "(void*, " ++ cppType ++ "*)"
@@ -146,13 +143,12 @@ deriveHsOptionUnsafe cppType sizeVal alignmentVal hsType = do
     [t| Constructible $optionType |]
     [newValueFn, constructValueFn]
 
-  return $
+  return
     [ addressableInst
     , storableInst
     , ctorImport
     , newImport
     , constructibleInst
-    ] ++ marshallable
+    ]
   where
     optionType = [t| HsOption $hsType |]
-    cppName = "HsOption" ++ cppType

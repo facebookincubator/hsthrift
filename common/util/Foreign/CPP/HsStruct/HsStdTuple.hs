@@ -12,7 +12,7 @@ import Foreign
 import Language.Haskell.TH
 
 import Foreign.CPP.Addressable
-import Foreign.CPP.Marshallable.TH
+import Foreign.CPP.Marshallable
 
 
 newtype HsStdTuple a = HsStdTuple { unHsStdTuple :: a }
@@ -113,15 +113,13 @@ deriveHsStdTupleUnsafe cppType sizeVal hsType = do
     [t| Constructible $tupleType |]
     []
 
-  marshallable <- deriveMarshallableUnsafe cppName tupleType
-
-  return $
-    [addressableInst
+  return
+    [ addressableInst
     , storableInst
     , constructibleInst
     , peekImport
     , pokeImport
-    ] ++ marshallable
+    ]
   where
     unfoldTupleT :: Type -> (Int, [Type])
     unfoldTupleT (AppT a b) = let

@@ -704,6 +704,7 @@ instance Constructible HsJSON where
       Object o -> withCxxObject (HsObject (HsJSON <$> o)) $
         c_constructHsJSONObject ptr
 
+-- Derive Marshallables first
 $(deriveMarshallableUnsafe "HsMaybeInt" [t| HsMaybe Int |])
 $(deriveMarshallableUnsafe "HsMaybeDouble" [t| HsMaybe Double |])
 $(deriveMarshallableUnsafe "HsMaybeString" [t| HsMaybe HsByteString |])
@@ -725,6 +726,27 @@ $(deriveMarshallableUnsafe "HsString" [t| HsText |])
 $(deriveMarshallableUnsafe "HsString" [t| HsLenientText |])
 
 $(deriveMarshallableUnsafe "HsStringPiece" [t| HsStringPiece |])
+
+$(deriveMarshallableUnsafe "HsOptionBool" [t| HsOption Bool |])
+$(deriveMarshallableUnsafe "HsOptionBool" [t| HsOption CBool |])
+$(deriveMarshallableUnsafe "HsOptionInt16" [t| HsOption CShort |])
+$(deriveMarshallableUnsafe "HsOptionInt16" [t| HsOption Int16 |])
+$(deriveMarshallableUnsafe "HsOptionInt32" [t| HsOption CInt |])
+$(deriveMarshallableUnsafe "HsOptionInt32" [t| HsOption Int32 |])
+$(deriveMarshallableUnsafe "HsOptionInt64" [t| HsOption CLong |])
+$(deriveMarshallableUnsafe "HsOptionInt64" [t| HsOption Int64 |])
+$(deriveMarshallableUnsafe "HsOptionUInt32" [t| HsOption CUInt |])
+$(deriveMarshallableUnsafe "HsOptionUInt32" [t| HsOption Word32 |])
+$(deriveMarshallableUnsafe "HsOptionUInt64" [t| HsOption CULong |])
+$(deriveMarshallableUnsafe "HsOptionUInt64" [t| HsOption Word64 |])
+$(deriveMarshallableUnsafe "HsOptionFloat" [t| HsOption Float |])
+$(deriveMarshallableUnsafe "HsOptionFloat" [t| HsOption CFloat |])
+$(deriveMarshallableUnsafe "HsOptionDouble" [t| HsOption Double |])
+$(deriveMarshallableUnsafe "HsOptionDouble" [t| HsOption CDouble |])
+$(deriveMarshallableUnsafe "HsOptionString" [t| HsOption HsText |])
+$(deriveMarshallableUnsafe "HsOptionString" [t| HsOption HsByteString |])
+$(deriveMarshallableUnsafe "HsOptionStringView" [t| HsOption HsStringPiece |])
+$(deriveMarshallableUnsafe "HsOptionHsJSON" [t| HsOption HsJSON |])
 
 $(deriveMarshallableUnsafe "HsArrayInt16" [t| HsList CShort |])
 $(deriveMarshallableUnsafe "HsArrayInt16" [t| HsList Int16 |])
@@ -801,6 +823,7 @@ $(deriveMarshallableUnsafe "HsMapStringString" [t| HsHashMap HsText HsText |])
 $(deriveMarshallableUnsafe "HsObjectJSON" [t| HsObject HsJSON |])
 $(deriveMarshallableUnsafe "HsJSON" [t| HsJSON |])
 
+-- Derive constructions after marshallable
 $(#{derive_hs_option_unsafe Bool} [t| Bool |])
 $(#{derive_hs_option_unsafe Bool} [t| CBool |])
 $(#{derive_hs_option_unsafe Int16} [t| CShort |])

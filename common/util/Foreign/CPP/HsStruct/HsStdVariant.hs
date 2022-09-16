@@ -11,7 +11,7 @@ import Language.Haskell.TH
 import Foreign
 import Foreign.C.Types
 import Foreign.CPP.Addressable
-import Foreign.CPP.Marshallable.TH
+import Foreign.CPP.Marshallable
 
 deriveHsStdVariantUnsafe
   :: String -> Int -> Int -> String -> TypeQ -> Q [Dec]
@@ -98,16 +98,13 @@ deriveHsStdVariantUnsafe cppName sizeVal alignmentVal hsName hsType = do
     [t| Constructible $hsType |]
     []
 
-  -- Marshallable
-  marshallable <- deriveMarshallableUnsafe cppName hsType
-
-  return $
+  return
     [ addressableInst
     , constructibleInst
     , peekValImport
     , pokeValImport
     , storableInst
-    ] ++ marshallable
+    ]
   where
     pN = mkName "p"
     castPtrN = mkName "castPtr"
