@@ -50,14 +50,6 @@ class HaskellAsyncProcessor : public AsyncProcessor {
       folly::EventBase* eb,
       apache::thrift::concurrency::ThreadManager* tm) override;
 
-  void processSerializedRequest(
-      ResponseChannelRequest::UniquePtr req,
-      apache::thrift::SerializedRequest&& serializedRequest,
-      protocol::PROTOCOL_TYPES protType,
-      Cpp2RequestContext* context,
-      folly::EventBase* eb,
-      concurrency::ThreadManager* tm) override;
-
   void executeRequest(
       ServerRequest&& request,
       const AsyncProcessorFactory::MethodMetadata& methodMetadata) override;

@@ -209,28 +209,5 @@ void HaskellAsyncProcessor::processSerializedCompressedRequestWithMetadata(
   auto ka = tm->getKeepAlive(pri, source);
   ka->add(std::move(task));
 }
-
-void HaskellAsyncProcessor::processSerializedRequest(
-    ResponseChannelRequest::UniquePtr req,
-    apache::thrift::SerializedRequest&& serializedRequest,
-    protocol::PROTOCOL_TYPES protType,
-    Cpp2RequestContext* context,
-    folly::EventBase* eb,
-    concurrency::ThreadManager* tm) {
-  const auto found = metadataMap_.find(context->getMethodName());
-  const auto metadata = found != metadataMap_.end()
-      ? *found->second
-      : apache::thrift::AsyncProcessorFactory::MethodMetadata();
-
-  processSerializedCompressedRequestWithMetadata(
-      std::move(req),
-      apache::thrift::SerializedCompressedRequest(std::move(serializedRequest)),
-      metadata,
-      protType,
-      context,
-      eb,
-      tm);
-}
-
 } // namespace thrift
 } // namespace apache

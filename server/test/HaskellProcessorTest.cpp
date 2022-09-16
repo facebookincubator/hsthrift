@@ -105,9 +105,11 @@ struct HaskellProcessorTest : public Test {
   };
 
   void process(Request& req) {
-    processor.processSerializedRequest(
+    processor.processSerializedCompressedRequestWithMetadata(
         req.move(),
-        apache::thrift::SerializedRequest(std::make_unique<folly::IOBuf>()),
+        apache::thrift::SerializedCompressedRequest(
+            std::make_unique<folly::IOBuf>()),
+        apache::thrift::AsyncProcessorFactory::MethodMetadata(),
         protocol::T_BINARY_PROTOCOL,
         request_context.get(),
         &event_base,
