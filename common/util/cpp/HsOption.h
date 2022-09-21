@@ -29,8 +29,8 @@
   extern "C" void option_ctorHsOption##Name(void* ret, Type* v) noexcept { \
     new (ret) HsOption<Type>(std::move(*v));                               \
   }                                                                        \
-  HS_PEEKABLE(HsOption<Type>);                                             \
-  HS_DEFINE_MARSHALLABLE(HsOption##Name, HsOption<Type>);
+  HS_PEEKABLE(FB_SINGLE_ARG(HsOption<Type>));                              \
+  HS_DEFINE_MARSHALLABLE(HsOption##Name, FB_SINGLE_ARG(HsOption<Type>));
 
 template <typename T>
 HS_STRUCT HsOption {
