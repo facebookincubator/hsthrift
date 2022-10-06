@@ -148,8 +148,7 @@ class HsCallback : public apache::thrift::RequestClientCallback {
     return methodName_;
   }
 
-  void setContextStack(
-      std::unique_ptr<apache::thrift::ContextStack>&& contextStack) {
+  void setContextStack(apache::thrift::ContextStack::UniquePtr&& contextStack) {
     contextStack_ = std::move(contextStack);
   }
 
@@ -173,7 +172,7 @@ class HsCallback : public apache::thrift::RequestClientCallback {
   // destructor. Fields are destructed in reverse order, and we need
   // methodName_ to have a larger lifetime than the ContextStack
   // object.
-  std::unique_ptr<apache::thrift::ContextStack> contextStack_;
+  apache::thrift::ContextStack::UniquePtr contextStack_;
 };
 
 using CallbackPtr = std::unique_ptr<
