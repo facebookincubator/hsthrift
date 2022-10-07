@@ -71,7 +71,7 @@ void peekVals(std::tuple<T...>* t, va_list& args, std::index_sequence<I...>) {
       hs_std_tuple::Name* ptr, const char* fmt, ...) {               \
     va_list args;                                                    \
     va_start(args, fmt);                                             \
-    ptr->fromArgs(args);                                             \
+    new (ptr) hs_std_tuple::Name(args);                              \
     va_end(args);                                                    \
   }                                                                  \
                                                                      \
@@ -129,15 +129,14 @@ HS_STRUCT HsStdTuple {
     return *this;
   }
 
-  ~HsStdTuple() {
-    destruct();
-  }
-
-  void fromArgs(va_list & args) {
-    destruct();
+  explicit HsStdTuple(va_list & args) {
     new (&data_.tup) decltype(data_.tup){
         hs_std_tuple::detail::makeTuple<Ts...>(args)};
     has_tuple_ = true;
+  }
+
+  ~HsStdTuple() {
+    destruct();
   }
 
   std::tuple<Ts...>* getTuplePtr() {
