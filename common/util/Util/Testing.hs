@@ -1,5 +1,6 @@
 -- Copyright (c) Facebook, Inc. and its affiliates.
 
+{-# LANGUAGE NamedFieldPuns #-}
 module Util.Testing
   ( assertProperty
   , skip
@@ -11,6 +12,7 @@ module Util.Testing
 
 import Control.Exception
 import GHC.Stack (HasCallStack)
+import System.Environment (lookupEnv)
 import System.IO
 import Test.HUnit
 import Test.HUnit.Lang (HUnitFailure)
@@ -39,9 +41,30 @@ skipTestIfRtsIsProfiled = skipTestIf $ const rtsIsProfiled
 assertProperty
   :: (HasCallStack, QC.Testable prop) => String -> prop -> Assertion
 assertProperty msg prop = do
-  result <- QC.quickCheckResult prop
+  size <- maybe (QC.maxSize QC.stdArgs) read <$> lookupEnv "QUICKCHECK_SIZE"
+  success <-
+    maybe (QC.maxSuccess QC.stdArgs )read <$> lookupEnv "QUICKCHECK_RUNS"
+  mbSeed <- lookupEnv "QUICKCHECK_SEED"
+  let args = QC.stdArgs {
+        QC.maxSize = size,
+        QC.maxSuccess = success,
+        QC.replay = (,size) . read <$> mbSeed
+      }
+  case QC.replay args of
+    Just r -> putStrLn $ "Running with replay: " <> show r
+    _ -> pure ()
+  result <- QC.quickCheckWithResult args prop
   case result of
     QC.Success{} -> return ()
     QC.Failure{theException = Just e}
       | Just (he :: HUnitFailure) <- fromException e -> throwIO he
+    QC.Failure{usedSeed, usedSize}
+     -> assertFailure $ unlines $
+      [ msg
+      , "To reproduce, set:"
+      , "- QUICKCHECK_SEED=" <> show (show usedSeed)
+      ] <>
+      [ "- QUICKCHECK_SIZE=" <> show usedSize
+      | usedSize /= QC.maxSize QC.stdArgs
+      ]
     _ -> assertFailure msg
