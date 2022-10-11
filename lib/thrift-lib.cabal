@@ -107,7 +107,7 @@ library
         word8,
         aeson-pretty,
         text-show,
-        base >=4.11.1 && <4.15,
+        base >=4.11.1 && <4.16,
         async ^>= 2.2,
         transformers ^>=0.5.5.0,
         bytestring ^>=0.10.8.2,

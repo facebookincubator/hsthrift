@@ -12,3 +12,6 @@ packages:
     cpp-channel/thrift-cpp-channel.cabal
 
 tests: true
+
+allow-newer: vector-fftw:base
+constraints: entropy < 0.4.1.9, haxl >= 2.4

@@ -101,7 +101,7 @@ library
         optparse-applicative,
         haskell-names,
         text-show,
-        base >=4.11.1 && <4.15,
+        base >=4.11.1 && <4.16,
         async ^>=2.2.1,
         filepath ^>=1.4.2,
         containers >=0.5.11 && <0.7,
