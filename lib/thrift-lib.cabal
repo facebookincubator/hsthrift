@@ -150,7 +150,7 @@ common test-deps
   build-depends: async ^>= 2.2,
                  base,
                  bytestring,
-                 dependent-sum,
+                 some,
                  fb-stubs,
                  fb-util,
                  filepath,
