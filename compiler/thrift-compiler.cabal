@@ -95,7 +95,7 @@ library
         aeson-pretty,
         array,
         extra,
-        dependent-sum,
+        some,
         haskell-src-exts >=1.20.3 && <1.24,
         either,
         optparse-applicative,
