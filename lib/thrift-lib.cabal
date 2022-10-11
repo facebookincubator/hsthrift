@@ -91,9 +91,7 @@ library
     extra-libraries: stdc++
 
     build-depends:
-        dependent-sum >= 0.6 && <= 0.6.2.0,
-          -- TODO: Data.Some was split out into package some at 0.6.2.2,
-          -- deprecated 'This' was removed.
+        some,
         containers,
         deepseq,
         STMonadTrans,
