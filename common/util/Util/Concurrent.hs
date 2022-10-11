@@ -1,6 +1,7 @@
 -- Copyright (c) Facebook, Inc. and its affiliates.
 
 {-# OPTIONS_GHC -fno-warn-missing-signatures #-}
+{-# LANGUAGE CPP #-}
 module Util.Concurrent
   ( concurrently3
   , concurrently4
@@ -20,7 +21,14 @@ import Control.Concurrent.Async
 import Control.Monad (void)
 import Control.Monad.IO.Class
 
+#if MIN_VERSION_ghc(9,0,2)
+import GHC.Utils.Exception (ExceptionMonad(..))
+import Control.Monad.Catch (bracket)
+
+gbracket = bracket
+#else
 import Exception (ExceptionMonad(..))
+#endif
 
 c :: IO a -> IO b -> IO (a, b)
 c = concurrently

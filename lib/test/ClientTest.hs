@@ -9,6 +9,7 @@ import Data.Proxy
 import TestRunner
 import Test.HUnit hiding (State)
 
+import Thrift.Api
 import Thrift.Channel
 import Thrift.Monad
 import Thrift.Protocol
@@ -20,7 +21,7 @@ import TestCommon
 import TestChannel
 
 mkClientTestWith
-  :: String -> RpcOptions -> ThriftM Binary TestChannel Calculator () -> Test
+  :: String -> RpcOptions -> Thrift Calculator () -> Test
 mkClientTestWith label opts action = TestLabel label $ TestCase $ do
   let proxy = Proxy :: Proxy Binary
   channel <- TestChannel <$> newEmptyMVar

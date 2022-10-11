@@ -56,7 +56,11 @@ import Data.Scientific (Scientific (..))
 import qualified Data.Scientific as Sci
 import Data.Word
 
+#if MIN_VERSION_ghc(9,0,2)
+import GHC.Data.FastMutInt
+#else
 import FastMutInt
+#endif
 
 #if __GLASGOW_HASKELL__ == 806
 import GHC.Base hiding (fail)

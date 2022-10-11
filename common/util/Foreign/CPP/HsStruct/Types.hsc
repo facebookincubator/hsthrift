@@ -119,6 +119,44 @@ peekElemOffWith f p i = f $ p `plusPtr` (i * offset)
 notPokeable :: String -> a
 notPokeable t = error $ "HsStruct." <> t <> " is not HS_POKEABLE"
 
+-- Derive Marshallables first
+
+$(deriveMarshallableUnsafe "HsOptionBool" [t| HsOption Bool |])
+$(deriveMarshallableUnsafe "HsOptionBool" [t| HsOption CBool |])
+$(deriveMarshallableUnsafe "HsOptionInt16" [t| HsOption CShort |])
+$(deriveMarshallableUnsafe "HsOptionInt16" [t| HsOption Int16 |])
+$(deriveMarshallableUnsafe "HsOptionInt32" [t| HsOption CInt |])
+$(deriveMarshallableUnsafe "HsOptionInt32" [t| HsOption Int32 |])
+$(deriveMarshallableUnsafe "HsOptionInt64" [t| HsOption CLong |])
+$(deriveMarshallableUnsafe "HsOptionInt64" [t| HsOption Int64 |])
+$(deriveMarshallableUnsafe "HsOptionUInt32" [t| HsOption CUInt |])
+$(deriveMarshallableUnsafe "HsOptionUInt32" [t| HsOption Word32 |])
+$(deriveMarshallableUnsafe "HsOptionUInt64" [t| HsOption CULong |])
+$(deriveMarshallableUnsafe "HsOptionUInt64" [t| HsOption Word64 |])
+$(deriveMarshallableUnsafe "HsOptionFloat" [t| HsOption Float |])
+$(deriveMarshallableUnsafe "HsOptionFloat" [t| HsOption CFloat |])
+$(deriveMarshallableUnsafe "HsOptionDouble" [t| HsOption Double |])
+$(deriveMarshallableUnsafe "HsOptionDouble" [t| HsOption CDouble |])
+
+
+-- Derive constructions after marshallable
+$(#{derive_hs_option_unsafe Bool} [t| Bool |])
+$(#{derive_hs_option_unsafe Bool} [t| CBool |])
+$(#{derive_hs_option_unsafe Int16} [t| CShort |])
+$(#{derive_hs_option_unsafe Int16} [t| Int16 |])
+$(#{derive_hs_option_unsafe Int32} [t| CInt |])
+$(#{derive_hs_option_unsafe Int32} [t| Int32 |])
+$(#{derive_hs_option_unsafe Int64} [t| CLong |])
+$(#{derive_hs_option_unsafe Int64} [t| Int64 |])
+$(#{derive_hs_option_unsafe UInt32} [t| CUInt |])
+$(#{derive_hs_option_unsafe UInt32} [t| Word32 |])
+$(#{derive_hs_option_unsafe UInt64} [t| CULong |])
+$(#{derive_hs_option_unsafe UInt64} [t| Word64 |])
+$(#{derive_hs_option_unsafe Float} [t| Float |])
+$(#{derive_hs_option_unsafe Float} [t| CFloat |])
+$(#{derive_hs_option_unsafe Double} [t| Double |])
+$(#{derive_hs_option_unsafe Double} [t| CDouble |])
+
 -- HsRange --------------------------------------------------------------------
 
 data HsRange a n = HsRange (Ptr a) n
@@ -150,6 +188,10 @@ $(mangle
       c_newHsStringPiece :: CString -> Word -> IO (Ptr HsStringPiece)
   |])
 
+$(deriveMarshallableUnsafe "HsStringPiece" [t| HsStringPiece |])
+$(deriveMarshallableUnsafe "HsOptionStringView" [t| HsOption HsStringPiece |])
+$(#{derive_hs_option_unsafe StringView} [t| HsStringPiece |])
+
 instance Constructible HsStringPiece where
   newValue (HsRange str len) =
     castPtr <$> c_newHsStringPiece str (fromIntegral len)
@@ -171,6 +213,9 @@ withTextAsHsStringPiece b = withByteStringAsHsStringPiece (Text.encodeUtf8 b)
 newtype HsMaybe a = HsMaybe
   { hsMaybe :: Maybe a
   }
+
+$(deriveMarshallableUnsafe "HsMaybeInt" [t| HsMaybe Int |])
+$(deriveMarshallableUnsafe "HsMaybeDouble" [t| HsMaybe Double |])
 
 instance Addressable1 HsMaybe where
   sizeOf1 _ = #{size DummyHsMaybe}
@@ -206,6 +251,8 @@ $(mangle
       c_newHsString :: CString -> Word -> IO (Ptr HsString)
   |])
 
+$(deriveMarshallableUnsafe "HsString" [t| HsString |])
+
 instance Addressable HsString
 
 instance Storable HsString where
@@ -234,22 +281,27 @@ newtype HsText = HsText
   { hsText :: Text
   }
 
-instance Addressable HsText where
-  sizeOf _ = #{size HsString}
-  alignment _ = #{alignment HsString}
-
 instance Constructible HsText where
   newValue (HsText txt) = newStrImpl (Text.encodeUtf8 txt)
   constructValue p (HsText txt) =
     constructStrImpl (castPtr p) (Text.encodeUtf8 txt)
 
-instance Assignable HsText
+instance Addressable HsText where
+  sizeOf _ = #{size HsString}
+  alignment _ = #{alignment HsString}
 
 instance Storable HsText where
   sizeOf _ = #{size HsString}
   alignment _ = #{alignment HsString}
   poke = error "HsStruct.HsText: poke not implemented"
   peek p = fmap HsText $ uncurry cStringLenToText =<< peekStrLen p
+
+$(deriveMarshallableUnsafe "HsString" [t| HsText |])
+$(deriveMarshallableUnsafe "HsOptionString" [t| HsOption HsText |])
+$(#{derive_hs_option_unsafe String} [t| HsText |])
+$(deriveMarshallableUnsafe "HsMaybeString" [t| HsMaybe HsText |])
+
+instance Assignable HsText
 
 instance Eq HsText where
   (HsText a) == (HsText b) = a == b
@@ -277,6 +329,10 @@ $(mangle
     foreign import ccall unsafe
       c_newHsEither :: HsEitherTag -> Ptr c -> IO (Ptr (HsEither a b))
   |])
+
+$(deriveMarshallableUnsafe "HsEitherStringInt" [t| HsEither HsText Int |])
+$(deriveMarshallableUnsafe "HsEitherStringDouble" [t| HsEither HsText Double |])
+$(deriveMarshallableUnsafe "HsEitherStringString" [t| HsEither HsText HsText |])
 
 instance Addressable1 (HsEither a) where
   sizeOf1 _ = #{size DummyHsEither}
@@ -325,7 +381,6 @@ instance (Constructible a, Constructible b)
 
 instance Assignable (HsEither HsText Int)
 instance Assignable (HsEither HsText Double)
-instance Assignable (HsEither HsText HsByteString)
 instance Assignable (HsEither HsText HsText)
 
 -- HsPair ---------------------------------------------------------------------
@@ -372,19 +427,29 @@ instance Constructible HsByteString where
   newValue (HsByteString bs) = newStrImpl bs
   constructValue p (HsByteString bs) = constructStrImpl (castPtr p) bs
 
-instance Assignable HsByteString
-
 instance Storable HsByteString where
   sizeOf _ = #{size HsString}
   alignment _ = #{alignment HsString}
   poke = notPokeable "HsByteString"
   peek p = fmap HsByteString $ packCStringLen =<< peekStrLen p
 
+$(deriveMarshallableUnsafe "HsString" [t| HsByteString |])
+$(deriveMarshallableUnsafe "HsOptionString" [t| HsOption HsByteString |])
+$(#{derive_hs_option_unsafe String} [t| HsByteString |])
+$(deriveMarshallableUnsafe "HsMaybeString" [t| HsMaybe HsByteString |])
+$(deriveMarshallableUnsafe "HsEitherStringString" [t| HsEither HsText HsByteString |])
+
+instance Assignable HsByteString
+instance Assignable (HsEither HsText HsByteString)
+
+
 -- HsLenientText --------------------------------------------------------------
 
 newtype HsLenientText = HsLenientText
   { hsLenientText :: Text
   }
+
+$(deriveMarshallableUnsafe "HsString" [t| HsLenientText |])
 
 instance Addressable HsLenientText
 
@@ -398,6 +463,32 @@ instance Storable HsLenientText where
 newtype HsArray a = HsArray
   { hsArray :: Vector a
   }
+
+peekDataSize :: Ptr b -> IO (Ptr a, Int)
+peekDataSize p = do
+  (a :: Ptr a) <- #{peek DummyHsArray, a} p
+  (n :: CSize) <- #{peek DummyHsArray, n} p
+  return (a, fromIntegral n)
+
+$(deriveMarshallableUnsafe "HsArrayInt16" [t| HsArray CShort |])
+$(deriveMarshallableUnsafe "HsArrayInt16" [t| HsArray Int16 |])
+$(deriveMarshallableUnsafe "HsArrayInt32" [t| HsArray CInt |])
+$(deriveMarshallableUnsafe "HsArrayInt32" [t| HsArray Int32 |])
+$(deriveMarshallableUnsafe "HsArrayInt64" [t| HsArray Int |])
+$(deriveMarshallableUnsafe "HsArrayInt64" [t| HsArray Int64 |])
+$(deriveMarshallableUnsafe "HsArrayInt64" [t| HsArray CLong |])
+$(deriveMarshallableUnsafe "HsArrayUInt8" [t| HsArray CBool |])
+$(deriveMarshallableUnsafe "HsArrayUInt8" [t| HsArray Word8 |])
+$(deriveMarshallableUnsafe "HsArrayUInt32" [t| HsArray CUInt |])
+$(deriveMarshallableUnsafe "HsArrayUInt32" [t| HsArray Word32 |])
+$(deriveMarshallableUnsafe "HsArrayUInt64" [t| HsArray CULong |])
+$(deriveMarshallableUnsafe "HsArrayUInt64" [t| HsArray Word64 |])
+$(deriveMarshallableUnsafe "HsArrayFloat" [t| HsArray Float |])
+$(deriveMarshallableUnsafe "HsArrayFloat" [t| HsArray CFloat |])
+$(deriveMarshallableUnsafe "HsArrayDouble" [t| HsArray Double |])
+$(deriveMarshallableUnsafe "HsArrayDouble" [t| HsArray CDouble |])
+$(deriveMarshallableUnsafe "HsArrayString" [t| HsArray HsByteString |])
+$(deriveMarshallableUnsafe "HsArrayString" [t| HsArray HsText |])
 
 instance Addressable1 HsArray where
   sizeOf1 _ = #{size DummyHsArray}
@@ -435,6 +526,49 @@ newtype HsList a = HsList
   { hsList :: [a]
   }
 
+$(deriveMarshallableUnsafe "HsArrayInt16" [t| HsList CShort |])
+$(deriveMarshallableUnsafe "HsArrayInt16" [t| HsList Int16 |])
+$(deriveMarshallableUnsafe "HsArrayInt32" [t| HsList CInt |])
+$(deriveMarshallableUnsafe "HsArrayInt32" [t| HsList Int32 |])
+$(deriveMarshallableUnsafe "HsArrayInt64" [t| HsList Int |])
+$(deriveMarshallableUnsafe "HsArrayInt64" [t| HsList Int64 |])
+$(deriveMarshallableUnsafe "HsArrayInt64" [t| HsList CLong |])
+$(deriveMarshallableUnsafe "HsArrayUInt8" [t| HsList CBool |])
+$(deriveMarshallableUnsafe "HsArrayUInt8" [t| HsList Word8 |])
+$(deriveMarshallableUnsafe "HsArrayUInt32" [t| HsList CUInt |])
+$(deriveMarshallableUnsafe "HsArrayUInt32" [t| HsList Word32 |])
+$(deriveMarshallableUnsafe "HsArrayUInt64" [t| HsList CULong |])
+$(deriveMarshallableUnsafe "HsArrayUInt64" [t| HsList Word64 |])
+$(deriveMarshallableUnsafe "HsArrayFloat" [t| HsList Float |])
+$(deriveMarshallableUnsafe "HsArrayFloat" [t| HsList CFloat |])
+$(deriveMarshallableUnsafe "HsArrayDouble" [t| HsList Double |])
+$(deriveMarshallableUnsafe "HsArrayDouble" [t| HsList CDouble |])
+$(deriveMarshallableUnsafe "HsArrayString" [t| HsList HsByteString |])
+$(deriveMarshallableUnsafe "HsArrayString" [t| HsList HsText |])
+$(deriveHsArrayUnsafe "Int16" [t| CShort |])
+$(deriveHsArrayUnsafe "Int16" [t| Int16 |])
+$(deriveHsArrayUnsafe "Int32" [t| CInt |])
+$(deriveHsArrayUnsafe "Int32" [t| Int32 |])
+$(deriveHsArrayUnsafe "Int64" [t| CLong |])
+$(deriveHsArrayUnsafe "Int64" [t| Int64 |])
+$(deriveHsArrayUnsafe "UInt8" [t| CBool |])
+$(deriveHsArrayUnsafe "UInt8" [t| Word8 |])
+$(deriveHsArrayUnsafe "UInt32" [t| CUInt |])
+$(deriveHsArrayUnsafe "UInt32" [t| Word32 |])
+$(deriveHsArrayUnsafe "UInt64" [t| CULong |])
+$(deriveHsArrayUnsafe "UInt64" [t| Word64 |])
+$(deriveHsArrayUnsafe "Float" [t| Float |])
+$(deriveHsArrayUnsafe "Float" [t| CFloat |])
+$(deriveHsArrayUnsafe "Double" [t| Double |])
+$(deriveHsArrayUnsafe "Double" [t| CDouble |])
+$(deriveHsArrayUnsafe "StringView" [t| HsStringPiece |])
+$(deriveHsArrayUnsafe "String" [t| HsText |])
+$(deriveHsArrayUnsafe "String" [t| HsByteString |])
+$(deriveMarshallableUnsafe "HsEitherStringArrayInt" [t| HsEither HsText (HsList Int) |])
+$(deriveMarshallableUnsafe "HsEitherStringArrayDouble" [t| HsEither HsText (HsList Double) |])
+$(deriveMarshallableUnsafe "HsEitherStringArrayString" [t| HsEither HsText (HsList HsByteString) |])
+$(deriveMarshallableUnsafe "HsEitherStringArrayString" [t| HsEither HsText (HsList HsText) |])
+
 instance Addressable1 HsList where
   sizeOf1 _ = #{size DummyHsArray}
   alignment1 _ = #{alignment DummyHsArray}
@@ -454,12 +588,6 @@ instance StorableContainer HsList where
               go (i-1) (e:acc)
     HsList <$> go (n-1) []
 
-peekDataSize :: Ptr b -> IO (Ptr a, Int)
-peekDataSize p = do
-  (a :: Ptr a) <- #{peek DummyHsArray, a} p
-  (n :: CSize) <- #{peek DummyHsArray, n} p
-  return (a, fromIntegral n)
-
 -- HsSet
 newtype HsHashSet a = HsHashSet
   -- Contains a List as a transport for the internal datatype that may not be
@@ -467,6 +595,39 @@ newtype HsHashSet a = HsHashSet
   -- type of Int is)
   { hsHashSet :: HashSet.HashSet a
   }
+
+$(deriveMarshallableUnsafe "HsSetInt32" [t| HsHashSet CInt |])
+$(deriveMarshallableUnsafe "HsSetInt32" [t| HsHashSet Int32 |])
+$(deriveMarshallableUnsafe "HsSetInt64" [t| HsHashSet Int |])
+$(deriveMarshallableUnsafe "HsSetInt64" [t| HsHashSet Int64 |])
+$(deriveMarshallableUnsafe "HsSetInt64" [t| HsHashSet CLong |])
+$(deriveMarshallableUnsafe "HsSetUInt8" [t| HsHashSet CBool |])
+$(deriveMarshallableUnsafe "HsSetUInt8" [t| HsHashSet Word8 |])
+$(deriveMarshallableUnsafe "HsSetUInt32" [t| HsHashSet CUInt |])
+$(deriveMarshallableUnsafe "HsSetUInt32" [t| HsHashSet Word32 |])
+$(deriveMarshallableUnsafe "HsSetUInt64" [t| HsHashSet CULong |])
+$(deriveMarshallableUnsafe "HsSetUInt64" [t| HsHashSet Word64 |])
+$(deriveMarshallableUnsafe "HsSetFloat" [t| HsHashSet Float |])
+$(deriveMarshallableUnsafe "HsSetDouble" [t| HsHashSet Double |])
+$(deriveMarshallableUnsafe "HsSetString" [t| HsHashSet HsByteString |])
+$(deriveMarshallableUnsafe "HsSetString" [t| HsHashSet HsText |])
+$(deriveHsHashSetUnsafe "Int16" [t| CShort |])
+$(deriveHsHashSetUnsafe "Int16" [t| Int16 |])
+$(deriveHsHashSetUnsafe "Int32" [t| CInt |])
+$(deriveHsHashSetUnsafe "Int32" [t| Int32 |])
+$(deriveHsHashSetUnsafe "Int64" [t| Int |])
+$(deriveHsHashSetUnsafe "Int64" [t| Int64 |])
+$(deriveHsHashSetUnsafe "Int64" [t| CLong |])
+$(deriveHsHashSetUnsafe "UInt8" [t| CBool |])
+$(deriveHsHashSetUnsafe "UInt8" [t| Word8 |])
+$(deriveHsHashSetUnsafe "UInt32" [t| CUInt |])
+$(deriveHsHashSetUnsafe "UInt32" [t| Word32 |])
+$(deriveHsHashSetUnsafe "UInt64" [t| CULong |])
+$(deriveHsHashSetUnsafe "UInt64" [t| Word64 |])
+$(deriveHsHashSetUnsafe "Float" [t| Float |])
+$(deriveHsHashSetUnsafe "Double" [t| Double |])
+$(deriveHsHashSetUnsafe "String" [t| HsByteString |])
+$(deriveHsHashSetUnsafe "String" [t| HsText |])
 
 instance Addressable1 HsHashSet where
   sizeOf1 = setSizeOf
@@ -510,6 +671,10 @@ newtype HsMap k v = HsMap
   { hsMap :: Map k v
   }
 
+mapSizeOf, mapAlignment :: a -> Int
+mapSizeOf _ = #{size DummyHsObject}
+mapAlignment _ = #{alignment DummyHsObject}
+
 instance Addressable1 (HsMap k) where
   sizeOf1 = mapSizeOf
   alignment1 = mapAlignment
@@ -517,81 +682,6 @@ instance Addressable1 (HsMap k) where
 instance Addressable (HsMap k v) where
   sizeOf = sizeOf1
   alignment = alignment1
-
-instance (Addressable k, Ord k, Storable k) => StorableContainer (HsMap k) where
-  pokeWith = notPokeable "HsMap"
-  peekWith f p = HsMap <$> peekMapWith Map.empty Map.insert peek f p
-
-newtype HsIntMap v = HsIntMap
-  { hsIntMap :: IntMap v
-  }
-
-instance Addressable1 HsIntMap where
-  sizeOf1 = mapSizeOf
-  alignment1 = mapAlignment
-
-instance Addressable (HsIntMap v) where
-  sizeOf = sizeOf1
-  alignment = alignment1
-
-instance StorableContainer HsIntMap where
-  pokeWith = notPokeable "HsIntMap"
-  peekWith f p = HsIntMap <$> peekMapWith IntMap.empty IntMap.insert peek f p
-
-newtype HsHashMap k v = HsHashMap
-  { hsHashMap :: HashMap k v
-  }
-
-instance Addressable1 (HsHashMap k) where
-  sizeOf1 = mapSizeOf
-  alignment1 = mapAlignment
-
-instance Addressable (HsHashMap k v) where
-  sizeOf = sizeOf1
-  alignment = alignment1
-
-instance (Addressable k, Eq k, Hashable k, Storable k)
-  => StorableContainer (HsHashMap k) where
-  pokeWith = notPokeable "HsHashMap"
-  peekWith f p = HsHashMap <$> peekMapWith HashMap.empty HashMap.insert peek f p
-
-newtype HsObject v = HsObject
-  { hsObject :: HashMap Text v
-  }
-
-instance Addressable1 HsObject where
-  sizeOf1 = mapSizeOf
-  alignment1 = mapAlignment
-
-instance Addressable (HsObject v) where
-  sizeOf = sizeOf1
-  alignment = alignment1
-
-instance StorableContainer HsObject where
-  pokeWith = notPokeable "HsObject"
-  peekWith f p = HsObject <$> peekMapWith HashMap.empty HashMap.insert fk f p
-    where
-    fk = fmap hsText . peek
-
-mapSizeOf, mapAlignment :: a -> Int
-mapSizeOf _ = #{size DummyHsObject}
-mapAlignment _ = #{alignment DummyHsObject}
-
-foreign import ccall unsafe "common_hs_ctorHsObjectJSON"
-  c_constructHsObjectJSON
-    :: Ptr (HsObject HsJSON)
-    -> Ptr (HsArray HsText)
-    -> Ptr (HsArray HsJSON)
-    -> IO ()
-
-instance Constructible (HsObject HsJSON) where
-  newValue (HsObject _o) = error "HsObject HsJSON cannot be made on heap"
-  constructValue ptr (HsObject m) =
-    withCxxObject (HsArray (Vector.fromList (map HsText keys))) $ \keys_p ->
-    withCxxObject (HsArray (Vector.fromList vals)) $ \vals_p ->
-      c_constructHsObjectJSON ptr keys_p vals_p
-    where
-      (keys, vals) = unzip $ HashMap.toList m
 
 {-# INLINE peekMapWith #-}
 peekMapWith
@@ -613,6 +703,91 @@ peekMapWith empty insert fk fv p = do
             v <- peekElemOffWith fv values i
             go (i+1) $ insert k v hm
   go 0 empty
+
+instance (Addressable k, Ord k, Storable k) => StorableContainer (HsMap k) where
+  pokeWith = notPokeable "HsMap"
+  peekWith f p = HsMap <$> peekMapWith Map.empty Map.insert peek f p
+
+newtype HsIntMap v = HsIntMap
+  { hsIntMap :: IntMap v
+  }
+
+$(deriveMarshallableUnsafe "HsMapIntInt" [t| HsIntMap Int |])
+$(deriveMarshallableUnsafe "HsMapIntDouble" [t| HsIntMap Double |])
+$(deriveMarshallableUnsafe "HsMapIntString" [t| HsIntMap HsByteString |])
+$(deriveMarshallableUnsafe "HsMapIntString" [t| HsIntMap HsText |])
+
+instance Addressable1 HsIntMap where
+  sizeOf1 = mapSizeOf
+  alignment1 = mapAlignment
+
+instance Addressable (HsIntMap v) where
+  sizeOf = sizeOf1
+  alignment = alignment1
+
+instance StorableContainer HsIntMap where
+  pokeWith = notPokeable "HsIntMap"
+  peekWith f p = HsIntMap <$> peekMapWith IntMap.empty IntMap.insert peek f p
+
+newtype HsHashMap k v = HsHashMap
+  { hsHashMap :: HashMap k v
+  }
+
+$(deriveMarshallableUnsafe "HsMapIntInt" [t| HsHashMap Int Int |])
+$(deriveMarshallableUnsafe "HsMapInt32String" [t| HsHashMap Int32 HsText |])
+$(deriveMarshallableUnsafe "HsMapDoubleInt32" [t| HsHashMap Double Int32 |])
+$(deriveMarshallableUnsafe "HsMapStringString" [t| HsHashMap HsText HsText |])
+-- O(n^2) derivations, try to derive just what you need
+$(deriveHsHashMapUnsafe "IntInt" [t| Int |] [t| Int |])
+$(deriveHsHashMapUnsafe "Int32Int32" [t| Int32 |] [t| Int32 |])
+$(deriveHsHashMapUnsafe "Int32Double" [t| Int32 |] [t| Double |])
+$(deriveHsHashMapUnsafe "Int32String" [t| Int32 |] [t| HsByteString |])
+$(deriveHsHashMapUnsafe "Int32String" [t| Int32 |] [t| HsText |])
+$(deriveHsHashMapUnsafe "DoubleInt32" [t| Double |] [t| Int32 |])
+$(deriveHsHashMapUnsafe "StringInt32" [t| HsByteString |] [t| Int32 |])
+$(deriveHsHashMapUnsafe "StringInt32" [t| HsText |] [t| Int32 |])
+$(deriveHsHashMapUnsafe "StringDouble" [t| HsText |] [t| Double |])
+$(deriveHsHashMapUnsafe "StringDouble" [t| HsByteString |] [t| Double |])
+$(deriveHsHashMapUnsafe "StringString" [t| HsText |] [t| HsText |])
+$(deriveHsHashMapUnsafe "StringString" [t| HsText |] [t| HsByteString |])
+$(deriveHsHashMapUnsafe "StringString" [t| HsByteString |] [t| HsText |])
+$(deriveHsHashMapUnsafe "StringString" [t| HsByteString |] [t| HsByteString |])
+
+instance Addressable1 (HsHashMap k) where
+  sizeOf1 = mapSizeOf
+  alignment1 = mapAlignment
+
+instance Addressable (HsHashMap k v) where
+  sizeOf = sizeOf1
+  alignment = alignment1
+
+instance (Addressable k, Eq k, Hashable k, Storable k)
+  => StorableContainer (HsHashMap k) where
+  pokeWith = notPokeable "HsHashMap"
+  peekWith f p = HsHashMap <$> peekMapWith HashMap.empty HashMap.insert peek f p
+
+newtype HsObject v = HsObject
+  { hsObject :: HashMap Text v
+  }
+
+$(deriveMarshallableUnsafe "HsMapStringInt" [t| HsObject Int |])
+$(deriveMarshallableUnsafe "HsMapStringDouble" [t| HsObject Double |])
+$(deriveMarshallableUnsafe "HsMapStringString" [t| HsObject HsByteString |])
+$(deriveMarshallableUnsafe "HsMapStringString" [t| HsObject HsText |])
+
+instance Addressable1 HsObject where
+  sizeOf1 = mapSizeOf
+  alignment1 = mapAlignment
+
+instance Addressable (HsObject v) where
+  sizeOf = sizeOf1
+  alignment = alignment1
+
+instance StorableContainer HsObject where
+  pokeWith = notPokeable "HsObject"
+  peekWith f p = HsObject <$> peekMapWith HashMap.empty HashMap.insert fk f p
+    where
+    fk = fmap hsText . peek
 
 -- HsJSON
 newtype HsJSON = HsJSON
@@ -697,6 +872,29 @@ $(mangle
       c_constructHsJSONObject :: Ptr HsJSON -> Ptr (HsObject HsJSON) -> IO ()
   |])
 
+$(deriveMarshallableUnsafe "HsArrayJSON" [t| HsArray HsJSON |])
+$(deriveMarshallableUnsafe "HsOptionHsJSON" [t| HsOption HsJSON |])
+$(deriveMarshallableUnsafe "HsArrayJSON" [t| HsList HsJSON |])
+$(deriveMarshallableUnsafe "HsSetJSON" [t| HsHashSet HsJSON |])
+$(deriveMarshallableUnsafe "HsObjectJSON" [t| HsObject HsJSON |])
+$(deriveHsArrayUnsafe "HsJSON" [t| HsJSON |])
+
+foreign import ccall unsafe "common_hs_ctorHsObjectJSON"
+  c_constructHsObjectJSON
+    :: Ptr (HsObject HsJSON)
+    -> Ptr (HsArray HsText)
+    -> Ptr (HsArray HsJSON)
+    -> IO ()
+
+instance Constructible (HsObject HsJSON) where
+  newValue (HsObject _o) = error "HsObject HsJSON cannot be made on heap"
+  constructValue ptr (HsObject m) =
+    withCxxObject (HsArray (Vector.fromList (map HsText keys))) $ \keys_p ->
+    withCxxObject (HsArray (Vector.fromList vals)) $ \vals_p ->
+      c_constructHsObjectJSON ptr keys_p vals_p
+    where
+      (keys, vals) = unzip $ HashMap.toList m
+
 instance Constructible HsJSON where
   newValue (HsJSON _val) = error $ "HsStruct.HsJSON cannot be built on heap"
   constructValue ptr (HsJSON val) =
@@ -714,201 +912,6 @@ instance Constructible HsJSON where
       Object o -> withCxxObject (HsObject (HsJSON <$> o)) $
         c_constructHsJSONObject ptr
 
--- Derive Marshallables first
-$(deriveMarshallableUnsafe "HsMaybeInt" [t| HsMaybe Int |])
-$(deriveMarshallableUnsafe "HsMaybeDouble" [t| HsMaybe Double |])
-$(deriveMarshallableUnsafe "HsMaybeString" [t| HsMaybe HsByteString |])
-$(deriveMarshallableUnsafe "HsMaybeString" [t| HsMaybe HsText |])
-
-$(deriveMarshallableUnsafe "HsEitherStringInt" [t| HsEither HsText Int |])
-$(deriveMarshallableUnsafe "HsEitherStringDouble" [t| HsEither HsText Double |])
-$(deriveMarshallableUnsafe "HsEitherStringString" [t| HsEither HsText HsByteString |])
-$(deriveMarshallableUnsafe "HsEitherStringString" [t| HsEither HsText HsText |])
-
-$(deriveMarshallableUnsafe "HsEitherStringArrayInt" [t| HsEither HsText (HsList Int) |])
-$(deriveMarshallableUnsafe "HsEitherStringArrayDouble" [t| HsEither HsText (HsList Double) |])
-$(deriveMarshallableUnsafe "HsEitherStringArrayString" [t| HsEither HsText (HsList HsByteString) |])
-$(deriveMarshallableUnsafe "HsEitherStringArrayString" [t| HsEither HsText (HsList HsText) |])
-
-$(deriveMarshallableUnsafe "HsString" [t| HsString |])
-$(deriveMarshallableUnsafe "HsString" [t| HsByteString |])
-$(deriveMarshallableUnsafe "HsString" [t| HsText |])
-$(deriveMarshallableUnsafe "HsString" [t| HsLenientText |])
-
-$(deriveMarshallableUnsafe "HsStringPiece" [t| HsStringPiece |])
-
-$(deriveMarshallableUnsafe "HsOptionBool" [t| HsOption Bool |])
-$(deriveMarshallableUnsafe "HsOptionBool" [t| HsOption CBool |])
-$(deriveMarshallableUnsafe "HsOptionInt16" [t| HsOption CShort |])
-$(deriveMarshallableUnsafe "HsOptionInt16" [t| HsOption Int16 |])
-$(deriveMarshallableUnsafe "HsOptionInt32" [t| HsOption CInt |])
-$(deriveMarshallableUnsafe "HsOptionInt32" [t| HsOption Int32 |])
-$(deriveMarshallableUnsafe "HsOptionInt64" [t| HsOption CLong |])
-$(deriveMarshallableUnsafe "HsOptionInt64" [t| HsOption Int64 |])
-$(deriveMarshallableUnsafe "HsOptionUInt32" [t| HsOption CUInt |])
-$(deriveMarshallableUnsafe "HsOptionUInt32" [t| HsOption Word32 |])
-$(deriveMarshallableUnsafe "HsOptionUInt64" [t| HsOption CULong |])
-$(deriveMarshallableUnsafe "HsOptionUInt64" [t| HsOption Word64 |])
-$(deriveMarshallableUnsafe "HsOptionFloat" [t| HsOption Float |])
-$(deriveMarshallableUnsafe "HsOptionFloat" [t| HsOption CFloat |])
-$(deriveMarshallableUnsafe "HsOptionDouble" [t| HsOption Double |])
-$(deriveMarshallableUnsafe "HsOptionDouble" [t| HsOption CDouble |])
-$(deriveMarshallableUnsafe "HsOptionString" [t| HsOption HsText |])
-$(deriveMarshallableUnsafe "HsOptionString" [t| HsOption HsByteString |])
-$(deriveMarshallableUnsafe "HsOptionStringView" [t| HsOption HsStringPiece |])
-$(deriveMarshallableUnsafe "HsOptionHsJSON" [t| HsOption HsJSON |])
-
-$(deriveMarshallableUnsafe "HsArrayInt16" [t| HsList CShort |])
-$(deriveMarshallableUnsafe "HsArrayInt16" [t| HsList Int16 |])
-$(deriveMarshallableUnsafe "HsArrayInt32" [t| HsList CInt |])
-$(deriveMarshallableUnsafe "HsArrayInt32" [t| HsList Int32 |])
-$(deriveMarshallableUnsafe "HsArrayInt64" [t| HsList Int |])
-$(deriveMarshallableUnsafe "HsArrayInt64" [t| HsList Int64 |])
-$(deriveMarshallableUnsafe "HsArrayInt64" [t| HsList CLong |])
-$(deriveMarshallableUnsafe "HsArrayUInt8" [t| HsList CBool |])
-$(deriveMarshallableUnsafe "HsArrayUInt8" [t| HsList Word8 |])
-$(deriveMarshallableUnsafe "HsArrayUInt32" [t| HsList CUInt |])
-$(deriveMarshallableUnsafe "HsArrayUInt32" [t| HsList Word32 |])
-$(deriveMarshallableUnsafe "HsArrayUInt64" [t| HsList CULong |])
-$(deriveMarshallableUnsafe "HsArrayUInt64" [t| HsList Word64 |])
-$(deriveMarshallableUnsafe "HsArrayFloat" [t| HsList Float |])
-$(deriveMarshallableUnsafe "HsArrayFloat" [t| HsList CFloat |])
-$(deriveMarshallableUnsafe "HsArrayDouble" [t| HsList Double |])
-$(deriveMarshallableUnsafe "HsArrayDouble" [t| HsList CDouble |])
-$(deriveMarshallableUnsafe "HsArrayString" [t| HsList HsByteString |])
-$(deriveMarshallableUnsafe "HsArrayString" [t| HsList HsText |])
-$(deriveMarshallableUnsafe "HsArrayStringPiece" [t| HsList HsStringPiece |])
-$(deriveMarshallableUnsafe "HsArrayJSON" [t| HsList HsJSON |])
-$(deriveMarshallableUnsafe "HsArrayInt16" [t| HsArray CShort |])
-$(deriveMarshallableUnsafe "HsArrayInt16" [t| HsArray Int16 |])
-$(deriveMarshallableUnsafe "HsArrayInt32" [t| HsArray CInt |])
-$(deriveMarshallableUnsafe "HsArrayInt32" [t| HsArray Int32 |])
-$(deriveMarshallableUnsafe "HsArrayInt64" [t| HsArray Int |])
-$(deriveMarshallableUnsafe "HsArrayInt64" [t| HsArray Int64 |])
-$(deriveMarshallableUnsafe "HsArrayInt64" [t| HsArray CLong |])
-$(deriveMarshallableUnsafe "HsArrayUInt8" [t| HsArray CBool |])
-$(deriveMarshallableUnsafe "HsArrayUInt8" [t| HsArray Word8 |])
-$(deriveMarshallableUnsafe "HsArrayUInt32" [t| HsArray CUInt |])
-$(deriveMarshallableUnsafe "HsArrayUInt32" [t| HsArray Word32 |])
-$(deriveMarshallableUnsafe "HsArrayUInt64" [t| HsArray CULong |])
-$(deriveMarshallableUnsafe "HsArrayUInt64" [t| HsArray Word64 |])
-$(deriveMarshallableUnsafe "HsArrayFloat" [t| HsArray Float |])
-$(deriveMarshallableUnsafe "HsArrayFloat" [t| HsArray CFloat |])
-$(deriveMarshallableUnsafe "HsArrayDouble" [t| HsArray Double |])
-$(deriveMarshallableUnsafe "HsArrayDouble" [t| HsArray CDouble |])
-$(deriveMarshallableUnsafe "HsArrayString" [t| HsArray HsByteString |])
-$(deriveMarshallableUnsafe "HsArrayString" [t| HsArray HsText |])
-$(deriveMarshallableUnsafe "HsArrayStringPiece" [t| HsArray HsStringPiece |])
-$(deriveMarshallableUnsafe "HsArrayJSON" [t| HsArray HsJSON |])
-
-$(deriveMarshallableUnsafe "HsSetInt32" [t| HsHashSet CInt |])
-$(deriveMarshallableUnsafe "HsSetInt32" [t| HsHashSet Int32 |])
-$(deriveMarshallableUnsafe "HsSetInt64" [t| HsHashSet Int |])
-$(deriveMarshallableUnsafe "HsSetInt64" [t| HsHashSet Int64 |])
-$(deriveMarshallableUnsafe "HsSetInt64" [t| HsHashSet CLong |])
-$(deriveMarshallableUnsafe "HsSetUInt8" [t| HsHashSet CBool |])
-$(deriveMarshallableUnsafe "HsSetUInt8" [t| HsHashSet Word8 |])
-$(deriveMarshallableUnsafe "HsSetUInt32" [t| HsHashSet CUInt |])
-$(deriveMarshallableUnsafe "HsSetUInt32" [t| HsHashSet Word32 |])
-$(deriveMarshallableUnsafe "HsSetUInt64" [t| HsHashSet CULong |])
-$(deriveMarshallableUnsafe "HsSetUInt64" [t| HsHashSet Word64 |])
-$(deriveMarshallableUnsafe "HsSetFloat" [t| HsHashSet Float |])
-$(deriveMarshallableUnsafe "HsSetDouble" [t| HsHashSet Double |])
-$(deriveMarshallableUnsafe "HsSetString" [t| HsHashSet HsByteString |])
-$(deriveMarshallableUnsafe "HsSetString" [t| HsHashSet HsText |])
-$(deriveMarshallableUnsafe "HsSetJSON" [t| HsHashSet HsJSON |])
-
-$(deriveMarshallableUnsafe "HsMapIntInt" [t| HsIntMap Int |])
-$(deriveMarshallableUnsafe "HsMapIntDouble" [t| HsIntMap Double |])
-$(deriveMarshallableUnsafe "HsMapIntString" [t| HsIntMap HsByteString |])
-$(deriveMarshallableUnsafe "HsMapIntString" [t| HsIntMap HsText |])
-$(deriveMarshallableUnsafe "HsMapStringInt" [t| HsObject Int |])
-$(deriveMarshallableUnsafe "HsMapStringDouble" [t| HsObject Double |])
-$(deriveMarshallableUnsafe "HsMapStringString" [t| HsObject HsByteString |])
-$(deriveMarshallableUnsafe "HsMapStringString" [t| HsObject HsText |])
-
-$(deriveMarshallableUnsafe "HsMapIntInt" [t| HsHashMap Int Int |])
-$(deriveMarshallableUnsafe "HsMapInt32String" [t| HsHashMap Int32 HsText |])
-$(deriveMarshallableUnsafe "HsMapDoubleInt32" [t| HsHashMap Double Int32 |])
-$(deriveMarshallableUnsafe "HsMapStringString" [t| HsHashMap HsText HsText |])
-
-$(deriveMarshallableUnsafe "HsObjectJSON" [t| HsObject HsJSON |])
 $(deriveMarshallableUnsafe "HsJSON" [t| HsJSON |])
-
--- Derive constructions after marshallable
-$(#{derive_hs_option_unsafe Bool} [t| Bool |])
-$(#{derive_hs_option_unsafe Bool} [t| CBool |])
-$(#{derive_hs_option_unsafe Int16} [t| CShort |])
-$(#{derive_hs_option_unsafe Int16} [t| Int16 |])
-$(#{derive_hs_option_unsafe Int32} [t| CInt |])
-$(#{derive_hs_option_unsafe Int32} [t| Int32 |])
-$(#{derive_hs_option_unsafe Int64} [t| CLong |])
-$(#{derive_hs_option_unsafe Int64} [t| Int64 |])
-$(#{derive_hs_option_unsafe UInt32} [t| CUInt |])
-$(#{derive_hs_option_unsafe UInt32} [t| Word32 |])
-$(#{derive_hs_option_unsafe UInt64} [t| CULong |])
-$(#{derive_hs_option_unsafe UInt64} [t| Word64 |])
-$(#{derive_hs_option_unsafe Float} [t| Float |])
-$(#{derive_hs_option_unsafe Float} [t| CFloat |])
-$(#{derive_hs_option_unsafe Double} [t| Double |])
-$(#{derive_hs_option_unsafe Double} [t| CDouble |])
-$(#{derive_hs_option_unsafe String} [t| HsText |])
-$(#{derive_hs_option_unsafe String} [t| HsByteString |])
-$(#{derive_hs_option_unsafe StringView} [t| HsStringPiece |])
 $(#{derive_hs_option_unsafe HsJSON} [t| HsJSON |])
-
-$(deriveHsArrayUnsafe "Int16" [t| CShort |])
-$(deriveHsArrayUnsafe "Int16" [t| Int16 |])
-$(deriveHsArrayUnsafe "Int32" [t| CInt |])
-$(deriveHsArrayUnsafe "Int32" [t| Int32 |])
-$(deriveHsArrayUnsafe "Int64" [t| CLong |])
-$(deriveHsArrayUnsafe "Int64" [t| Int64 |])
-$(deriveHsArrayUnsafe "UInt8" [t| CBool |])
-$(deriveHsArrayUnsafe "UInt8" [t| Word8 |])
-$(deriveHsArrayUnsafe "UInt32" [t| CUInt |])
-$(deriveHsArrayUnsafe "UInt32" [t| Word32 |])
-$(deriveHsArrayUnsafe "UInt64" [t| CULong |])
-$(deriveHsArrayUnsafe "UInt64" [t| Word64 |])
-$(deriveHsArrayUnsafe "Float" [t| Float |])
-$(deriveHsArrayUnsafe "Float" [t| CFloat |])
-$(deriveHsArrayUnsafe "Double" [t| Double |])
-$(deriveHsArrayUnsafe "Double" [t| CDouble |])
-$(deriveHsArrayUnsafe "String" [t| HsText |])
-$(deriveHsArrayUnsafe "String" [t| HsByteString |])
-$(deriveHsArrayUnsafe "StringView" [t| HsStringPiece |])
-$(deriveHsArrayUnsafe "HsJSON" [t| HsJSON |])
-
-$(deriveHsHashSetUnsafe "Int16" [t| CShort |])
-$(deriveHsHashSetUnsafe "Int16" [t| Int16 |])
-$(deriveHsHashSetUnsafe "Int32" [t| CInt |])
-$(deriveHsHashSetUnsafe "Int32" [t| Int32 |])
-$(deriveHsHashSetUnsafe "Int64" [t| Int |])
-$(deriveHsHashSetUnsafe "Int64" [t| Int64 |])
-$(deriveHsHashSetUnsafe "Int64" [t| CLong |])
-$(deriveHsHashSetUnsafe "UInt8" [t| CBool |])
-$(deriveHsHashSetUnsafe "UInt8" [t| Word8 |])
-$(deriveHsHashSetUnsafe "UInt32" [t| CUInt |])
-$(deriveHsHashSetUnsafe "UInt32" [t| Word32 |])
-$(deriveHsHashSetUnsafe "UInt64" [t| CULong |])
-$(deriveHsHashSetUnsafe "UInt64" [t| Word64 |])
-$(deriveHsHashSetUnsafe "Float" [t| Float |])
-$(deriveHsHashSetUnsafe "Double" [t| Double |])
-$(deriveHsHashSetUnsafe "String" [t| HsByteString |])
-$(deriveHsHashSetUnsafe "String" [t| HsText |])
 $(deriveHsHashSetUnsafe "HsJSON" [t| HsJSON |])
-
--- O(n^2) derivations, try to derive just what you need
-$(deriveHsHashMapUnsafe "IntInt" [t| Int |] [t| Int |])
-$(deriveHsHashMapUnsafe "Int32Int32" [t| Int32 |] [t| Int32 |])
-$(deriveHsHashMapUnsafe "Int32Double" [t| Int32 |] [t| Double |])
-$(deriveHsHashMapUnsafe "Int32String" [t| Int32 |] [t| HsByteString |])
-$(deriveHsHashMapUnsafe "Int32String" [t| Int32 |] [t| HsText |])
-$(deriveHsHashMapUnsafe "DoubleInt32" [t| Double |] [t| Int32 |])
-$(deriveHsHashMapUnsafe "StringInt32" [t| HsByteString |] [t| Int32 |])
-$(deriveHsHashMapUnsafe "StringInt32" [t| HsText |] [t| Int32 |])
-$(deriveHsHashMapUnsafe "StringDouble" [t| HsText |] [t| Double |])
-$(deriveHsHashMapUnsafe "StringDouble" [t| HsByteString |] [t| Double |])
-$(deriveHsHashMapUnsafe "StringString" [t| HsText |] [t| HsText |])
-$(deriveHsHashMapUnsafe "StringString" [t| HsText |] [t| HsByteString |])
-$(deriveHsHashMapUnsafe "StringString" [t| HsByteString |] [t| HsText |])
-$(deriveHsHashMapUnsafe "StringString" [t| HsByteString |] [t| HsByteString |])
