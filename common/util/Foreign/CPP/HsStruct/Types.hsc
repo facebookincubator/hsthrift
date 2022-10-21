@@ -8,6 +8,8 @@ module Foreign.CPP.HsStruct.Types
   -- * HsRange
   , HsRange(..)
   , HsStringPiece
+  , withByteStringAsHsStringPiece
+  , withTextAsHsStringPiece
   -- * HsMaybe
   , HsMaybe(..)
   -- * HsOption
@@ -155,6 +157,14 @@ instance Constructible HsStringPiece where
     c_constructHsStringPiece (castPtr p) str (fromIntegral len)
 
 instance Addressable HsStringPiece
+
+withByteStringAsHsStringPiece
+  :: ByteString -> (HsStringPiece -> IO res) -> IO res
+withByteStringAsHsStringPiece b act = unsafeUseAsCStringLen b $ \cstrlen ->
+  act (uncurry HsRange cstrlen)
+
+withTextAsHsStringPiece :: Text -> (HsStringPiece -> IO res) -> IO res
+withTextAsHsStringPiece b = withByteStringAsHsStringPiece (Text.encodeUtf8 b)
 
 -- HsMaybe --------------------------------------------------------------------
 
@@ -767,6 +777,7 @@ $(deriveMarshallableUnsafe "HsArrayDouble" [t| HsList Double |])
 $(deriveMarshallableUnsafe "HsArrayDouble" [t| HsList CDouble |])
 $(deriveMarshallableUnsafe "HsArrayString" [t| HsList HsByteString |])
 $(deriveMarshallableUnsafe "HsArrayString" [t| HsList HsText |])
+$(deriveMarshallableUnsafe "HsArrayStringPiece" [t| HsList HsStringPiece |])
 $(deriveMarshallableUnsafe "HsArrayJSON" [t| HsList HsJSON |])
 $(deriveMarshallableUnsafe "HsArrayInt16" [t| HsArray CShort |])
 $(deriveMarshallableUnsafe "HsArrayInt16" [t| HsArray Int16 |])
@@ -787,6 +798,7 @@ $(deriveMarshallableUnsafe "HsArrayDouble" [t| HsArray Double |])
 $(deriveMarshallableUnsafe "HsArrayDouble" [t| HsArray CDouble |])
 $(deriveMarshallableUnsafe "HsArrayString" [t| HsArray HsByteString |])
 $(deriveMarshallableUnsafe "HsArrayString" [t| HsArray HsText |])
+$(deriveMarshallableUnsafe "HsArrayStringPiece" [t| HsArray HsStringPiece |])
 $(deriveMarshallableUnsafe "HsArrayJSON" [t| HsArray HsJSON |])
 
 $(deriveMarshallableUnsafe "HsSetInt32" [t| HsHashSet CInt |])

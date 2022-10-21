@@ -238,6 +238,7 @@ HS_DEFINE_MARSHALLABLE(HsArrayUInt64, HsArray<uint64_t>);
 HS_DEFINE_MARSHALLABLE(HsArrayFloat, HsArray<float>);
 HS_DEFINE_MARSHALLABLE(HsArrayDouble, HsArray<double>);
 HS_DEFINE_MARSHALLABLE(HsArrayString, HsArray<HsString>);
+HS_DEFINE_MARSHALLABLE(HsArrayStringPiece, HsArray<HsStringPiece>);
 HS_DEFINE_MARSHALLABLE(HsArrayJSON, HsArray<HsJSON>);
 
 HS_DEFINE_MARSHALLABLE(HsSetInt16, HsSet<int16_t>);
