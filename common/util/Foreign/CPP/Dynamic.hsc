@@ -37,6 +37,10 @@ import Control.Exception (bracket)
 import Data.Aeson hiding (parseJSON)
 import qualified Data.Vector as Vector
 import qualified Data.HashMap.Strict as HashMap
+#if MIN_VERSION_aeson(2,0,0)
+import qualified Data.Aeson.Key as Key
+import qualified Data.Aeson.KeyMap as KeyMap
+#endif
 import Data.Text (Text)
 import qualified Data.Text as Text
 import Data.Scientific
@@ -266,9 +270,13 @@ peekImpl peekCString p = do
                   | otherwise = do
                     key <- peekElemOff pkeys i >>= getDynKey
                     val <- peekElemOff pvals i >>= getDyn
+#ifdef MIN_VERSION_aeson(2,0,0)
+                    go (i+1) (KeyMap.insert (Key.fromText key) val obj)
+#else
                     go (i+1) (HashMap.insert key val obj)
+#endif
 
-            go 0 HashMap.empty
+            go 0 mempty
     in
     Dynamic <$> getDyn p
 
@@ -302,8 +310,14 @@ instance Storable Dynamic where
               c_createDynamicArray pdyn (fromIntegral $ size) pelems
 
           putDyn pdyn (Object obj) = do
+#if MIN_VERSION_aeson(2,0,0)
+            let size = KeyMap.size obj
+                (keys', vals) = unzip $ KeyMap.toList obj
+                keys = map Key.toText keys'
+#else
             let size = HashMap.size obj
                 (keys, vals) = unzip $ HashMap.toList obj
+#endif
             useTextsAsCStrings keys $ \pkeys ->
               withArray' size (map Dynamic vals) $ \pvals ->
                 c_createDynamicObject pdyn (fromIntegral $ size) pkeys pvals

@@ -60,5 +60,5 @@ library
         Facebook.Init
 
     build-depends:
-        base >=4.11.1.0 && <4.16,
+        base >=4.11.1.0 && <4.17,
         HUnit ^>= 1.6.1

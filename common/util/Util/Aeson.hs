@@ -2,7 +2,7 @@
 
 -- FromJSON instance below is an orphan (deliberately)
 {-# OPTIONS_GHC -Wno-orphans #-}
-
+{-# LANGUAGE CPP #-}
 module Util.Aeson
   ( toJSONText
   , toJSONByteString
@@ -28,7 +28,12 @@ import Data.Text (Text)
 import Foreign.C
 
 import Text.PrettyPrint
+#if MIN_VERSION_aeson(2,0,0)
+import qualified Data.Aeson.KeyMap as HashMap
+import qualified Data.Aeson.Key as Key
+#else
 import qualified Data.HashMap.Strict as HashMap
+#endif
 import qualified Data.Vector as Vector
 import qualified Data.Text as Text
 import qualified Data.Text.Encoding as Text
@@ -71,8 +76,15 @@ prettyJSON val = show (pp val)
   pp (Object hm) =
     braces $ sep $
       punctuate (char ',')
-        [ sep [ pp (String key) <+> char ':', nest 2 (pp v) ]
+        [ sep [ pp (String (keyStr key)) <+> char ':', nest 2 (pp v) ]
         | (key, v) <- HashMap.toList hm ]
+    where
+      keyStr =
+#if MIN_VERSION_aeson(2,0,0)
+        Key.toText
+#else
+        id
+#endif
   pp (Array arr) =
     brackets $ sep $ punctuate (char ',') $ map pp $ Vector.toList arr
 
@@ -97,6 +109,10 @@ parseValueStrict' = A.parseOnly
 -- otherwise a constraint "FromJSON (HashMap Text a)" doesn't have a
 -- single most-specific instance to resolve to.  INCOHERENT is ok;
 -- the worst that can happen is that we lose the optimisation.
+#if MIN_VERSION_aeson(2,0,0)
+instance {-# INCOHERENT #-} FromJSON (HashMap.KeyMap Value) where
+#else
 instance {-# INCOHERENT #-} FromJSON (HashMap Text Value) where
+#endif
   parseJSON (Object obj) = return obj
   parseJSON other = typeMismatch "object" other

@@ -1,5 +1,5 @@
 -- Copyright (c) Facebook, Inc. and its affiliates.
-
+{-# LANGUAGE CPP #-}
 module Util.ToExp
   ( ToExp(..)
   , intE
@@ -28,6 +28,12 @@ import qualified Data.Vector as Vector
 import qualified Data.Vector.Storable as SVector
 import Language.Haskell.Exts hiding (intE)
 import Util.Text
+
+#if MIN_VERSION_aeson(2,0,0)
+import Data.Aeson.KeyMap (Key, KeyMap)
+import qualified Data.Aeson.Key as Key
+import qualified Data.Aeson.KeyMap as KeyMap
+#endif
 
 infixl 1 =.=
 infixl 1 =.==
@@ -120,6 +126,14 @@ instance (SVector.Storable a, ToExp a)
 
 instance (ToExp k, ToExp v) => ToExp (HashMap k v) where
   toExp m = fun "HashMap.fromList" =$= HashMap.toList m
+
+#if MIN_VERSION_aeson(2,0,0)
+instance ToExp Key where
+  toExp k = fun "Key.fromText" =$= Key.toText k
+
+instance ToExp v => ToExp (KeyMap v) where
+  toExp m = fun "KeyMap.fromList" =$= KeyMap.toList m
+#endif
 
 instance ToExp A.Value where
   toExp A.Null = con "Null"

@@ -107,15 +107,15 @@ library
         word8,
         aeson-pretty,
         text-show,
-        base >=4.11.1 && <4.16,
+        base >=4.11.1 && <4.17,
         async ^>= 2.2,
         transformers ^>=0.5.5.0,
-        bytestring ^>=0.10.8.2,
+        bytestring >=0.10.8.2 && <0.12,
         network,
         text ^>=1.2.3.0,
         unordered-containers ^>=0.2.9.0,
         hashable >=1.2.7.0 && <1.4,
-        vector ^>=0.12.0.1
+        vector ^>=0.12
 
     if flag(tests_use_ipv4)
       -- for SocketChannel.hs

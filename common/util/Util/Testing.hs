@@ -19,10 +19,14 @@ import Test.HUnit.Lang (HUnitFailure)
 import Util.Control.Exception
 import qualified Test.QuickCheck as QC
 
+#if MIN_VERSION_ghc(9,2,0)
+import GHC.Platform.Ways (hostIsProfiled)
+#else
 #if MIN_VERSION_ghc(9,0,2)
 import GHC.Driver.Ways (hostIsProfiled)
 #else
 import DynFlags (rtsIsProfiled)
+#endif
 #endif
 
 isProfiled :: Bool
