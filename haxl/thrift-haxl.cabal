@@ -61,7 +61,7 @@ library
         Haxl.DataSource.Thrift
     build-depends:
         thrift-lib,
-        hashable >=1.2.7.0 && <1.4,
+        hashable >=1.2.7.0 && <1.5,
         haxl >= 2.1.2.0 && < 2.5,
         mtl ^>=2.2.2,
         text-show,

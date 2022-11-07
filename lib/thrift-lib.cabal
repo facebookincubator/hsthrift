@@ -114,7 +114,7 @@ library
         network,
         text ^>=1.2.3.0,
         unordered-containers ^>=0.2.9.0,
-        hashable >=1.2.7.0 && <1.4,
+        hashable >=1.2.7.0 && <1.5,
         vector ^>=0.12
 
     if flag(tests_use_ipv4)
