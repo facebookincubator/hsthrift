@@ -30,7 +30,8 @@ import Language.Haskell.Exts hiding (intE)
 import Util.Text
 
 #if MIN_VERSION_aeson(2,0,0)
-import Data.Aeson.KeyMap (Key, KeyMap)
+import Data.Aeson.Key (Key)
+import Data.Aeson.KeyMap (KeyMap)
 import qualified Data.Aeson.Key as Key
 import qualified Data.Aeson.KeyMap as KeyMap
 #endif

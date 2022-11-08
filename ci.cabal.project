@@ -23,5 +23,10 @@ package thrift-server
 package thrift-cpp-channel
   flags: +tests_use_ipv4
 
-allow-newer: vector-fftw:base
+allow-newer: vector-fftw:base, haskell-names:aeson, haskell-names:bytestring, haxl:bytestring, haxl:time
 constraints: entropy < 0.4.1.9, haxl >= 2.4
+
+source-repository-package
+    type: git
+    location: https://github.com/exi/vector-fftw.git
+    tag: 6d09555b94c8e0363e0243a2802153b5749f8d2d
