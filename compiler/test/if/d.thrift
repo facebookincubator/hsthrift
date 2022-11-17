@@ -52,5 +52,17 @@ enum HsEnumPseudoenumAnn {
   TWO = 2,
   THREE = 3,
 } (hs.pseudoenum)
+enum HsEnumDuplicatedPseudoenumAnn {
+  ONE = 1,
+  TWO = 2,
+  THREE = 3,
+} (hs.pseudoenum)
 enum HsEnumEmptyPseudoenumAnn {
 } (hs.pseudoenum)
+
+struct HsStructOfComplexTypes {
+  1: HsStruct a_struct;
+  2: HsUnion a_union;
+  3: HsEnum an_enum;
+  4: HsEnumPseudoenumAnn a_pseudoenum;
+}

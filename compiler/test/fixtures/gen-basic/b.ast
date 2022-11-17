@@ -134,6 +134,74 @@
             }
         },
         {
+            "name": "scoped_enum_value",
+            "type": {
+                "name": {
+                    "name": "Number"
+                },
+                "type": "enum"
+            },
+            "value": {
+                "literal": {
+                    "type": "enum",
+                    "value": {
+                        "name": "Zero"
+                    }
+                }
+            }
+        },
+        {
+            "name": "enum_value",
+            "type": {
+                "name": {
+                    "name": "Number"
+                },
+                "type": "enum"
+            },
+            "value": {
+                "literal": {
+                    "type": "enum",
+                    "value": {
+                        "name": "One"
+                    }
+                }
+            }
+        },
+        {
+            "name": "scoped_pseudoenum_value",
+            "type": {
+                "name": {
+                    "name": "Number_Pseudo"
+                },
+                "type": "enum"
+            },
+            "value": {
+                "literal": {
+                    "type": "enum",
+                    "value": {
+                        "name": "Zero"
+                    }
+                }
+            }
+        },
+        {
+            "name": "pseudoenum_value",
+            "type": {
+                "name": {
+                    "name": "Number_Pseudo"
+                },
+                "type": "enum"
+            },
+            "value": {
+                "literal": {
+                    "type": "enum",
+                    "value": {
+                        "name": "Four"
+                    }
+                }
+            }
+        },
+        {
             "name": "list_value",
             "type": {
                 "inner_type": {
@@ -528,6 +596,20 @@
             ],
             "is_psuedo": false,
             "name": "Number_Strict"
+        },
+        {
+            "constants": [
+                {
+                    "name": "Zero",
+                    "value": 0
+                },
+                {
+                    "name": "Four",
+                    "value": 4
+                }
+            ],
+            "is_psuedo": false,
+            "name": "Number_Pseudo"
         },
         {
             "constants": [

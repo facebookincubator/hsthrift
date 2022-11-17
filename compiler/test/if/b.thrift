@@ -23,6 +23,11 @@ enum Number_Strict {
   Zero = 0,
 } (hs.nounknown)
 
+enum Number_Pseudo {
+  Zero = 0,
+  Four = 4,
+} (hs.pseudoenum)
+
 enum Number_Discontinuous {
   Five = 5,
   Zero = 0,
@@ -44,6 +49,10 @@ const bool bool_value = true;
 const string string_value = "xxx";
 const binary binary_value = "yyy";
 const Int newtype_value = 10;
+const Number scoped_enum_value = Number.Zero;
+const Number enum_value = One;
+const Number_Pseudo scoped_pseudoenum_value = Number_Pseudo.Zero;
+const Number_Pseudo pseudoenum_value = Four;
 
 # Some Collection Types
 const list<i64> list_value = [0, i64_value];

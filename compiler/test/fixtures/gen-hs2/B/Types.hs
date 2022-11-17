@@ -16,13 +16,16 @@ module B.Types
         Number(Number_Zero, Number_One, Number_Two, Number_Three,
                Number__UNKNOWN),
         Number_Strict(Number_Strict_Zero),
+        Number_Pseudo(Number_Pseudo, unNumber_Pseudo), number_Pseudo_Zero,
+        number_Pseudo_Four,
         Number_Discontinuous(Number_Discontinuous_Five,
                              Number_Discontinuous_Zero, Number_Discontinuous__UNKNOWN),
         Number_Empty(Number_Empty__UNKNOWN), Int(Int, unInt), byte_value,
         i16_value, i32_value, i64_value, float_value, double_value,
-        bool_value, string_value, binary_value, newtype_value, list_value,
-        set_value, map_value, hash_map_value, struct_value,
-        explicit_struct_value, explicit_nested_struct_value)
+        bool_value, string_value, binary_value, newtype_value,
+        scoped_enum_value, enum_value, scoped_pseudoenum_value,
+        pseudoenum_value, list_value, set_value, map_value, hash_map_value,
+        struct_value, explicit_struct_value, explicit_nested_struct_value)
        where
 import qualified Control.DeepSeq as DeepSeq
 import qualified Control.Exception as Exception
@@ -315,6 +318,22 @@ instance Thrift.ThriftEnum Number_Strict where
         ("toThriftEnumEither: not a valid identifier for enum Number_Strict: "
            ++ Prelude.show val)
 
+newtype Number_Pseudo = Number_Pseudo{unNumber_Pseudo :: Int.Int32}
+                        deriving (Prelude.Eq, Prelude.Show, DeepSeq.NFData, Prelude.Ord)
+
+instance Hashable.Hashable Number_Pseudo where
+  hashWithSalt __salt (Number_Pseudo __val)
+    = Hashable.hashWithSalt __salt __val
+
+instance Aeson.ToJSON Number_Pseudo where
+  toJSON (Number_Pseudo __val) = Aeson.toJSON __val
+
+number_Pseudo_Zero :: Number_Pseudo
+number_Pseudo_Zero = Number_Pseudo 0
+
+number_Pseudo_Four :: Number_Pseudo
+number_Pseudo_Four = Number_Pseudo 4
+
 data Number_Discontinuous = Number_Discontinuous_Zero
                           | Number_Discontinuous_Five
                           | Number_Discontinuous__UNKNOWN Prelude.Int
@@ -419,6 +438,18 @@ binary_value = "yyy"
 
 newtype_value :: Int
 newtype_value = Int 10
+
+scoped_enum_value :: Number
+scoped_enum_value = Number_Zero
+
+enum_value :: Number
+enum_value = Number_One
+
+scoped_pseudoenum_value :: Number_Pseudo
+scoped_pseudoenum_value = number_Pseudo_Zero
+
+pseudoenum_value :: Number_Pseudo
+pseudoenum_value = number_Pseudo_Four
 
 list_value :: [Int.Int64]
 list_value = [0, i64_value]

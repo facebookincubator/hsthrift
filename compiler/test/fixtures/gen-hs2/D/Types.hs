@@ -32,8 +32,17 @@ module D.Types
         HsEnumPseudoenumAnn(HsEnumPseudoenumAnn, unHsEnumPseudoenumAnn),
         hsEnumPseudoenumAnn_ONE, hsEnumPseudoenumAnn_TWO,
         hsEnumPseudoenumAnn_THREE,
+        HsEnumDuplicatedPseudoenumAnn(HsEnumDuplicatedPseudoenumAnn,
+                                      unHsEnumDuplicatedPseudoenumAnn),
+        hsEnumDuplicatedPseudoenumAnn_ONE,
+        hsEnumDuplicatedPseudoenumAnn_TWO,
+        hsEnumDuplicatedPseudoenumAnn_THREE,
         HsEnumEmptyPseudoenumAnn(HsEnumEmptyPseudoenumAnn,
-                                 unHsEnumEmptyPseudoenumAnn))
+                                 unHsEnumEmptyPseudoenumAnn),
+        HsStructOfComplexTypes(HsStructOfComplexTypes,
+                               hsStructOfComplexTypes_a_struct, hsStructOfComplexTypes_a_union,
+                               hsStructOfComplexTypes_an_enum,
+                               hsStructOfComplexTypes_a_pseudoenum))
        where
 import qualified Control.DeepSeq as DeepSeq
 import qualified Control.Exception as Exception
@@ -803,6 +812,29 @@ hsEnumPseudoenumAnn_TWO = HsEnumPseudoenumAnn 2
 hsEnumPseudoenumAnn_THREE :: HsEnumPseudoenumAnn
 hsEnumPseudoenumAnn_THREE = HsEnumPseudoenumAnn 3
 
+newtype HsEnumDuplicatedPseudoenumAnn = HsEnumDuplicatedPseudoenumAnn{unHsEnumDuplicatedPseudoenumAnn
+                                                                      :: Int.Int32}
+                                        deriving (Prelude.Eq, Prelude.Show, DeepSeq.NFData,
+                                                  Prelude.Ord)
+
+instance Hashable.Hashable HsEnumDuplicatedPseudoenumAnn where
+  hashWithSalt __salt (HsEnumDuplicatedPseudoenumAnn __val)
+    = Hashable.hashWithSalt __salt __val
+
+instance Aeson.ToJSON HsEnumDuplicatedPseudoenumAnn where
+  toJSON (HsEnumDuplicatedPseudoenumAnn __val) = Aeson.toJSON __val
+
+hsEnumDuplicatedPseudoenumAnn_ONE :: HsEnumDuplicatedPseudoenumAnn
+hsEnumDuplicatedPseudoenumAnn_ONE = HsEnumDuplicatedPseudoenumAnn 1
+
+hsEnumDuplicatedPseudoenumAnn_TWO :: HsEnumDuplicatedPseudoenumAnn
+hsEnumDuplicatedPseudoenumAnn_TWO = HsEnumDuplicatedPseudoenumAnn 2
+
+hsEnumDuplicatedPseudoenumAnn_THREE ::
+                                    HsEnumDuplicatedPseudoenumAnn
+hsEnumDuplicatedPseudoenumAnn_THREE
+  = HsEnumDuplicatedPseudoenumAnn 3
+
 newtype HsEnumEmptyPseudoenumAnn = HsEnumEmptyPseudoenumAnn{unHsEnumEmptyPseudoenumAnn
                                                             :: Int.Int32}
                                    deriving (Prelude.Eq, Prelude.Show, DeepSeq.NFData, Prelude.Ord)
@@ -813,3 +845,143 @@ instance Hashable.Hashable HsEnumEmptyPseudoenumAnn where
 
 instance Aeson.ToJSON HsEnumEmptyPseudoenumAnn where
   toJSON (HsEnumEmptyPseudoenumAnn __val) = Aeson.toJSON __val
+
+data HsStructOfComplexTypes = HsStructOfComplexTypes{hsStructOfComplexTypes_a_struct
+                                                     :: HsStruct,
+                                                     hsStructOfComplexTypes_a_union :: HsUnion,
+                                                     hsStructOfComplexTypes_an_enum :: HsEnum,
+                                                     hsStructOfComplexTypes_a_pseudoenum ::
+                                                     HsEnumPseudoenumAnn}
+                              deriving (Prelude.Eq, Prelude.Show, Prelude.Ord)
+
+instance Aeson.ToJSON HsStructOfComplexTypes where
+  toJSON
+    (HsStructOfComplexTypes __field__a_struct __field__a_union
+       __field__an_enum __field__a_pseudoenum)
+    = Aeson.object
+        ("a_struct" .= __field__a_struct :
+           "a_union" .= __field__a_union :
+             "an_enum" .= __field__an_enum :
+               "a_pseudoenum" .= unHsEnumPseudoenumAnn __field__a_pseudoenum :
+                 Prelude.mempty)
+
+instance Thrift.ThriftStruct HsStructOfComplexTypes where
+  buildStruct _proxy
+    (HsStructOfComplexTypes __field__a_struct __field__a_union
+       __field__an_enum __field__a_pseudoenum)
+    = Thrift.genStruct _proxy
+        (Thrift.genField _proxy "a_struct" (Thrift.getStructType _proxy) 1
+           0
+           (Thrift.buildStruct _proxy __field__a_struct)
+           :
+           Thrift.genField _proxy "a_union" (Thrift.getStructType _proxy) 2 1
+             (Thrift.buildStruct _proxy __field__a_union)
+             :
+             Thrift.genField _proxy "an_enum" (Thrift.getI32Type _proxy) 3 2
+               ((Thrift.genI32 _proxy . Prelude.fromIntegral .
+                   Thrift.fromThriftEnum)
+                  __field__an_enum)
+               :
+               Thrift.genField _proxy "a_pseudoenum" (Thrift.getI32Type _proxy) 4
+                 3
+                 ((Thrift.genI32 _proxy . unHsEnumPseudoenumAnn)
+                    __field__a_pseudoenum)
+                 : [])
+  parseStruct _proxy
+    = ST.runSTT
+        (do Prelude.return ()
+            __field__a_struct <- ST.newSTRef Default.def
+            __field__a_union <- ST.newSTRef Default.def
+            __field__an_enum <- ST.newSTRef Default.def
+            __field__a_pseudoenum <- ST.newSTRef
+                                       (HsEnumPseudoenumAnn Default.def)
+            let
+              _parse _lastId
+                = do _fieldBegin <- Trans.lift
+                                      (Thrift.parseFieldBegin _proxy _lastId _idMap)
+                     case _fieldBegin of
+                       Thrift.FieldBegin _type _id _bool -> do case _id of
+                                                                 1 | _type ==
+                                                                       Thrift.getStructType _proxy
+                                                                     ->
+                                                                     do !_val <- Trans.lift
+                                                                                   (Thrift.parseStruct
+                                                                                      _proxy)
+                                                                        ST.writeSTRef
+                                                                          __field__a_struct
+                                                                          _val
+                                                                 2 | _type ==
+                                                                       Thrift.getStructType _proxy
+                                                                     ->
+                                                                     do !_val <- Trans.lift
+                                                                                   (Thrift.parseStruct
+                                                                                      _proxy)
+                                                                        ST.writeSTRef
+                                                                          __field__a_union
+                                                                          _val
+                                                                 3 | _type ==
+                                                                       Thrift.getI32Type _proxy
+                                                                     ->
+                                                                     do !_val <- Trans.lift
+                                                                                   (Thrift.parseEnum
+                                                                                      _proxy
+                                                                                      "HsEnum")
+                                                                        ST.writeSTRef
+                                                                          __field__an_enum
+                                                                          _val
+                                                                 4 | _type ==
+                                                                       Thrift.getI32Type _proxy
+                                                                     ->
+                                                                     do !_val <- Trans.lift
+                                                                                   (Prelude.fmap
+                                                                                      HsEnumPseudoenumAnn
+                                                                                      (Thrift.parseI32
+                                                                                         _proxy))
+                                                                        ST.writeSTRef
+                                                                          __field__a_pseudoenum
+                                                                          _val
+                                                                 _ -> Trans.lift
+                                                                        (Thrift.parseSkip _proxy
+                                                                           _type
+                                                                           (Prelude.Just _bool))
+                                                               _parse _id
+                       Thrift.FieldEnd -> do !__val__a_struct <- ST.readSTRef
+                                                                   __field__a_struct
+                                             !__val__a_union <- ST.readSTRef __field__a_union
+                                             !__val__an_enum <- ST.readSTRef __field__an_enum
+                                             !__val__a_pseudoenum <- ST.readSTRef
+                                                                       __field__a_pseudoenum
+                                             Prelude.pure
+                                               (HsStructOfComplexTypes __val__a_struct
+                                                  __val__a_union
+                                                  __val__an_enum
+                                                  __val__a_pseudoenum)
+              _idMap
+                = HashMap.fromList
+                    [("a_struct", 1), ("a_union", 2), ("an_enum", 3),
+                     ("a_pseudoenum", 4)]
+            _parse 0)
+
+instance DeepSeq.NFData HsStructOfComplexTypes where
+  rnf
+    (HsStructOfComplexTypes __field__a_struct __field__a_union
+       __field__an_enum __field__a_pseudoenum)
+    = DeepSeq.rnf __field__a_struct `Prelude.seq`
+        DeepSeq.rnf __field__a_union `Prelude.seq`
+          DeepSeq.rnf __field__an_enum `Prelude.seq`
+            DeepSeq.rnf __field__a_pseudoenum `Prelude.seq` ()
+
+instance Default.Default HsStructOfComplexTypes where
+  def
+    = HsStructOfComplexTypes Default.def Default.def Default.def
+        (HsEnumPseudoenumAnn Default.def)
+
+instance Hashable.Hashable HsStructOfComplexTypes where
+  hashWithSalt __salt
+    (HsStructOfComplexTypes _a_struct _a_union _an_enum _a_pseudoenum)
+    = Hashable.hashWithSalt
+        (Hashable.hashWithSalt
+           (Hashable.hashWithSalt (Hashable.hashWithSalt __salt _a_struct)
+              _a_union)
+           _an_enum)
+        _a_pseudoenum

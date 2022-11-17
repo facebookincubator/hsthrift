@@ -66,6 +66,24 @@
             "name": "HsEnumPseudoenumAnn"
         },
         {
+            "constants": [
+                {
+                    "name": "hsEnumDuplicatedPseudoenumAnn_ONE",
+                    "value": 1
+                },
+                {
+                    "name": "hsEnumDuplicatedPseudoenumAnn_TWO",
+                    "value": 2
+                },
+                {
+                    "name": "hsEnumDuplicatedPseudoenumAnn_THREE",
+                    "value": 3
+                }
+            ],
+            "is_psuedo": true,
+            "name": "HsEnumDuplicatedPseudoenumAnn"
+        },
+        {
             "constants": [],
             "is_psuedo": true,
             "name": "HsEnumEmptyPseudoenumAnn"
@@ -201,6 +219,59 @@
                 }
             ],
             "name": "HsPrefixAnn",
+            "struct_type": "STRUCT"
+        },
+        {
+            "fields": [
+                {
+                    "id": 1,
+                    "name": "hsStructOfComplexTypes_a_struct",
+                    "requiredness": "default",
+                    "type": {
+                        "name": {
+                            "name": "HsStruct"
+                        },
+                        "type": "struct"
+                    }
+                },
+                {
+                    "id": 2,
+                    "name": "hsStructOfComplexTypes_a_union",
+                    "requiredness": "default",
+                    "type": {
+                        "name": {
+                            "name": "HsUnion"
+                        },
+                        "type": "union"
+                    }
+                },
+                {
+                    "id": 3,
+                    "name": "hsStructOfComplexTypes_an_enum",
+                    "requiredness": "default",
+                    "type": {
+                        "name": {
+                            "name": "HsEnum"
+                        },
+                        "type": "enum"
+                    }
+                },
+                {
+                    "id": 4,
+                    "name": "hsStructOfComplexTypes_a_pseudoenum",
+                    "requiredness": "default",
+                    "type": {
+                        "inner_type": {
+                            "type": "i32"
+                        },
+                        "name": {
+                            "name": "HsEnumPseudoenumAnn"
+                        },
+                        "type": "newtype"
+                    }
+                }
+            ],
+            "name": "HsStructOfComplexTypes",
             "struct_type": "STRUCT"
         }
     ],

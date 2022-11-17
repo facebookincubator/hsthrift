@@ -908,21 +908,12 @@ mkConstMap (thriftName, opts@Options{..}) imap tmap = foldM insertC emptyContext
 
     -- All the enum constants have the type of the enum
     insertC m (D_Enum enum@Enum{..})
-      | isPseudo opts enum = foldM insPE m enumConstants
       | enumAltsAreUnique opts = foldM insE m enumConstants
       | otherwise = pure m
       where
         insE acc EnumValue{..} = addToScope loc renamed acc
           where
             renamed = renameEnumAlt opts enum evName
-            loc = lLocation $ evlName evLoc
-        insPE acc EnumValue{..} =
-          insertContext loc evName renamed (getEnumType opts enum, name, loc)
-            =<< addToCtxMap loc sname (getEnumType opts enum, name, loc) acc
-          where
-            name = mkName evName renamed
-            renamed = renameEnumAlt opts enum evName
-            sname = enumName <> "." <> evName
             loc = lLocation $ evlName evLoc
     insertC m (D_Const Const{..}) = do
       ty <- runTypechecker env $ resolveAnnotatedType constType
@@ -1059,12 +1050,13 @@ typecheckConst (TTypedef _ ty _loc) val = typecheckConst ty val
 
 -- Newtypes
 -- This case is a bit complicated
-typecheckConst newt@(TNewtype _ ty _loc) val@(UntypedConst Located{..} c) =
+typecheckConst newt@(TNewtype name ty _loc) val@(UntypedConst Located{..} c) =
    case c of
      -- If it's an identifier, then it needs to be an exact type match,
      -- however IdConsts can also be enums, so we have to check for this case
      -- too
      IdConst ident ->
+       typecheckPseudoEnum newt lLocation name ident `orT`
        typecheckIdent newt lLocation ident `orT`
        (liftNew =<< typecheckConst ty val)
      _ -> liftNew =<< typecheckConst ty val
@@ -1192,6 +1184,24 @@ typecheckEnum loc Name{..} ident = do
       pfx = enumLocal <> "."
     (targetName, targetLoc) <- Map.lookup identUnscoped nameMap
     return $ Literal $ EnumVal targetName targetLoc
+
+typecheckPseudoEnum
+  :: (Typecheckable l)
+  => Type l t
+  -> Loc
+  -> Name
+  -> Text
+  -> TC l (TypedConst l t)
+typecheckPseudoEnum ty loc n@Name{..} ident = do
+  result <- typecheckEnum loc n ident
+  case result of
+    Just (Literal (EnumVal renamed locDefined)) -> do
+      thistrueTy <- lookupType sourceName loc
+      case thistrueTy of
+        This trueTy -> case trueTy `eqOrAlias` ty of
+          Just Refl -> pure $ Identifier renamed ty locDefined
+          Nothing -> emptyT
+    _ -> emptyT
 
 -- | Handle weird case of enum to int casting, dispatch when 'ty' is int like.
 --
@@ -1435,11 +1445,6 @@ addToScope :: Loc -> Text -> Context a -> Either [TypeError l] (Context a)
 addToScope loc x ctx@Context{..}
   | Set.member x cScope = Left [TypeError loc $ DuplicateName x]
   | otherwise = Right ctx { cScope = Set.insert x cScope }
-
-addToCtxMap :: Loc -> Text -> a -> Context a -> Either [TypeError l] (Context a)
-addToCtxMap loc k v ctx@Context{..}
-  | Map.member k cMap = Left [TypeError loc $ DuplicateName k]
-  | otherwise = Right ctx { cMap = Map.insert k v cMap }
 
 -- Resolve Named Types ---------------------------------------------------------
 

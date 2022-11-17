@@ -36,7 +36,7 @@
                 },
                 {
                     "aLoc": "Loc {locFile = \"test/if/a.thrift\", locStartLine = 30, locStartCol = 13, locEndLine = 30, locEndCol = 24}",
-                    "rLoc": "Loc {locFile = \"test/if/b.thrift\", locStartLine = 40, locStartCol = 11, locEndLine = 40, locEndCol = 20}"
+                    "rLoc": "Loc {locFile = \"test/if/b.thrift\", locStartLine = 45, locStartCol = 11, locEndLine = 45, locEndCol = 20}"
                 }
             ]
         },
