@@ -1,0 +1,275 @@
+{
+    "consts": [],
+    "enums": [
+        {
+            "constants": [
+                {
+                    "name": "HsEnum_ONE",
+                    "value": 1
+                },
+                {
+                    "name": "HsEnum_TWO",
+                    "value": 2
+                },
+                {
+                    "name": "HsEnum_THREE",
+                    "value": 3
+                }
+            ],
+            "is_psuedo": false,
+            "name": "HsEnum"
+        },
+        {
+            "constants": [],
+            "is_psuedo": false,
+            "name": "HsEnumEmpty"
+        },
+        {
+            "constants": [
+                {
+                    "name": "HsEnumNoUnknownAnn_ONE",
+                    "value": 1
+                },
+                {
+                    "name": "HsEnumNoUnknownAnn_TWO",
+                    "value": 2
+                },
+                {
+                    "name": "HsEnumNoUnknownAnn_THREE",
+                    "value": 3
+                }
+            ],
+            "is_psuedo": false,
+            "name": "HsEnumNoUnknownAnn"
+        },
+        {
+            "constants": [],
+            "is_psuedo": false,
+            "name": "HsEnumEmptyNoUnknownAnn"
+        },
+        {
+            "constants": [
+                {
+                    "name": "hsEnumPseudoenumAnn_ONE",
+                    "value": 1
+                },
+                {
+                    "name": "hsEnumPseudoenumAnn_TWO",
+                    "value": 2
+                },
+                {
+                    "name": "hsEnumPseudoenumAnn_THREE",
+                    "value": 3
+                }
+            ],
+            "is_psuedo": true,
+            "name": "HsEnumPseudoenumAnn"
+        },
+        {
+            "constants": [],
+            "is_psuedo": true,
+            "name": "HsEnumEmptyPseudoenumAnn"
+        }
+    ],
+    "includes": [],
+    "name": "D",
+    "options": {
+        "genfiles": null,
+        "include_path": ".",
+        "out_path": "test/fixtures/gen-basic",
+        "path": "test/if/d.thrift",
+        "recursive": true
+    },
+    "path": "test/if/d.thrift",
+    "services": [],
+    "structs": [
+        {
+            "fields": [
+                {
+                    "id": 1,
+                    "name": "hsStruct_strictann",
+                    "requiredness": "default",
+                    "type": {
+                        "type": "i32"
+                    }
+                },
+                {
+                    "id": 2,
+                    "name": "hsStruct_lazyann",
+                    "requiredness": "default",
+                    "type": {
+                        "type": "i32"
+                    }
+                },
+                {
+                    "id": 3,
+                    "name": "hsStruct_inherit",
+                    "requiredness": "default",
+                    "type": {
+                        "type": "i32"
+                    }
+                }
+            ],
+            "name": "HsStruct",
+            "struct_type": "STRUCT"
+        },
+        {
+            "fields": [
+                {
+                    "id": 1,
+                    "name": "hsStrictAnn_strictann",
+                    "requiredness": "default",
+                    "type": {
+                        "type": "i32"
+                    }
+                },
+                {
+                    "id": 2,
+                    "name": "hsStrictAnn_lazyann",
+                    "requiredness": "default",
+                    "type": {
+                        "type": "i32"
+                    }
+                },
+                {
+                    "id": 3,
+                    "name": "hsStrictAnn_inherit",
+                    "requiredness": "default",
+                    "type": {
+                        "type": "i32"
+                    }
+                }
+            ],
+            "name": "HsStrictAnn",
+            "struct_type": "STRUCT"
+        },
+        {
+            "fields": [
+                {
+                    "id": 1,
+                    "name": "hsLazyAnn_strictann",
+                    "requiredness": "default",
+                    "type": {
+                        "type": "i32"
+                    }
+                },
+                {
+                    "id": 2,
+                    "name": "hsLazyAnn_lazyann",
+                    "requiredness": "default",
+                    "type": {
+                        "type": "i32"
+                    }
+                },
+                {
+                    "id": 3,
+                    "name": "hsLazyAnn_inherit",
+                    "requiredness": "default",
+                    "type": {
+                        "type": "i32"
+                    }
+                }
+            ],
+            "name": "HsLazyAnn",
+            "struct_type": "STRUCT"
+        },
+        {
+            "fields": [
+                {
+                    "id": 1,
+                    "name": "structprefixstrictann",
+                    "requiredness": "default",
+                    "type": {
+                        "type": "i32"
+                    }
+                },
+                {
+                    "id": 2,
+                    "name": "structprefixlazyann",
+                    "requiredness": "default",
+                    "type": {
+                        "type": "i32"
+                    }
+                },
+                {
+                    "id": 3,
+                    "name": "structprefixinherit",
+                    "requiredness": "default",
+                    "type": {
+                        "type": "i32"
+                    }
+                }
+            ],
+            "name": "HsPrefixAnn",
+            "struct_type": "STRUCT"
+        }
+    ],
+    "typedefs": [
+        {
+            "name": "Hstypedef",
+            "newtype": false,
+            "type": {
+                "key_type": {
+                    "type": "string"
+                },
+                "type": "map",
+                "val_type": {
+                    "type": "string"
+                }
+            }
+        },
+        {
+            "name": "Hsnewtypeann",
+            "newtype": true,
+            "type": {
+                "key_type": {
+                    "type": "string"
+                },
+                "type": "map",
+                "val_type": {
+                    "type": "string"
+                }
+            }
+        }
+    ],
+    "unions": [
+        {
+            "fields": [
+                {
+                    "id": 1,
+                    "name": "HsUnion_left",
+                    "type": {
+                        "type": "i32"
+                    }
+                },
+                {
+                    "id": 2,
+                    "name": "HsUnion_right",
+                    "type": {
+                        "type": "i32"
+                    }
+                }
+            ],
+            "name": "HsUnion"
+        },
+        {
+            "fields": [
+                {
+                    "id": 1,
+                    "name": "HsUnionNonEmptyAnn_left",
+                    "type": {
+                        "type": "i32"
+                    }
+                },
+                {
+                    "id": 2,
+                    "name": "HsUnionNonEmptyAnn_right",
+                    "type": {
+                        "type": "i32"
+                    }
+                }
+            ],
+            "name": "HsUnionNonEmptyAnn"
+        }
+    ]
+}

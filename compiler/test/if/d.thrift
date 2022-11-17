@@ -38,13 +38,19 @@ enum HsEnum {
   TWO = 2,
   THREE = 3,
 }
-enum HsStructNoUnknownAnn {
+enum HsEnumEmpty {
+}
+enum HsEnumNoUnknownAnn {
   ONE = 1,
   TWO = 2,
   THREE = 3,
 } (hs.nounknown)
-enum HsStructPseudoenumAnn {
+enum HsEnumEmptyNoUnknownAnn {
+} (hs.nounknown)
+enum HsEnumPseudoenumAnn {
   ONE = 1,
   TWO = 2,
   THREE = 3,
+} (hs.pseudoenum)
+enum HsEnumEmptyPseudoenumAnn {
 } (hs.pseudoenum)

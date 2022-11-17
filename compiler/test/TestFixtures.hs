@@ -5,7 +5,6 @@ module TestFixtures (main) where
 
 import Control.Monad (unless, when)
 import Data.Aeson.Encode.Pretty
-import Data.Char
 import Data.List
 import Data.List.Extra
 import qualified Data.Text.Lazy as Text
@@ -14,7 +13,6 @@ import Data.Typeable
 import System.FilePath
 import Test.HUnit
 import TestRunner
-import Text.Printf
 
 import Util
 
@@ -67,22 +65,11 @@ genFixtures (TheseOptions opts@Options{..}) = do
 
 checkFixture :: ThriftModule -> Test
 checkFixture ThriftModule{..} = TestLabel mname $ TestCase $ do
-  let parseResult = parseFileContentsWithExts exts tmContents
-  when (canParse tmPath) $
-    assertBool
-      (printf "Test fixture for file '%s' parses" tmPath)
-      (isOk parseResult)
-
+  when (canParse tmPath) $ assertParseOk tmPath tmContents exts
   fixture <- readFile tmPath
-  assertEqualPgm tmPath fixture tmContents
+  assertFileEqual tmPath fixture tmContents
   where
-    mname = intercalate "/" $ dropLower $ wordsBy (== '/') tmPath
-    dropLower [] = []
-    dropLower [x] = [x] -- Don't drop the last thing
-    dropLower (x : xs) | lowerName x = dropLower xs
-                       | otherwise   = x : dropLower xs
-    lowerName [] = True -- We want to drop emptys
-    lowerName (c : _) = isLower c
+    mname = tail $ snd $ breakOnEnd fixturesPath tmPath
     canParse filename
       | isSuffixOf ".ast" filename = False
       | isSuffixOf "Service.hs" filename = False
@@ -90,12 +77,21 @@ checkFixture ThriftModule{..} = TestLabel mname $ TestCase $ do
       -- https://github.com/haskell-suite/haskell-src-exts/issues/310
       -- (I think)
       | otherwise = True
-    isOk (ParseOk _) = True
-    isOk (ParseFailed _ _) = False
     exts = map EnableExtension [ConstraintKinds]
 
-assertEqualPgm :: String -> String -> String -> IO ()
-assertEqualPgm path expected obtained =
+assertParseOk :: FilePath -> String -> [Extension] -> IO ()
+assertParseOk path contents exts =
+  case parseFileContentsWithExts exts contents of
+    ParseOk _ -> return ()
+    ParseFailed loc str -> do
+      putStrLn path
+      putStrLn "Contents:"
+      putStrLn contents
+      assertFailure $ "Parse failed at [" ++ path ++ "] (" ++
+        show (srcLine loc) ++ ":" ++ show (srcColumn loc) ++ "): " ++ str
+
+assertFileEqual :: FilePath -> String -> String -> IO ()
+assertFileEqual path expected obtained =
   unless (normalize expected == normalize obtained) $ do
     putStrLn path
     putStrLn "Expected:"
@@ -103,7 +99,7 @@ assertEqualPgm path expected obtained =
     putStrLn "-------------------------------------------------------------------"
     putStrLn "But got:"
     putStrLn obtained
-    error "expectation failure"
+    assertFailure "expectation failure"
   where
     -- In dependent-sum > 0.6 the This constructor was renamed to Some
     normalize

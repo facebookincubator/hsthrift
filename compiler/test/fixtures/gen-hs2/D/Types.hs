@@ -25,12 +25,15 @@ module D.Types
         HsUnionNonEmptyAnn(HsUnionNonEmptyAnn_left,
                            HsUnionNonEmptyAnn_right),
         HsEnum(HsEnum_ONE, HsEnum_TWO, HsEnum_THREE, HsEnum__UNKNOWN),
-        HsStructNoUnknownAnn(HsStructNoUnknownAnn_ONE,
-                             HsStructNoUnknownAnn_TWO, HsStructNoUnknownAnn_THREE),
-        HsStructPseudoenumAnn(HsStructPseudoenumAnn,
-                              unHsStructPseudoenumAnn),
-        hsStructPseudoenumAnn_ONE, hsStructPseudoenumAnn_TWO,
-        hsStructPseudoenumAnn_THREE)
+        HsEnumEmpty(HsEnumEmpty__UNKNOWN),
+        HsEnumNoUnknownAnn(HsEnumNoUnknownAnn_ONE, HsEnumNoUnknownAnn_TWO,
+                           HsEnumNoUnknownAnn_THREE),
+        HsEnumEmptyNoUnknownAnn(),
+        HsEnumPseudoenumAnn(HsEnumPseudoenumAnn, unHsEnumPseudoenumAnn),
+        hsEnumPseudoenumAnn_ONE, hsEnumPseudoenumAnn_TWO,
+        hsEnumPseudoenumAnn_THREE,
+        HsEnumEmptyPseudoenumAnn(HsEnumEmptyPseudoenumAnn,
+                                 unHsEnumEmptyPseudoenumAnn))
        where
 import qualified Control.DeepSeq as DeepSeq
 import qualified Control.Exception as Exception
@@ -644,71 +647,206 @@ instance Thrift.ThriftEnum HsEnum where
 instance Prelude.Ord HsEnum where
   compare = Function.on Prelude.compare Thrift.fromThriftEnum
 
-data HsStructNoUnknownAnn = HsStructNoUnknownAnn_ONE
-                          | HsStructNoUnknownAnn_TWO
-                          | HsStructNoUnknownAnn_THREE
-                            deriving (Prelude.Eq, Prelude.Show)
+data HsEnumEmpty = HsEnumEmpty__UNKNOWN Prelude.Int
 
-instance Aeson.ToJSON HsStructNoUnknownAnn where
+instance Prelude.Eq HsEnumEmpty where
+  (==)
+    = Exception.throw
+        (Thrift.ProtocolException
+           "(==): Thrift enum 'HsEnumEmpty' is uninhabited")
+
+instance Prelude.Show HsEnumEmpty where
+  show
+    = Exception.throw
+        (Thrift.ProtocolException
+           "show: Thrift enum 'HsEnumEmpty' is uninhabited")
+
+instance Prelude.Ord HsEnumEmpty where
+  compare
+    = Exception.throw
+        (Thrift.ProtocolException
+           "compare: Thrift enum 'HsEnumEmpty' is uninhabited")
+
+instance Aeson.ToJSON HsEnumEmpty where
+  toJSON
+    = Exception.throw
+        (Thrift.ProtocolException
+           "toJSON: Thrift enum 'HsEnumEmpty' is uninhabited")
+
+instance Default.Default HsEnumEmpty where
+  def
+    = Exception.throw
+        (Thrift.ProtocolException
+           "def: Thrift enum 'HsEnumEmpty' is uninhabited")
+
+instance Hashable.Hashable HsEnumEmpty where
+  hashWithSalt
+    = Exception.throw
+        (Thrift.ProtocolException
+           "hashWithSalt: Thrift enum 'HsEnumEmpty' is uninhabited")
+
+instance DeepSeq.NFData HsEnumEmpty where
+  rnf
+    = Exception.throw
+        (Thrift.ProtocolException
+           "rnf: Thrift enum 'HsEnumEmpty' is uninhabited")
+
+instance Thrift.ThriftEnum HsEnumEmpty where
+  toThriftEnum
+    = Exception.throw
+        (Thrift.ProtocolException
+           "toThriftEnum: Thrift enum 'HsEnumEmpty' is uninhabited")
+  fromThriftEnum
+    = Exception.throw
+        (Thrift.ProtocolException
+           "fromThriftEnum: Thrift enum 'HsEnumEmpty' is uninhabited")
+  allThriftEnumValues
+    = Exception.throw
+        (Thrift.ProtocolException
+           "allThriftEnumValues: Thrift enum 'HsEnumEmpty' is uninhabited")
+  toThriftEnumEither
+    = Exception.throw
+        (Thrift.ProtocolException
+           "toThriftEnumEither: Thrift enum 'HsEnumEmpty' is uninhabited")
+
+data HsEnumNoUnknownAnn = HsEnumNoUnknownAnn_ONE
+                        | HsEnumNoUnknownAnn_TWO
+                        | HsEnumNoUnknownAnn_THREE
+                          deriving (Prelude.Eq, Prelude.Show)
+
+instance Aeson.ToJSON HsEnumNoUnknownAnn where
   toJSON = Aeson.toJSON . Thrift.fromThriftEnum
 
-instance DeepSeq.NFData HsStructNoUnknownAnn where
-  rnf __HsStructNoUnknownAnn = Prelude.seq __HsStructNoUnknownAnn ()
+instance DeepSeq.NFData HsEnumNoUnknownAnn where
+  rnf __HsEnumNoUnknownAnn = Prelude.seq __HsEnumNoUnknownAnn ()
 
-instance Default.Default HsStructNoUnknownAnn where
-  def = HsStructNoUnknownAnn_ONE
+instance Default.Default HsEnumNoUnknownAnn where
+  def = HsEnumNoUnknownAnn_ONE
 
-instance Hashable.Hashable HsStructNoUnknownAnn where
+instance Hashable.Hashable HsEnumNoUnknownAnn where
   hashWithSalt _salt _val
     = Hashable.hashWithSalt _salt (Thrift.fromThriftEnum _val)
 
-instance Thrift.ThriftEnum HsStructNoUnknownAnn where
-  toThriftEnum 1 = HsStructNoUnknownAnn_ONE
-  toThriftEnum 2 = HsStructNoUnknownAnn_TWO
-  toThriftEnum 3 = HsStructNoUnknownAnn_THREE
+instance Thrift.ThriftEnum HsEnumNoUnknownAnn where
+  toThriftEnum 1 = HsEnumNoUnknownAnn_ONE
+  toThriftEnum 2 = HsEnumNoUnknownAnn_TWO
+  toThriftEnum 3 = HsEnumNoUnknownAnn_THREE
   toThriftEnum _val
     = Exception.throw
         (Thrift.ProtocolException
-           ("toThriftEnum: not a valid identifier for enum HsStructNoUnknownAnn: "
+           ("toThriftEnum: not a valid identifier for enum HsEnumNoUnknownAnn: "
               ++ Prelude.show _val))
-  fromThriftEnum HsStructNoUnknownAnn_ONE = 1
-  fromThriftEnum HsStructNoUnknownAnn_TWO = 2
-  fromThriftEnum HsStructNoUnknownAnn_THREE = 3
+  fromThriftEnum HsEnumNoUnknownAnn_ONE = 1
+  fromThriftEnum HsEnumNoUnknownAnn_TWO = 2
+  fromThriftEnum HsEnumNoUnknownAnn_THREE = 3
   fromThriftEnum _val
     = Exception.throw
         (Thrift.ProtocolException
-           ("fromThriftEnum: not a valid identifier for enum HsStructNoUnknownAnn: "
+           ("fromThriftEnum: not a valid identifier for enum HsEnumNoUnknownAnn: "
               ++ Prelude.show _val))
   allThriftEnumValues
-    = [HsStructNoUnknownAnn_ONE, HsStructNoUnknownAnn_TWO,
-       HsStructNoUnknownAnn_THREE]
-  toThriftEnumEither 1 = Prelude.Right HsStructNoUnknownAnn_ONE
-  toThriftEnumEither 2 = Prelude.Right HsStructNoUnknownAnn_TWO
-  toThriftEnumEither 3 = Prelude.Right HsStructNoUnknownAnn_THREE
+    = [HsEnumNoUnknownAnn_ONE, HsEnumNoUnknownAnn_TWO,
+       HsEnumNoUnknownAnn_THREE]
+  toThriftEnumEither 1 = Prelude.Right HsEnumNoUnknownAnn_ONE
+  toThriftEnumEither 2 = Prelude.Right HsEnumNoUnknownAnn_TWO
+  toThriftEnumEither 3 = Prelude.Right HsEnumNoUnknownAnn_THREE
   toThriftEnumEither val
     = Prelude.Left
-        ("toThriftEnumEither: not a valid identifier for enum HsStructNoUnknownAnn: "
+        ("toThriftEnumEither: not a valid identifier for enum HsEnumNoUnknownAnn: "
            ++ Prelude.show val)
 
-instance Prelude.Ord HsStructNoUnknownAnn where
+instance Prelude.Ord HsEnumNoUnknownAnn where
   compare = Function.on Prelude.compare Thrift.fromThriftEnum
 
-newtype HsStructPseudoenumAnn = HsStructPseudoenumAnn{unHsStructPseudoenumAnn
-                                                      :: Int.Int32}
-                                deriving (Prelude.Eq, Prelude.Show, DeepSeq.NFData, Prelude.Ord)
+data HsEnumEmptyNoUnknownAnn
 
-instance Hashable.Hashable HsStructPseudoenumAnn where
-  hashWithSalt __salt (HsStructPseudoenumAnn __val)
+instance Prelude.Eq HsEnumEmptyNoUnknownAnn where
+  (==)
+    = Exception.throw
+        (Thrift.ProtocolException
+           "(==): Thrift enum 'HsEnumEmptyNoUnknownAnn' is uninhabited")
+
+instance Prelude.Show HsEnumEmptyNoUnknownAnn where
+  show
+    = Exception.throw
+        (Thrift.ProtocolException
+           "show: Thrift enum 'HsEnumEmptyNoUnknownAnn' is uninhabited")
+
+instance Prelude.Ord HsEnumEmptyNoUnknownAnn where
+  compare
+    = Exception.throw
+        (Thrift.ProtocolException
+           "compare: Thrift enum 'HsEnumEmptyNoUnknownAnn' is uninhabited")
+
+instance Aeson.ToJSON HsEnumEmptyNoUnknownAnn where
+  toJSON
+    = Exception.throw
+        (Thrift.ProtocolException
+           "toJSON: Thrift enum 'HsEnumEmptyNoUnknownAnn' is uninhabited")
+
+instance Default.Default HsEnumEmptyNoUnknownAnn where
+  def
+    = Exception.throw
+        (Thrift.ProtocolException
+           "def: Thrift enum 'HsEnumEmptyNoUnknownAnn' is uninhabited")
+
+instance Hashable.Hashable HsEnumEmptyNoUnknownAnn where
+  hashWithSalt
+    = Exception.throw
+        (Thrift.ProtocolException
+           "hashWithSalt: Thrift enum 'HsEnumEmptyNoUnknownAnn' is uninhabited")
+
+instance DeepSeq.NFData HsEnumEmptyNoUnknownAnn where
+  rnf
+    = Exception.throw
+        (Thrift.ProtocolException
+           "rnf: Thrift enum 'HsEnumEmptyNoUnknownAnn' is uninhabited")
+
+instance Thrift.ThriftEnum HsEnumEmptyNoUnknownAnn where
+  toThriftEnum
+    = Exception.throw
+        (Thrift.ProtocolException
+           "toThriftEnum: Thrift enum 'HsEnumEmptyNoUnknownAnn' is uninhabited")
+  fromThriftEnum
+    = Exception.throw
+        (Thrift.ProtocolException
+           "fromThriftEnum: Thrift enum 'HsEnumEmptyNoUnknownAnn' is uninhabited")
+  allThriftEnumValues
+    = Exception.throw
+        (Thrift.ProtocolException
+           "allThriftEnumValues: Thrift enum 'HsEnumEmptyNoUnknownAnn' is uninhabited")
+  toThriftEnumEither
+    = Exception.throw
+        (Thrift.ProtocolException
+           "toThriftEnumEither: Thrift enum 'HsEnumEmptyNoUnknownAnn' is uninhabited")
+
+newtype HsEnumPseudoenumAnn = HsEnumPseudoenumAnn{unHsEnumPseudoenumAnn
+                                                  :: Int.Int32}
+                              deriving (Prelude.Eq, Prelude.Show, DeepSeq.NFData, Prelude.Ord)
+
+instance Hashable.Hashable HsEnumPseudoenumAnn where
+  hashWithSalt __salt (HsEnumPseudoenumAnn __val)
     = Hashable.hashWithSalt __salt __val
 
-instance Aeson.ToJSON HsStructPseudoenumAnn where
-  toJSON (HsStructPseudoenumAnn __val) = Aeson.toJSON __val
+instance Aeson.ToJSON HsEnumPseudoenumAnn where
+  toJSON (HsEnumPseudoenumAnn __val) = Aeson.toJSON __val
 
-hsStructPseudoenumAnn_ONE :: HsStructPseudoenumAnn
-hsStructPseudoenumAnn_ONE = HsStructPseudoenumAnn 1
+hsEnumPseudoenumAnn_ONE :: HsEnumPseudoenumAnn
+hsEnumPseudoenumAnn_ONE = HsEnumPseudoenumAnn 1
 
-hsStructPseudoenumAnn_TWO :: HsStructPseudoenumAnn
-hsStructPseudoenumAnn_TWO = HsStructPseudoenumAnn 2
+hsEnumPseudoenumAnn_TWO :: HsEnumPseudoenumAnn
+hsEnumPseudoenumAnn_TWO = HsEnumPseudoenumAnn 2
 
-hsStructPseudoenumAnn_THREE :: HsStructPseudoenumAnn
-hsStructPseudoenumAnn_THREE = HsStructPseudoenumAnn 3
+hsEnumPseudoenumAnn_THREE :: HsEnumPseudoenumAnn
+hsEnumPseudoenumAnn_THREE = HsEnumPseudoenumAnn 3
+
+newtype HsEnumEmptyPseudoenumAnn = HsEnumEmptyPseudoenumAnn{unHsEnumEmptyPseudoenumAnn
+                                                            :: Int.Int32}
+                                   deriving (Prelude.Eq, Prelude.Show, DeepSeq.NFData, Prelude.Ord)
+
+instance Hashable.Hashable HsEnumEmptyPseudoenumAnn where
+  hashWithSalt __salt (HsEnumEmptyPseudoenumAnn __val)
+    = Hashable.hashWithSalt __salt __val
+
+instance Aeson.ToJSON HsEnumEmptyPseudoenumAnn where
+  toJSON (HsEnumEmptyPseudoenumAnn __val) = Aeson.toJSON __val
