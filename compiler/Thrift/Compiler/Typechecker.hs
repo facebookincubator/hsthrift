@@ -930,7 +930,7 @@ mkConstMap (thriftName, opts@Options{..}) imap tmap = foldM insertC emptyContext
 
 getEnumType :: Typecheckable l => Options l -> Parsed Enum -> Some (Type l)
 getEnumType opts@Options{..} enum@Enum{..}
-  | isPseudo opts enum = This $ TNewtype name I32 loc
+  | isPseudo opts enum = This $ TNewtype name enumValueType loc
   | otherwise = This $ TEnum name loc (noUnknown enum)
   where
     name = mkName enumName $ renameEnum opts enum

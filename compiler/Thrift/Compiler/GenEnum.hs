@@ -44,8 +44,8 @@ genEnumDecl Enum{ enumIsPseudo=True,..} =
       { tdName = enumName
       , tdResolvedName = enumResolvedName
       , tdTag = IsNewtype
-      , tdType = AnnotatedType I32 Nothing (Arity0Loc nlc)
-      , tdResolvedType = I32
+      , tdType = AnnotatedType enumValueType Nothing (Arity0Loc nlc)
+      , tdResolvedType = enumValueType
       , tdLoc = TypedefLoc nlc nlc
       , tdAnns = Nothing
       , tdSAnns = []
@@ -55,7 +55,7 @@ genEnumDecl Enum{ enumIsPseudo=True,..} =
       , constResolvedName = evResolvedName
       , constType = AnnotatedType (TNamed enumName) Nothing (Arity0Loc nlc)
       , constResolvedType =
-        TNewtype (mkName enumName enumResolvedName) I32 noLoc
+        TNewtype (mkName enumName enumResolvedName) enumValueType noLoc
       , constVal =
         UntypedConst nlc $ IntConst (fromIntegral evValue) (showt evValue)
       , constResolvedVal = Literal $ New $ fromIntegral evValue

@@ -29,6 +29,7 @@ module Thrift.Compiler.Types
   , Requiredness(..), Laziness(..)
   , Union(..), UnionAlt(..), PossiblyEmpty(..), EmptyName
   , Enum(..), EnumValue(..), EnumValLoc(..)
+  , EnumValueType, enumValueType
   , Service(..), Super(..), Function(..), FunLoc(..)
   , funThrows, ThrowsLoc(..), Throws(..), FunctionType(..)
   , RpcIdempotency(..), RpcIdempotencyType(..)
@@ -269,12 +270,12 @@ type ImportMap l = Map.Map Text (Env l)
 
 -- We need to be able to look up the constants keyed by their numeric value
 -- or themselves
-type EnumValues = (Map.Map Int32 (Name, Loc), Map.Map Text (Name, Loc))
+type EnumValues = (Map.Map EnumValueType (Name, Loc), Map.Map Text (Name, Loc))
 
 -- | There are weird thrift file using enum constants as I32 and I64 defaults,
 -- (as unqualified names).  If there is a name collision with different value
 -- this holds Nothing to detect the ambiguity. Active when weird mode is on.
-type EnumInt = Map.Map Text (Maybe Int32)
+type EnumInt = Map.Map Text (Maybe EnumValueType)
 
 -- Thrift Typedef --------------------------------------------------------------
 
@@ -564,11 +565,16 @@ data Enum (s :: Status) (l :: * {- Language -}) a = Enum
 data EnumValue (s :: Status) (l :: * {- Language -}) a = EnumValue
   { evName         :: Text
   , evResolvedName :: IfResolved s Text
-  , evValue        :: Int32
+  , evValue        :: EnumValueType
   , evLoc          :: EnumValLoc a
   , evAnns         :: Maybe (Annotations a)
   , evSAnns        :: [StructuredAnnotation s l a]
   }
+
+type EnumValueType = Int32
+
+enumValueType :: TType s l a EnumValueType
+enumValueType = I32
 
 data EnumValLoc a = EnumValLoc
   { evlName      :: Located a
