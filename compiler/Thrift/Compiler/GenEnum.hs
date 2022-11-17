@@ -69,7 +69,7 @@ genEnumDecl Enum{..} =
     -- We generate them in sorted order so that we can derive Bounded correctly
     ((genConstr <$> sortOn evValue enumConstants) ++ [genUnknownConstr | not enumNoUnknown])
     -- Deriving
-    (if null enumConstants
+    (if enumNoUnknown && null enumConstants
      then mzero
      else
        pure $ deriving_ $ map (IRule () Nothing Nothing . IHCon ()) $
@@ -78,7 +78,7 @@ genEnumDecl Enum{..} =
        ] ++ [ qualSym "Prelude" "Ord" | canDeriveOrd ])
   ] ++
   -- Instances
-  if null enumConstants
+  if enumNoUnknown && null enumConstants
   then
     map (genEmptyInstance enumResolvedName)
     -- Using the symbol (==) in the AST is technically wrong, but it
@@ -90,10 +90,8 @@ genEnumDecl Enum{..} =
     , ("Default", "Default", [ "def" ])
     , ("Hashable", "Hashable", [ "hashWithSalt" ])
     , ("DeepSeq", "NFData", [ "rnf" ])
-    , ("Thrift", "ThriftEnum",
-        [ "toThriftEnum", "fromThriftEnum", "allThriftEnumValues", "toThriftEnumEither" ]
-      )
-    ]
+    ] ++
+    [genThriftEnumInst enumResolvedName enumConstants enumNoUnknown]
   else
     [ genToJSON enumResolvedName
     , genNFData enumResolvedName
@@ -198,7 +196,7 @@ genDefault name consts =
             [] ->
               qvar "Exception" "throw" `app`
               (qvar "Thrift" "ProtocolException" `app`
-               stringLit ("def: enum " <> name <> "has no constructors")))
+               stringLit ("def: enum " <> name <> " has no constructors")))
          Nothing
        ]
      ])
@@ -232,18 +230,19 @@ genEmptyInstance name (mname, className, methods) =
        (IHCon () $ qualSym mname className)
        (TyCon () $ unqualSym name))
     (Just $ map
-     (\method ->
-       InsDecl () $ FunBind ()
-       [ Match () (textToName method) []
-         (UnGuardedRhs () $
-          qvar "Exception" "throw" `app`
-          (qvar "Thrift" "ProtocolException" `app`
-           stringLit
-           (mconcat
-            [ method, ": Thrift enum '", name, "' is uninhabited"])))
-         Nothing
-       ])
+     (\method -> InsDecl () $ FunBind () [genEmptyMethod name method])
      methods)
+
+genEmptyMethod :: Text -> Text -> Match ()
+genEmptyMethod name method =
+  Match () (textToName method) []
+  (UnGuardedRhs () $
+   qvar "Exception" "throw" `app`
+   (qvar "Thrift" "ProtocolException" `app`
+    stringLit
+    (mconcat
+     [ method, ": Thrift enum '", name, "' is uninhabited"])))
+  Nothing
 
 -- Thrift Enum Instance --------------------------------------------------------
 
@@ -255,21 +254,23 @@ genThriftEnumInst ename consts enumNoUnknown =
        (IHCon () (qualSym "Thrift" "ThriftEnum"))
        (TyCon () (unqualSym ename))))
     (Just $ map (InsDecl () . FunBind ())
-       [ map genToEnumMatch consts
-          ++ [ if enumNoUnknown
-               then genToEnumCatchAll
-               else genToEnumUnknown
-             ]
-       , map genFromEnumMatch consts
-          ++ [ if enumNoUnknown
-               then genFromEnumCatchAll
-               else genFromEnumUnknown
-             ]
+       [ genThriftEnumMethod "toThriftEnum"
+           genToEnumMatch genToEnumCatchAll genToEnumUnknown
+       , genThriftEnumMethod "fromThriftEnum"
+           genFromEnumMatch genFromEnumCatchAll genFromEnumUnknown
        , genAllEnumValues consts
        , map genToEnumEitherMatch consts ++ [genToEnumEitherUnknown]
        ]
     )
   where
+    genThriftEnumMethod method genEnumMatch genEnumCatchAll genEnumUnknown =
+      if enumNoUnknown && null consts
+      then [genEmptyMethod ename method]
+      else map genEnumMatch consts ++
+        [ if enumNoUnknown
+          then genEnumCatchAll
+          else genEnumUnknown
+        ]
     genToEnumMatch :: HS EnumValue -> Match ()
     genToEnumMatch EnumValue{..} =
       Match ()

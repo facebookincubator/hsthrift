@@ -353,66 +353,32 @@ instance Prelude.Ord Number_Discontinuous where
   compare = Function.on Prelude.compare Thrift.fromThriftEnum
 
 data Number_Empty = Number_Empty__UNKNOWN Prelude.Int
-
-instance Prelude.Eq Number_Empty where
-  (==)
-    = Exception.throw
-        (Thrift.ProtocolException
-           "(==): Thrift enum 'Number_Empty' is uninhabited")
-
-instance Prelude.Show Number_Empty where
-  show
-    = Exception.throw
-        (Thrift.ProtocolException
-           "show: Thrift enum 'Number_Empty' is uninhabited")
-
-instance Prelude.Ord Number_Empty where
-  compare
-    = Exception.throw
-        (Thrift.ProtocolException
-           "compare: Thrift enum 'Number_Empty' is uninhabited")
+                    deriving (Prelude.Eq, Prelude.Show, Prelude.Ord)
 
 instance Aeson.ToJSON Number_Empty where
-  toJSON
-    = Exception.throw
-        (Thrift.ProtocolException
-           "toJSON: Thrift enum 'Number_Empty' is uninhabited")
+  toJSON = Aeson.toJSON . Thrift.fromThriftEnum
+
+instance DeepSeq.NFData Number_Empty where
+  rnf __Number_Empty = Prelude.seq __Number_Empty ()
 
 instance Default.Default Number_Empty where
   def
     = Exception.throw
         (Thrift.ProtocolException
-           "def: Thrift enum 'Number_Empty' is uninhabited")
+           "def: enum Number_Empty has no constructors")
 
 instance Hashable.Hashable Number_Empty where
-  hashWithSalt
-    = Exception.throw
-        (Thrift.ProtocolException
-           "hashWithSalt: Thrift enum 'Number_Empty' is uninhabited")
-
-instance DeepSeq.NFData Number_Empty where
-  rnf
-    = Exception.throw
-        (Thrift.ProtocolException
-           "rnf: Thrift enum 'Number_Empty' is uninhabited")
+  hashWithSalt _salt _val
+    = Hashable.hashWithSalt _salt (Thrift.fromThriftEnum _val)
 
 instance Thrift.ThriftEnum Number_Empty where
-  toThriftEnum
-    = Exception.throw
-        (Thrift.ProtocolException
-           "toThriftEnum: Thrift enum 'Number_Empty' is uninhabited")
-  fromThriftEnum
-    = Exception.throw
-        (Thrift.ProtocolException
-           "fromThriftEnum: Thrift enum 'Number_Empty' is uninhabited")
-  allThriftEnumValues
-    = Exception.throw
-        (Thrift.ProtocolException
-           "allThriftEnumValues: Thrift enum 'Number_Empty' is uninhabited")
-  toThriftEnumEither
-    = Exception.throw
-        (Thrift.ProtocolException
-           "toThriftEnumEither: Thrift enum 'Number_Empty' is uninhabited")
+  toThriftEnum val = Number_Empty__UNKNOWN val
+  fromThriftEnum (Number_Empty__UNKNOWN val) = val
+  allThriftEnumValues = []
+  toThriftEnumEither val
+    = Prelude.Left
+        ("toThriftEnumEither: not a valid identifier for enum Number_Empty: "
+           ++ Prelude.show val)
 
 newtype Int = Int{unInt :: Int.Int64}
               deriving (Prelude.Eq, Prelude.Show, DeepSeq.NFData, Prelude.Ord)

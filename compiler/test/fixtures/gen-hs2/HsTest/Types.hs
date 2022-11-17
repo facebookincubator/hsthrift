@@ -1316,64 +1316,31 @@ instance Thrift.ThriftEnum Perfect where
            Prelude.show val)
 
 data Void = Void__UNKNOWN Prelude.Int
-
-instance Prelude.Eq Void where
-  (==)
-    = Exception.throw
-        (Thrift.ProtocolException
-           "(==): Thrift enum 'Void' is uninhabited")
-
-instance Prelude.Show Void where
-  show
-    = Exception.throw
-        (Thrift.ProtocolException
-           "show: Thrift enum 'Void' is uninhabited")
-
-instance Prelude.Ord Void where
-  compare
-    = Exception.throw
-        (Thrift.ProtocolException
-           "compare: Thrift enum 'Void' is uninhabited")
+            deriving (Prelude.Eq, Prelude.Show, Prelude.Ord)
 
 instance Aeson.ToJSON Void where
-  toJSON
-    = Exception.throw
-        (Thrift.ProtocolException
-           "toJSON: Thrift enum 'Void' is uninhabited")
+  toJSON = Aeson.toJSON . Thrift.fromThriftEnum
+
+instance DeepSeq.NFData Void where
+  rnf __Void = Prelude.seq __Void ()
 
 instance Default.Default Void where
   def
     = Exception.throw
-        (Thrift.ProtocolException "def: Thrift enum 'Void' is uninhabited")
+        (Thrift.ProtocolException "def: enum Void has no constructors")
 
 instance Hashable.Hashable Void where
-  hashWithSalt
-    = Exception.throw
-        (Thrift.ProtocolException
-           "hashWithSalt: Thrift enum 'Void' is uninhabited")
-
-instance DeepSeq.NFData Void where
-  rnf
-    = Exception.throw
-        (Thrift.ProtocolException "rnf: Thrift enum 'Void' is uninhabited")
+  hashWithSalt _salt _val
+    = Hashable.hashWithSalt _salt (Thrift.fromThriftEnum _val)
 
 instance Thrift.ThriftEnum Void where
-  toThriftEnum
-    = Exception.throw
-        (Thrift.ProtocolException
-           "toThriftEnum: Thrift enum 'Void' is uninhabited")
-  fromThriftEnum
-    = Exception.throw
-        (Thrift.ProtocolException
-           "fromThriftEnum: Thrift enum 'Void' is uninhabited")
-  allThriftEnumValues
-    = Exception.throw
-        (Thrift.ProtocolException
-           "allThriftEnumValues: Thrift enum 'Void' is uninhabited")
-  toThriftEnumEither
-    = Exception.throw
-        (Thrift.ProtocolException
-           "toThriftEnumEither: Thrift enum 'Void' is uninhabited")
+  toThriftEnum val = Void__UNKNOWN val
+  fromThriftEnum (Void__UNKNOWN val) = val
+  allThriftEnumValues = []
+  toThriftEnumEither val
+    = Prelude.Left
+        ("toThriftEnumEither: not a valid identifier for enum Void: " ++
+           Prelude.show val)
 {-# LINE 9 "if/hs_test_instances.hs" #-}
 instance QuickCheck.Arbitrary Foo where
   arbitrary = Foo <$> QuickCheck.arbitrary <*> QuickCheck.arbitrary
