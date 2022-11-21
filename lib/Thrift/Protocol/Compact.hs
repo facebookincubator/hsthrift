@@ -29,10 +29,10 @@ import Thrift.Protocol.Binary.Internal
 
 data Compact
 
-serializeCompact :: ThriftSerializable a => a -> ByteString
+serializeCompact :: ThriftStruct a => a -> ByteString
 serializeCompact = serializeGen (Proxy :: Proxy Compact)
 
-deserializeCompact :: ThriftSerializable a => ByteString -> Either String a
+deserializeCompact :: ThriftStruct a => ByteString -> Either String a
 deserializeCompact = deserializeGen (Proxy :: Proxy Compact)
 
 -- Macros for ThriftTypes ------------------------------------------------------

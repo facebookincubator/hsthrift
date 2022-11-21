@@ -60,7 +60,7 @@ instance ThriftEnum Bool where
 
 {-# INLINE serializeGen #-}
 serializeGen
-  :: (Protocol p, ThriftSerializable a)
+  :: (Protocol p, ThriftStruct a)
   => Proxy p
   -> a
   -> ByteString
@@ -68,7 +68,7 @@ serializeGen proxy = LBS.toStrict . toLazyByteString . buildStruct proxy
 
 {-# INLINE deserializeGen #-}
 deserializeGen
-  :: (Protocol p, ThriftSerializable a)
+  :: (Protocol p, ThriftStruct a)
   => Proxy p
   -> ByteString
   -> Either String a
