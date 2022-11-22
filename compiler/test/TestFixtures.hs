@@ -69,7 +69,7 @@ checkFixture ThriftModule{..} = TestLabel mname $ TestCase $ do
   fixture <- readFile tmPath
   assertFileEqual tmPath fixture tmContents
   where
-    mname = tail $ snd $ breakOnEnd fixturesPath tmPath
+    mname = snd $ breakOnEnd "/test/fixtures/" tmPath
     canParse filename
       | isSuffixOf ".ast" filename = False
       | isSuffixOf "Service.hs" filename = False

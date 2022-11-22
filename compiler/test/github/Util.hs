@@ -2,10 +2,7 @@
 
 module Util (withFixtureOptions) where
 
-import Data.Foldable
 import Data.List
-import Data.List.Extra
-import Data.Maybe
 import System.Directory
 import System.FilePath
 
@@ -18,8 +15,6 @@ withFixtureOptions :: ([SomeOptions] -> IO a) -> IO a
 withFixtureOptions f = do
   dir <- getCurrentDirectory
   compilerDir <- findCompilerDir dir
-  relCompilerDir <- (\path -> if "./" `isPrefixOf` path then drop 2 path else path)
-                <$> makeRelativeToCurrentDirectory compilerDir
   let outPath = if inTree
         then "compiler" </> "test" </> "fixtures"
         else                "test" </> "fixtures"
@@ -68,7 +63,7 @@ findCompilerDir cwd = lookFor "thrift-compiler.cabal" cwd maxDepth >>= \mdir ->
     Nothing -> error "findCompilerDir: reached max depth, couldn't find thrift-compiler.cabal"
     Just d  -> return d
 
-  where lookFor file curDir (-1) = return Nothing
+  where lookFor _ _ (-1) = return Nothing
         lookFor file curDir depth = do
           existsHere <- doesFileExist (curDir </> file)
           if existsHere
@@ -84,4 +79,4 @@ findCompilerDir cwd = lookFor "thrift-compiler.cabal" cwd maxDepth >>= \mdir ->
                       Nothing -> visitDirsIn ds file curDir depth
                       Just fp -> return (Just fp)
             else visitDirsIn ds file curDir depth
-        maxDepth = 2
+        maxDepth = 2 :: Int
