@@ -240,7 +240,9 @@ genEnum :: Typecheckable l => Enum 'Resolved l Loc -> Object
 genEnum Enum{..} = HashMap.fromList
   [ "name"      .= enumResolvedName
   , "constants" .= map genEnumConst enumConstants
-  , "is_psuedo" .= enumIsPseudo
+  , "flavour" .= case enumFlavour of
+      SumTypeEnum{} -> "sum_type" :: Text
+      PseudoEnum{} -> "pseudo"
   , "loc_keyword" .= displayLocated (slKeyword enumLoc)
   , "loc_name" .= displayLocated (slName enumLoc)
   ]

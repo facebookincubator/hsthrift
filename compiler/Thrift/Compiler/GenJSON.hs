@@ -84,7 +84,9 @@ genEnum :: Typecheckable l => Enum 'Resolved l a -> Object
 genEnum Enum{..} = HashMap.fromList
   [ "name"      .= enumResolvedName
   , "constants" .= map genEnumConst enumConstants
-  , "is_psuedo" .= enumIsPseudo
+  , "flavour" .= case enumFlavour of
+      SumTypeEnum{} -> "sum_type" :: Text
+      PseudoEnum{} -> "pseudo"
   ]
 
 genEnumConst :: EnumValue 'Resolved l a -> Object

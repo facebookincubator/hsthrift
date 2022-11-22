@@ -36,7 +36,7 @@ genEnumImports = Set.fromList
   ]
 
 genEnumDecl :: HS Enum -> [HS.Decl ()]
-genEnumDecl Enum{ enumIsPseudo=True,..} =
+genEnumDecl Enum{ enumFlavour=PseudoEnum,..} =
   genTypedefDecl typedef ++
   concatMap genConstDecl consts
   where
@@ -62,7 +62,7 @@ genEnumDecl Enum{ enumIsPseudo=True,..} =
       , constLoc = ConstLoc nlc nlc nlc NoSep
       , constSAnns = []
       }
-genEnumDecl Enum{..} =
+genEnumDecl Enum{ enumFlavour=SumTypeEnum{..},..} =
   -- Enum Declaration
   [ DataDecl () (DataType ()) Nothing
     (DHead () $ textToName enumResolvedName)

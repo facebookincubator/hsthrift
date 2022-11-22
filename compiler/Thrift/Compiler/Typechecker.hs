@@ -660,16 +660,12 @@ resolveEnum enum@Enum{..} = do
   consts <- mapM mkAlt enumConstants
   sAnns   <- resolveStructuredAnns enumSAnns
   Env{..} <- ask
-  let
-    tag = isPseudo options enum
-    n = noUnknown enum
   forM_ getDups $
     typeError $ lLocation $ slName enumLoc
   return Enum
     { enumResolvedName = renameEnum options enum
     , enumConstants = consts
-    , enumIsPseudo  = tag
-    , enumNoUnknown = n
+    , enumFlavour = enumFlavourTag options enum
     , enumSAnns = sAnns
     , ..
     }
@@ -929,9 +925,9 @@ mkConstMap (thriftName, opts@Options{..}) imap tmap = foldM insertC emptyContext
     insertC m D_Service{} = pure m
 
 getEnumType :: Typecheckable l => Options l -> Parsed Enum -> Some (Type l)
-getEnumType opts@Options{..} enum@Enum{..}
-  | isPseudo opts enum = This $ TNewtype name enumValueType loc
-  | otherwise = This $ TEnum name loc (noUnknown enum)
+getEnumType opts@Options{..} enum@Enum{..} = case enumFlavourTag opts enum of
+  PseudoEnum{} -> This $ TNewtype name enumValueType loc
+  SumTypeEnum noUnknown -> This $ TEnum name loc noUnknown
   where
     name = mkName enumName $ renameEnum opts enum
     loc = lLocation (slName enumLoc)
@@ -1761,10 +1757,3 @@ sortServices services = mapE getVertex sccs
     getVertex (CyclicSCC ss@(Service{..}:_)) =
       Left [TypeError (lLocation $ slName serviceLoc) (CyclicServices ss)]
     getVertex (CyclicSCC []) = Left []
-
--- Check Enum nounknown --------------------------------------------------------
-noUnknown :: Parsed Enum -> Bool
-noUnknown Enum{..} = or
-  [ saTag == "hs.nounknown"
-  | SimpleAnn{..} <- getAnns enumAnns
-  ]

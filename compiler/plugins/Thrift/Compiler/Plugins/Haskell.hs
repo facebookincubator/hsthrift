@@ -218,9 +218,9 @@ instance Typecheckable Haskell where
       | Just prefix <- getPrefix (getAnns enumAnns) -> prefix <> name
       | otherwise -> enumName <> "_" <> name
     where
-      fixCase
-        | isPseudo opts e = lowercase
-        | otherwise = uppercase
+      fixCase = case enumFlavourTag opts e of
+        PseudoEnum{} -> lowercase
+        _ -> uppercase
 
   renameUnion _ Union{..} = toConstructorName unionName
 
@@ -236,10 +236,15 @@ instance Typecheckable Haskell where
   unionAltsAreUnique _ = True
   enumAltsAreUnique Options{..} = True
 
-  isPseudo _ Enum{..} = or
-    [ saTag == "hs.psuedoenum" || saTag == "hs.pseudoenum"
-    | SimpleAnn{..} <- getAnns enumAnns
-    ]
+  enumFlavourTag _ Enum{..}
+    | hasSimpleAnn "hs.pseudoenum" = PseudoEnum
+    | hasSimpleAnn "hs.nounknown" = SumTypeEnum True
+    | otherwise = SumTypeEnum False
+    where
+      hasSimpleAnn t = or
+        [ saTag == t
+        | SimpleAnn{..} <- getAnns enumAnns
+        ]
 
   -- Back-Translators
 
@@ -277,15 +282,16 @@ getDeclIface opts name mname decl = ifaceFromSymbols mname $ case decl of
       (packHs $ renameUnion opts u))
     unionAlts
   -- Enums
-  D_Enum e@Enum{..}
-    | isPseudo opts e ->
+  D_Enum e@Enum{..} ->
+    case enumFlavourTag opts e of
+      PseudoEnum{} ->
         mkNewtype (packT enumName) (packHs $ renameEnum opts e)
           (packHs $ ("un" <>) $ renameEnum opts e) ++
         concatMap
         (\EnumValue{..} ->
           mkValue (packT enumName) (packHs $ renameEnumAlt opts e evName))
         enumConstants
-    | otherwise ->
+      SumTypeEnum{} ->
         mkData (packT enumName) (packHs $ renameEnum opts e) ++
         concatMap
         (\EnumValue{..} ->

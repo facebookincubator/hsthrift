@@ -28,7 +28,7 @@ module Thrift.Compiler.Types
   , Field(..), FieldLoc(..), FieldType(..), FieldTag(..), FieldId
   , Requiredness(..), Laziness(..)
   , Union(..), UnionAlt(..), PossiblyEmpty(..), EmptyName
-  , Enum(..), EnumValue(..), EnumValLoc(..)
+  , Enum(..), EnumFlavour(..), EnumValue(..), EnumValLoc(..)
   , EnumValueType, enumValueType
   , Service(..), Super(..), Function(..), FunLoc(..)
   , funThrows, ThrowsLoc(..), Throws(..), FunctionType(..)
@@ -554,13 +554,18 @@ type family EmptyName s u where
 data Enum (s :: Status) (l :: * {- Language -}) a = Enum
   { enumName         :: Text
   , enumResolvedName :: IfResolved s Text
-  , enumIsPseudo     :: IfResolved s Bool
+  , enumFlavour      :: IfResolved s EnumFlavour
   , enumConstants    :: [EnumValue s l a]
   , enumLoc          :: StructLoc a
   , enumAnns         :: Maybe (Annotations a)
   , enumSAnns        :: [StructuredAnnotation s l a]
-  , enumNoUnknown    :: IfResolved s Bool
   }
+
+data EnumFlavour
+  = SumTypeEnum
+    { enumNoUnknown :: Bool
+    }
+  | PseudoEnum
 
 data EnumValue (s :: Status) (l :: * {- Language -}) a = EnumValue
   { evName         :: Text

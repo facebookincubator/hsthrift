@@ -441,7 +441,7 @@ Enum : StructuredAnnotations enum Symbol '{' list(EnumVal) '}' Annotations
        { Enum
          { enumName         = lVal $3
          , enumResolvedName = ()
-         , enumIsPseudo     = ()
+         , enumFlavour      = ()
          , enumConstants    = $5
          , enumLoc          = StructLoc
            { slKeyword    = getLoc $2
@@ -451,7 +451,6 @@ Enum : StructuredAnnotations enum Symbol '{' list(EnumVal) '}' Annotations
            }
          , enumAnns = $7
          , enumSAnns = $1
-         , enumNoUnknown = ()
          }
        }
 

@@ -584,7 +584,7 @@
                     "value": 3
                 }
             ],
-            "is_psuedo": false,
+            "flavour": "sum_type",
             "name": "Number"
         },
         {
@@ -594,7 +594,7 @@
                     "value": 0
                 }
             ],
-            "is_psuedo": false,
+            "flavour": "sum_type",
             "name": "Number_Strict"
         },
         {
@@ -608,7 +608,7 @@
                     "value": 4
                 }
             ],
-            "is_psuedo": false,
+            "flavour": "sum_type",
             "name": "Number_Pseudo"
         },
         {
@@ -622,12 +622,12 @@
                     "value": 0
                 }
             ],
-            "is_psuedo": false,
+            "flavour": "sum_type",
             "name": "Number_Discontinuous"
         },
         {
             "constants": [],
-            "is_psuedo": false,
+            "flavour": "sum_type",
             "name": "Number_Empty"
         }
     ],

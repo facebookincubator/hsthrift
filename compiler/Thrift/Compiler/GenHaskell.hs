@@ -154,18 +154,18 @@ genTypesModule prog@Program{..} extensions extraHasFields =
              NonEmpty -> id)
           [ ConName () (textToName altResolvedName) | UnionAlt{..} <- unionAlts ]
         enumExport :: HS Thrift.Enum -> [ExportSpec ()]
-        enumExport Enum{..}
-          | enumIsPseudo =
-              newtypeExport enumResolvedName :
-              [ EVar () $ unqualSym $ evResolvedName
-              | EnumValue{..} <- enumConstants
-              ]
-          | otherwise =
+        enumExport Enum{..} = case enumFlavour of
+          PseudoEnum{} ->
+            newtypeExport enumResolvedName :
+            [ EVar () $ unqualSym evResolvedName
+            | EnumValue{..} <- enumConstants
+            ]
+          SumTypeEnum{..} ->
             [ EThingWith () (NoWildcard ()) (unqualSym enumResolvedName) $
-              [ConName () (textToName evResolvedName)
+              [ ConName () (textToName evResolvedName)
               | EnumValue{..} <- enumConstants
               ] ++
-              [ConName () (textToName $ enumResolvedName <> "__UNKNOWN")
+              [ ConName () (textToName $ enumResolvedName <> "__UNKNOWN")
               | not enumNoUnknown
               ]
             ]

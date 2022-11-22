@@ -70,11 +70,10 @@ simpleTest = TestLabel "simple test" $ TestCase $ do
                 { enumName = "Bar"
                 , enumResolvedName = ()
                 , enumConstants = []
-                , enumIsPseudo = ()
+                , enumFlavour = ()
                 , enumLoc = StructLoc nlc nlc nlc nlc
                 , enumAnns = Nothing
                 , enumSAnns = []
-                , enumNoUnknown = ()
                 }
               ]
   let result = typecheck (defaultOptions NoOpts) (mkThrift decls)

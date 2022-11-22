@@ -1604,7 +1604,7 @@
                         "value": 3
                     }
                 ],
-                "is_psuedo": false,
+                "flavour": "sum_type",
                 "loc_keyword": "Loc {locFile = \"test/if/b.thrift\", locStartLine = 15, locStartCol = 1, locEndLine = 15, locEndCol = 5}",
                 "loc_name": "Loc {locFile = \"test/if/b.thrift\", locStartLine = 15, locStartCol = 6, locEndLine = 15, locEndCol = 12}",
                 "name": "Number"
@@ -1617,7 +1617,7 @@
                         "value": 0
                     }
                 ],
-                "is_psuedo": false,
+                "flavour": "sum_type",
                 "loc_keyword": "Loc {locFile = \"test/if/b.thrift\", locStartLine = 22, locStartCol = 1, locEndLine = 22, locEndCol = 5}",
                 "loc_name": "Loc {locFile = \"test/if/b.thrift\", locStartLine = 22, locStartCol = 6, locEndLine = 22, locEndCol = 19}",
                 "name": "Number_Strict"
@@ -1635,7 +1635,7 @@
                         "value": 4
                     }
                 ],
-                "is_psuedo": false,
+                "flavour": "sum_type",
                 "loc_keyword": "Loc {locFile = \"test/if/b.thrift\", locStartLine = 26, locStartCol = 1, locEndLine = 26, locEndCol = 5}",
                 "loc_name": "Loc {locFile = \"test/if/b.thrift\", locStartLine = 26, locStartCol = 6, locEndLine = 26, locEndCol = 19}",
                 "name": "Number_Pseudo"
@@ -1653,14 +1653,14 @@
                         "value": 0
                     }
                 ],
-                "is_psuedo": false,
+                "flavour": "sum_type",
                 "loc_keyword": "Loc {locFile = \"test/if/b.thrift\", locStartLine = 31, locStartCol = 1, locEndLine = 31, locEndCol = 5}",
                 "loc_name": "Loc {locFile = \"test/if/b.thrift\", locStartLine = 31, locStartCol = 6, locEndLine = 31, locEndCol = 26}",
                 "name": "Number_Discontinuous"
             },
             {
                 "constants": [],
-                "is_psuedo": false,
+                "flavour": "sum_type",
                 "loc_keyword": "Loc {locFile = \"test/if/b.thrift\", locStartLine = 36, locStartCol = 1, locEndLine = 36, locEndCol = 5}",
                 "loc_name": "Loc {locFile = \"test/if/b.thrift\", locStartLine = 36, locStartCol = 6, locEndLine = 36, locEndCol = 18}",
                 "name": "Number_Empty"

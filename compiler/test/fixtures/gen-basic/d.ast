@@ -16,12 +16,12 @@
                     "value": 3
                 }
             ],
-            "is_psuedo": false,
+            "flavour": "sum_type",
             "name": "HsEnum"
         },
         {
             "constants": [],
-            "is_psuedo": false,
+            "flavour": "sum_type",
             "name": "HsEnumEmpty"
         },
         {
@@ -39,12 +39,12 @@
                     "value": 3
                 }
             ],
-            "is_psuedo": false,
+            "flavour": "sum_type",
             "name": "HsEnumNoUnknownAnn"
         },
         {
             "constants": [],
-            "is_psuedo": false,
+            "flavour": "sum_type",
             "name": "HsEnumEmptyNoUnknownAnn"
         },
         {
@@ -62,7 +62,7 @@
                     "value": 3
                 }
             ],
-            "is_psuedo": true,
+            "flavour": "pseudo",
             "name": "HsEnumPseudoenumAnn"
         },
         {
@@ -80,12 +80,12 @@
                     "value": 3
                 }
             ],
-            "is_psuedo": true,
+            "flavour": "pseudo",
             "name": "HsEnumDuplicatedPseudoenumAnn"
         },
         {
             "constants": [],
-            "is_psuedo": true,
+            "flavour": "pseudo",
             "name": "HsEnumEmptyPseudoenumAnn"
         }
     ],
