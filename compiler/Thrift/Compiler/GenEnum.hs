@@ -17,6 +17,7 @@ import TextShow
 import Thrift.Compiler.GenConst
 import Thrift.Compiler.GenTypedef
 import Thrift.Compiler.GenUtils
+import Thrift.Compiler.Plugin
 import Thrift.Compiler.Plugins.Haskell
 import Thrift.Compiler.Types
 
@@ -30,15 +31,24 @@ genEnumImports = Set.fromList
   , QImport "Data.Aeson" "Aeson"
   , QImport "Data.Default" "Default"
   , QImport "Data.Function" "Function"
+  , QImport "Data.HashMap.Strict" "HashMap"
   , QImport "Data.Hashable" "Hashable"
   , QImport "Data.Int" "Int"
   , SymImport "Prelude" [ ".", "++", ">", "==" ]
   ]
 
 genEnumDecl :: HS Enum -> [HS.Decl ()]
-genEnumDecl Enum{ enumFlavour=PseudoEnum,..} =
-  genTypedefDecl typedef ++
-  concatMap genConstDecl consts
+genEnumDecl Enum{ enumFlavour=PseudoEnum{..},..} =
+  genTypedefDecl typedef (not peThriftEnum) ++
+  concatMap genConstDecl consts ++
+  -- Instances
+  if not peThriftEnum
+  then mzero
+  else
+    [ genDefault enumResolvedName enumConstants
+    , genShow enumResolvedName enumConstants
+    , genThriftEnumInst enumResolvedName enumConstants True True
+    ]
   where
     typedef = Typedef
       { tdName = enumName
@@ -91,13 +101,13 @@ genEnumDecl Enum{ enumFlavour=SumTypeEnum{..},..} =
     , ("Hashable", "Hashable", [ "hashWithSalt" ])
     , ("DeepSeq", "NFData", [ "rnf" ])
     ] ++
-    [genThriftEnumInst enumResolvedName enumConstants enumNoUnknown]
+    [genThriftEnumInst enumResolvedName enumConstants enumNoUnknown False]
   else
     [ genToJSON enumResolvedName
     , genNFData enumResolvedName
     , genDefault enumResolvedName enumConstants
     , genHashable enumResolvedName
-    , genThriftEnumInst enumResolvedName enumConstants enumNoUnknown
+    , genThriftEnumInst enumResolvedName enumConstants enumNoUnknown False
     ] ++
     [genOrd enumResolvedName | not canDeriveOrd]
   where
@@ -127,8 +137,8 @@ genOrd name =
      IHApp ()
        (IHCon () $ qualSym "Prelude" "Ord")
        (TyCon () $ unqualSym name))
-    (Just $ map (InsDecl ())
-     [ FunBind ()
+    (Just
+     [ InsDecl () $ FunBind ()
        [ Match () (textToName "compare") []
          (UnGuardedRhs () $
           qvar "Function" "on" `app`
@@ -137,6 +147,45 @@ genOrd name =
          Nothing
        ]
      ])
+
+-- Generate Show Instance --------------------------------------------------
+
+genShow :: Text -> [HS EnumValue] -> HS.Decl ()
+genShow name consts =
+  InstDecl () Nothing
+    (IRule () Nothing Nothing $
+     IHApp ()
+       (IHCon () $ qualSym "Prelude" "Show")
+       (TyCon () $ unqualSym name))
+    (Just
+     [ InsDecl () $ FunBind ()
+       [ Match () (textToName "showsPrec")
+         [ pvar "__d", PApp () (unqualSym name) [pvar "__val"] ]
+         (UnGuardedRhs () $
+          Case () (qvar "HashMap" "lookup" `app` var "__val" `app` var "__m")
+            [ Alt () (PApp () (qualSym "Prelude" "Just") [pvar "__s"])
+              (UnGuardedRhs () $ qvar "Prelude" "showString" `app` var "__s")
+              Nothing
+            , Alt () (PApp () (qualSym "Prelude" "Nothing") [])
+              (UnGuardedRhs () $ qvar "Prelude" "showParen" `app`
+                infixApp ">" (var "__d") (intLit (10 :: Int)) `app`
+                infixApp "."
+                  (qvar "Prelude" "showString" `app`
+                    stringLit (name <> "__UNKNOWN "))
+                  (qvar "Prelude" "showsPrec" `app`
+                    intLit (11 :: Int) `app` var "__val"))
+              Nothing
+            ])
+         (Just $ BDecls () [FunBind () [Match () (textToName "__m") []
+          (UnGuardedRhs () $ genConst (THashMap enumValueType TText) m)
+          Nothing]])
+       ]
+     ])
+  where
+    m = Literal $ HashMap $
+      [ (Literal evValue, Literal $ uppercase evResolvedName)
+      | EnumValue{..} <- consts
+      ]
 
 -- Aeson Instances -------------------------------------------------------------
 
@@ -147,8 +196,8 @@ genToJSON name =
      IHApp ()
        (IHCon () $ qualSym "Aeson" "ToJSON")
        (TyCon () $ unqualSym name))
-    (Just $ map (InsDecl ())
-     [ FunBind ()
+    (Just
+     [ InsDecl () $ FunBind ()
        [ Match () (textToName "toJSON") []
          (UnGuardedRhs () $
           qvar "Aeson" "toJSON" `compose` qvar "Thrift" "fromThriftEnum")
@@ -156,7 +205,7 @@ genToJSON name =
        ]
      ])
 
- -- Generate NFData Instance ---------------------------------------------------
+-- Generate NFData Instance ---------------------------------------------------
 
 genNFData :: Text -> HS.Decl ()
 genNFData name =
@@ -165,8 +214,8 @@ genNFData name =
      IHApp ()
        (IHCon () $ qualSym "DeepSeq" "NFData")
        (TyCon () $ unqualSym name))
-    (Just $ map (InsDecl ())
-     [ FunBind ()
+    (Just
+     [ InsDecl () $ FunBind ()
        [ Match () (textToName "rnf")
          [ PApp () (unqualSym arg) [] ]
          (UnGuardedRhs () $
@@ -178,7 +227,7 @@ genNFData name =
       arg = "__" <> name
       unit = Con () (Special () (UnitCon ()))
 
- -- Generate Default Instance --------------------------------------------------
+-- Generate Default Instance --------------------------------------------------
 
 genDefault :: Text -> [HS EnumValue] -> HS.Decl ()
 genDefault name consts =
@@ -187,8 +236,8 @@ genDefault name consts =
      IHApp ()
        (IHCon () $ qualSym "Default" "Default")
        (TyCon () $ unqualSym name))
-    (Just $ map (InsDecl ())
-     [ FunBind ()
+    (Just
+     [ InsDecl () $ FunBind ()
        [ Match () (textToName "def") []
          (UnGuardedRhs () $
           case consts of
@@ -201,7 +250,7 @@ genDefault name consts =
        ]
      ])
 
- -- Generate Hashable Instance -------------------------------------------------
+-- Generate Hashable Instance -------------------------------------------------
 
 genHashable :: Text -> HS.Decl ()
 genHashable name =
@@ -246,27 +295,29 @@ genEmptyMethod name method =
 
 -- Thrift Enum Instance --------------------------------------------------------
 
-genThriftEnumInst :: Text -> [HS EnumValue] -> Bool -> HS.Decl ()
-genThriftEnumInst ename consts enumNoUnknown =
+genThriftEnumInst :: Text -> [HS EnumValue] -> Bool -> Bool -> HS.Decl ()
+genThriftEnumInst ename consts enumNoUnknown pseudoEnum =
   InstDecl () Nothing
     (IRule () Nothing Nothing
       (IHApp ()
        (IHCon () (qualSym "Thrift" "ThriftEnum"))
        (TyCon () (unqualSym ename))))
     (Just $ map (InsDecl () . FunBind ())
-       [ genThriftEnumMethod "toThriftEnum"
-           genToEnumMatch genToEnumCatchAll genToEnumUnknown
-       , genThriftEnumMethod "fromThriftEnum"
-           genFromEnumMatch genFromEnumCatchAll genFromEnumUnknown
+       [ genThriftEnumMethod "toThriftEnum" genToEnumMatch
+          genToEnumCatchAll genToEnumUnknown genToEnumPseudo
+       , genThriftEnumMethod "fromThriftEnum" genFromEnumMatch
+          genFromEnumCatchAll genFromEnumUnknown genFromEnumPseudo
        , genAllEnumValues consts
-       , map genToEnumEitherMatch consts ++ [genToEnumEitherUnknown]
+       , if pseudoEnum then [genToEnumEitherPseudo]
+         else map genToEnumEitherMatch consts ++ [genToEnumEitherUnknown]
        ]
     )
   where
-    genThriftEnumMethod method genEnumMatch genEnumCatchAll genEnumUnknown =
-      if enumNoUnknown && null consts
-      then [genEmptyMethod ename method]
-      else map genEnumMatch consts ++
+    genThriftEnumMethod
+      method genEnumMatch genEnumCatchAll genEnumUnknown genEnumPseudo
+      | pseudoEnum = [genEnumPseudo]
+      | enumNoUnknown && null consts = [genEmptyMethod ename method]
+      | otherwise = map genEnumMatch consts ++
         [ if enumNoUnknown
           then genEnumCatchAll
           else genEnumUnknown
@@ -275,10 +326,7 @@ genThriftEnumInst ename consts enumNoUnknown =
     genToEnumMatch EnumValue{..} =
       Match ()
         (textToName "toThriftEnum")
-        [ PLit ()
-          (if evValue < 0 then Negative () else Signless ())
-          (Int () (abs $ fromIntegral evValue) (show evValue))
-        ]
+        [ intP evValue ]
         (UnGuardedRhs () $ Con () $ unqualSym evResolvedName)
         Nothing
     genToEnumCatchAll =
@@ -299,11 +347,20 @@ genThriftEnumInst ename consts enumNoUnknown =
         [ pvar "val" ]
         (UnGuardedRhs () $ var (ename <> "__UNKNOWN") `app` var "val")
         Nothing
+    genToEnumPseudo =
+      Match ()
+        (textToName "toThriftEnum")
+        [ pvar "__val" ]
+        (UnGuardedRhs () $ var ename `app`
+          (qvar "Prelude" "fromIntegral" `app` var "__val"))
+        Nothing
     genFromEnumMatch :: HS EnumValue -> Match ()
     genFromEnumMatch EnumValue{..} =
       Match ()
         (textToName "fromThriftEnum")
-        [PApp () (unqualSym evResolvedName) []]
+        (if pseudoEnum
+          then [PApp () (unqualSym ename) [intP evValue]]
+          else [PApp () (unqualSym evResolvedName) []])
         (UnGuardedRhs () $ intLit evValue)
         Nothing
     genFromEnumCatchAll =
@@ -324,14 +381,17 @@ genThriftEnumInst ename consts enumNoUnknown =
         [PApp () (unqualSym (ename <> "__UNKNOWN")) [pvar "val"]]
         (UnGuardedRhs () $ var "val")
         Nothing
+    genFromEnumPseudo =
+      Match ()
+        (textToName "fromThriftEnum")
+        [PApp () (unqualSym ename) [pvar "__val"]]
+        (UnGuardedRhs () $ qvar "Prelude" "fromIntegral" `app` var "__val")
+        Nothing
     genToEnumEitherMatch :: HS EnumValue -> Match ()
     genToEnumEitherMatch EnumValue{..} =
       Match ()
         (textToName "toThriftEnumEither")
-        [ PLit ()
-          (if evValue < 0 then Negative () else Signless ())
-          (Int () (abs $ fromIntegral evValue) (show evValue))
-        ]
+        [ intP evValue ]
         (UnGuardedRhs () $ qvar "Prelude" "Right" `app` var evResolvedName)
         Nothing
     genToEnumEitherUnknown =
@@ -343,6 +403,21 @@ genThriftEnumInst ename consts enumNoUnknown =
                      ename <> ": ")
           (qvar "Prelude" "show" `app` var "val"))
         Nothing
+    genToEnumEitherPseudo =
+      Match ()
+        (textToName "toThriftEnumEither")
+        [ pvar "val" ]
+        (UnGuardedRhs () $ If () (qvar "Prelude" "elem"
+          `app` var "__val" `app` qvar "Thrift" "allThriftEnumValues")
+          (qvar "Prelude" "Right" `app` var "__val")
+          (qvar "Prelude" "Left" `app` infixApp "++"
+            (stringLit $ "toThriftEnumEither: not a valid identifier for enum " <>
+                        ename <> ": ")
+            (qvar "Prelude" "show" `app` var "val")))
+        (Just $ BDecls () [FunBind () [Match () (textToName "__val") []
+          (UnGuardedRhs () $ var ename `app`
+            (qvar "Prelude" "fromIntegral" `app` var "val"))
+          Nothing]])
 
 genAllEnumValues :: [HS EnumValue] -> [Match ()]
 genAllEnumValues cs =

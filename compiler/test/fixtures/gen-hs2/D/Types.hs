@@ -39,10 +39,17 @@ module D.Types
         hsEnumDuplicatedPseudoenumAnn_THREE,
         HsEnumEmptyPseudoenumAnn(HsEnumEmptyPseudoenumAnn,
                                  unHsEnumEmptyPseudoenumAnn),
+        HsEnumPseudoenumThriftAnn(HsEnumPseudoenumThriftAnn,
+                                  unHsEnumPseudoenumThriftAnn),
+        hsEnumPseudoenumThriftAnn_ONE, hsEnumPseudoenumThriftAnn_TWO,
+        hsEnumPseudoenumThriftAnn_THREE,
+        HsEnumEmptyPseudoenumThriftAnn(HsEnumEmptyPseudoenumThriftAnn,
+                                       unHsEnumEmptyPseudoenumThriftAnn),
         HsStructOfComplexTypes(HsStructOfComplexTypes,
                                hsStructOfComplexTypes_a_struct, hsStructOfComplexTypes_a_union,
                                hsStructOfComplexTypes_an_enum,
-                               hsStructOfComplexTypes_a_pseudoenum))
+                               hsStructOfComplexTypes_a_pseudoenum,
+                               hsStructOfComplexTypes_a_thrift_pseudoenum))
        where
 import qualified Control.DeepSeq as DeepSeq
 import qualified Control.Exception as Exception
@@ -846,29 +853,131 @@ instance Hashable.Hashable HsEnumEmptyPseudoenumAnn where
 instance Aeson.ToJSON HsEnumEmptyPseudoenumAnn where
   toJSON (HsEnumEmptyPseudoenumAnn __val) = Aeson.toJSON __val
 
+newtype HsEnumPseudoenumThriftAnn = HsEnumPseudoenumThriftAnn{unHsEnumPseudoenumThriftAnn
+                                                              :: Int.Int32}
+                                    deriving (Prelude.Eq, DeepSeq.NFData, Prelude.Ord)
+
+instance Hashable.Hashable HsEnumPseudoenumThriftAnn where
+  hashWithSalt __salt (HsEnumPseudoenumThriftAnn __val)
+    = Hashable.hashWithSalt __salt __val
+
+instance Aeson.ToJSON HsEnumPseudoenumThriftAnn where
+  toJSON (HsEnumPseudoenumThriftAnn __val) = Aeson.toJSON __val
+
+hsEnumPseudoenumThriftAnn_ONE :: HsEnumPseudoenumThriftAnn
+hsEnumPseudoenumThriftAnn_ONE = HsEnumPseudoenumThriftAnn 1
+
+hsEnumPseudoenumThriftAnn_TWO :: HsEnumPseudoenumThriftAnn
+hsEnumPseudoenumThriftAnn_TWO = HsEnumPseudoenumThriftAnn 2
+
+hsEnumPseudoenumThriftAnn_THREE :: HsEnumPseudoenumThriftAnn
+hsEnumPseudoenumThriftAnn_THREE = HsEnumPseudoenumThriftAnn 3
+
+instance Default.Default HsEnumPseudoenumThriftAnn where
+  def = hsEnumPseudoenumThriftAnn_ONE
+
+instance Prelude.Show HsEnumPseudoenumThriftAnn where
+  showsPrec __d (HsEnumPseudoenumThriftAnn __val)
+    = case HashMap.lookup __val __m of
+        Prelude.Just __s -> Prelude.showString __s
+        Prelude.Nothing -> Prelude.showParen (__d > 10)
+                             (Prelude.showString "HsEnumPseudoenumThriftAnn__UNKNOWN " .
+                                Prelude.showsPrec 11 __val)
+    where
+      __m
+        = HashMap.fromList
+            [(1, "HsEnumPseudoenumThriftAnn_ONE"),
+             (2, "HsEnumPseudoenumThriftAnn_TWO"),
+             (3, "HsEnumPseudoenumThriftAnn_THREE")]
+
+instance Thrift.ThriftEnum HsEnumPseudoenumThriftAnn where
+  toThriftEnum __val
+    = HsEnumPseudoenumThriftAnn (Prelude.fromIntegral __val)
+  fromThriftEnum (HsEnumPseudoenumThriftAnn __val)
+    = Prelude.fromIntegral __val
+  allThriftEnumValues
+    = [hsEnumPseudoenumThriftAnn_ONE, hsEnumPseudoenumThriftAnn_TWO,
+       hsEnumPseudoenumThriftAnn_THREE]
+  toThriftEnumEither val
+    = if Prelude.elem __val Thrift.allThriftEnumValues then
+        Prelude.Right __val else
+        Prelude.Left
+          ("toThriftEnumEither: not a valid identifier for enum HsEnumPseudoenumThriftAnn: "
+             ++ Prelude.show val)
+    where
+      __val = HsEnumPseudoenumThriftAnn (Prelude.fromIntegral val)
+
+newtype HsEnumEmptyPseudoenumThriftAnn = HsEnumEmptyPseudoenumThriftAnn{unHsEnumEmptyPseudoenumThriftAnn
+                                                                        :: Int.Int32}
+                                         deriving (Prelude.Eq, DeepSeq.NFData, Prelude.Ord)
+
+instance Hashable.Hashable HsEnumEmptyPseudoenumThriftAnn where
+  hashWithSalt __salt (HsEnumEmptyPseudoenumThriftAnn __val)
+    = Hashable.hashWithSalt __salt __val
+
+instance Aeson.ToJSON HsEnumEmptyPseudoenumThriftAnn where
+  toJSON (HsEnumEmptyPseudoenumThriftAnn __val) = Aeson.toJSON __val
+
+instance Default.Default HsEnumEmptyPseudoenumThriftAnn where
+  def
+    = Exception.throw
+        (Thrift.ProtocolException
+           "def: enum HsEnumEmptyPseudoenumThriftAnn has no constructors")
+
+instance Prelude.Show HsEnumEmptyPseudoenumThriftAnn where
+  showsPrec __d (HsEnumEmptyPseudoenumThriftAnn __val)
+    = case HashMap.lookup __val __m of
+        Prelude.Just __s -> Prelude.showString __s
+        Prelude.Nothing -> Prelude.showParen (__d > 10)
+                             (Prelude.showString "HsEnumEmptyPseudoenumThriftAnn__UNKNOWN " .
+                                Prelude.showsPrec 11 __val)
+    where
+      __m = HashMap.fromList []
+
+instance Thrift.ThriftEnum HsEnumEmptyPseudoenumThriftAnn where
+  toThriftEnum __val
+    = HsEnumEmptyPseudoenumThriftAnn (Prelude.fromIntegral __val)
+  fromThriftEnum (HsEnumEmptyPseudoenumThriftAnn __val)
+    = Prelude.fromIntegral __val
+  allThriftEnumValues = []
+  toThriftEnumEither val
+    = if Prelude.elem __val Thrift.allThriftEnumValues then
+        Prelude.Right __val else
+        Prelude.Left
+          ("toThriftEnumEither: not a valid identifier for enum HsEnumEmptyPseudoenumThriftAnn: "
+             ++ Prelude.show val)
+    where
+      __val = HsEnumEmptyPseudoenumThriftAnn (Prelude.fromIntegral val)
+
 data HsStructOfComplexTypes = HsStructOfComplexTypes{hsStructOfComplexTypes_a_struct
                                                      :: HsStruct,
                                                      hsStructOfComplexTypes_a_union :: HsUnion,
                                                      hsStructOfComplexTypes_an_enum :: HsEnum,
                                                      hsStructOfComplexTypes_a_pseudoenum ::
-                                                     HsEnumPseudoenumAnn}
+                                                     HsEnumPseudoenumAnn,
+                                                     hsStructOfComplexTypes_a_thrift_pseudoenum ::
+                                                     HsEnumPseudoenumThriftAnn}
                               deriving (Prelude.Eq, Prelude.Show, Prelude.Ord)
 
 instance Aeson.ToJSON HsStructOfComplexTypes where
   toJSON
     (HsStructOfComplexTypes __field__a_struct __field__a_union
-       __field__an_enum __field__a_pseudoenum)
+       __field__an_enum __field__a_pseudoenum
+       __field__a_thrift_pseudoenum)
     = Aeson.object
         ("a_struct" .= __field__a_struct :
            "a_union" .= __field__a_union :
              "an_enum" .= __field__an_enum :
                "a_pseudoenum" .= unHsEnumPseudoenumAnn __field__a_pseudoenum :
-                 Prelude.mempty)
+                 "a_thrift_pseudoenum" .=
+                   unHsEnumPseudoenumThriftAnn __field__a_thrift_pseudoenum
+                   : Prelude.mempty)
 
 instance Thrift.ThriftStruct HsStructOfComplexTypes where
   buildStruct _proxy
     (HsStructOfComplexTypes __field__a_struct __field__a_union
-       __field__an_enum __field__a_pseudoenum)
+       __field__an_enum __field__a_pseudoenum
+       __field__a_thrift_pseudoenum)
     = Thrift.genStruct _proxy
         (Thrift.genField _proxy "a_struct" (Thrift.getStructType _proxy) 1
            0
@@ -886,7 +995,14 @@ instance Thrift.ThriftStruct HsStructOfComplexTypes where
                  3
                  ((Thrift.genI32 _proxy . unHsEnumPseudoenumAnn)
                     __field__a_pseudoenum)
-                 : [])
+                 :
+                 Thrift.genField _proxy "a_thrift_pseudoenum"
+                   (Thrift.getI32Type _proxy)
+                   5
+                   4
+                   ((Thrift.genI32 _proxy . unHsEnumPseudoenumThriftAnn)
+                      __field__a_thrift_pseudoenum)
+                   : [])
   parseStruct _proxy
     = ST.runSTT
         (do Prelude.return ()
@@ -895,6 +1011,8 @@ instance Thrift.ThriftStruct HsStructOfComplexTypes where
             __field__an_enum <- ST.newSTRef Default.def
             __field__a_pseudoenum <- ST.newSTRef
                                        (HsEnumPseudoenumAnn Default.def)
+            __field__a_thrift_pseudoenum <- ST.newSTRef
+                                              (HsEnumPseudoenumThriftAnn Default.def)
             let
               _parse _lastId
                 = do _fieldBegin <- Trans.lift
@@ -940,6 +1058,17 @@ instance Thrift.ThriftStruct HsStructOfComplexTypes where
                                                                         ST.writeSTRef
                                                                           __field__a_pseudoenum
                                                                           _val
+                                                                 5 | _type ==
+                                                                       Thrift.getI32Type _proxy
+                                                                     ->
+                                                                     do !_val <- Trans.lift
+                                                                                   (Prelude.fmap
+                                                                                      HsEnumPseudoenumThriftAnn
+                                                                                      (Thrift.parseI32
+                                                                                         _proxy))
+                                                                        ST.writeSTRef
+                                                                          __field__a_thrift_pseudoenum
+                                                                          _val
                                                                  _ -> Trans.lift
                                                                         (Thrift.parseSkip _proxy
                                                                            _type
@@ -951,37 +1080,46 @@ instance Thrift.ThriftStruct HsStructOfComplexTypes where
                                              !__val__an_enum <- ST.readSTRef __field__an_enum
                                              !__val__a_pseudoenum <- ST.readSTRef
                                                                        __field__a_pseudoenum
+                                             !__val__a_thrift_pseudoenum <- ST.readSTRef
+                                                                              __field__a_thrift_pseudoenum
                                              Prelude.pure
                                                (HsStructOfComplexTypes __val__a_struct
                                                   __val__a_union
                                                   __val__an_enum
-                                                  __val__a_pseudoenum)
+                                                  __val__a_pseudoenum
+                                                  __val__a_thrift_pseudoenum)
               _idMap
                 = HashMap.fromList
                     [("a_struct", 1), ("a_union", 2), ("an_enum", 3),
-                     ("a_pseudoenum", 4)]
+                     ("a_pseudoenum", 4), ("a_thrift_pseudoenum", 5)]
             _parse 0)
 
 instance DeepSeq.NFData HsStructOfComplexTypes where
   rnf
     (HsStructOfComplexTypes __field__a_struct __field__a_union
-       __field__an_enum __field__a_pseudoenum)
+       __field__an_enum __field__a_pseudoenum
+       __field__a_thrift_pseudoenum)
     = DeepSeq.rnf __field__a_struct `Prelude.seq`
         DeepSeq.rnf __field__a_union `Prelude.seq`
           DeepSeq.rnf __field__an_enum `Prelude.seq`
-            DeepSeq.rnf __field__a_pseudoenum `Prelude.seq` ()
+            DeepSeq.rnf __field__a_pseudoenum `Prelude.seq`
+              DeepSeq.rnf __field__a_thrift_pseudoenum `Prelude.seq` ()
 
 instance Default.Default HsStructOfComplexTypes where
   def
     = HsStructOfComplexTypes Default.def Default.def Default.def
         (HsEnumPseudoenumAnn Default.def)
+        (HsEnumPseudoenumThriftAnn Default.def)
 
 instance Hashable.Hashable HsStructOfComplexTypes where
   hashWithSalt __salt
-    (HsStructOfComplexTypes _a_struct _a_union _an_enum _a_pseudoenum)
+    (HsStructOfComplexTypes _a_struct _a_union _an_enum _a_pseudoenum
+       _a_thrift_pseudoenum)
     = Hashable.hashWithSalt
         (Hashable.hashWithSalt
-           (Hashable.hashWithSalt (Hashable.hashWithSalt __salt _a_struct)
-              _a_union)
-           _an_enum)
-        _a_pseudoenum
+           (Hashable.hashWithSalt
+              (Hashable.hashWithSalt (Hashable.hashWithSalt __salt _a_struct)
+                 _a_union)
+              _an_enum)
+           _a_pseudoenum)
+        _a_thrift_pseudoenum

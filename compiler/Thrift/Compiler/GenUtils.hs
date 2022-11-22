@@ -190,7 +190,7 @@ wrapNegativeLit x = case show x of
   -- >>> let x = -0.0 in (show x, signum x, x < 0)
   -- ("-0.0", -0.0, False)
 
-intP :: Int -> Pat ()
+intP :: (Integral a, Show a) => a -> Pat ()
 intP x = PLit () (sign ()) $ Int () (fromIntegral $ abs x) (show x)
   where sign | x < 0 = Negative
              | otherwise = Signless

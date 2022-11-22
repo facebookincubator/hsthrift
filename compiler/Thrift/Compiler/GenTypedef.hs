@@ -5,6 +5,7 @@ module Thrift.Compiler.GenTypedef
   , genTypedefImports
   ) where
 
+import Control.Monad
 import Data.Maybe
 import Data.Set (union)
 import Data.Text (Text)
@@ -28,8 +29,8 @@ genTypedefImports Typedef{..} =
       , QImport "Data.Hashable" "Hashable"
       ]
 
-genTypedefDecl :: HS Typedef -> [Decl ()]
-genTypedefDecl Typedef{..} = case tdTag of
+genTypedefDecl :: HS Typedef -> Bool -> [Decl ()]
+genTypedefDecl Typedef{..} deriveShow = case tdTag of
   IsTypedef ->
     [ TypeDecl () (DHead () $ textToName tdResolvedName)
       (genType tdResolvedType)
@@ -44,12 +45,12 @@ genTypedefDecl Typedef{..} = case tdTag of
          ])
       ]
       -- Deriving
-      (pure $ deriving_ $ map (IRule () Nothing Nothing . IHCon ()) $
-             [ qualSym "Prelude" "Eq"
-             , qualSym "Prelude" "Show"
-             , qualSym "DeepSeq" "NFData"
-             ] ++
-             [ qualSym "Prelude" "Ord" | deriveOrd ])
+      (pure $ deriving_ $ map (IRule () Nothing Nothing . IHCon ()) $ catMaybes
+        [ qualSym "Prelude" "Eq"     <$ guard True
+        , qualSym "Prelude" "Show"   <$ guard deriveShow
+        , qualSym "DeepSeq" "NFData" <$ guard True
+        , qualSym "Prelude" "Ord"    <$ guard deriveOrd
+        ])
       -- Instances
     , genHashable tdResolvedType tdResolvedName
     , genToJSON tdResolvedType tdResolvedName

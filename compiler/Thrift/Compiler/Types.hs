@@ -566,6 +566,8 @@ data EnumFlavour
     { enumNoUnknown :: Bool
     }
   | PseudoEnum
+    { peThriftEnum :: Bool
+    }
 
 data EnumValue (s :: Status) (l :: * {- Language -}) a = EnumValue
   { evName         :: Text

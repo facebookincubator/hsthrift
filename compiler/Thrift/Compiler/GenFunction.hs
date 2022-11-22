@@ -474,7 +474,7 @@ genParseReply Function{..} = Do ()
 
 genParseResult :: HSType t -> Alt ()
 genParseResult ty =
-  Alt () (intP 0)
+  Alt () (intP (0 :: Int))
   (GuardedRhss ()
    [ GuardedRhs ()
      [ Qualifier () $ infixApp "==" (var "_type") (genThriftType ty) ] $
@@ -486,7 +486,7 @@ genParseResult ty =
 
 genParseException :: HS (Field 'ThrowsField) -> Alt ()
 genParseException Field{..} =
-  Alt () (intP $ fromIntegral fieldId)
+  Alt () (intP fieldId)
   (GuardedRhss ()
    [ GuardedRhs ()
      [ Qualifier () $ infixApp "==" (var "_type")

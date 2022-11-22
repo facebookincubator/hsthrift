@@ -126,7 +126,7 @@ genTypesModule prog@Program{..} extensions extraHasFields =
           D_Union u ->
             (genUnionDecl u, genUnionImports u, [unionExport u])
           D_Typedef t ->
-            (genTypedefDecl t, genTypedefImports t, [tdefExport t])
+            (genTypedefDecl t True, genTypedefImports t, [tdefExport t])
           D_Enum en -> (genEnumDecl en, genEnumImports, enumExport en)
           D_Const c -> (genConstDecl c, genConstImports c, [constExport c])
           -- Services are not included in this module

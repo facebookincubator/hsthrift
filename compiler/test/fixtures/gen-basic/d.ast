@@ -87,6 +87,29 @@
             "constants": [],
             "flavour": "pseudo",
             "name": "HsEnumEmptyPseudoenumAnn"
+        },
+        {
+            "constants": [
+                {
+                    "name": "hsEnumPseudoenumThriftAnn_ONE",
+                    "value": 1
+                },
+                {
+                    "name": "hsEnumPseudoenumThriftAnn_TWO",
+                    "value": 2
+                },
+                {
+                    "name": "hsEnumPseudoenumThriftAnn_THREE",
+                    "value": 3
+                }
+            ],
+            "flavour": "pseudo",
+            "name": "HsEnumPseudoenumThriftAnn"
+        },
+        {
+            "constants": [],
+            "flavour": "pseudo",
+            "name": "HsEnumEmptyPseudoenumThriftAnn"
         }
     ],
     "includes": [],
@@ -266,6 +289,20 @@
                         },
                         "name": {
                             "name": "HsEnumPseudoenumAnn"
+                        },
+                        "type": "newtype"
+                    }
+                },
+                {
+                    "id": 5,
+                    "name": "hsStructOfComplexTypes_a_thrift_pseudoenum",
+                    "requiredness": "default",
+                    "type": {
+                        "inner_type": {
+                            "type": "i32"
+                        },
+                        "name": {
+                            "name": "HsEnumPseudoenumThriftAnn"
                         },
                         "type": "newtype"
                     }

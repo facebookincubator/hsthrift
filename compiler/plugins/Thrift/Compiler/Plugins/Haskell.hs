@@ -237,13 +237,18 @@ instance Typecheckable Haskell where
   enumAltsAreUnique Options{..} = True
 
   enumFlavourTag _ Enum{..}
-    | hasSimpleAnn "hs.pseudoenum" = PseudoEnum
+    | hasSimpleAnn "hs.pseudoenum" = PseudoEnum False
+    | hasValueAnn "hs.pseudoenum" "thriftenum" = PseudoEnum True
     | hasSimpleAnn "hs.nounknown" = SumTypeEnum True
     | otherwise = SumTypeEnum False
     where
       hasSimpleAnn t = or
         [ saTag == t
         | SimpleAnn{..} <- getAnns enumAnns
+        ]
+      hasValueAnn t v = or
+        [ vaTag == t && av == v
+        | ValueAnn{ vaVal=TextAnn av _, ..} <- getAnns enumAnns
         ]
 
   -- Back-Translators
