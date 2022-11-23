@@ -154,6 +154,7 @@ common test-deps
                  fb-stubs,
                  fb-util,
                  filepath,
+                 ghc-prim,
                  hspec,
                  hspec-contrib,
                  HUnit ^>= 1.6.1,

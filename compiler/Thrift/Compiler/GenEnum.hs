@@ -8,6 +8,7 @@ module Thrift.Compiler.GenEnum
 import Prelude hiding (Enum)
 import Control.Monad
 import Data.List
+import Data.List.Extra
 import Data.Text (Text)
 import Language.Haskell.Exts.Syntax hiding (Type, Decl)
 import qualified Data.Set as Set
@@ -34,6 +35,7 @@ genEnumImports = Set.fromList
   , QImport "Data.HashMap.Strict" "HashMap"
   , QImport "Data.Hashable" "Hashable"
   , QImport "Data.Int" "Int"
+  , QImport "GHC.Magic" "GHC"
   , SymImport "Prelude" [ ".", "++", ">", "==" ]
   ]
 
@@ -177,14 +179,21 @@ genShow name consts =
               Nothing
             ])
          (Just $ BDecls () [FunBind () [Match () (textToName "__m") []
-          (UnGuardedRhs () $ genConst (THashMap enumValueType TText) m)
+          (UnGuardedRhs () $ qvar "HashMap" "fromList" `app` pairs)
           Nothing]])
        ]
      ])
   where
-    m = Literal $ HashMap $
-      [ (Literal evValue, Literal $ uppercase evResolvedName)
-      | EnumValue{..} <- consts
+    -- https://gitlab.haskell.org/ghc/ghc/-/issues/4505
+    chunkLimit = 1000
+    pairs
+      | length consts <= chunkLimit = pairList consts
+      | otherwise = qvar "Prelude" "concat" `app` listE
+        (flip map (chunksOf chunkLimit consts) $ \chunk ->
+          qvar "GHC" "noinline" `app` qvar "Prelude" "id" `app` pairList chunk)
+    pairList cs = listE
+      [ Tuple () Boxed [intLit evValue, stringLit $ uppercase evResolvedName]
+      | EnumValue{..} <- cs
       ]
 
 -- Aeson Instances -------------------------------------------------------------

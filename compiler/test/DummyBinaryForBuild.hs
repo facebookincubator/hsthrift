@@ -25,6 +25,8 @@ import Namespace.E.Types
 import Namespace.E.TU__Service.Client
 import Namespace.E.TU__Service.Service
 
+import F.Types
+
 -- Create an empty binary to be used as a build target that depends on the
 -- compiled Thrift (so that we can test that the generated Haskell compiles).
 main :: IO ()

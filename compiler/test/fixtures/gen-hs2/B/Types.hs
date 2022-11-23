@@ -46,6 +46,7 @@ import qualified Data.Ord as Ord
 import qualified Data.Set as Set
 import qualified Data.Text as Text
 import qualified Data.Text.Encoding as Text
+import qualified GHC.Magic as GHC
 import qualified Prelude as Prelude
 import qualified Thrift.Binary.Parser as Parser
 import qualified Thrift.CodegenTypesOnly as Thrift

@@ -51,6 +51,7 @@ import qualified Data.Text as Text
 import qualified Data.Text.Encoding as Text
 import qualified Data.Vector as Vector
 import qualified Data.Vector.Storable as VectorStorable
+import qualified GHC.Magic as GHC
 import qualified Prelude as Prelude
 import qualified Thrift.Binary.Parser as Parser
 import qualified Thrift.CodegenTypesOnly as Thrift
@@ -69,7 +70,7 @@ import qualified Data.Vector as Vector
 import qualified Data.Vector.Storable as VectorStorable
 {-# LINE 7 "if/hs_test_instances.hs" #-}
 import Prelude ((/=), ($))
-{-# LINE 73 "test/fixtures/gen-hs2/HsTest/Types.hs" #-}
+{-# LINE 74 "test/fixtures/gen-hs2/HsTest/Types.hs" #-}
 
 newtype X = X{unX :: Int.Int64}
             deriving (Prelude.Eq, Prelude.Show, DeepSeq.NFData, Prelude.Ord)
