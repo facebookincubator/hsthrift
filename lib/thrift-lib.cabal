@@ -91,6 +91,7 @@ library
     extra-libraries: stdc++
 
     build-depends:
+        ghc-prim,
         dependent-sum >= 0.6 && <= 0.6.2.0,
           -- TODO: Data.Some was split out into package some at 0.6.2.2,
           -- deprecated 'This' was removed.
@@ -149,6 +150,7 @@ common test-deps
     cxx-options: -DIPV4
   build-depends: async ^>= 2.2,
                  base,
+                 ghc-prim,
                  bytestring,
                  some,
                  fb-stubs,
