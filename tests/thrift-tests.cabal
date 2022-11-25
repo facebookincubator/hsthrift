@@ -74,6 +74,7 @@ common test-common
                  deepseq,
                  either,
                  fb-stubs,
+                 ghc-prim,
                  hashable,
                  hspec,
                  hspec-contrib,

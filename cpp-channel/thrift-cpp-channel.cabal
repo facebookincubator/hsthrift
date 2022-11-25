@@ -162,6 +162,7 @@ test-suite header-channel
   build-depends:
                   base,
                   bytestring,
+                  ghc-prim,
                   thrift-cpp-channel:thrift-cpp-channel,
                   fb-stubs,
                   thrift-lib:thrift-lib,

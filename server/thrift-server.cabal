@@ -118,6 +118,7 @@ common test-deps
                  hashable,
                  hspec,
                  hspec-contrib,
+                 ghc-prim,
                  HUnit ^>= 1.6.1,
                  STMonadTrans,
                  text,
