@@ -20,6 +20,8 @@ import GHC.Stats
 import GHC.Conc
 import System.IO (stderr)
 
+import Util.PrettyPrint
+
 -- | Runs an 'IO' operation and prints how long it took. Also returns
 -- the timing value for use.
 reportAndShowTime :: String -> IO a -> IO (Double, Int64, a)
@@ -48,17 +50,7 @@ showTime t = printf "%.2f%s" val unit
 
 -- | Converts a number of bytes to a human-friendsly string.
 showAllocs :: Int64 -> String
-showAllocs b
- | b' > gb = printf "%.2f GB" (b' / gb)
- | b' > mb = printf "%.2f MB" (b' / mb)
- | b' > kb = printf "%.2f kB" (b' / kb)
- | otherwise = printf "%d bytes" (fromIntegral b :: Integer)
- where
-  kb, mb, gb :: Double
-  kb = 1024
-  mb = 1024*kb
-  gb = 1024*mb
-  b' = fromIntegral b :: Double
+showAllocs = renderBytesString . fromIntegral
 
 -- | Runs an 'IO' action and returns a triple of the time it consumed (in sec),
 -- the number of bytes it allocated, and the result it returned.

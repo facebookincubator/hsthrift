@@ -6,6 +6,8 @@ module Util.PrettyPrint
   , renderIncrease
   , renderNum
   , renderInt
+  , renderBytes
+  , renderBytesString
   ) where
 
 import Data.Text (Text)
@@ -46,3 +48,19 @@ renderInt num
   | num < 1000 = showt num
   | num < 1000000 = showt (num `div` 1000) <> "k"
   | otherwise = showt (num `div` 1000000) <> "M"
+
+renderBytes :: Int -> Text
+renderBytes b = Text.pack $ renderBytesString b
+
+renderBytesString :: Int -> String
+renderBytesString b
+ | b' > gb = printf "%.2f GiB" (b' / gb)
+ | b' > mb = printf "%.2f MiB" (b' / mb)
+ | b' > kb = printf "%.2f kiB" (b' / kb)
+ | otherwise = printf "%d bytes" (fromIntegral b :: Integer)
+ where
+  kb, mb, gb :: Double
+  kb = 1024
+  mb = 1024*kb
+  gb = 1024*mb
+  b' = fromIntegral b :: Double
