@@ -1,12 +1,16 @@
 -- Copyright (c) Facebook, Inc. and its affiliates.
 
+-- | Reexports 'Control.Concurrent.STM'
+--   adding logging for deadlocks and utility functions
 module Util.STM
  ( updateTVar
  , atomicallyWithLabel
  , Util.STM.atomically
+ , module Control.Concurrent.STM
  ) where
 
-import Control.Concurrent.STM as STM
+import qualified Control.Concurrent.STM as STM
+import Control.Concurrent.STM hiding (atomically)
 import Control.Exception (Exception, BlockedIndefinitelyOnSTM, catch, throwIO)
 import GHC.Stack
 import Data.Typeable (Typeable)
