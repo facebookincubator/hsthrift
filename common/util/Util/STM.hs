@@ -40,7 +40,7 @@ getCaller :: [(String, SrcLoc)] -> String
 getCaller cs =
   case cs of
     -- Take the first element of the stack if it exists
-    ((_,sl):_) -> srcLocFile sl
+    ((_,sl):_) -> prettySrcLoc sl
     _       -> "Unknown stack trace"
 
 -- | 'atomicallyWithLabel' replaces occurrences of 'BlockedIndefinitelyOnSTM' w/
@@ -51,6 +51,6 @@ newtype BlockedIndefinitelyOnNamedSTM = BlockedIndefinitelyOnNamedSTM String
 
 instance Show BlockedIndefinitelyOnNamedSTM where
     showsPrec _ (BlockedIndefinitelyOnNamedSTM name) =
-        showString $ "thread blocked indefinitely in STM transaction" ++ name
+        showString $ "thread blocked indefinitely in STM transaction: " ++ name
 
 instance Exception BlockedIndefinitelyOnNamedSTM
