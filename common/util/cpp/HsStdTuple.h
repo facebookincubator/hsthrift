@@ -65,7 +65,7 @@ void peekVals(std::tuple<T...>* t, va_list& args, std::index_sequence<I...>) {
  * worry about argument promotions.
  */
 #define HS_STD_TUPLE_CPP(Name)                                       \
-  HS_DEFINE_MARSHALLABLE(Name, hs_std_tuple::Name);                  \
+  HS_DEFINE_MARSHALLABLE(Name, hs_std_tuple::Name)                   \
                                                                      \
   extern "C" void std_tuple_poke_##Name(                             \
       hs_std_tuple::Name* ptr, const char* fmt, ...) {               \

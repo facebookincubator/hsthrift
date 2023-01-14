@@ -40,7 +40,7 @@ void std_variant_poke(void* var, void* val, uint32_t idx) {
 
 #define HS_STD_VARIANT_CPP(Name)                                              \
   HS_PEEKABLE(hs_std_variant::Name);                                          \
-  HS_DEFINE_MARSHALLABLE(Name, hs_std_variant::Name);                         \
+  HS_DEFINE_MARSHALLABLE(Name, hs_std_variant::Name)                          \
                                                                               \
   extern "C" void* std_variant_peek##Name(void* var, int32_t* idx) noexcept { \
     constexpr auto variant_size = std::variant_size_v<hs_std_variant::Name>;  \

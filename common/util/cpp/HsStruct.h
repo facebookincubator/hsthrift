@@ -401,8 +401,8 @@ HS_STRUCT HsString {
     return const_cast<char*>(s_.data());
   }
 
-  void resize(size_t n) {
-    s_.resize(n);
+  void resize(size_t capacity) {
+    s_.resize(capacity);
     update();
   }
 
@@ -486,8 +486,8 @@ HS_STRUCT HsArray {
   using Iterator = typename std::vector<T>::iterator;
   using ConstIterator = typename std::vector<T>::const_iterator;
 
-  void reserve(size_t n) {
-    v_.reserve(n);
+  void reserve(size_t capacity) {
+    v_.reserve(capacity);
     update();
   }
 
@@ -650,8 +650,8 @@ HS_STRUCT HsSet {
     }
   };
 
-  void reserve(size_t n) {
-    k_.reserve(n);
+  void reserve(size_t capacity) {
+    k_.reserve(capacity);
     update();
   }
 
@@ -788,9 +788,9 @@ HS_STRUCT HsMap {
     return ConstIterator(*this);
   }
 
-  void reserve(size_t n) {
-    k_.reserve(n);
-    v_.reserve(n);
+  void reserve(size_t capacity) {
+    k_.reserve(capacity);
+    v_.reserve(capacity);
     update();
   }
 
@@ -1007,14 +1007,14 @@ class HsJSON {
 
 HS_PEEKABLE(HsJSON);
 
-HS_OPTION_H(Bool, bool);
-HS_OPTION_H(Int16, int16_t);
-HS_OPTION_H(Int32, int32_t);
-HS_OPTION_H(Int64, int64_t);
-HS_OPTION_H(UInt32, uint32_t);
-HS_OPTION_H(UInt64, uint64_t);
-HS_OPTION_H(Float, float);
-HS_OPTION_H(Double, double);
-HS_OPTION_H(String, HsString);
-HS_OPTION_H(StringView, HsStringPiece);
-HS_OPTION_H(HsJSON, HsJSON);
+HS_OPTION_H(Bool, bool)
+HS_OPTION_H(Int16, int16_t)
+HS_OPTION_H(Int32, int32_t)
+HS_OPTION_H(Int64, int64_t)
+HS_OPTION_H(UInt32, uint32_t)
+HS_OPTION_H(UInt64, uint64_t)
+HS_OPTION_H(Float, float)
+HS_OPTION_H(Double, double)
+HS_OPTION_H(String, HsString)
+HS_OPTION_H(StringView, HsStringPiece)
+HS_OPTION_H(HsJSON, HsJSON)
