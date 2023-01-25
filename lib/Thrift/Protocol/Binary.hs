@@ -26,10 +26,10 @@ import Thrift.Protocol.Binary.Internal
 
 data Binary
 
-serializeBinary :: ThriftSerializable a => a -> ByteString
+serializeBinary :: ThriftStruct a => a -> ByteString
 serializeBinary = serializeGen (Proxy :: Proxy Binary)
 
-deserializeBinary :: ThriftSerializable a => ByteString -> Either String a
+deserializeBinary :: ThriftStruct a => ByteString -> Either String a
 deserializeBinary = deserializeGen (Proxy :: Proxy Binary)
 
 -- Type Macros -----------------------------------------------------------------
