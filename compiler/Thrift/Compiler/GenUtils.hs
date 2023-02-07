@@ -128,8 +128,8 @@ typeToImport (TStruct name _loc) = nameToImport name
 typeToImport (TException name _loc) = nameToImport name
 typeToImport (TUnion name _loc) = nameToImport name
 typeToImport (TEnum name _loc _) = nameToImport name
-typeToImport (TTypedef name ty _loc) = nameToImport name `union` typeToImport ty
-typeToImport (TNewtype name ty _loc) = nameToImport name `union` typeToImport ty
+typeToImport (TTypedef name _ty _loc) = nameToImport name
+typeToImport (TNewtype name _ty _loc) = nameToImport name
 
 nameToImport :: Name -> Set.Set Import
 nameToImport Name{..} = case resolvedName of

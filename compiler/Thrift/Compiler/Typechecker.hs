@@ -237,7 +237,7 @@ unSelfQualDecls thriftName xs = map unSelfQual xs
 
 -- Map Builders ----------------------------------------------------------------
 
--- | When using @--weird@ mode, this includes not only the direct import but
+-- | When using @--lenient@ mode, this includes not only the direct import but
 -- also all others.  If there is a naming collision then direct wins over
 -- indirect, but naming collisions between indirect ones is resolved in an
 -- unspecified way. See T43181464 for weird examples of transitive imports.
