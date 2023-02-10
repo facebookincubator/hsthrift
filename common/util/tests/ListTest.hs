@@ -1,24 +1,19 @@
 -- Copyright (c) Facebook, Inc. and its affiliates.
 
-{-# OPTIONS_GHC -w #-}
 module ListTest (main) where
 
 import Test.QuickCheck
 import Test.HUnit
 import TestRunner
 import Util.List
-import Util.Testing
 
 main :: IO ()
 main = testRunner $ TestList
   [ TestLabel "atMostChunksOf" $ TestCase $ do
-      skip "skipping"
-{-
       result <- quickCheckResult prop_atMostChunksOf
       case result of
         Success{} -> return ()
         _ -> assertFailure "failed"
--}
   , TestLabel "chunkBy" $ TestCase $ do
       result <- quickCheckResult prop_chunkBy
       case result of
