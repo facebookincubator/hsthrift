@@ -39,6 +39,7 @@ module Util.Text
   , textToInt
   , hexToInt
   , wrapText
+  , slice
   ) where
 
 import Control.Arrow (first)
@@ -372,3 +373,13 @@ wrapText indent maxLength text = concatMap wrapLine $ Text.lines text
       where
         len = n + Text.length w + 1
     margin = Text.replicate indent " "
+
+-- | The obvious implementation has a performance bug in platform < 011:
+--    https://github.com/channable/haskell-string-slicing-benchmarks
+slice :: Int -> Int -> Text -> Text
+#if MIN_VERSION_text(2,0,0)
+slice from len = Text.take len . Text.drop from
+#else
+slice from len t =
+  let !t' = Text.drop from t in Text.take len t'
+#endif
