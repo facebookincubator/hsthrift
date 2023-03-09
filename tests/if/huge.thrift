@@ -19,31 +19,31 @@
 hs_include "if/huge.hs"
 
 struct A {
-  1: B b;
-  2: C c;
+  1: B b
+  2: C c
 }
 
 struct B {}
 
 struct C {
-  1: D d;
-  2: E e;
+  1: D d
+  2: E e
 }
 
 struct D {
-  1: F f;
+  1: F f
 }
 
 struct E {
-  1: list<F> f = foo;
+  1: list<F> f = foo
 }
 
 enum F {
   F = 0,
 }
 
-const list<F> foo = [bar];
-const F bar = F;
+const list<F> foo = [ bar ]
+const F bar = F
 
 enum G {
   G = 0,
@@ -84,17 +84,17 @@ enum Y {
 }
 
 struct Z {
-  1: W w;
+  1: W w
 }
 
 service Service {
-  void weNeedThis(1: i64 x);
-  void weDontNeedThis(1: string x);
+  void weNeedThis(1: i64 x)
+  void weDontNeedThis(1: string x)
 }
 
 struct HsInclude {}
 struct HsInclude2 {
-  1: HsInclude get;
+  1: HsInclude get
 }
 
-const HsInclude hsconst = {};
+const HsInclude hsconst = {}
