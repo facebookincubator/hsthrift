@@ -56,7 +56,11 @@ import Data.Scientific (Scientific (..))
 import qualified Data.Scientific as Sci
 import Data.Word
 
+#if __GLASGOW_HASKELL__ >= 900
+import GHC.Data.FastMutInt
+#else
 import FastMutInt
+#endif
 
 #if __GLASGOW_HASKELL__ == 806
 import GHC.Base hiding (fail)
@@ -143,8 +147,12 @@ parse :: Parser a -> ByteString -> Either String a
 parse getter bs =
   let
     eitherA = unsafeDupablePerformIO $ do
+#if __GLASGOW_HASKELL__ >= 900
+      mutPos <- newFastMutInt 0
+#else
       mutPos <- newFastMutInt
       writeFastMutInt mutPos 0
+#endif
       tryAll $ unParser getter $ Env bs mutPos in
   case eitherA of
     Right a -> Right a
@@ -472,11 +480,20 @@ getInt64le = fromIntegral <$> getWord64le
 
 ------------------------------------------------------------------------
 -- Unchecked shifts
+
 shiftl_w16 :: Word16 -> Int -> Word16
+#if __GLASGOW_HASKELL__ >= 902
+shiftl_w16 (W16# w) (I# i) = W16# (w `uncheckedShiftLWord16#` i)
+#else
 shiftl_w16 (W16# w) (I# i) = W16# (w `uncheckedShiftL#` i)
+#endif
 
 shiftl_w32 :: Word32 -> Int -> Word32
+#if __GLASGOW_HASKELL__ >= 902
+shiftl_w32 (W32# w) (I# i) = W32# (w `uncheckedShiftLWord32#` i)
+#else
 shiftl_w32 (W32# w) (I# i) = W32# (w `uncheckedShiftL#` i)
+#endif
 
 shiftl_w64 :: Word64 -> Int -> Word64
 #if WORD_SIZE_IN_BITS < 64

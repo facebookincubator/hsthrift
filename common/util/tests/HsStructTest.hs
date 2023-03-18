@@ -1,11 +1,15 @@
 -- Copyright (c) Facebook, Inc. and its affiliates.
-
+{-# LANGUAGE CPP #-}
 module HsStructTest (main) where
 
 import Test.HUnit
 import TestRunner
 
 import Control.Exception
+#if MIN_VERSION_aeson(2,0,0)
+import Data.Aeson.KeyMap (KeyMap)
+import qualified Data.Aeson.KeyMap as KeyMap
+#endif
 import qualified Data.Aeson as Aeson
 import Data.ByteString (ByteString, useAsCStringLen)
 import Data.ByteString.Unsafe (unsafeUseAsCStringLen)
@@ -407,7 +411,11 @@ pairTest = TestLabel "Pair" $
 foreign import ccall unsafe "getPair"
   getPair :: IO (Ptr a)
 
+#if MIN_VERSION_aeson(2,0,0)
+type Nested = KeyMap (IntMap [Maybe Text])
+#else
 type Nested = HashMap Text (IntMap [Maybe Text])
+#endif
 type HsNested = HsObject (HsIntMap (HsList (HsMaybe HsText)))
 
 nestedTest :: Test
@@ -416,8 +424,13 @@ nestedTest = TestLabel "nested" $
     actual :: Nested <- coerce $ bracket createNested destroyNested peek
     assertEqual "Nested" expected actual
   where
+#if MIN_VERSION_aeson(2,0,0)
+    mapFromList = KeyMap.fromList
+#else
+    mapFromList = HashMap.fromList
+#endif
     expected =
-      HashMap.fromList
+      mapFromList
         [ ("zero", IntMap.empty)
         , ("one", IntMap.singleton 1 [])
         , ("two", IntMap.singleton 2 [Nothing])
@@ -454,9 +467,7 @@ jsonRoundTrip = TestLabel "json" $
             [Aeson.Null, Aeson.Bool True, Aeson.String "VectorVector"]
       )
     roundTrip
-      ( Aeson.Object $
-          HashMap.fromList
-            [("foo", Aeson.Bool True), ("bar", Aeson.Bool False)]
+      ( Aeson.object [ "foo" Aeson..= True, "bar" Aeson..= False ]
       )
   where
     roundTrip j = withCxxObject (HsJSON j) $ \p -> do
