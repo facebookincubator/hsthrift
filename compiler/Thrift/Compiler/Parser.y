@@ -76,25 +76,26 @@ import Thrift.Compiler.Types
        '='         { Tok EQUALS _ }
        '@'         { Tok AT _ }
        -- Tokens for unused syntax
-       package    { Tok PACKAGE _ }
-       binary     { Tok BINARY _ }
-       senum      { Tok SENUM _ }
-       stream     { Tok STREAM _ }
-       void       { Tok VOID _ }
-       union      { Tok UNION _ }
-       view       { Tok VIEW _ }
-       exception  { Tok EXCEPTION _ }
-       service    { Tok SERVICE _ }
-       oneway     { Tok ONEWAY _ }
-       extends    { Tok EXTENDS _ }
-       throws     { Tok THROWS _ }
-       safe       { Tok SAFE _ }
-       transient  { Tok TRANSIENT _ }
-       stateful   { Tok STATEFUL _ }
-       permanent  { Tok PERMANENT _ }
-       server     { Tok SERVER _ }
-       client     { Tok CLIENT _ }
-       readonly   { Tok READONLY _ }
+       package     { Tok PACKAGE _ }
+       binary      { Tok BINARY _ }
+       senum       { Tok SENUM _ }
+       stream      { Tok STREAM _ }
+       interaction { Tok INTERACTION _ }
+       void        { Tok VOID _ }
+       union       { Tok UNION _ }
+       view        { Tok VIEW _ }
+       exception   { Tok EXCEPTION _ }
+       service     { Tok SERVICE _ }
+       oneway      { Tok ONEWAY _ }
+       extends     { Tok EXTENDS _ }
+       throws      { Tok THROWS _ }
+       safe        { Tok SAFE _ }
+       transient   { Tok TRANSIENT _ }
+       stateful    { Tok STATEFUL _ }
+       permanent   { Tok PERMANENT _ }
+       server      { Tok SERVER _ }
+       client      { Tok CLIENT _ }
+       readonly    { Tok READONLY _ }
        idempotent { Tok IDEMPOTENT _ }
 
 -- Shift/reduce conflicts
@@ -160,6 +161,7 @@ Decl :: { Maybe (Parsed Decl) }
   | Enum    { Just $ D_Enum $1 }
   | Const   { Just $ D_Const $1 }
   | Service { Just $ D_Service $1 }
+  | Interaction { Just $ D_Interaction $1 }
   | UnusedDecl { Nothing }
 
 -- Structs ---------------------------------------------------------------------
@@ -646,6 +648,28 @@ UnusedDecl
 ViewField
   : Symbol Annotations                              {}
   | intLit ':' Req AnnotatedType Symbol Annotations {}
+
+-- Interactions --------------------------------------------------------------------
+
+Interaction :: { Parsed Interaction }
+Interaction
+  : StructuredAnnotations interaction Symbol Extends '{' list(Function) '}' Annotations
+     { Interaction
+       { interactionName         = lVal $3
+       , interactionResolvedName = ()
+       , interactionSuper        = $4
+       , interactionFunctions    = $6
+       , interactionLoc          = StructLoc
+         { slKeyword    = getLoc $2
+         , slName       = lLoc $3
+         , slOpenBrace  = getLoc $5
+         , slCloseBrace = getLoc $7
+         }
+       , interactionAnns         = $8
+       , interactionSAnns        = $1
+       }
+     }
+
 
 -- Other------------------------------------------------------------------------
 

@@ -98,6 +98,7 @@ tokens :-
   "client"             { basicToken CLIENT }
   "readonly"           { basicToken READONLY }
   "idempotent"         { basicToken IDEMPOTENT }
+  "interaction"        { basicToken INTERACTION }
 
 
   -- Literals
@@ -158,7 +159,7 @@ data TokenType
   | SYMBOL String
   | TRUE | FALSE
   -- Stuff we don't use (yet)
-  | SENUM | STREAM | VOID | BINARY
+  | SENUM | STREAM | VOID | BINARY | INTERACTION
   | UNION | VIEW | EXCEPTION | SERVICE
   | ONEWAY | EXTENDS | THROWS | ASYNC
   | SAFE | TRANSIENT | STATEFUL | PERMANENT | SERVER | CLIENT

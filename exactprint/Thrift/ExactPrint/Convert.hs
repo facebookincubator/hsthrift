@@ -96,6 +96,7 @@ computeDeclOffsets origin d = case d of
   D_Typedef t -> first D_Typedef $ computeTypedefOffsets origin t
   D_Const c   -> first D_Const $ computeConstOffsets origin c
   D_Service s -> first D_Service $ computeServiceOffsets origin s
+  D_Interaction i -> first D_Interaction $ computeInteractionOffsets origin i
 
 -- Structs ---------------------------------------------------------------------
 
@@ -485,6 +486,38 @@ functionOffsets origin fun@Function{..} =
     (anns, annsEnd) = annsOffsets throwsEnd funAnns
     (sep, sepEnd) = separatorOffsets annsEnd fnlSeparator
     FunLoc{..} = funLoc
+
+computeInteractionOffsets
+  :: Loc -> Interaction s l Loc -> (Interaction s l Offset, Loc)
+computeInteractionOffsets origin Interaction{..} =
+  (Interaction
+   { interactionSuper = super
+   , interactionFunctions = funcs
+   , interactionLoc = StructLoc
+     { slKeyword = getOffsets sAnnsEnd slKeyword
+     , slName    = getOffsets (lLocation slKeyword) slName
+     , slOpenBrace  = getOffsets superEnd slOpenBrace
+     , slCloseBrace = getOffsets funcEnd slCloseBrace
+     }
+   , interactionAnns = anns
+   , interactionSAnns = sAnns
+   , ..
+   },
+   annsEnd)
+  where
+    (super, superEnd) = case interactionSuper of
+      Nothing -> (Nothing, lLocation slName)
+      Just Super{..} ->
+        (Just Super { supExtends = getOffsets (lLocation slName) supExtends
+                    , supLoc     = getOffsets (lLocation supExtends) supLoc
+                    , ..
+                    },
+         lLocation supLoc)
+    (sAnns, sAnnsEnd) = foldO sAnnOffsets origin interactionSAnns
+    (funcs, funcEnd) =
+      foldO functionOffsets (lLocation slOpenBrace) interactionFunctions
+    (anns, annsEnd) = annsOffsets (lLocation slCloseBrace) interactionAnns
+    StructLoc{..} = interactionLoc
 
 streamOffsets
   :: Loc

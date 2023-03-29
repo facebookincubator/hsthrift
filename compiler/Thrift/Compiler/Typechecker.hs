@@ -43,6 +43,7 @@ data PartitionedDecls s l a = Decls
   , dEnums   :: [Enum s l a]
   , dConsts  :: [Const s l a]
   , dServs   :: [Service s l a]
+  , dInteractions   :: [Interaction s l a]
   }
 
 partitionDecls :: [Decl s l a] -> PartitionedDecls s l a
@@ -54,6 +55,7 @@ partitionDecls = foldr addDecl emptyDecls
     addDecl (D_Enum e)     decls@Decls{..} = decls { dEnums   = e : dEnums   }
     addDecl (D_Const c)    decls@Decls{..} = decls { dConsts  = c : dConsts  }
     addDecl (D_Service s)  decls@Decls{..} = decls { dServs   = s : dServs   }
+    addDecl (D_Interaction s) decls@Decls{..} = decls { dInteractions = s : dInteractions }
 
 emptyDecls :: PartitionedDecls s l a
 emptyDecls = Decls
@@ -63,6 +65,7 @@ emptyDecls = Decls
   , dEnums   = []
   , dConsts  = []
   , dServs   = []
+  , dInteractions = []
   }
 
 getLoc :: Parsed Decl -> Loc
@@ -72,6 +75,7 @@ getLoc (D_Union Union{..}) = lLocation $ slName unionLoc
 getLoc (D_Enum Enum{..}) = lLocation $ slName enumLoc
 getLoc (D_Const Const{..}) = lLocation $ clName constLoc
 getLoc (D_Service Service{..}) = lLocation $ slName serviceLoc
+getLoc (D_Interaction Interaction{..}) = lLocation $ slName interactionLoc
 
 -- Main Typechecking Function --------------------------------------------------
 
@@ -361,6 +365,13 @@ filterDecls reqSymbols symbolMap =
           map (\f -> f {funSAnns=[]}) $
           filter (\Function{..} -> Set.member funName symbols) $
           serviceFunctions s
+    filterDecl (D_Interaction s, _, _) symbols = mkVertex newDecl
+      where
+        newDecl = D_Interaction s {interactionFunctions = filteredFuns, interactionSAnns=[]}
+        filteredFuns =
+          map (\f -> f {funSAnns=[]}) $
+          filter (\Function{..} -> Set.member funName symbols) $
+          interactionFunctions s
     filterDecl (D_Struct s, syms, smap) _ =
       (D_Struct s
         { structSAnns = []
@@ -404,7 +415,12 @@ filterDecls reqSymbols symbolMap =
       , maybeToList (supName <$> serviceSuper) ++
         concatMap funSymbols serviceFunctions
       )
-
+    mkVertex d@(D_Interaction Interaction{..}) =
+      ( d
+      , interactionName
+      , maybeToList (supName <$> interactionSuper) ++
+        concatMap funSymbols interactionFunctions
+      )
     fieldSymbols :: Parsed (Field u) -> [Text]
     fieldSymbols Field{..} =
       maybe [] constSymbols fieldVal ++ anTypeSymbols fieldType
@@ -469,6 +485,7 @@ resolveDecl (D_Typedef t) = D_Typedef <$> resolveTypedef t
 resolveDecl (D_Enum e)    = D_Enum    <$> resolveEnum e
 resolveDecl (D_Const c)   = D_Const   <$> resolveConst c
 resolveDecl (D_Service s) = D_Service <$> resolveService s
+resolveDecl (D_Interaction s) = D_Interaction <$> resolveInteraction s
 
 resolveTypedef
   :: forall l. Typecheckable l
@@ -724,6 +741,26 @@ resolveService s@Service{..} = do
       (rname, _, rloc) <- lookupService name $ lLocation $ slName serviceLoc
       pure Super { supResolvedName = (rname, rloc), .. }
 
+resolveInteraction :: Typecheckable l => Parsed Interaction -> Typechecked l Interaction
+resolveInteraction Interaction{..} = do
+  (super, funs, sAnns)
+    <- (,,) <$> sequence (resolveSuper <$> interactionSuper)
+           `collect` mapT resolveFunction interactionFunctions
+           `collect` resolveStructuredAnns interactionSAnns
+  Env{..} <- ask
+  pure Interaction
+    { interactionResolvedName = interactionName
+    , interactionSuper        = super
+    , interactionFunctions    = funs
+    , interactionSAnns        = sAnns
+    , ..
+    }
+  where
+    resolveSuper Super{..} = do
+      name <- mkThriftName supName
+      (rname, _, rloc) <- lookupService name $ lLocation $ slName interactionLoc
+      pure Super { supResolvedName = (rname, rloc), .. }
+
 resolveFunction :: Typecheckable l => Parsed Function -> Typechecked l Function
 resolveFunction f@Function{..} = do
   (rtype, ftype, args, excepts, sAnns)
@@ -923,6 +960,7 @@ mkConstMap (thriftName, opts@Options{..}) imap tmap = foldM insertC emptyContext
           }
         loc = lLocation $ clName constLoc
     insertC m D_Service{} = pure m
+    insertC m D_Interaction{} = pure m
 
 getEnumType :: Typecheckable l => Options l -> Parsed Enum -> Some (Type l)
 getEnumType opts@Options{..} enum@Enum{..} = case enumFlavourTag opts enum of
@@ -1494,6 +1532,7 @@ mkTypemap (thriftName, opts@Options{..}) imap =
       (getEnumType opts e) m
     resolve m D_Const{} = pure m
     resolve m D_Service{} = pure m
+    resolve m D_Interaction{} = pure m
 
 -- Topologically sort the Decls based on dependencies
 -- This function will fail if there is a cycle
@@ -1509,6 +1548,7 @@ sortDecls decls = mapE getVertex sccs
     mkVertex d@(D_Enum Enum{..})       = Just (d, enumName, [])
     mkVertex D_Const{}   = Nothing
     mkVertex D_Service{} = Nothing
+    mkVertex D_Interaction{} = Nothing
     -- Find the dependencies of a type
     getEdges :: AnnotatedType Loc t -> [Text]
     getEdges AnnotatedType{..} =

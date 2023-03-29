@@ -314,8 +314,10 @@ getDeclIface opts name mname decl = ifaceFromSymbols mname $ case decl of
   -- Constants
   D_Const Const{..} ->
     mkValue (packT constName) (packHs $ renameConst opts constName)
-  -- Services are not suppoerted yet
+  -- Services are not supported yet
   D_Service{} -> []
+  -- Interaction are not supported yet
+  D_Interaction{} -> []
 
   where
     mkValue tname hsname =

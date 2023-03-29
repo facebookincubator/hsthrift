@@ -131,6 +131,8 @@ genTypesModule prog@Program{..} extensions extraHasFields =
           D_Const c -> (genConstDecl c, genConstImports c, [constExport c])
           -- Services are not included in this module
           D_Service{} -> mempty
+          -- Interactions are not included in this module
+          D_Interaction{} -> mempty
 
         tdefExport Typedef{..} = case tdTag of
           IsNewtype -> newtypeExport tdResolvedName

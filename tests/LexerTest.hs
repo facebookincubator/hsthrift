@@ -110,6 +110,7 @@ ppT SENUM = "senum"
 ppT STREAM = "stream"
 ppT TRUE = "true"
 ppT FALSE = "false"
+ppT INTERACTION = "interaction"
 
 pp :: [Token] -> String
 pp tokens = unwords [ ppT tok | Tok tok _ <- tokens ]

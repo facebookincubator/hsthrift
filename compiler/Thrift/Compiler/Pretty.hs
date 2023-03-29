@@ -63,6 +63,7 @@ ppErrorMsg (CyclicTypes decls) =
       getName (D_Enum Enum{..})       ns = ppText enumName : ns
       getName D_Const{}               ns = ns
       getName D_Service{}             ns = ns
+      getName D_Interaction{}             ns = ns
 ppErrorMsg (CyclicServices ss) =
   "cycle in service hierarchy:" <+> sep (punctuate "," (map getName ss))
     where

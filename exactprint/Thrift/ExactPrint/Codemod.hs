@@ -67,6 +67,8 @@ codemodConsts f p@Program{..} = p { progDecls = map codemodDecl progDecls }
     codemodDecl d@D_Union{} = d
     -- Services not supported yet
     codemodDecl d@D_Service{} = d
+    -- Interactions not supported yet
+    codemodDecl d@D_Interaction{} = d
 
     codemodField :: Field u 'Resolved l a -> Field u 'Resolved l a
     codemodField fl@Field{..} =

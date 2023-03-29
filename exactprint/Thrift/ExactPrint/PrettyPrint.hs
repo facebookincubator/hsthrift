@@ -124,6 +124,23 @@ ppDecl (D_Service Service{serviceLoc=StructLoc{..},..}) = mconcat $
   , ppAnns serviceAnns
   ]
 
+ppDecl (D_Interaction Interaction{interactionLoc=StructLoc{..},..}) = mconcat $
+  [ ppSAnns interactionSAnns
+  , addHeader slKeyword, "interaction"
+  , addHeader slName, fromText interactionName
+  ] ++
+  (case interactionSuper of
+    Nothing -> []
+    Just Super{..} ->
+      [ addHeader supExtends, "extends"
+      , addHeader supLoc, fromText supName
+      ]) ++
+  [ addHeader slOpenBrace, "{" ] ++
+  map ppFunction interactionFunctions ++
+  [ addHeader slCloseBrace, "}"
+  , ppAnns interactionAnns
+  ]
+
 ppStruct
   :: StructLoc Offset
   -> [StructuredAnnotation s l Offset]

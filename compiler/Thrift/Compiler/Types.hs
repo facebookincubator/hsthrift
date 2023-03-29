@@ -32,6 +32,7 @@ module Thrift.Compiler.Types
   , EnumValueType, enumValueType
   , Service(..), Super(..), Function(..), FunLoc(..)
   , funThrows, ThrowsLoc(..), Throws(..), FunctionType(..)
+  , Interaction(..)
   , RpcIdempotency(..), RpcIdempotencyType(..)
   , Stream(..), ResponseAndStreamReturn(..), rsTypeLoc, rsLoc
   , Type, AnnotatedType(..), TType(..), SomeAnnTy(..)
@@ -125,6 +126,7 @@ data Decl s l a
   | D_Typedef (Typedef s l a)
   | D_Const (Const s l a)
   | D_Service (Service s l a)
+  | D_Interaction (Interaction s l a)
 
 type SpliceFile = Maybe (Module SrcSpanInfo)
 
@@ -685,6 +687,19 @@ funThrows Function{funLoc=FunLoc{..}, ..} = fmap f fnlThrows
 newtype RpcIdempotency = RpcIdempotency { riType :: RpcIdempotencyType }
 
 data RpcIdempotencyType = RiReadonly | RiIdempotent
+
+-- Thrift Interaction ----------------------------------------------------------
+
+data Interaction (s :: Status) (l :: * {- Language -}) a = Interaction
+  { interactionName         :: Text
+  , interactionResolvedName :: IfResolved s Text
+  , interactionSuper        :: Maybe (Super s a)
+  , interactionFunctions    :: [Function s l a]
+  , interactionLoc          :: StructLoc a
+  , interactionAnns         :: Maybe (Annotations a)
+  , interactionSAnns        :: [StructuredAnnotation s l a]
+  }
+
 
 -- Thrift Value Types ----------------------------------------------------------
 
