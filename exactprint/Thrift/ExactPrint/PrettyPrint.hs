@@ -107,7 +107,7 @@ ppDecl (D_Const Const{constLoc=ConstLoc{..},..}) = mconcat
   , ppSeparator clSeparator
   ]
 
-ppDecl (D_Service Service{serviceLoc=StructLoc{..},..}) = mconcat $
+ppDecl (D_Service s@Service{serviceLoc=StructLoc{..},..}) = mconcat $
   [ ppSAnns serviceSAnns
   , addHeader slKeyword, "service"
   , addHeader slName, fromText serviceName
@@ -119,7 +119,7 @@ ppDecl (D_Service Service{serviceLoc=StructLoc{..},..}) = mconcat $
       , addHeader supLoc, fromText supName
       ]) ++
   [ addHeader slOpenBrace, "{" ] ++
-  map ppFunction serviceFunctions ++
+  map ppFunction (getServiceFunctions s) ++
   [ addHeader slCloseBrace, "}"
   , ppAnns serviceAnns
   ]

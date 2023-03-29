@@ -149,9 +149,9 @@ genAlt UnionAlt{..} = HashMap.fromList
 -- Services and Functions ------------------------------------------------------
 
 genService :: Typecheckable l => Service 'Resolved l a -> Object
-genService Service{..} = HashMap.fromList $
+genService s@Service{..} = HashMap.fromList $
   [ "name"      .= serviceResolvedName
-  , "functions" .= map genFunction serviceFunctions
+  , "functions" .= map genFunction (getServiceFunctions s)
   ] ++
   (case serviceSuper of
      Nothing -> []

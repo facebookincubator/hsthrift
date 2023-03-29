@@ -2,7 +2,6 @@
 
 {-# LANGUAGE AllowAmbiguousTypes #-}
 {-# LANGUAGE ConstraintKinds #-}
-{-# LANGUAGE KindSignatures #-}
 {-# LANGUAGE PolyKinds #-}
 {-# LANGUAGE TypeOperators #-}
 module Thrift.Compiler.Types
@@ -30,7 +29,8 @@ module Thrift.Compiler.Types
   , Union(..), UnionAlt(..), PossiblyEmpty(..), EmptyName
   , Enum(..), EnumFlavour(..), EnumValue(..), EnumValLoc(..)
   , EnumValueType, enumValueType
-  , Service(..), Super(..), Function(..), FunLoc(..)
+  , Service(..), Super(..), Function(..), FunLoc(..), getServiceFunctions
+  , ServiceStmt(..), Performs(..)
   , funThrows, ThrowsLoc(..), Throws(..), FunctionType(..)
   , Interaction(..)
   , RpcIdempotency(..), RpcIdempotencyType(..)
@@ -599,11 +599,18 @@ data Service (s :: Status) (l :: * {- Language -}) a = Service
   { serviceName         :: Text
   , serviceResolvedName :: IfResolved s Text
   , serviceSuper        :: Maybe (Super s a)
-  , serviceFunctions    :: [Function s l a]
+  -- , serviceFunctions    :: [Function s l a]
+  , serviceStmts        :: [ServiceStmt s l a]
   , serviceLoc          :: StructLoc a
   , serviceAnns         :: Maybe (Annotations a)
   , serviceSAnns        :: [StructuredAnnotation s l a]
   }
+
+getServiceFunctions :: Service s l a -> [Function s l a]
+getServiceFunctions Service {..} = concatMap getFn serviceStmts
+  where
+    getFn (FunctionStmt f ) = [f]
+    getFn _ = []
 
 data Super s a = Super
   { supName         :: Text
@@ -615,6 +622,14 @@ data Super s a = Super
 type family SuperOf (s :: Status) :: * where
   SuperOf 'Resolved   = Name
   SuperOf 'Unresolved = Text
+
+data ServiceStmt s l a
+  = FunctionStmt (Function s l a)
+  | PerformsStmt (Performs s l a)
+
+newtype Performs (s :: Status) (l :: * {- Language -}) a = Performs
+  { performsName :: Text
+  }
 
 data Function (s :: Status) (l :: * {- Language -}) a = Function
   { funName         :: Text

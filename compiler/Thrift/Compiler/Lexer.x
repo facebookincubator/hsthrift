@@ -99,6 +99,7 @@ tokens :-
   "readonly"           { basicToken READONLY }
   "idempotent"         { basicToken IDEMPOTENT }
   "interaction"        { basicToken INTERACTION }
+  "performs"           { basicToken PERFORMS }
 
 
   -- Literals
@@ -161,7 +162,7 @@ data TokenType
   -- Stuff we don't use (yet)
   | SENUM | STREAM | VOID | BINARY | INTERACTION
   | UNION | VIEW | EXCEPTION | SERVICE
-  | ONEWAY | EXTENDS | THROWS | ASYNC
+  | ONEWAY | EXTENDS | THROWS | ASYNC | PERFORMS
   | SAFE | TRANSIENT | STATEFUL | PERMANENT | SERVER | CLIENT
   | READONLY | IDEMPOTENT
   | PACKAGE

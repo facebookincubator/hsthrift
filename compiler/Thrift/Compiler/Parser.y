@@ -88,6 +88,7 @@ import Thrift.Compiler.Types
        service     { Tok SERVICE _ }
        oneway      { Tok ONEWAY _ }
        extends     { Tok EXTENDS _ }
+       performs    { Tok PERFORMS _ }
        throws      { Tok THROWS _ }
        safe        { Tok SAFE _ }
        transient   { Tok TRANSIENT _ }
@@ -478,12 +479,12 @@ EnumVal : StructuredAnnotations Symbol '=' intLit Annotations Separator
 
 Service :: { Parsed Service }
 Service
-  : StructuredAnnotations service Symbol Extends '{' list(Function) '}' Annotations
+  : StructuredAnnotations service Symbol Extends '{' list(ServiceStmt) '}' Annotations
      { Service
        { serviceName         = lVal $3
        , serviceResolvedName = ()
        , serviceSuper        = $4
-       , serviceFunctions    = $6
+       , serviceStmts        = $6
        , serviceLoc          = StructLoc
          { slKeyword    = getLoc $2
          , slName       = lLoc $3
@@ -494,6 +495,18 @@ Service
        , serviceSAnns        = $1
        }
      }
+
+ServiceStmt :: { Parsed ServiceStmt }
+  : Function
+    { FunctionStmt $1
+    }
+  | performs Symbol Separator
+    { PerformsStmt
+      ( Performs
+        { performsName = lVal $2
+        }
+      )
+    }
 
 Function :: { Parsed Function }
   : StructuredAnnotations IsOneway RpcIdempotency FunType Symbol '(' list(Argument) ')' Throws Annotations Separator

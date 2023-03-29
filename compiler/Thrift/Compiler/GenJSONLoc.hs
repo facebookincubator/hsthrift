@@ -320,9 +320,9 @@ genAlt UnionAlt{..} = HashMap.fromList
 -- Services and Functions ------------------------------------------------------
 
 genService :: Typecheckable l => Service 'Resolved l Loc -> Object
-genService Service{..} = HashMap.fromList $
+genService s@Service{..} = HashMap.fromList $
   [ "name"      .= serviceResolvedName
-  , "functions" .= map genFunction serviceFunctions
+  , "functions" .= map genFunction (getServiceFunctions s)
   , "loc_keyword" .= displayLocated (slKeyword serviceLoc)
   , "loc_name" .= displayLocated (slName serviceLoc)
   ] ++

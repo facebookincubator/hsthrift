@@ -111,6 +111,7 @@ ppT STREAM = "stream"
 ppT TRUE = "true"
 ppT FALSE = "false"
 ppT INTERACTION = "interaction"
+ppT PERFORMS = "performs"
 
 pp :: [Token] -> String
 pp tokens = unwords [ ppT tok | Tok tok _ <- tokens ]

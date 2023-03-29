@@ -177,6 +177,7 @@ genClientModule :: Program Haskell Thrift.Loc -> HS Service -> (String, Module (
 genClientModule prog@Program{..} service@Service{..} =
   genModule prog (serviceResolvedName <> ".Client") pragmas exports imports decls
   where
+    theseFunctions = getServiceFunctions service
     pragmas = commonPragmas opts ++
               map (LanguagePragma () . (:[]) . textToName)
               (["FlexibleContexts", "TypeFamilies", "TypeOperators"] ++
@@ -187,15 +188,15 @@ genClientModule prog@Program{..} service@Service{..} =
                 map (EVar () . unqualSym . ($ funResolvedName)) $
                 [ id, (<> "IO"), ("send_" <>), ("_build_" <>) ] ++
                 (if funIsOneWay then [] else [ ("recv_" <>), ("_parse_"<>) ]))
-              serviceFunctions
+              theseFunctions
     imports = map genImportModule $ Set.toList $ Set.unions $
               Set.singleton (QImport "Thrift.Codegen" "Thrift") :
               Set.singleton (TypesImport progHSName) :
               Set.fromList (map importFromInclude progIncludes) :
               genClientImports progHSName service :
-              map genFunctionImports serviceFunctions
+              map genFunctionImports theseFunctions
     decls   = genClientDecls service ++
-              concatMap (genFunctionDecls service) serviceFunctions
+              concatMap (genFunctionDecls service) theseFunctions
     opts@Options{..} = options progEnv
 
 genServiceModule :: Program Haskell Thrift.Loc -> HS Service -> (String, Module ())

@@ -11,13 +11,18 @@ srcFile = unlines
   , "  void foo();"
   , "  i64 bar();"
   , "}"
+  , ""
+  , "service MyService {"
+  , "  void baz();"
+  , "  performs MyInteraction;"
+  ,"}"
   ]
 
 interactionTest :: Test
 interactionTest = TestLabel "Interaction Test" $ TestCase $ do
   let file = "foo_bar"
   case snd <$> runParser parseThrift (file ++ ".thrift") srcFile of
-    Right [ D_Interaction {}] -> return ()
+    Right [ D_Interaction {},  D_Service {}] -> return ()
     _ -> assertFailure "not equal"
 
 main :: IO ()

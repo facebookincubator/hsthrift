@@ -44,8 +44,8 @@ genServiceExports s@Service{..} =
     ["reqName'", "reqParser'", "respWriter'", "methodsInfo'"]
 
 genServiceImports :: Text.Text -> HS Service -> Set.Set Import
-genServiceImports this Service{..} =
-  foldr (Set.union . importsForFunc) baseImports serviceFunctions
+genServiceImports this s@Service{..} =
+  foldr (Set.union . importsForFunc) baseImports (getServiceFunctions s)
   where
     importsForFunc Function{..} =
       foldr (Set.union . getImports) (retImport funResolvedType) funArgs
@@ -127,7 +127,7 @@ genCommandDT s@Service{..} = HS.GDataDecl () (HS.DataType ()) Nothing
   genFunctions
   mzero
   where
-    genFunctions = map genDTFunction serviceFunctions ++
+    genFunctions = map genDTFunction (getServiceFunctions s) ++
       case fst . supResolvedName <$> serviceSuper of
         Nothing -> []
         Just Name{..} -> [genSuper $ localName resolvedName]
@@ -162,12 +162,13 @@ genReqName s@Service{..} =
   [ HS.TypeSig () [textToName "reqName'"] $ HS.TyFun ()
       (HS.TyApp () (simpleType $ commandTypeName s) (simpleType "a"))
       (qualType "Text" "Text")
-  ] ++ map genFunction serviceFunctions ++
+  ] ++ map genFunction theseFunctions ++
     case fst . supResolvedName <$> serviceSuper of
-      Nothing -> noParentBody (null serviceFunctions)
+      Nothing -> noParentBody (null theseFunctions)
       Just Name{..} -> [genSuper $ localName resolvedName]
 
   where
+    theseFunctions = getServiceFunctions s
     genSuper superName = HS.FunBind ()
       [ HS.Match () (textToName "reqName'")
         [HS.PParen () $ HS.PApp ()
@@ -210,7 +211,7 @@ genReqParser s@Service{..} =
     HS.TyApp () (qualType "Parser" "Parser") $ HS.TyParen () $
       qualType "Thrift" "Some" `appT` simpleType (commandTypeName s)
   ] ++
-  map genFunction serviceFunctions ++
+  map genFunction (getServiceFunctions s) ++
   genSuper serviceSuper
   where
     genSuper Nothing = [ HS.FunBind ()
@@ -279,9 +280,10 @@ genRespWriter s@Service{..} =
             ]
       ]
   ] ++
-  map genFunction serviceFunctions ++
-  genSuper serviceSuper (null serviceFunctions)
+  map genFunction theseFunctions ++
+  genSuper serviceSuper (null theseFunctions)
   where
+    theseFunctions = getServiceFunctions s
     genSuper Nothing True =
       [ HS.FunBind ()
         [ HS.Match () (textToName "respWriter'")
@@ -436,7 +438,7 @@ genMethodsInfo service =
       return $ qvar (localName resolvedName) methodsInfo'
 
     instanceMethodsInfo = qvar "Map" "fromList" `app`
-      listE (genInfoTuple <$> serviceFunctions service)
+      listE (genInfoTuple <$> getServiceFunctions service)
 
     infos = case superMethodsInfo of
       Nothing -> instanceMethodsInfo
@@ -458,4 +460,4 @@ commandTypeName :: HS Service -> Text
 commandTypeName Service{..} = serviceResolvedName <> "Command"
 
 isEmptyService :: HS Service -> Bool
-isEmptyService Service{..} = null serviceFunctions && isNothing serviceSuper
+isEmptyService s@Service{..} = null (getServiceFunctions s) && isNothing serviceSuper

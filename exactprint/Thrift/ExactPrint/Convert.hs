@@ -400,10 +400,10 @@ structPairOffsets origin StructPair{..} =
 -- Services --------------------------------------------------------------------
 
 computeServiceOffsets :: Loc -> Service s l Loc -> (Service s l Offset, Loc)
-computeServiceOffsets origin Service{..} =
+computeServiceOffsets origin s@Service{..} =
   (Service
    { serviceSuper = super
-   , serviceFunctions = funcs
+   , serviceStmts = map FunctionStmt funcs
    , serviceLoc = StructLoc
      { slKeyword = getOffsets sAnnsEnd slKeyword
      , slName    = getOffsets (lLocation slKeyword) slName
@@ -426,7 +426,7 @@ computeServiceOffsets origin Service{..} =
          lLocation supLoc)
     (sAnns, sAnnsEnd) = foldO sAnnOffsets origin serviceSAnns
     (funcs, funcEnd) =
-      foldO functionOffsets (lLocation slOpenBrace) serviceFunctions
+      foldO functionOffsets (lLocation slOpenBrace) (getServiceFunctions s)
     (anns, annsEnd) = annsOffsets (lLocation slCloseBrace) serviceAnns
     StructLoc{..} = serviceLoc
 

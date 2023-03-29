@@ -188,7 +188,7 @@ unSelfQualDecls thriftName xs = map unSelfQual xs
       D_Typedef Typedef{..}
         | Just x <- usqAnnType tdType -> D_Typedef Typedef{tdType=x, ..}
       D_Service Service{..}
-        -> D_Service Service{serviceFunctions = map usqFun serviceFunctions, ..}
+        -> D_Service Service{serviceStmts = map usqStmt serviceStmts, ..}
       _ -> p
 
     usqField f@Field{..}
@@ -200,8 +200,8 @@ unSelfQualDecls thriftName xs = map unSelfQual xs
       | Just x <- usqAnnType altType = UnionAlt{altType=x, ..}
       | otherwise = a
 
-    usqFun :: Function 'Unresolved () Loc -> Function 'Unresolved () Loc
-    usqFun Function{..}= Function
+    usqStmt :: ServiceStmt 'Unresolved () Loc -> ServiceStmt 'Unresolved () Loc
+    usqStmt (FunctionStmt Function{..}) = FunctionStmt $ Function
       { funType = case funType of
           FunType (Some at) | Just x <- usqAnnType at -> FunType (Some x)
           FunTypeResponseAndStreamReturn ResponseAndStreamReturn{..}
@@ -215,6 +215,7 @@ unSelfQualDecls thriftName xs = map unSelfQual xs
       , funArgs = map usqField funArgs
       , funExceptions = map usqField funExceptions
       , .. }
+    usqStmt (PerformsStmt p) = PerformsStmt p
 
     usqAnnType :: forall v. AnnotatedType Loc v -> Maybe (AnnotatedType Loc v)
     usqAnnType t@AnnotatedType{..} = (\x -> t{atType=x}) <$> usqType atType
@@ -345,10 +346,12 @@ filterDecls reqSymbols symbolMap =
     -- Otherwise we don't need it
     filterSCC _ ctx = ctx
 
+    filterOutFns symbols (FunctionStmt Function{..}) = Set.member funName symbols
+    filterOutFns _ (PerformsStmt _) = False
+
     isRequired (D_Service Service{..}, dname, _) symbols =
       Set.member dname symbols ||
-      any (\Function{..} -> Set.member funName symbols)
-      serviceFunctions
+      any (filterOutFns symbols) serviceStmts
     isRequired (_, dname, _) symbols = Set.member dname symbols
 
     addNode node (ds, syms, smap) = (decl : ds, newSyms, newMap)
@@ -360,11 +363,15 @@ filterDecls reqSymbols symbolMap =
     -- are required
     filterDecl (D_Service s, _, _) symbols = mkVertex newDecl
       where
-        newDecl = D_Service s {serviceFunctions = filteredFuns, serviceSAnns=[]}
-        filteredFuns =
-          map (\f -> f {funSAnns=[]}) $
-          filter (\Function{..} -> Set.member funName symbols) $
-          serviceFunctions s
+        newDecl = D_Service s {serviceStmts = filteredStmts, serviceSAnns=[]}
+
+        mapFunSAnns (FunctionStmt f) = FunctionStmt (f {funSAnns=[]})
+        mapFunSAnns p = p
+
+        filteredStmts =
+          map mapFunSAnns $
+          filter (filterOutFns symbols) $
+          serviceStmts s
     filterDecl (D_Interaction s, _, _) symbols = mkVertex newDecl
       where
         newDecl = D_Interaction s {interactionFunctions = filteredFuns, interactionSAnns=[]}
@@ -413,7 +420,7 @@ filterDecls reqSymbols symbolMap =
       ( d
       , serviceName
       , maybeToList (supName <$> serviceSuper) ++
-        concatMap funSymbols serviceFunctions
+        concatMap stmtSymbols serviceStmts
       )
     mkVertex d@(D_Interaction Interaction{..}) =
       ( d
@@ -439,6 +446,9 @@ filterDecls reqSymbols symbolMap =
     constValSymbols StructConst{..} =
       [ s | ListElem{leElem=StructPair{..}} <- svElems
           , s <- constSymbols spVal ]
+    stmtSymbols :: Parsed ServiceStmt -> [Text]
+    stmtSymbols (FunctionStmt f) = funSymbols f
+    stmtSymbols _ = []
     funSymbols :: Parsed Function -> [Text]
     funSymbols Function{..} =
       funName :
@@ -723,15 +733,15 @@ resolveConst Const{..} = do
 
 resolveService :: Typecheckable l => Parsed Service -> Typechecked l Service
 resolveService s@Service{..} = do
-  (super, funs, sAnns)
+  (super, stmts, sAnns)
     <- (,,) <$> sequence (resolveSuper <$> serviceSuper)
-           `collect` mapT resolveFunction serviceFunctions
+           `collect` mapT resolveStmt serviceStmts
            `collect` resolveStructuredAnns serviceSAnns
   Env{..} <- ask
   pure Service
     { serviceResolvedName = renameService options s
     , serviceSuper        = super
-    , serviceFunctions    = funs
+    , serviceStmts        = stmts
     , serviceSAnns        = sAnns
     , ..
     }
@@ -740,6 +750,14 @@ resolveService s@Service{..} = do
       name <- mkThriftName supName
       (rname, _, rloc) <- lookupService name $ lLocation $ slName serviceLoc
       pure Super { supResolvedName = (rname, rloc), .. }
+
+resolveStmt :: Typecheckable l => Parsed ServiceStmt -> Typechecked l ServiceStmt
+resolveStmt (FunctionStmt f) = do
+  r <- resolveFunction f
+  pure $ FunctionStmt r
+resolveStmt (PerformsStmt Performs{..}) = do
+  Env{..} <- ask
+  pure $ PerformsStmt $ Performs {..}
 
 resolveInteraction :: Typecheckable l => Parsed Interaction -> Typechecked l Interaction
 resolveInteraction Interaction{..} = do
@@ -1779,10 +1797,11 @@ mkServiceMap (thriftName, opts@Options{..}) imap =
             name <- mkThriftName supName
             (\(_, setFuns, _) -> setFuns) <$>
               lookupService name (sloc serviceLoc)
-      foldM insFunc scope serviceFunctions
-    insFunc ctx f@Function{..} =
+      foldM insFunc scope serviceStmts
+    insFunc ctx (FunctionStmt f@Function{..}) =
       addToSet (lLocation $ fnlName funLoc) renamed ctx
       where renamed = renameFunction opts f
+    insFunc ctxt _ = Right ctxt
     sloc = lLocation . slName
 
 sortServices

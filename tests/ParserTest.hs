@@ -44,12 +44,15 @@ priorityTest = TestLabel "priority test" $ TestCase $ do
   let input = "service S { void foo() (priority = \"HIGH\") }"
   let decls = snd <$> runParser parseThrift "" input
   case decls of
-    Right [D_Service Service{serviceFunctions=[Function{..}]}] ->
-      case getAnns funAnns of
-       [ValueAnn{..}]
-         | vaTag == "priority"
-         , TextAnn p _ <- vaVal -> assertEqual "priority" "HIGH" p
-       _ -> assertFailure "Parsing failed."
+    Right [D_Service s@Service{}] -> do
+      case getServiceFunctions s of
+        [Function{..}] ->
+          case getAnns funAnns of
+          [ValueAnn{..}]
+            | vaTag == "priority"
+            , TextAnn p _ <- vaVal -> assertEqual "priority" "HIGH" p
+          _ -> assertFailure "Parsing failed."
+        _ -> assertFailure "Parsing failed."
     _ -> assertFailure "Parsing failed."
 
 main :: IO ()
