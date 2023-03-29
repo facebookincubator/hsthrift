@@ -37,7 +37,7 @@ run opts@Options{..} = do
   -- Parse and Typecheck
   (headModule, deps) <- typecheckInput opts =<< parseAll opts optsPath
 
-  if optsLenient then return []
+  if optsLenient && not optsLenientStillGenCode then return []
   else do
     -- Generate Outputs
     genFiles <- getGenerator opts headModule deps

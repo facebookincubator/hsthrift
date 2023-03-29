@@ -81,6 +81,10 @@ optionsParser = do
     [ long "lenient"
     , help "Parse & Typecheck weird old thrift files, disables code generation"
     ]
+  optsLenientStillGenCode <- switch $ mconcat
+    [ long "lenient-still-gencode"
+    , help "Do code generation for lenient runs"
+    ]
   -- We can support parsing these options for compatibility, but they don't do
   -- anything
   _ <- switch (long "allow-64bit-consts")

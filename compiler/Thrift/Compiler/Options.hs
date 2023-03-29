@@ -19,6 +19,7 @@ data Options l = Options
   , optsReqSymbols    :: Maybe [Text]
   , optsSingleOutput  :: Bool
   , optsLenient       :: Bool -- ^ whether to accept older weirder thrift files
+  , optsLenientStillGenCode :: Bool -- ^ whether to still generate code under lenient
   }
 
 defaultOptions :: LangOpts l -> Options l
@@ -33,6 +34,7 @@ defaultOptions opts = Options
   , optsReqSymbols    = Nothing
   , optsSingleOutput  = False
   , optsLenient       = False
+  , optsLenientStillGenCode = False
   }
 
 data OptLoc = WithoutLoc | WithLoc
