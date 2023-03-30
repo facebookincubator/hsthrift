@@ -253,10 +253,13 @@ HS_DEFINE_MARSHALLABLE(HsSetString, HsSet<HsString>);
 HS_DEFINE_MARSHALLABLE(HsSetJSON, HsSet<HsJSON>);
 
 HS_DEFINE_MARSHALLABLE(HsMapIntInt, HsMap<int64_t, int64_t>);
+HS_DEFINE_MARSHALLABLE(HsMapInt32Int32, HsMap<int32_t, int32_t>);
+HS_DEFINE_MARSHALLABLE(HsMapInt32Double, HsMap<int32_t, double>);
 HS_DEFINE_MARSHALLABLE(HsMapIntDouble, HsMap<int64_t, double>);
 HS_DEFINE_MARSHALLABLE(HsMapIntString, HsMap<int64_t, HsString>);
 HS_DEFINE_MARSHALLABLE(HsMapInt32String, HsMap<int32_t, HsString>);
 HS_DEFINE_MARSHALLABLE(HsMapDoubleInt32, HsMap<double, int32_t>);
+HS_DEFINE_MARSHALLABLE(HsMapStringInt32, HsMap<HsString, int32_t>);
 HS_DEFINE_MARSHALLABLE(HsMapStringInt, HsMap<HsString, int64_t>);
 HS_DEFINE_MARSHALLABLE(HsMapStringDouble, HsMap<HsString, double>);
 HS_DEFINE_MARSHALLABLE(HsMapStringString, HsMap<HsString, HsString>);
