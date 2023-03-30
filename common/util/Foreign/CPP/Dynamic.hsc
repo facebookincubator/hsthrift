@@ -18,6 +18,8 @@ module Foreign.CPP.Dynamic
   , parseJSON
   , parseJSONWithOptions
   , JSONOptions(..)
+  , JSONParserFFI
+  , callJSONParserFFI
   ) where
 
 import Control.Monad (when)
@@ -188,8 +190,20 @@ instance Default JSONOptions
 parseJSON :: ByteString -> IO (Either Text Value)
 parseJSON = parseJSONWithOptions def
 
+type JSONParserFFI = CString -> CLong -> Ptr (Ptr CChar) -> IO (Ptr Dynamic)
+
 parseJSONWithOptions :: JSONOptions -> ByteString -> IO (Either Text Value)
-parseJSONWithOptions JSONOptions{..} bs =
+parseJSONWithOptions JSONOptions{..} bs = callJSONParserFFI parserFFI bs
+  where
+    rec = maybe (-1) fromIntegral json_recursionLimit
+    parserFFI cstr clen = ffi cstr clen rec
+    ffi
+      -- conservative: 100K parses in about 0.2ms
+      | B.length bs > 10*1024 = c_parseJSON_safe
+      | otherwise = c_parseJSON
+
+callJSONParserFFI :: JSONParserFFI -> ByteString -> IO (Either Text Value)
+callJSONParserFFI ffi bs =
   unsafeUseAsCStringLen bs $ \(cstr, clen) ->
   Foreign.with nullPtr $ \perr -> do
     let
@@ -197,14 +211,8 @@ parseJSONWithOptions JSONOptions{..} bs =
         str <- peek perr
         when (str /= nullPtr) $ free str
         delete pdynamic
-      ffi
-        -- conservative: 100K parses in about 0.2ms
-        | B.length bs > 10*1024 = c_parseJSON_safe
-        | otherwise = c_parseJSON
-
-      rec = maybe (-1) fromIntegral json_recursionLimit
     bracket
-      (ffi cstr (fromIntegral clen) rec perr)
+      (ffi cstr (fromIntegral clen) perr)
       cleanup $ \pdynamic -> do
         if pdynamic == nullPtr
           then fmap Left $ cStringToText =<< peek perr
