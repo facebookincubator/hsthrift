@@ -60,10 +60,7 @@ const set<string> set_value = [string_value, ""];
 # set<float> is undefined - can't handle NaN.
 # const set<double> (cpp.template = 'std::unordered_set') hash_set_value = [0.1, 0.2]
 const map<i64, bool> map_value = {0: true, 1: false};
-const map<string, string> (hs.type = "HashMap") hash_map_value = {
-  "a": "A",
-  "b": "B",
-};
+const map_string_string_6258 hash_map_value = {"a": "A", "b": "B"};
 
 const B struct_value = {"a": 1, "b": 2, "c": 3};
 const B explicit_struct_value = B{a = 1, b = 2, c = 3};
@@ -72,3 +69,6 @@ const C explicit_nested_struct_value = C{
   y = [],
   z = B{a = 1, b = 2, c = 3},
 };
+
+// The following were automatically generated and may benefit from renaming.
+typedef map<string, string> (hs.type = "HashMap") map_string_string_6258
