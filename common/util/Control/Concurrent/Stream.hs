@@ -8,6 +8,8 @@ module Control.Concurrent.Stream
   , streamBound
   , streamWithState
   , streamWithStateBound
+  , mapConcurrently_unordered
+  , forConcurrently_unordered
   ) where
 
 import Control.Concurrent.Async
@@ -17,6 +19,8 @@ import Control.Monad
 
 import Util.Control.Exception
 import Util.Log
+import Data.IORef
+import Data.IORef.Extra
 
 data ShouldBindThreads = BoundThreads | UnboundThreads
 
@@ -113,3 +117,32 @@ stream_ useBoundThreads shouldThrow producer workerStates worker = do
               SwallowExceptions -> logError $ show ex
             Right _ -> return ()
           runWorker unmask q s
+
+-- | Concurrent map over a stream of values. Results are unordered.
+--
+-- Convenience interface over Control.Concurrent.Stream (stream),
+-- for processing values in lists in the same manner as mapConcurrently.
+-- The list of output values may not be in the same order as the list
+-- of input values.
+mapConcurrently_unordered
+  :: Int -- ^ Maximum concurrency
+  -> (a -> IO b) -- ^ Function to map over the input values
+  -> [a] -- ^ List of input values
+  -> IO [b] -- ^ List of output values (unordered)
+mapConcurrently_unordered maxConcurrency transformIO input = do
+  outputRef <- Data.IORef.newIORef []
+  stream maxConcurrency (forM_ input) $ \inputElement -> do
+    transformedElement <- transformIO inputElement
+    Data.IORef.Extra.atomicModifyIORef_ outputRef (transformedElement:)
+  Data.IORef.readIORef outputRef
+
+-- | Control.Concurrent.Stream (mapConcurrently) but with its arguments reversed
+--
+-- The list of output values may not be in the same order as the list
+-- of input values.
+forConcurrently_unordered
+  :: Int -- ^ Maximum concurrency
+  -> [a] -- ^ List of input values
+  -> (a -> IO b) -- ^ Function to map over the input values
+  -> IO [b] -- ^ List of output values (unordered)
+forConcurrently_unordered = flip . mapConcurrently_unordered
