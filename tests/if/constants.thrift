@@ -34,18 +34,15 @@ typedef i64 Id (hs.newtype)
 
 const Id idConst = 12345;
 
-const list<Id> (hs.type = "Vector") idVect = [1, 2, 3, 4, 5];
+const list_Id_1134 idVect = [1, 2, 3, 4, 5];
 
-const list<i64> (hs.type = "VectorStorable") i64VectS = [1, 2, 3, 4, 5];
+const list_i64_5078 i64VectS = [1, 2, 3, 4, 5];
 
-const map<i64, string> (hs.type = "HashMap") hashmapConst = {
-  0: 'zero',
-  1: 'one',
-};
+const map_i64_string_4289 hashmapConst = {0: 'zero', 1: 'one'};
 
-const string (hs.type = "String") strConst = "string";
+const string_9126 strConst = "string";
 
-const string (hs.type = "ByteString") byteStrConst = "string";
+const string_9425 byteStrConst = "string";
 
 const i64 negative = -1;
 
@@ -61,3 +58,10 @@ union NonEmpty {
 
 const bool trueConst = true;
 const bool falseConst = false;
+
+// The following were automatically generated and may benefit from renaming.
+typedef list<Id> (hs.type = "Vector") list_Id_1134
+typedef list<i64> (hs.type = "VectorStorable") list_i64_5078
+typedef map<i64, string> (hs.type = "HashMap") map_i64_string_4289
+typedef string (hs.type = "String") string_9126
+typedef string (hs.type = "ByteString") string_9425
