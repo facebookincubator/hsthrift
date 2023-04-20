@@ -380,6 +380,12 @@ instance Storable HsByteString where
   poke = notPokeable "HsByteString"
   peek p = fmap HsByteString $ packCStringLen =<< peekStrLen p
 
+instance Eq HsByteString where
+  (HsByteString a) == (HsByteString b) = a == b
+
+instance Hashable HsByteString where
+  hashWithSalt i (HsByteString a) = hashWithSalt i a
+
 -- HsLenientText --------------------------------------------------------------
 
 newtype HsLenientText = HsLenientText
