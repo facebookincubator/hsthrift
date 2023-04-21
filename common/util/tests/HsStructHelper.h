@@ -50,3 +50,5 @@ HS_STD_TUPLE_H(
         HsJSON,
         facebook::common::hs::OnlyMovable,
         HsEither<HsString, int64_t>));
+HS_STD_TUPLE_H(TupleStringString, FB_SINGLE_ARG(HsString, HsString));
+HS_OPTION_H(TupleStringString, FB_SINGLE_ARG(HsStdTuple<HsString, HsString>));

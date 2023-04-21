@@ -67,8 +67,12 @@ data MyVariant
 $(deriveMarshallableUnsafe "HsOptionMyCppVariant" [t| HsOption MyVariant |])
 $(deriveMarshallableUnsafe "MyCppVariant" [t| MyVariant |])
 $(deriveMarshallableUnsafe "CppTupleIntJSONOnlyMovable" [t| HsStdTuple (Int32, HsJSON, OnlyMovable, HsEither HsText Int) |])
+$(deriveMarshallableUnsafe "TupleStringString" [t| HsStdTuple (HsText, HsText) |])
+$(deriveMarshallableUnsafe "HsOptionTupleStringString" [t| HsOption (HsStdTuple (HsText, HsText)) |])
 
 -- Constructions next
 $(#{derive_hs_std_variant_unsafe MyCppVariant} "MyVariant" [t| MyVariant |])
 $(#{derive_hs_option_unsafe MyCppVariant} [t| MyVariant |])
 $(#{derive_hs_std_tuple_unsafe CppTupleIntJSONOnlyMovable} [t| (Int32, HsJSON, OnlyMovable, HsEither HsText Int) |])
+$(#{derive_hs_std_tuple_unsafe TupleStringString} [t| (HsText, HsText) |])
+$(#{derive_hs_option_unsafe TupleStringString} [t| HsStdTuple (HsText, HsText) |])

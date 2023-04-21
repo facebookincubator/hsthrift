@@ -15,7 +15,7 @@
       "deriveHsOptionUnsafe \"%s\" %lu ",                    \
       #cxx_name,                                             \
       (unsigned long)sizeof(HsOption<hs_option::cxx_name>)); \
-  hsc_alignment(HsOption<hs_option::cxx_name>);
+  hsc_printf("%lu", (unsigned long)sizeof(HsOption<hs_option::cxx_name>));
 
 #define HS_OPTION_H(Name, Type) \
   namespace hs_option {         \
@@ -29,7 +29,6 @@
   extern "C" void option_ctorHsOption##Name(void* ret, Type* v) noexcept { \
     new (ret) HsOption<Type>(std::move(*v));                               \
   }                                                                        \
-  HS_PEEKABLE(FB_SINGLE_ARG(HsOption<Type>));                              \
   HS_DEFINE_MARSHALLABLE(HsOption##Name, FB_SINGLE_ARG(HsOption<Type>))
 
 template <typename T>

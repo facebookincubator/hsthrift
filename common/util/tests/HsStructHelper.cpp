@@ -14,6 +14,7 @@ namespace facebook::common::hs {
 
 HS_DEFINE_DESTRUCTIBLE(HsMaybeNonmovable, HsMaybe<Nonmovable>);
 HS_STD_TUPLE_CPP(CppTupleIntJSONOnlyMovable);
+HS_STD_TUPLE_CPP(TupleStringString);
 
 extern "C" {
 
@@ -47,6 +48,7 @@ void fillCppTuple(hs_std_tuple::CppTupleIntJSONOnlyMovable* t) noexcept {
 
 HS_STD_VARIANT_CPP(MyCppVariant);
 HS_OPTION_CPP(MyCppVariant, hs_std_variant::MyCppVariant);
+HS_OPTION_CPP(TupleStringString, FB_SINGLE_ARG(HsStdTuple<HsString, HsString>));
 
 extern "C" {
 
