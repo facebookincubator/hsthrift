@@ -25,7 +25,8 @@ module B.Types
         bool_value, string_value, binary_value, newtype_value,
         scoped_enum_value, enum_value, scoped_pseudoenum_value,
         pseudoenum_value, list_value, set_value, map_value, hash_map_value,
-        struct_value, explicit_struct_value, explicit_nested_struct_value)
+        struct_value, explicit_struct_value, explicit_nested_struct_value,
+        Map_string_string_6258)
        where
 import qualified Control.DeepSeq as DeepSeq
 import qualified Control.Exception as Exception
@@ -461,7 +462,7 @@ set_value = Set.fromList [string_value, ""]
 map_value :: Map.Map Int.Int64 Prelude.Bool
 map_value = Map.fromList [(0, Prelude.True), (1, Prelude.False)]
 
-hash_map_value :: HashMap.HashMap Text.Text Text.Text
+hash_map_value :: Map_string_string_6258
 hash_map_value = HashMap.fromList [("a", "A"), ("b", "B")]
 
 struct_value :: B
@@ -475,3 +476,5 @@ explicit_nested_struct_value :: C
 explicit_nested_struct_value
   = (Default.def :: C){c_x = [], c_y = [],
                        c_z = (Default.def :: B){b_a = 1, b_b = 2, b_c = 3}}
+
+type Map_string_string_6258 = HashMap.HashMap Text.Text Text.Text

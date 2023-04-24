@@ -308,13 +308,19 @@
         {
             "name": "hash_map_value",
             "type": {
-                "key_type": {
-                    "type": "string"
+                "inner_type": {
+                    "key_type": {
+                        "type": "string"
+                    },
+                    "type": "map",
+                    "val_type": {
+                        "type": "string"
+                    }
                 },
-                "type": "map",
-                "val_type": {
-                    "type": "string"
-                }
+                "name": {
+                    "name": "map_string_string_6258"
+                },
+                "type": "typedef"
             },
             "value": {
                 "literal": {
@@ -731,6 +737,19 @@
             "newtype": true,
             "type": {
                 "type": "i64"
+            }
+        },
+        {
+            "name": "map_string_string_6258",
+            "newtype": false,
+            "type": {
+                "key_type": {
+                    "type": "string"
+                },
+                "type": "map",
+                "val_type": {
+                    "type": "string"
+                }
             }
         }
     ],
