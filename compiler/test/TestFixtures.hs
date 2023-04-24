@@ -109,10 +109,10 @@ assertFileEqual path expected obtained =
       . Text.lines
       . Text.pack
 
-    fixLine l
+    fixLine
       = Text.replace "\"compiler/test/fixtures/"
                      "\"test/fixtures/"
       . Text.replace "\"include_path\": \"compiler\","
                      "\"include_path\": \".\","
     -- TODO: update the fixtures and remove this replace once 8.8 lands
-      $ Text.replace "Thrift.This" "Thrift.Some" l
+      . Text.replace "Thrift.This" "Thrift.Some"
