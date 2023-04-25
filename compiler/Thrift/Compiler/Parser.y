@@ -174,7 +174,7 @@ Struct
       { structName         = lVal $4
       , structResolvedName = ()
       , structType         = lVal $3
-      , structMembers      = $6
+      , structMembers      = filterHiddenFields $6
       , structLoc          = StructLoc
         { slKeyword    = lLoc $3
         , slName       = lLoc $4
