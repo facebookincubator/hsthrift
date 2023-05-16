@@ -6,6 +6,8 @@ include "test/if/b.thrift"
 
 typedef i64 T
 
+const T a = b.i64_value;
+
 struct A {
   1: T a = a;
   2: b.B b = b;
@@ -26,8 +28,6 @@ union U {
 exception X {
   1: string reason;
 }
-
-const T a = b.i64_value;
 
 const U u = {"y": [b.string_value]};
 

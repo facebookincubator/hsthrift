@@ -9,6 +9,8 @@ exception _Exception {
   1: string reason;
 }
 
+const _Type a = 100;
+
 struct _Struct {
   1: _Type a = a;
   2: list<list<_Type>> b;
@@ -19,8 +21,6 @@ union _Union {
   2: list<string> y;
   3: set<i64> z;
 }
-
-const _Type a = 100;
 
 const _Union u = {"y": ["test"]};
 
