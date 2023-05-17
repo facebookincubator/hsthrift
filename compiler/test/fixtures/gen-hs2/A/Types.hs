@@ -12,9 +12,8 @@
 {-# OPTIONS_GHC -fno-warn-incomplete-uni-patterns#-}
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
 module A.Types
-       (T, A(A, a_a, a_b, a_c, a_d, a_e, a_f, a_g, a_h),
-        U(U_EMPTY, U_x, U_y, U_z), X(X, x_reason), a, u, b, default_d,
-        zero)
+       (T, a, A(A, a_a, a_b, a_c, a_d, a_e, a_f, a_g, a_h),
+        U(U_EMPTY, U_x, U_y, U_z), X(X, x_reason), u, b, default_d, zero)
        where
 import qualified B.Types as B
 import qualified Control.DeepSeq as DeepSeq
@@ -45,6 +44,9 @@ import Prelude ((.), (<$>), (<*>), (>>=), (==), (++))
 import Prelude ((.), (<$>), (<*>), (>>=), (==), (/=), (<), (++))
 
 type T = Int.Int64
+
+a :: T
+a = B.i64_value
 
 data A = A{a_a :: T, a_b :: B.B, a_c :: Prelude.Bool,
            a_d :: [[Int.Int32]], a_e :: Map.Map Int.Int32 Text.Text,
@@ -408,9 +410,6 @@ instance Hashable.Hashable X where
     = Hashable.hashWithSalt __salt _reason
 
 instance Exception.Exception X
-
-a :: T
-a = B.i64_value
 
 u :: U
 u = U_y [B.string_value]

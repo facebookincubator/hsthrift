@@ -12,10 +12,10 @@
 {-# OPTIONS_GHC -fno-warn-incomplete-uni-patterns#-}
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
 module Namespace.E.Types
-       (TU__Type, TU__Exception(TU__Exception, _Exception_reason),
+       (TU__Type, TU__Exception(TU__Exception, _Exception_reason), a,
         TU__Struct(TU__Struct, _Struct_a, _Struct_b),
         TU__Union(TU__Union_EMPTY, TU__Union_x, TU__Union_y, TU__Union_z),
-        a, u)
+        u)
        where
 import qualified Control.DeepSeq as DeepSeq
 import qualified Control.Exception as Exception
@@ -101,6 +101,9 @@ instance Hashable.Hashable TU__Exception where
     = Hashable.hashWithSalt __salt _reason
 
 instance Exception.Exception TU__Exception
+
+a :: TU__Type
+a = 100
 
 data TU__Struct = TU__Struct{_Struct_a :: TU__Type,
                              _Struct_b :: [[TU__Type]]}
@@ -259,9 +262,6 @@ instance Hashable.Hashable TU__Union where
         (Hashable.hashWithSalt 3 (Set.elems _z))
   hashWithSalt __salt TU__Union_EMPTY
     = Hashable.hashWithSalt __salt (0 :: Prelude.Int)
-
-a :: TU__Type
-a = 100
 
 u :: TU__Union
 u = TU__Union_y ["test"]
