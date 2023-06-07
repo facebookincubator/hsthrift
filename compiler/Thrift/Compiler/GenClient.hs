@@ -35,7 +35,7 @@ genClientDecls Service{..} =
     Nothing -> []
     Just Super{..} ->
       [ TypeInsDecl ()
-        (qualType "Thrift" "Super" `appT` simpleType serviceName)
+        (qualType "Thrift" "Super" `appT` simpleType serviceResolvedName)
         (case resolvedName . fst $ supResolvedName of
            UName n -> qualType n n
            QName _ n -> qualType n n)
