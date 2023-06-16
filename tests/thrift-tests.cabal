@@ -188,8 +188,8 @@ test-suite integration
 test-suite interaction
   import: fb-haskell, test-common
   type: exitcode-stdio-1.0
-  main-is: InteractionTest.hs
-  ghc-options: -main-is InteractionTest
+  main-is: InteractionsTest.hs
+  ghc-options: -main-is InteractionsTest
 test-suite interface
   import: fb-haskell, test-common
   type: exitcode-stdio-1.0
