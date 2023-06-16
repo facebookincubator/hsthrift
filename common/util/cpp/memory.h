@@ -74,33 +74,40 @@ malloced_array<T> malloc_array(size_t n) {
 }
 
 template <typename T>
-malloced_array<T> clone_array(const T* data, size_t size) {
-  malloced_array<T> arr(size);
+malloced_array<T> clone_array(const T* data, size_t size, size_t pad = 0) {
+  malloced_array<T> arr(size + pad);
   if (size != 0) {
     std::memcpy(arr.get(), data, size * sizeof(T));
   }
   return arr;
 }
 
-inline malloced_array<uint8_t> clone_bytes(const void* data, size_t size) {
-  return clone_array<uint8_t>(static_cast<const uint8_t*>(data), size);
+inline malloced_array<uint8_t>
+clone_bytes(const void* data, size_t size, size_t pad = 0) {
+  return clone_array<uint8_t>(static_cast<const uint8_t*>(data), size, pad);
 }
 
-inline malloced_array<uint8_t> clone_bytes(folly::ByteRange bytes) {
-  return clone_bytes(bytes.data(), bytes.size());
+inline malloced_array<uint8_t> clone_bytes(
+    folly::ByteRange bytes,
+    size_t pad = 0) {
+  return clone_bytes(bytes.data(), bytes.size(), pad);
 }
 
-inline malloced_array<uint8_t> clone_bytes(const folly::fbstring& bytes) {
-  return clone_bytes(bytes.data(), bytes.size());
+inline malloced_array<uint8_t> clone_bytes(
+    const folly::fbstring& bytes,
+    size_t pad = 0) {
+  return clone_bytes(bytes.data(), bytes.size(), pad);
 }
 
-inline malloced_array<uint8_t> clone_bytes(const std::string& bytes) {
-  return clone_bytes(bytes.data(), bytes.size());
+inline malloced_array<uint8_t> clone_bytes(
+    const std::string& bytes,
+    size_t pad = 0) {
+  return clone_bytes(bytes.data(), bytes.size(), pad);
 }
 
-inline malloced_array<char> clone_string(const std::string& s) {
+inline malloced_array<char> clone_string(const std::string& s, size_t pad = 0) {
   auto p = s.c_str();
-  return clone_array(p, strlen(p) + 1);
+  return clone_array(p, strlen(p) + 1, pad);
 }
 
 } // namespace ffi
