@@ -68,15 +68,14 @@ struct Foo {
   5: optional SetWithAdapter optionalSetField;
   @hack.Adapter{name = '\Adapter3'}
   @cpp.Adapter{name = 'my::Adapter3'}
-  6: map<string, ListWithElemAdapter_withAdapter (py.adapter = 'my.Adapter2')> (
+  6: map<string, ListWithElemAdapter_withAdapter_2769> (
     py.adapter = 'my.Adapter3',
   ) mapField;
   @hack.Adapter{name = '\Adapter3'}
   @cpp.Adapter{name = 'my::Adapter3'}
-  7: optional map<
-    string,
-    ListWithElemAdapter_withAdapter (py.adapter = 'my.Adapter2')
-  > (py.adapter = 'my.Adapter3') optionalMapField;
+  7: optional map<string, ListWithElemAdapter_withAdapter_2769> (
+    py.adapter = 'my.Adapter3',
+  ) optionalMapField;
   @hack.Adapter{name = '\Adapter1'}
   @cpp.Adapter{name = 'my::Adapter3'}
   8: binary (py.adapter = 'my.Adapter1') binaryField;
@@ -96,7 +95,7 @@ union Baz {
   4: SetWithAdapter setField;
   @hack.Adapter{name = '\Adapter3'}
   @cpp.Adapter{name = 'my::Adapter3'}
-  6: map<string, ListWithElemAdapter_withAdapter (py.adapter = 'my.Adapter2')> (
+  6: map<string, ListWithElemAdapter_withAdapter_2769> (
     py.adapter = 'my.Adapter3',
   ) mapField;
   @hack.Adapter{name = '\Adapter1'}
@@ -116,10 +115,8 @@ struct Bar {
   @hack.Adapter{name = '\Adapter1'}
   @cpp.Adapter{name = 'my::Adapter1'}
   2: optional Foo (py.adapter = 'my.Adapter1') optionalStructField;
-  3: list<FooWithAdapter (py.adapter = 'my.Adapter1')> structListField;
-  4: optional list<
-    FooWithAdapter (py.adapter = 'my.Adapter1')
-  > optionalStructListField;
+  3: list<FooWithAdapter_8945> structListField;
+  4: optional list<FooWithAdapter_8945> optionalStructListField;
   @hack.Adapter{name = '\Adapter1'}
   @cpp.Adapter{name = 'my::Adapter1'}
   5: Baz (py.adapter = 'my.Adapter1') unionField;
@@ -181,8 +178,8 @@ typedef A AdaptedA
 struct A {}
 
 service Service {
-  MyI32 (py.adapter = 'my.Adapter1') func(
-    1: StringWithAdapter (py.adapter = 'my.Adapter2') arg1,
+  MyI32_553 func(
+    1: StringWithAdapter_9663 arg1,
     @cpp.Adapter{name = "my::Adapter2"}
     2: string arg2,
     3: Foo arg3,
@@ -201,3 +198,11 @@ struct MyStruct {
 
 @cpp.Adapter{name = "MyVarAdapter"}
 const MyStruct var3 = MyStruct{field = 30};
+
+// The following were automatically generated and may benefit from renaming.
+typedef FooWithAdapter (py.adapter = "my.Adapter1") FooWithAdapter_8945
+typedef ListWithElemAdapter_withAdapter (
+  py.adapter = "my.Adapter2",
+) ListWithElemAdapter_withAdapter_2769
+typedef MyI32 (py.adapter = "my.Adapter1") MyI32_553
+typedef StringWithAdapter (py.adapter = "my.Adapter2") StringWithAdapter_9663
