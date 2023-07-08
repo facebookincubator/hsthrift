@@ -10,5 +10,6 @@ packages:
     tests/thrift-tests.cabal
     haxl/thrift-haxl.cabal
     cpp-channel/thrift-cpp-channel.cabal
+    http/thrift-http.cabal
 
 tests: true

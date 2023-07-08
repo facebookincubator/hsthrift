@@ -38,11 +38,17 @@ thrift-hs:: compiler
 		test/if/math.thrift \
 		-o ../server/test)
 	(cd lib && $(THRIFT_COMPILE) --hs --use-int \
+		test/if/math.thrift \
+		-o ../http/test)
+	(cd lib && $(THRIFT_COMPILE) --hs --use-int \
 		test/if/echoer.thrift \
 		-o test)
 	(cd lib && $(THRIFT_COMPILE) --hs --use-int \
 		test/if/echoer.thrift \
 		-o ../server/test)
+	(cd lib && $(THRIFT_COMPILE) --hs --use-int \
+		test/if/echoer.thrift \
+		-o ../http/test)
 	(cd server && $(THRIFT_COMPILE) --hs \
 		test/if/hash_map.thrift \
 		-o test)
