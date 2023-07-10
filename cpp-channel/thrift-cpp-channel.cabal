@@ -127,6 +127,8 @@ library
         text-show,
         bytestring
 
+-- Workaround for IPv6 loopback bug on Docker/Ubuntu:
+--   https://github.com/docker/for-linux/issues/1374
 flag tests_use_ipv4
      description: Force tests to use IPV4 whenever bringing thrift clients/servers up
      default: False
