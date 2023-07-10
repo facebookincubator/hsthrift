@@ -144,6 +144,7 @@ test-suite header-channel
                test/if/gen-cpp2/Calculator.cpp
                test/if/gen-cpp2/AdderAsyncClient.cpp
                test/if/gen-cpp2/Adder.cpp
+               test/if/gen-cpp2/math_data.cpp
                test/if/gen-cpp2/math_types.cpp
                test/if/gen-cpp2/math_metadata.cpp
   extra-libraries:
