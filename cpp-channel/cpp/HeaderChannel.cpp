@@ -1,7 +1,7 @@
 // Copyright (c) Facebook, Inc. and its affiliates.
 
 #include <folly/io/async/AsyncSocket.h>
-#include <thrift/lib/cpp2/async/HeaderClientChannel.h>
+#include <thrift/lib/cpp2/async/RocketClientChannel.h>
 
 using namespace apache::thrift;
 using namespace folly;
@@ -15,7 +15,7 @@ typedef folly::AsyncTransport::UniquePtr (*MakeTransport)(
     folly::EventBase* eb,
     size_t conn_timeout);
 
-HeaderClientChannel::Ptr* newHeaderChannel(
+RocketClientChannel::Ptr* newHeaderChannel(
     const char* host_str,
     size_t host_len,
     size_t port,
@@ -30,18 +30,16 @@ HeaderClientChannel::Ptr* newHeaderChannel(
   // Construction of the socket needs to be in the event base thread
   auto f = folly::via(eb, [=, &addr] {
     auto transport = makeTransport(addr, eb, conn_timeout);
-    auto chan = HeaderClientChannel::newChannel(
-        std::move(transport),
-        HeaderClientChannel::Options().setProtocolId(protocol_id));
-
+    auto chan = RocketClientChannel::newChannel(std::move(transport));
+    chan->setProtocolId(protocol_id);
     chan->setTimeout(send_timeout + recv_timeout);
     chan->getTransport()->setSendTimeout(send_timeout);
     return chan;
   });
-  return new HeaderClientChannel::Ptr(std::move(f).get());
+  return new RocketClientChannel::Ptr(std::move(f).get());
 }
 
-void deleteHeaderChannel(HeaderClientChannel::Ptr* ch) noexcept {
+void deleteHeaderChannel(RocketClientChannel::Ptr* ch) noexcept {
   auto h = std::move(*ch);
   delete ch;
   // Destruction needs to be done in the event base thread too
