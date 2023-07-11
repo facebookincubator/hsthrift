@@ -11,14 +11,19 @@ THREADS=4
 # These are required source deps not satisifiable with common package systems
 # in topological order. You can pass additional deps on the command line.
 #
-DEPS="fmt folly fizz wangle fbthrift"
+BASE_DEPS="fmt folly"
+FBTHRIFT_DEPS="fizz wangle fbthrift"
+EXTRA_DEPS=""
 
 while [ "$#" -gt 0 ]; do
     case "$1" in
         --threads) THREADS="$2"; shift; shift;;
-        *) DEPS+=" $1"; shift;;
+        --no-fbthrift) FBTHRIFT_DEPS=""; shift;;
+        *) EXTRA_DEPS+=" $1"; shift;;
     esac
 done
+
+DEPS="$BASE_DEPS $FBTHRIFT_DEPS $EXTRA_DEPS"
 
 # default library and bin install path
 if [ -z "${INSTALL_PREFIX}" ]; then
