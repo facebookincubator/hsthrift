@@ -1,16 +1,11 @@
 -- Copyright (c) Facebook, Inc. and its affiliates.
 
-{-# LANGUAGE CPP #-}
 module Thrift.Compiler.Pretty
   ( renderTypeError
   , renderTypeErrorPlain
   , renderType
   , ppHeader, ppName, ppType, ppText
   ) where
-
-#if __GLASGOW_HASKELL__ > 804
-#define This Some
-#endif
 
 import Text.PrettyPrint hiding ((<>))
 import Data.Some
@@ -158,7 +153,7 @@ ppType (TException name _loc) = ppName name
 ppType (TUnion name _loc)     = ppName name
 ppType (TEnum name _loc _)      = ppName name
 ppType (TSpecial ty) = case backTranslateType ty of
-  (This u, name) -> ppType u <+> parens (ppText name)
+  (Some u, name) -> ppType u <+> parens (ppText name)
 
 ppName :: Name -> Doc
 ppName Name{..} = ppName_ sourceName

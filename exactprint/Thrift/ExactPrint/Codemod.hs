@@ -1,6 +1,5 @@
 -- Copyright (c) Facebook, Inc. and its affiliates.
 
-{-# LANGUAGE CPP #-}
 module Thrift.ExactPrint.Codemod
   ( roundTripWith
   , codemodConsts
@@ -23,10 +22,6 @@ import Thrift.Compiler.Plugins.Linter
 import Thrift.ExactPrint.Convert
 import Thrift.ExactPrint.PrettyPrint
 import Thrift.ExactPrint.Types
-
-#if MIN_VERSION_dependent_sum(0,6,0)
-#define This Some
-#endif
 
 -- | Round Trip a file, applying some tranformation to the typechecked AST
 roundTripWith
@@ -96,13 +91,13 @@ codemodConsts f p@Program{..} = p { progDecls = map codemodDecl progDecls }
 
     -- Structs
     codemodConstVal t@(TStruct name _loc) c
-      | Just (This schema) <- lookupSchema name progEnv =
+      | Just (Some schema) <- lookupSchema name progEnv =
           f progEnv t $ codemodSchema schema c
     codemodConstVal t@(TException name _loc) c
-      | Just (This schema) <- lookupSchema name progEnv =
+      | Just (Some schema) <- lookupSchema name progEnv =
           f progEnv t $ codemodSchema schema c
     codemodConstVal t@(TUnion name _loc) c
-      | Just (This schema) <- lookupUnion name progEnv =
+      | Just (Some schema) <- lookupUnion name progEnv =
           f progEnv t $ codemodSchema schema c
 
     -- Everything Else

@@ -1,15 +1,10 @@
 -- Copyright (c) Facebook, Inc. and its affiliates.
 
-{-# LANGUAGE CPP #-}
 module Thrift.Compiler.GenJSON
   ( genJSON
   , writeJSON
   , getAstPath
   ) where
-
-#if __GLASGOW_HASKELL__ > 804
-#define This Some
-#endif
 
 import Prelude hiding (Enum)
 import Data.Aeson
@@ -206,7 +201,7 @@ genType (TNewtype name ty _loc) = HashMap.fromList
   , "inner_type" .= genType ty
   ]
 genType (TSpecial ty) = case backTranslateType ty of
-  (This u, tag) -> genType u <> HashMap.fromList [ "special" .= tag ]
+  (Some u, tag) -> genType u <> HashMap.fromList [ "special" .= tag ]
 
 simpleType :: Text -> Object
 simpleType tyName = HashMap.singleton "type" (String tyName)
@@ -272,9 +267,9 @@ genLiteral (TMap k v)     (Map xs)     = mapLiteral "map" k v xs
 genLiteral (THashMap k v) (HashMap xs) = mapLiteral "hash_map" k v xs
 
 -- Named Types
-genLiteral TStruct{} (This sval) = genStructVal sval
-genLiteral TException{} (This (EV sval)) = genStructVal sval
-genLiteral TUnion{} (This uval) = genUnionVal uval
+genLiteral TStruct{} (Some sval) = genStructVal sval
+genLiteral TException{} (Some (EV sval)) = genStructVal sval
+genLiteral TUnion{} (Some uval) = genUnionVal uval
 genLiteral TEnum{} (EnumVal name _loc) = HashMap.fromList
   [ "type"  .= ("enum" :: Text)
   , "value" .= genName name

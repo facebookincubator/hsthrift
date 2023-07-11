@@ -1,6 +1,6 @@
 -- Copyright (c) Facebook, Inc. and its affiliates.
 
-{-# LANGUAGE CPP, NamedFieldPuns #-}
+{-# LANGUAGE NamedFieldPuns #-}
 module Thrift.Compiler.GenJSONLoc
   ( -- * Main generation
     genJSONLoc
@@ -10,10 +10,6 @@ module Thrift.Compiler.GenJSONLoc
   , displayAnnotatedType
   , genType
   ) where
-
-#if __GLASGOW_HASKELL__ > 804
-#define This Some
-#endif
 
 import Prelude hiding (Enum)
 import Data.Aeson
@@ -175,7 +171,7 @@ reconstructXRef atIn@AnnotatedType{atType, atLoc} rt = case (atType, rt) of
     (TNamed{}, TUnion _ rtLoc) -> [(getTypeLoc atLoc, rtLoc)]
     (TNamed{}, TEnum _ rtLoc _) -> [(getTypeLoc atLoc, rtLoc)]
     (_, TSpecial st) -> case backTranslateType st of
-      (This rtSimple, _) -> reconstructXRef atIn rtSimple
+      (Some rtSimple, _) -> reconstructXRef atIn rtSimple
     _ -> []
 
 displayXRef
@@ -427,7 +423,7 @@ genType (TNewtype name ty loc) = HashMap.fromList
   , "loc" .= displayLoc loc
   ]
 genType (TSpecial ty) = case backTranslateType ty of
-  (This u, tag) -> genType u <> HashMap.fromList [ "special" .= tag ]
+  (Some u, tag) -> genType u <> HashMap.fromList [ "special" .= tag ]
 
 simpleType :: Text -> Object
 simpleType tyName = HashMap.singleton "type" (String tyName)
@@ -494,9 +490,9 @@ genLiteral (TMap k v)     (Map xs)     = mapLiteral "map" k v xs
 genLiteral (THashMap k v) (HashMap xs) = mapLiteral "hash_map" k v xs
 
 -- Named Types
-genLiteral TStruct{} (This sval) = genStructVal sval
-genLiteral TException{} (This (EV sval)) = genStructVal sval
-genLiteral TUnion{} (This uval) = genUnionVal uval
+genLiteral TStruct{} (Some sval) = genStructVal sval
+genLiteral TException{} (Some (EV sval)) = genStructVal sval
+genLiteral TUnion{} (Some uval) = genUnionVal uval
 genLiteral TEnum{} (EnumVal name _loc) = HashMap.fromList
   [ "type"  .= ("enum" :: Text)
   , "value" .= genName name

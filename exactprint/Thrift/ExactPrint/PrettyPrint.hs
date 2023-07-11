@@ -1,6 +1,5 @@
 -- Copyright (c) Facebook, Inc. and its affiliates.
 
-{-# LANGUAGE CPP #-}
 module Thrift.ExactPrint.PrettyPrint
   ( exactPrint
   , exactPrintThrift
@@ -19,10 +18,6 @@ import Thrift.Compiler.Types
 
 import Thrift.ExactPrint.Convert
 import Thrift.ExactPrint.Types
-
-#if MIN_VERSION_dependent_sum(0,6,0)
-#define This Some
-#endif
 
 exactPrint :: Program l Offset -> Text
 exactPrint Program{..} = toLazyText $ mconcat
@@ -260,7 +255,7 @@ ppFunction fun@Function{funLoc=FunLoc{..},..} = mconcat $
   [ ppSAnns funSAnns
   , case fnlOneway of { Nothing -> "" ; Just loc -> addHeader loc <> "oneway" }
   , case funType of
-     FunType (This ty) -> ppType ty
+     FunType (Some ty) -> ppType ty
      FunTypeVoid loc -> addHeader loc <> "void"
      FunTypeResponseAndStreamReturn ResponseAndStreamReturn{..} -> mconcat
         [ maybe mempty ppType rsReturn

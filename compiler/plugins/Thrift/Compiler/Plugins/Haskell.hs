@@ -1,6 +1,5 @@
 -- Copyright (c) Facebook, Inc. and its affiliates.
 
-{-# LANGUAGE CPP #-}
 module Thrift.Compiler.Plugins.Haskell
   ( Haskell, HSType, HS
   , SpecialType(..)
@@ -9,10 +8,6 @@ module Thrift.Compiler.Plugins.Haskell
   , LangOpts(..), defaultHsOpts
   , toCamel
   ) where
-
-#if __GLASGOW_HASKELL__ > 804
-#define This Some
-#endif
 
 import Control.Monad.Trans.Reader
 import Data.ByteString (ByteString)
@@ -121,34 +116,34 @@ instance Typecheckable Haskell where
         -> TC Haskell (Some HSType)
       resolve I64 [("Int",_)] = special HsInt
       resolve TText [("String",_)] = special HsString
-      resolve (TMap k v) [("HashMap",_)] = pure $ This $ THashMap k v
-      resolve (TSet u) [("HashSet",_)] = pure $ This $ THashSet u
+      resolve (TMap k v) [("HashMap",_)] = pure $ Some $ THashMap k v
+      resolve (TSet u) [("HashSet",_)] = pure $ Some $ THashSet u
       resolve TText [("ByteString",_)] = special HsByteString
       resolve (TList u) [(vec,_)]
         | Just kind <-
             lookup vec [(hsVectorQual x,x) | x <- [minBound .. maxBound]] =
               special $ HsVector kind u
-      resolve u [] = pure $ This u
+      resolve u [] = pure $ Some u
       resolve u ((_,a):_) =
         typeError (annLoc a) $ AnnotationMismatch (AnnType u) a
 
-      special = pure . This . TSpecial
+      special = pure . Some . TSpecial
 
       ifFlag
         :: Bool
         -> (forall t. HSType t -> Some HSType)
         -> Some HSType
         -> Some HSType
-      ifFlag flag fun (This u)
+      ifFlag flag fun (Some u)
         | flag      = fun u
-        | otherwise = This u
+        | otherwise = Some u
       i64ToInt :: HSType t -> Some HSType
-      i64ToInt I64 = This $ TSpecial HsInt
-      i64ToInt u  = This u
-      map2HashMap (TMap k v) = This $ THashMap k v
-      map2HashMap u = This u
-      set2HashSet (TSet u) = This $ THashSet u
-      set2HashSet u = This u
+      i64ToInt I64 = Some $ TSpecial HsInt
+      i64ToInt u  = Some u
+      map2HashMap (TMap k v) = Some $ THashMap k v
+      map2HashMap u = Some u
+      set2HashSet (TSet u) = Some $ THashSet u
+      set2HashSet u = Some u
 
   -- Typechecking
 
@@ -253,10 +248,10 @@ instance Typecheckable Haskell where
 
   -- Back-Translators
 
-  backTranslateType HsInt = (This I64, "Int")
-  backTranslateType HsString = (This TText, "String")
-  backTranslateType HsByteString = (This TText, "ByteString")
-  backTranslateType (HsVector kind u) = (This (TList u), hsVectorQual kind)
+  backTranslateType HsInt = (Some I64, "Int")
+  backTranslateType HsString = (Some TText, "String")
+  backTranslateType HsByteString = (Some TText, "ByteString")
+  backTranslateType (HsVector kind u) = (Some (TList u), hsVectorQual kind)
 
   backTranslateLiteral HsInt i = ThisLit I64 (fromIntegral i)
   backTranslateLiteral HsString s = ThisLit TText (Text.pack s)

@@ -92,9 +92,7 @@ library
 
     build-depends:
         ghc-prim,
-        dependent-sum >= 0.6 && <= 0.6.2.0,
-          -- TODO: Data.Some was split out into package some at 0.6.2.2,
-          -- deprecated 'This' was removed.
+        some,
         containers,
         deepseq,
         STMonadTrans,
@@ -151,7 +149,6 @@ common test-deps
   build-depends: async ^>= 2.2,
                  base,
                  bytestring,
-                 some,
                  fb-stubs,
                  fb-util,
                  filepath,

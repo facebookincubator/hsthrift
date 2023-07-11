@@ -11,10 +11,6 @@ module Thrift.Processor
   , MethodInfo(..)
   ) where
 
-#if __GLASGOW_HASKELL__ > 804
-#define This Some
-#endif
-
 import Control.Exception
 import Thrift.Binary.Parser
 import Data.ByteString
@@ -82,7 +78,7 @@ process proxy seqNum handler input = do
           <> buildStruct proxy ex
           <> genMsgEnd proxy
         , Just (toException ex, ClientError) )
-    Right (This cmd) -> processCommand proxy seqNum handler cmd
+    Right (Some cmd) -> processCommand proxy seqNum handler cmd
   return (toStrict (toLazyByteString response), exc)
 
 processCommand

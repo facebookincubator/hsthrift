@@ -9,13 +9,6 @@ module Thrift.Compiler.GenService
   , genServiceExports
   ) where
 
-#if __GLASGOW_HASKELL__ > 804
-#define This Some
-#define THIS "Some"
-#else
-#define THIS "This"
-#endif
-
 import Control.Monad
 #if __GLASGOW_HASKELL__ <= 804
 import Data.Monoid ((<>))
@@ -51,7 +44,7 @@ genServiceImports this s@Service{..} =
       foldr (Set.union . getImports) (retImport funResolvedType) funArgs
       where
         retImport Nothing = Set.empty
-        retImport (Just (This i)) = typeToImport i
+        retImport (Just (Some i)) = typeToImport i
 
     getImports :: HS (Field u) -> Set.Set Import
     getImports Field{..} = typeToImport fieldResolvedType
@@ -228,13 +221,13 @@ genReqParser s@Service{..} =
       [ HS.Match () (textToName "reqParser'")
         [ pvar "_proxy", pvar "funName" ]
         (HS.UnGuardedRhs () $ HS.Do ()
-          [ HS.Generator () (HS.PApp () (qualSym "Thrift" THIS) [ pvar "x" ])
+          [ HS.Generator () (HS.PApp () (qualSym "Thrift" "Some") [ pvar "x" ])
              (qvar (toCamel n) "reqParser'" `app`
               var "_proxy" `app`
               var "funName")
           , HS.Qualifier ()
              (qvar "Prelude" "return" `app` HS.Paren ()
-               (qcon "Thrift" THIS `app`
+               (qcon "Thrift" "Some" `app`
                 HS.Paren () (
                   con ("Super" <> n) `app`
                   var "x"
@@ -248,7 +241,7 @@ genReqParser s@Service{..} =
         [ pvar "_proxy", stringP funName ]
         (genFieldParser (map (qualifyField "Types") funArgs)
          (toCamel funName)
-         (app (qcon "Thrift" THIS)))
+         (app (qcon "Thrift" "Some")))
         Nothing
       ]
 
@@ -413,7 +406,7 @@ genRespWriter s@Service{..} =
           ]
 
         genResp Nothing = []
-        genResp (Just (This t)) =
+        genResp (Just (Some t)) =
           [ genFieldBase t "" 0 (intLit (0 :: Int)) (var "_result") ]
 
 genMethodsInfo :: HS Service -> [HS.Decl ()]

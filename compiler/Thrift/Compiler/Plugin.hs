@@ -1,6 +1,5 @@
 -- Copyright (c) Facebook, Inc. and its affiliates.
 
-{-# LANGUAGE CPP           #-}
 {-# LANGUAGE TypeOperators #-}
 module Thrift.Compiler.Plugin
   ( Typecheckable(..), SomeLit(..)
@@ -13,10 +12,6 @@ module Thrift.Compiler.Plugin
   , isNewtype
   , filterHsAnns, getTypeAnns
   ) where
-
-#if __GLASGOW_HASKELL__ > 804
-#define This Some
-#endif
 
 import Data.Bifunctor
 import Data.List
@@ -54,7 +49,7 @@ class Monoid (Interface l) => Typecheckable l  where
     :: Type l t
     -> [Annotation Loc]
     -> TC l (Some (Type l))
-  resolveTypeAnnotations ty _ = pure $ This ty
+  resolveTypeAnnotations ty _ = pure $ Some ty
 
   -- | Recursively qualify all of the named types in a SpecialType so that they
   -- can be properly identified in imports
@@ -180,14 +175,14 @@ qualify m env = env
       -> Context a
     qualCtx f ctx@Context{..} = ctx { cMap = Map.map f cMap }
     qualST :: Typecheckable l => Some (Type l) -> Some (Type l)
-    qualST (This ty) = This $ qualifyType m ty
+    qualST (Some ty) = Some $ qualifyType m ty
     qualC :: Typecheckable l => (Some (Type l), Name, Loc)
                              -> (Some (Type l), Name, Loc)
     qualC (st, n, loc) = (qualST st, qualName m n, loc)
     qualSchemas
       :: Typecheckable l
       => Map.Map Text (Some (SCHEMA l t)) -> Map.Map Text (Some (SCHEMA l t))
-    qualSchemas = Map.map $ \(This schema) -> This (qualifySchema m schema)
+    qualSchemas = Map.map $ \(Some schema) -> Some (qualifySchema m schema)
     qualEnums = Map.map $ \(vs, ns) ->
       (Map.map (first (qualName m)) vs, Map.map (first (qualName m)) ns)
     qualServices = Map.map $ \(a, b, c) -> (qualName m a, b, c)

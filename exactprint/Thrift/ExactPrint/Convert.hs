@@ -1,6 +1,5 @@
 -- Copyright (c) Facebook, Inc. and its affiliates.
 
-{-# LANGUAGE CPP #-}
 module Thrift.ExactPrint.Convert
   ( computeOffsets
   , computeThriftFileOffsets
@@ -17,10 +16,6 @@ import Thrift.Compiler.Parser
 import Thrift.Compiler.Types
 
 import Thrift.ExactPrint.Types
-
-#if MIN_VERSION_dependent_sum(0,6,0)
-#define This Some
-#endif
 
 computeOffsets :: Program l Loc -> Program l Offset
 computeOffsets Program{..} = Program
@@ -455,8 +450,8 @@ functionOffsets origin fun@Function{..} =
     onewayEnd = maybe sAnnsEnd lLocation fnlOneway
     idempotencyEnd = maybe onewayEnd lLocation fnlIdempotency
     (ty, tyEnd) = case funType of
-      FunType (This t) ->
-        first (FunType . This) $ computeTypeOffsets idempotencyEnd t
+      FunType (Some t) ->
+        first (FunType . Some) $ computeTypeOffsets idempotencyEnd t
       FunTypeVoid loc ->
         (FunTypeVoid $ getOffsets idempotencyEnd loc, lLocation loc)
       FunTypeResponseAndStreamReturn ResponseAndStreamReturn{..} ->

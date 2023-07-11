@@ -1,6 +1,5 @@
 -- Copyright (c) Facebook, Inc. and its affiliates.
 
-{-# LANGUAGE CPP #-}
 module Thrift.Compiler.GenUtils
   ( textToName
   , qualSym, unqualSym, nameToQName
@@ -17,10 +16,6 @@ module Thrift.Compiler.GenUtils
   , genCALL, genREPLY, genEXCEPTION, genONEWAY
   , PrimType(..), getPrim
   ) where
-
-#if __GLASGOW_HASKELL__ > 804
-#define This Some
-#endif
 
 import Data.Proxy
 import Data.Set (union)
@@ -280,9 +275,9 @@ genConst (THashMap kt vt) (Literal (HashMap m)) =
 genConst (TTypedef _ ty _loc) lit@Literal{} = genConst ty lit
 genConst (TNewtype name ty _loc) (Literal (New lit)) =
   Con () (nameToQName name) `app` genConst ty (Literal lit)
-genConst (TStruct name _loc) (Literal (This s)) = genStructConst name s
-genConst (TException name _loc) (Literal (This (EV s))) = genStructConst name s
-genConst (TUnion name _loc) (Literal (This (UnionVal proxy ty val _))) =
+genConst (TStruct name _loc) (Literal (Some s)) = genStructConst name s
+genConst (TException name _loc) (Literal (Some (EV s))) = genStructConst name s
+genConst (TUnion name _loc) (Literal (Some (UnionVal proxy ty val _))) =
   Con () (nameToQName cname) `app` genConst ty val
   where
     conName = Text.pack $ symbolVal proxy
@@ -460,10 +455,10 @@ qualifyLit q (TMap kt vt) (Map m) =
 qualifyLit q (THashMap kt vt) (HashMap m) =
   HashMap [ (qualifyConst q kt k, qualifyConst q vt v) | (k, v) <- m ]
 -- Named Types
-qualifyLit q TStruct{} (This s) = This $ qualifyStruct q s
-qualifyLit q TException{} (This (EV s)) = This $ EV $ qualifyStruct q s
+qualifyLit q TStruct{} (Some s) = Some $ qualifyStruct q s
+qualifyLit q TException{} (Some (EV s)) = Some $ EV $ qualifyStruct q s
 qualifyLit q TEnum{} (EnumVal name loc) = EnumVal (qualifyName q name) loc
-qualifyLit q TUnion{} (This u) = This $ qualifyUnion q u
+qualifyLit q TUnion{} (Some u) = Some $ qualifyUnion q u
 qualifyLit q (TTypedef _ ty _loc) lit = qualifyLit q ty lit
 qualifyLit q (TNewtype _ ty _loc) (New lit) = New $ qualifyLit q ty lit
 

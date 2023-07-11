@@ -2,10 +2,6 @@
 
 {
 
-#if __GLASGOW_HASKELL__ > 804
-#define This Some
-#endif
-
 module Thrift.Compiler.Parser
   ( parseThrift, runParser
   , parse, parseString
@@ -194,7 +190,7 @@ StructType
 Field :: { Parsed (Field 'StructField) }
 Field : StructuredAnnotations intLit ':' Req AnnotatedType Symbol MaybeConst Annotations Separator
         { case $5 of
-            This t -> Field
+            Some t -> Field
               { fieldId           = fromIntegral $ lParsed $2
               , fieldName         = lVal $6
               , fieldResolvedName = ()
@@ -270,7 +266,7 @@ UnionAlt :: { Parsed UnionAlt }
 UnionAlt
   : StructuredAnnotations intLit ':' AnnotatedType Symbol MaybeConst Annotations Separator
     { case $4 of
-        This t -> UnionAlt
+        Some t -> UnionAlt
           { altId           = fromIntegral $ lParsed $2
           , altName         = lVal $5
           , altResolvedName = ()
@@ -294,7 +290,7 @@ UnionAlt
 Typedef :: { Parsed Typedef }
 Typedef : StructuredAnnotations typedef AnnotatedType Symbol Annotations
           { case $3 of
-              This t -> Typedef
+              Some t -> Typedef
                 { tdName         = lVal $4
                 , tdResolvedName = ()
                 , tdTag          = IsTypedef
@@ -375,7 +371,7 @@ StructuredAnnotation
 Const :: { Parsed Const }
 Const : StructuredAnnotations const AnnotatedType Symbol '=' UntypedConst Separator
         { case $3 of
-            This ty -> Const
+            Some ty -> Const
               { constName         = lVal $4
               , constResolvedName = ()
               , constType         = ty
@@ -537,7 +533,7 @@ Function :: { Parsed Function }
 Argument :: { Parsed (Field 'Argument) }
 Argument : StructuredAnnotations intLit ':' AnnotatedType Symbol MaybeConst Annotations Separator
   { case $4 of
-     This t -> Field
+     Some t -> Field
        { fieldId           = fromIntegral $ lParsed $2
        , fieldName         = lVal $5
        , fieldResolvedName = ()
@@ -606,7 +602,7 @@ FunType
 ResponseAndStreamReturnType
   : stream '<' AnnotatedType Throws '>'
     { case $3 of
-        This t -> ResponseAndStreamReturn
+        Some t -> ResponseAndStreamReturn
           { rsReturn = Nothing
           , rsComma = Nothing
           , rsStream = (Stream t $4 (annTy1 $1 $2 $5))
@@ -614,7 +610,7 @@ ResponseAndStreamReturnType
     }
   | AnnotatedType ',' stream '<' AnnotatedType Throws '>'
     { case ($1, $5) of
-        (This tRet, This tStream) -> ResponseAndStreamReturn
+        (Some tRet, Some tStream) -> ResponseAndStreamReturn
           { rsReturn = Just tRet
           , rsComma = Just $ getLoc $2
           , rsStream = (Stream tStream $6 (annTy1 $3 $4 $7))
@@ -624,7 +620,7 @@ ResponseAndStreamReturnType
 Throw :: { Parsed (Field 'ThrowsField) }
 Throw : StructuredAnnotations intLit ':' AnnotatedType Symbol MaybeConst Annotations Separator
         { case $4 of
-            This t -> Field
+            Some t -> Field
               { fieldId           = fromIntegral $ lParsed $2
               , fieldName         = lVal $5
               , fieldResolvedName = ()
@@ -738,7 +734,7 @@ Separator :: { Separator Loc }
 AnnotatedType :: { Some (AnnotatedType Loc) }
 AnnotatedType : Type Annotations
                 { case $1 of
-                    ThisAnnTy ty loc -> This $ AnnotatedType ty $2 loc
+                    ThisAnnTy ty loc -> Some $ AnnotatedType ty $2 loc
                 }
 
 Type :: { SomeAnnTy 'Unresolved () }
@@ -754,23 +750,23 @@ Type : byte   { ThisAnnTy I8 (annTy0 $1) }
      | Symbol { ThisAnnTy (TNamed (lVal $1)) (Arity0Loc (lLoc $1)) }
      | map '<' AnnotatedType ',' AnnotatedType '>'
        { case ($3, $5) of
-           (This k, This v) -> ThisAnnTy (TMap k v) (annTy2 $1 $2 $4 $6)
+           (Some k, Some v) -> ThisAnnTy (TMap k v) (annTy2 $1 $2 $4 $6)
        }
      | hash_map '<' AnnotatedType ',' AnnotatedType '>'
        { case ($3, $5) of
-           (This k, This v) -> ThisAnnTy (THashMap k v) (annTy2 $1 $2 $4 $6)
+           (Some k, Some v) -> ThisAnnTy (THashMap k v) (annTy2 $1 $2 $4 $6)
        }
      | set '<' AnnotatedType '>'
        { case $3 of
-           This t -> ThisAnnTy (TSet t) (annTy1 $1 $2 $4)
+           Some t -> ThisAnnTy (TSet t) (annTy1 $1 $2 $4)
        }
      | hash_set '<' AnnotatedType '>'
        { case $3 of
-           This t -> ThisAnnTy (THashSet t) (annTy1 $1 $2 $4)
+           Some t -> ThisAnnTy (THashSet t) (annTy1 $1 $2 $4)
        }
      | list '<' AnnotatedType '>'
        { case $3 of
-           This t -> ThisAnnTy (TList t) (annTy1 $1 $2 $4) }
+           Some t -> ThisAnnTy (TList t) (annTy1 $1 $2 $4) }
 
 {
 

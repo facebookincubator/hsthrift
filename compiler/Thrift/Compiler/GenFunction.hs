@@ -1,15 +1,9 @@
 -- Copyright (c) Facebook, Inc. and its affiliates.
 
-{-# LANGUAGE CPP #-}
-
 module Thrift.Compiler.GenFunction
   ( genFunctionDecls
   , genFunctionImports
   ) where
-
-#if __GLASGOW_HASKELL__ > 804
-#define This Some
-#endif
 
 import Data.Maybe
 import Data.Set (union)
@@ -333,7 +327,7 @@ genParseResponse func@Function{..}
      qualType "Exception" "SomeException" `appT`
      case funResolvedType of
        Nothing -> unit_tycon ()
-       Just (This ty) -> genType ty)
+       Just (Some ty) -> genType ty)
   -- Function Body
   , FunBind ()
     [ Match () (textToName (parseName func)) [ pvar "_proxy" ]
