@@ -1,4 +1,10 @@
-// Copyright (c) Facebook, Inc. and its affiliates.
+/*
+ * Copyright (c) Meta Platforms, Inc. and affiliates.
+ * All rights reserved.
+ *
+ * This source code is licensed under the BSD-style license found in the
+ * LICENSE file in the root directory of this source tree.
+ */
 
 #include <thrift/lib/cpp2/util/ScopedServerInterfaceThread.h>
 #include "test/if/gen-cpp2/Calculator.h"
