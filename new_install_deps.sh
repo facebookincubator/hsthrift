@@ -15,7 +15,7 @@ THREADS=4
 # in topological order. You can pass additional deps on the command line.
 #
 BASE_DEPS="fmt folly"
-FBTHRIFT_DEPS="fizz wangle fbthrift"
+FBTHRIFT_DEPS="fizz wangle mvfst fbthrift"
 EXTRA_DEPS=""
 
 while [ "$#" -gt 0 ]; do
