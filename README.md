@@ -39,24 +39,40 @@ The repository contains the following packages:
 * [fb-util](common/util), a collection of utilities
 * [thrift-compiler](compiler), the Haskell Thrift compiler
 * [thrift-lib](lib), libraries for Thrift clients
-* [thrift-server](server), libraries for Thrift servers
 * [thrift-tests](tests), a test suite
+* [thrift-http](http), Thrift client and server transport (using HTTP)
+* [thrift-cpp-channel](cpp-channel), libraries for Thrift clients (using fbthrift)
+* [thrift-server](server), libraries for Thrift servers (using fbthrift)
 
 # Building and testing
 
+The following instructions assume you want to use `fbthrift`. To omit
+the `fbthrift` dependency and use only the HTTP transport, follow the
+extra instructions marked with "[no fbthrift]".
+
 First install all dependencies (see [Dependencies](#Dependencies) section below).
 
-Then, build a local checkout of `cabal-install`'s master branch
-using commit `f5f8d933db229d30e6fc558f5335f0a4e85d7d44` or
-newer. The aforementioned commit will be available in the
-3.6 release of `Cabal` and `cabal-install`.
+Note that `hsthrift` requires Cabal version 3.6 or later.
 
-We then use the C++ thrift compiler to generate some files needed
-to build the Haskell thrift compiler, which we can do immediately
-afterwards.
+We use the C++ thrift compiler to generate some files needed to build
+the Haskell thrift compiler.
+
+[no fbthrift] Omit this step.
 
 ``` sh
 $ make thrift-cpp
+```
+
+[no fbthrift] Edit `cabal.project` to remove `thrift-cpp-channel` and add
+
+```
+package thrift-tests
+    flags: -fbthrift
+```
+
+Next build the Haskell Thrift compiler:
+
+```
 $ cabal build exe:thrift-compiler
 ```
 
@@ -160,25 +176,31 @@ export PKG_CONFIG_PATH=/usr/local/lib/pkgconfig
 
 ## Other dependencies
 
-hsthrift also depends on:
-
-* [folly](https://github.com/facebook/folly), a library of general C++ utilities
-* [fbthrift](https://github.com/facebook/fbthrift), Facebook's Thrift compiler and support libraries.
-* Other C++ libraries required by fbthrift: [rsocket-cpp](https://github.com/rsocket/rsocket-cpp), [fizz](https://github.com/facebookincubator/fizz), [wangle](https://github.com/facebook/wangle).
-* [libfmt](https://github.com/fmtlib/fmt/releases) v8
-
-These are typically not packaged by Linux distributions, so we have to
-build and install them manually from their github repos.  We've
-provided a script in the hsthrift repository, `new_install_deps.sh` to do
-that.  Run the following commands to clone the repos and build and
-install the dependencies (pass e.g. `--threads 8` to build in parallel. Default is 4):
+hsthrift also depends on some other C++ libraries that are not
+typically packaged for Linux. We've provided a script to fetch them
+from github, and build and install them locally. Run the following
+commands to clone the repos and build and install the dependencies
+(pass e.g. `--threads 8` to build in parallel. Default is 4):
 
 ```
 ./new_install_deps.sh
-
 ```
 
-Set your env variables to pick up the new libraries and binaries:
+[no fbthrift] Instead use:
+
+```
+./new_install_deps.sh --no-fbthrift
+```
+
+The dependencies are:
+
+* [folly](https://github.com/facebook/folly), a library of general C++ utilities
+* [libfmt](https://github.com/fmtlib/fmt/releases) v8
+* [fbthrift](https://github.com/facebook/fbthrift), Facebook's Thrift compiler and support libraries.
+* Other C++ libraries required by fbthrift: [rsocket-cpp](https://github.com/rsocket/rsocket-cpp), [fizz](https://github.com/facebookincubator/fizz), [wangle](https://github.com/facebook/wangle).
+
+After running `new_install_deps.sh`, set your env variables to pick up the new libraries and binaries:
+
 ```
 export LD_LIBRARY_PATH=$HOME/.hsthrift/lib:
 export PKG_CONFIG_PATH=$HOME/.hsthrift/lib/pkgconfig
