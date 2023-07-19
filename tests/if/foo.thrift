@@ -46,3 +46,5 @@ const Foo fooConst = {
 const map<i32, list<i32>> mapConst = {0: [], 1: [1, 2, 3]};
 
 typedef map<i64, i64> (hs.type = "HashMap") NewtypeMap (hs.newtype)
+
+typedef string (hs.type = "String") HsString

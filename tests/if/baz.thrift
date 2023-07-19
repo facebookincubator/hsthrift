@@ -10,4 +10,5 @@ include "if/bar.thrift"
 
 struct Baz {
   1: bar.NewBar theBar;
+  2: bar.HsStringVector theVector;
 }

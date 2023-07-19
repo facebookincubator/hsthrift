@@ -9,3 +9,4 @@
 include "if/foo.thrift"
 
 typedef foo.Bar NewBar
+typedef list<foo.HsString> (hs.type = "Vector") HsStringVector

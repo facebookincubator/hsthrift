@@ -86,56 +86,61 @@ importFromInclude Program{..} =
   QImport (progHSName <> ".Types") progHSName
 
 typeToImport :: HSType t -> Set.Set Import
-typeToImport I8  = Set.singleton (QImport "Data.Int" "Int")
-typeToImport I16 = Set.singleton (QImport "Data.Int" "Int")
-typeToImport I32 = Set.singleton (QImport "Data.Int" "Int")
-typeToImport I64 = Set.singleton (QImport "Data.Int" "Int")
-typeToImport (TSpecial HsInt) = Set.empty
-typeToImport TFloat = Set.empty
-typeToImport TDouble = Set.empty
-typeToImport TText   = Set.fromList
-                       [ QImport "Data.Text" "Text"
-                       , QImport "Data.Text.Encoding" "Text"
-                       ]
-typeToImport (TSpecial HsString) = typeToImport TText
-typeToImport (TSpecial HsByteString) = Set.fromList
+typeToImport = typeToImportRec True
+
+typeToImportRec :: Bool -> HSType t -> Set.Set Import
+typeToImportRec _ I8  = Set.singleton (QImport "Data.Int" "Int")
+typeToImportRec _ I16 = Set.singleton (QImport "Data.Int" "Int")
+typeToImportRec _ I32 = Set.singleton (QImport "Data.Int" "Int")
+typeToImportRec _ I64 = Set.singleton (QImport "Data.Int" "Int")
+typeToImportRec _ (TSpecial HsInt) = Set.empty
+typeToImportRec _ TFloat = Set.empty
+typeToImportRec _ TDouble = Set.empty
+typeToImportRec _ TText = Set.fromList
+  [ QImport "Data.Text" "Text"
+  , QImport "Data.Text.Encoding" "Text"
+  ]
+typeToImportRec r (TSpecial HsString) = typeToImportRec r TText
+typeToImportRec _ (TSpecial HsByteString) = Set.fromList
   [ QImport "Data.ByteString" "ByteString"
   , QImport "Data.Text" "Text"
   , QImport "Data.Text.Encoding" "Text"
   ]
-typeToImport TBytes  = Set.fromList
+typeToImportRec _ TBytes = Set.fromList
   [ QImport "Data.ByteString" "ByteString"
   ]
-typeToImport TBool   = Set.empty
-typeToImport (TSet t) =
+typeToImportRec _ TBool = Set.empty
+typeToImportRec r (TSet t) =
   Set.singleton (QImport "Data.Set" "Set") `union`
-  typeToImport t
-typeToImport (THashSet t) =
+  typeToImportRec r t
+typeToImportRec r (THashSet t) =
   Set.singleton (QImport "Data.HashSet" "HashSet") `union`
-  typeToImport t
-typeToImport (TList t) = typeToImport t
-typeToImport (TSpecial (HsVector vec t)) =
+  typeToImportRec r t
+typeToImportRec r (TList t) = typeToImportRec r t
+typeToImportRec r (TSpecial (HsVector vec t)) =
   Set.singleton (QImport (hsVectorImport vec) (hsVectorQual vec)) `union`
-  typeToImport t
-typeToImport (TMap k v) =
+  typeToImportRec r t
+typeToImportRec r (TMap k v) =
   Set.singleton (QImport "Data.Map.Strict" "Map") `union`
-  typeToImport k `union`
-  typeToImport v
-typeToImport (THashMap k v) =
+  typeToImportRec r k `union`
+  typeToImportRec r v
+typeToImportRec r (THashMap k v) =
   Set.singleton (QImport "Data.HashMap.Strict" "HashMap") `union`
-  typeToImport k `union`
-  typeToImport v
-typeToImport (TStruct name _loc) = nameToImport name
-typeToImport (TException name _loc) = nameToImport name
-typeToImport (TUnion name _loc) = nameToImport name
-typeToImport (TEnum name _loc _) = nameToImport name
-typeToImport (TTypedef name _ty _loc) = nameToImport name
-typeToImport (TNewtype name _ty _loc) = nameToImport name
+  typeToImportRec r k `union`
+  typeToImportRec r v
+typeToImportRec r (TStruct name _loc) = nameToImport r name
+typeToImportRec r (TException name _loc) = nameToImport r name
+typeToImportRec r (TUnion name _loc) = nameToImport r name
+typeToImportRec r (TEnum name _loc _) = nameToImport r name
+typeToImportRec r (TTypedef name ty _loc) =
+  nameToImport r name `union` typeToImportRec False ty
+typeToImportRec r (TNewtype name ty _loc) =
+  nameToImport r name `union` typeToImportRec False ty
 
-nameToImport :: Name -> Set.Set Import
-nameToImport Name{..} = case resolvedName of
-  UName{} -> Set.empty
-  QName q _ -> Set.singleton $ QImport (q <> ".Types") q
+nameToImport :: Bool -> Name -> Set.Set Import
+nameToImport cond Name{..} = case resolvedName of
+  QName q _ | cond-> Set.singleton $ QImport (q <> ".Types") q
+  _ -> Set.empty
 
 unqualSym :: Text -> QName ()
 unqualSym = UnQual () . textToName
