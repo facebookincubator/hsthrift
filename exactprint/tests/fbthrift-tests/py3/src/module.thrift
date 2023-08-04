@@ -18,10 +18,14 @@
  * limitations under the License.
  */
 
+include "thrift/annotation/cpp.thrift"
+
 namespace cpp2 py3.simple
 
-typedef binary (cpp2.type = "std::unique_ptr<folly::IOBuf>", py3.iobuf) IOBufPtr
-typedef binary (cpp2.type = "folly::IOBuf", py3.iobuf) IOBuf
+@cpp.Type{name = "std::unique_ptr<folly::IOBuf>"}
+typedef binary IOBufPtr
+@cpp.Type{name = "folly::IOBuf"}
+typedef binary IOBuf
 
 enum AnEnum {
   None = 0 (py3.name = "NOTSET"),
