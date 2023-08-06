@@ -18,6 +18,7 @@ module Util.TimeSec
   , minutes, hours, days, weeks
   , minute, hour, day, week
   , toSeconds, toMinutes, toHours, toDays
+  , trBetween
   , trLength
   , trLast
   , ppUTCTime, ppDate, ppTime, ppTimeSpan, ppTimeSpanWithGranularity
@@ -98,11 +99,14 @@ trLength :: TimeRange -> TimeSpan
 trLength (TimeRange s e) = timeDiff e s
 
 trLast :: TimeSpan -> IO TimeRange
-trLast d = do
+trLast d = trBetween d (TimeSpan 0)
+
+trBetween :: TimeSpan -> TimeSpan -> IO TimeRange
+trBetween startDiff endDiff = do
   t <- now
   return TimeRange
-    { start = t `subTime` d
-    , end = t
+    { start = t `subTime` startDiff
+    , end = t `subTime` endDiff
     }
 
 -- Some generally useful pretty printing functions -----------------------------
