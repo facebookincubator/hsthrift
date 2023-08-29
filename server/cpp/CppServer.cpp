@@ -162,7 +162,9 @@ CreateCppServerResult* c_create_cpp_server(
           methodOneways[i]
               ? apache::thrift::RpcKind::SINGLE_REQUEST_NO_RESPONSE
               : apache::thrift::RpcKind::SINGLE_REQUEST_SINGLE_RESPONSE,
-          priority);
+          priority,
+          std::nullopt,
+          false);
 
       DVLOG(5) << "Method priority: " << priority << " " << name;
       metadataMap.emplace(name, metadata);
