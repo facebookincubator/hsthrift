@@ -13,7 +13,7 @@ struct Foo {
   2: bool foo2;
   3: Bar foo3;
   4: X foo4;
-  5: list<i64> (hs.type = "Vector") foo5;
+  5: list_i64_6026 foo5;
   7: i64 foo_foo1;
 }
 
@@ -29,7 +29,7 @@ struct Huge {
   2: bool foo2;
   3: Bar foo3;
   4: X foo4;
-  5: list<i64> (hs.type = "Vector") foo5;
+  5: list_i64_6026 foo5;
   7: i64 foo_foo1;
   10: i64 huge10;
   11: i64 huge11;
@@ -102,3 +102,6 @@ struct Huge {
   78: i64 huge78;
   79: i64 huge79;
 }
+
+// The following were automatically generated and may benefit from renaming.
+typedef list<i64> (hs.type = "Vector") list_i64_6026

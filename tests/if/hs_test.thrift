@@ -37,18 +37,18 @@ struct TestStruct {
   11: set<byte> f_set;
   12: optional i32 o_i32;
   99: Foo foo = {"bar": 1, "baz": 2};
-  13: map<Number, i64> (hs.type = "HashMap") f_hash_map;
+  13: map_Number_i64_1522 f_hash_map;
   14: Z f_newtype;
   15: tUnion f_union;
-  16: string (hs.type = "String") f_string;
+  16: string_5858 f_string;
   17: binary f_binary;
   18: optional X f_optional_newtype;
   19: map<i32, bool> bool_map;
   20: list<bool> bool_list;
-  21: list<i64> (hs.type = "Vector") i64_vec;
-  22: list<i64> (hs.type = "VectorStorable") i64_svec;
+  21: list_i64_7708 i64_vec;
+  22: list_i64_1894 i64_svec;
   23: map<binary, i64> binary_key;
-  24: string (hs.type = "ByteString") f_bytestring;
+  24: string_1484 f_bytestring;
 }
 
 enum Number {
@@ -65,3 +65,10 @@ enum Perfect {
 
 enum Void {
 }
+
+// The following were automatically generated and may benefit from renaming.
+typedef list<i64> (hs.type = "VectorStorable") list_i64_1894
+typedef list<i64> (hs.type = "Vector") list_i64_7708
+typedef map<Number, i64> (hs.type = "HashMap") map_Number_i64_1522
+typedef string (hs.type = "ByteString") string_1484
+typedef string (hs.type = "String") string_5858

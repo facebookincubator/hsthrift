@@ -13,8 +13,8 @@ struct Foo {
   2: required bool foo2;
   3: Bar foo3;
   4: X foo4;
-  5: list<i64> (hs.type = "Vector") foo5;
-  6: list<i64> (hs.type = "VectorStorable") foo6;
+  5: list_i64_6540 foo5;
+  6: list_i64_2857 foo6;
 }
 
 struct Bar {
@@ -48,3 +48,7 @@ const map<i32, list<i32>> mapConst = {0: [], 1: [1, 2, 3]};
 typedef map<i64, i64> (hs.type = "HashMap") NewtypeMap (hs.newtype)
 
 typedef string (hs.type = "String") HsString
+
+// The following were automatically generated and may benefit from renaming.
+typedef list<i64> (hs.type = "VectorStorable") list_i64_2857
+typedef list<i64> (hs.type = "Vector") list_i64_6540
