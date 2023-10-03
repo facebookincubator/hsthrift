@@ -213,8 +213,8 @@ instance Protocol Compact where
       n -> fail $ "invalid boolean value: " ++ show n
 
   parseBoolF  _ = pure
-  parseByteString _ = getBuffer parseVarint32 BS.copy
-  parseText _ = getBuffer parseVarint32 decodeUtf8
+  parseByteString _ = getBuffer parseVarint BS.copy
+  parseText _ = getBuffer parseVarint decodeUtf8
 
   parseSkip _ TTRUE Nothing = P.skipN 1
   parseSkip _ TFALSE Nothing = P.skipN 1

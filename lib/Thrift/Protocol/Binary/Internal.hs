@@ -16,7 +16,6 @@ import Thrift.Binary.Parser (getWord32be)
 #endif
 import Thrift.Binary.Parser as P
 import Data.ByteString (ByteString)
-import Data.Int
 import Foreign.Marshal.Alloc
 import Foreign.Storable as F
 import Foreign.Ptr
@@ -45,7 +44,7 @@ binaryDouble = toFloat <$> getWord64be
 -- because the result is a slice of the input which may be a memory buffer that
 -- is owned by C++. We also want to eliminate references to the input so that it
 -- can get GC'd
-getBuffer :: Parser Int32 -> (ByteString -> a) -> Parser a
+getBuffer :: Integral len => Parser len -> (ByteString -> a) -> Parser a
 getBuffer getLength copy = do
   len <- getLength
   buf <- P.getByteString $ fromIntegral len
