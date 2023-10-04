@@ -16,10 +16,10 @@ using namespace folly;
 
 extern "C" {
 
-typedef folly::AsyncTransport::UniquePtr (*MakeTransport)(
-    const folly::SocketAddress& addr,
-    folly::EventBase* eb,
-    size_t conn_timeout);
+using MakeTransport = folly::AsyncTransport::UniquePtr (*)(
+    const folly::SocketAddress&,
+    folly::EventBase*,
+    size_t);
 
 RocketClientChannel::Ptr* newHeaderChannel(
     const char* host_str,
