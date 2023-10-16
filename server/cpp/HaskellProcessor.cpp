@@ -52,21 +52,6 @@ void HaskellAsyncProcessor::run(
   (*cb)(
       context->getHeader()->getProtocolId(), input_data, input_len, &response);
   std::unique_ptr<uint8_t[], decltype(free)*> output_str(response.data, free);
-  SCOPE_EXIT {
-    free(response.ex_name);
-    free(response.ex_text);
-  };
-  if (response.ex_name) {
-    auto header = context->getHeader();
-    header->setHeader(
-        kUex, std::string(response.ex_name, response.ex_name_len));
-    if (response.ex_text) {
-      header->setHeader(
-          kUexw, std::string(response.ex_text, response.ex_text_len));
-    }
-    header->setHeader(
-        kEx, response.client_error ? kAppClientErrorCode : kAppServerErrorCode);
-  }
 
   for (auto& hdr : response.headers) {
     context->getHeader()->setHeader(hdr.first, hdr.second);

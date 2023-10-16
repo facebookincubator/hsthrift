@@ -51,6 +51,13 @@ deleteProcessorCallback = freeHaskellFunPtr
 
 data TResponse
 
+kEx, kUex, kUexw, kAppClientErrorCode, kAppServerErrorCode :: ByteString
+kEx   = UTF8.fromString "ex"
+kUex  = UTF8.fromString "uex"
+kUexw = UTF8.fromString "uexw"
+kAppClientErrorCode = "23"
+kAppServerErrorCode = "24"
+
 -- | A function that will be called from C back into Haskell
 -- Takes protocol id, input data, input length, pointer to fill with output
 -- length, and returns a newly malloc'd set of bytes
@@ -71,36 +78,14 @@ handlerWrapper counter handler postProcess prot_id input_str input_len response_
   #{poke apache::thrift::TResponse, data} response_ptr output_str
   #{poke apache::thrift::TResponse, len} response_ptr
     (fromIntegral output_len :: CSize)
-  case exc of
-    Just (SomeException ex, blame) -> do
-      (ex_name, ex_name_len) <- newByteStringAsCStringLen
-        $ UTF8.fromString
-        $ show
-        $ typeOf ex
-      (ex_text, ex_text_len) <- newByteStringAsCStringLen
-        $ UTF8.fromString
-        $ take 1024
-        $ show ex
-      #{poke apache::thrift::TResponse, ex_name} response_ptr ex_name
-      #{poke apache::thrift::TResponse, ex_name_len} response_ptr
-        (fromIntegral ex_name_len :: CSize)
-      #{poke apache::thrift::TResponse, ex_text} response_ptr ex_text
-      #{poke apache::thrift::TResponse, ex_text_len} response_ptr
-        (fromIntegral ex_text_len :: CSize)
-      #{poke apache::thrift::TResponse, client_error} response_ptr
-        (blame == ClientError)
-    Nothing -> do
-      #{poke apache::thrift::TResponse, ex_name} response_ptr nullPtr
-      #{poke apache::thrift::TResponse, ex_name_len} response_ptr (0 :: CSize)
-      #{poke apache::thrift::TResponse, ex_text} response_ptr nullPtr
-      #{poke apache::thrift::TResponse, ex_text_len} response_ptr (0 :: CSize)
-
-  for_ headers $ \(n,v) ->
-    BS.unsafeUseAsCStringLen n $ \(n_str, n_len) ->
-    BS.unsafeUseAsCStringLen v $ \(v_str, v_len) ->
-      addHeaderToResponse
-        response_ptr n_str (fromIntegral n_len) v_str (fromIntegral v_len)
-
+  for_ exc $ \(SomeException ex, blame) -> do
+    addHeaderToResponse kUex (UTF8.fromString $ show $ typeOf ex)
+    addHeaderToResponse kUexw (UTF8.fromString $ take 1024 $ show ex)
+    addHeaderToResponse kEx $
+      if blame == ClientError
+        then kAppClientErrorCode
+        else kAppServerErrorCode
+  for_ headers $ uncurry addHeaderToResponse
   where
     -- Allocates a new buffer to give away ownership of memory
     newByteStringAsCStringLen :: ByteString -> IO CStringLen
@@ -110,9 +95,15 @@ handlerWrapper counter handler postProcess prot_id input_str input_len response_
         copyBytes buf src len
         return (buf, len)
 
+    addHeaderToResponse n v =
+      BS.unsafeUseAsCStringLen n $ \(n_str, n_len) ->
+      BS.unsafeUseAsCStringLen v $ \(v_str, v_len) ->
+        addHeaderToResponse_c
+          response_ptr n_str (fromIntegral n_len) v_str (fromIntegral v_len)
+
 foreign import ccall "wrapper"
   mkProcessorCallback :: ProcessorCallback -> IO (FunPtr ProcessorCallback)
 
 foreign import ccall unsafe "addHeaderToResponse"
-  addHeaderToResponse
+  addHeaderToResponse_c
     :: Ptr TResponse -> CString -> CSize -> CString -> CSize -> IO ()

@@ -24,11 +24,6 @@ namespace thrift {
 struct TResponse {
   uint8_t* data;
   size_t len;
-  char* ex_name = nullptr;
-  size_t ex_name_len = 0;
-  char* ex_text = nullptr;
-  size_t ex_text_len = 0;
-  bool client_error = false;
   std::vector<std::pair<std::string, std::string>> headers = {};
 };
 
