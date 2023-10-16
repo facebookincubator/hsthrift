@@ -20,7 +20,7 @@ clientTest :: Test
 clientTest = TestLabel "client test" $ TestCase $ do
   channel <- TestChannel <$> newEmptyMVar
   bracket
-    (forkIO $ runTestServer channel $ \x -> return (x, Nothing))
+    (forkIO $ runTestServer channel $ \x -> return (x, Nothing, []))
     killThread $
     const $ do
     let request = "this is my one request"

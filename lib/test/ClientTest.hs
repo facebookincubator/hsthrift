@@ -47,4 +47,4 @@ main = testRunner . TestList $
 runCalculatorServer :: Protocol p => Proxy p -> TestChannel Calculator -> IO ()
 runCalculatorServer proxy ch = do
   state  <- initServerState
-  runServer proxy ch $ processCommand state
+  runServer proxy ch (processCommand state) (\_ _ -> [])

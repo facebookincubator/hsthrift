@@ -68,6 +68,10 @@ void HaskellAsyncProcessor::run(
         kEx, response.client_error ? kAppClientErrorCode : kAppServerErrorCode);
   }
 
+  for (auto& hdr : response.headers) {
+    context->getHeader()->setHeader(hdr.first, hdr.second);
+  }
+
   if (!oneway && req && req->isActive()) {
     apache::thrift::MessageType mtype;
     apache::thrift::ResponsePayload payload;
@@ -217,3 +221,16 @@ void HaskellAsyncProcessor::processSerializedCompressedRequestWithMetadata(
 }
 } // namespace thrift
 } // namespace apache
+
+// TODO move inside the namespace and resolve the C++ symbol from Haskell
+extern "C" {
+void addHeaderToResponse(
+    apache::thrift::TResponse* response,
+    const char* name_str,
+    size_t name_len,
+    const char* value_str,
+    size_t value_len) {
+  response->headers.emplace_back(
+      std::string(name_str, name_len), std::string(value_str, value_len));
+}
+}

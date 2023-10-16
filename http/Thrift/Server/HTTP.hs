@@ -14,6 +14,7 @@ module Thrift.Server.HTTP (
     Server(..),
     defaultOptions,
     withBackgroundServer,
+    withBackgroundServer',
     thriftApplication,
   ) where
 
@@ -30,7 +31,8 @@ import Network.Socket (close)
 import Network.Wai.Handler.Warp
 import Network.Wai
 
-import Thrift.Processor
+import Thrift.Processor hiding (Header)
+import qualified Thrift.Processor as Thrift
 import Thrift.Protocol
 import Thrift.Protocol.Binary
 import Thrift.Protocol.Compact
@@ -78,11 +80,24 @@ withBackgroundServer
   -> ServerOptions
   -> (Server -> IO a)  -- ^ action to run while the server is up
   -> IO a
-withBackgroundServer handler ServerOptions{..} action = do
+withBackgroundServer handler = withBackgroundServer' handler (\_ _ -> [])
+
+-- | Create an HTTP server for a Thrift service from the given 'ServerOptions'.
+-- This is a simple wrapper around Warp's 'runSettings' that optionally creates
+-- the server on a random port, and also wait for the server to start before
+-- invoking the given action. Shuts down the server when the action returns.
+withBackgroundServer'
+  :: forall s a . (Processor s)
+  => (forall r . s r -> IO r) -- ^ handler to use
+  -> (forall r . s r -> Either SomeException r -> Thrift.Header)
+  -> ServerOptions
+  -> (Server -> IO a)  -- ^ action to run while the server is up
+  -> IO a
+withBackgroundServer' handler postProcess ServerOptions{..} action = do
   ready <- newEmptyMVar
   let
     host = getHost warpSettings
-    application = thriftApplication handler
+    application = thriftApplication handler postProcess
 
     settings =
       maybe id setPort desiredPort $
@@ -107,11 +122,13 @@ withBackgroundServer handler ServerOptions{..} action = do
 thriftApplication
   :: forall s . (Processor s)
   => (forall r . s r -> IO r) -- ^ handler to use
+  -> (forall r . s r -> Either SomeException r -> Thrift.Header)
   -> Application
-thriftApplication handler req respond = do
+thriftApplication handler postProcess req respond = do
   body <- strictRequestBody req
   withProto (requestHeaders req) $ \proto contentType -> do
-    (res, _maybeEx) <- process proto 0 handler (LBS.toStrict body)
+    (res, _maybeEx, _headers) <-
+      process proto 0 handler postProcess (LBS.toStrict body)
     respond $ responseLBS
       status200
       [(hContentType, contentType)]

@@ -13,6 +13,7 @@ module TestChannel
   ) where
 
 import Control.Concurrent
+import Control.Exception (SomeException)
 import Control.Monad
 import Data.ByteString (ByteString)
 import Data.Proxy
@@ -44,18 +45,19 @@ runServer
   => Proxy p
   -> TestChannel s
   -> (forall r . c r -> IO r)
+  -> (forall r . c r -> Either SomeException r -> Header)
   -> IO ()
-runServer p ch handler = do
+runServer p ch handler postProcess = do
   counter <- newCounter
   runTestServer ch $ \bytes -> do
     seqNum <- counter
-    process p seqNum handler bytes
+    process p seqNum handler postProcess bytes
 
 runTestServer
   :: TestChannel s
-  -> (ByteString -> IO (ByteString, a))
+  -> (ByteString -> IO (ByteString, a, Header))
   -> IO ()
 runTestServer (TestChannel req) handler = forever $ do
   Req bytes callback <- takeMVar req
-  (handled, _) <- handler bytes
-  callback $ Right $ Response handled mempty
+  (handled, _, headers) <- handler bytes
+  callback $ Right $ Response handled headers

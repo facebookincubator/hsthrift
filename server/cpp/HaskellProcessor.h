@@ -29,6 +29,7 @@ struct TResponse {
   char* ex_text = nullptr;
   size_t ex_text_len = 0;
   bool client_error = false;
+  std::vector<std::pair<std::string, std::string>> headers = {};
 };
 
 // Equivalent of ProcessorCallback from CppServer.hs

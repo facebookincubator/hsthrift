@@ -10,6 +10,7 @@
 module Thrift.Processor
   ( Processor(..)
   , Blame(..)
+  , Header
   , process
   , processCommand
   , msgParser
@@ -32,6 +33,7 @@ import Data.Proxy
 import Data.Text (Text)
 import qualified Data.Text as Text
 
+import Thrift.Channel (Header)
 import Thrift.Protocol
 import Thrift.Protocol.ApplicationException.Types
 import Thrift.Monad (Priority(..))
@@ -69,12 +71,13 @@ process :: (Processor s, Protocol p)
         -> SeqNum   -- ^ Sequence number
         -> (forall r . s r -> IO r)
            -- ^ Handler for user-code
+        -> (forall r . s r -> Either SomeException r -> Header)
         -> ByteString -- ^ Input bytes off the wire
-        -> IO (ByteString, Maybe (SomeException, Blame))
+        -> IO (ByteString, Maybe (SomeException, Blame), Header)
             -- ^ Output bytes to put on the wire as well as the exception
             -- information for the response
-process proxy seqNum handler input = do
-  (response, exc) <- case parse (msgParser proxy) input of
+process proxy seqNum handler postProcess input = do
+  (response, exc, headers) <- case parse (msgParser proxy) input of
     Left err -> do
       -- Parsing failed, so the protocol is broken
       let ex = ApplicationException (Text.pack err)
@@ -83,22 +86,26 @@ process proxy seqNum handler input = do
         ( genMsgBegin proxy "" 3 seqNum
           <> buildStruct proxy ex
           <> genMsgEnd proxy
-        , Just (toException ex, ClientError) )
-    Right (Some cmd) -> processCommand proxy seqNum handler cmd
-  return (toStrict (toLazyByteString response), exc)
+        , Just (toException ex, ClientError)
+        , [] )
+    Right (Some cmd) -> processCommand proxy seqNum handler postProcess cmd
+  return (toStrict (toLazyByteString response), exc, headers)
 
 processCommand
   :: (Processor s, Protocol p)
   => Proxy p
   -> SeqNum
   -> (forall r . s r -> IO r) -- ^ Handler for user-code
+  -> (forall r . s r -> Either SomeException r -> Header)
   -> s r                      -- ^ input command
-  -> IO (Builder, Maybe (SomeException, Blame))
-processCommand proxy seqNum handler cmd = do
+  -> IO (Builder, Maybe (SomeException, Blame), Header)
+processCommand proxy seqNum handler postProcess cmd = do
   -- Run the handler and generate its return struct, forcing evaluation
-  (builder, exc) <- respWriter proxy seqNum cmd <$> try (handler cmd)
+  res <- try (handler cmd)
+  let (builder, exc) = respWriter proxy seqNum cmd res
+      headers = postProcess cmd res
   builder' <- evaluate builder
-  return (builder', exc)
+  return (builder', exc, headers)
 
 msgParser
   :: (Processor s, Protocol p)

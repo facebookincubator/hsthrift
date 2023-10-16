@@ -28,7 +28,7 @@ mkTest :: String -> ThriftM Binary TestChannel Echoer () -> Test
 mkTest label action = TestLabel label $ TestCase $ do
   channel <- TestChannel <$> newEmptyMVar :: IO (TestChannel Echoer)
   echoSt <- initEchoerState
-  let handler = process proxy 0 (echoHandler echoSt)
+  let handler = process proxy 0 (echoHandler echoSt) (\_ _ -> [])
   bracket (forkIO (runTestServer channel handler)) killThread $ const $
     runThrift action channel
   where

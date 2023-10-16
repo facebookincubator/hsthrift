@@ -42,4 +42,5 @@ mkClientTestSockWith
   -> Test
 mkClientTestSockWith lbl _opts action = TestLabel lbl $ TestCase $ do
   state <- initServerState
-  withServer binaryProtocolId Nothing maxListenQueue (processCommand state) action
+  withServer binaryProtocolId Nothing maxListenQueue (processCommand state)
+   (\_ _ -> []) action

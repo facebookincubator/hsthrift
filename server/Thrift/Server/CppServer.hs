@@ -11,6 +11,7 @@
 module Thrift.Server.CppServer
   ( Server(..)
   , withBackgroundServer
+  , withBackgroundServer'
 
   , module Thrift.Server.Types
   ) where
@@ -66,8 +67,22 @@ withBackgroundServer :: forall s a . (Processor s)
                      -> ServerOptions
                      -> (Server -> IO a)
                      -> IO a
-withBackgroundServer handler ServerOptions{..} action =
-  withProcessorCallback handler runServer
+withBackgroundServer handler = withBackgroundServer' handler (\_ _ -> [])
+
+-- | Spawns a background thread that blocks on the server
+-- Creates a server in a background thread to serve requests. After the server
+-- has been successfully started, the supplied Server -> IO a action is
+-- executed, and when this action returns the server is  terminated. A pool of
+-- worker threads executes requests by calling the s r -> IO r action for each
+-- request received.
+withBackgroundServer' :: forall s a . (Processor s)
+                     => (forall r . s r -> IO r) -- ^ handler to use
+                     -> (forall r . s r -> Either SomeException r -> Header)
+                     -> ServerOptions
+                     -> (Server -> IO a)
+                     -> IO a
+withBackgroundServer' handler postProcess ServerOptions{..} action =
+  withProcessorCallback handler postProcess runServer
   where
     err = ServerException "failed to get event manager"
     cPort = fromIntegral $ fromMaybe 0 desiredPort

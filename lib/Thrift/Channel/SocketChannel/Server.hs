@@ -70,15 +70,17 @@ data SocketServer = SocketServer
 withSocketServerOpts
   :: Processor s
   => (forall r. s r -> IO r) -- ^ server side handler
+  -> (forall r. s r -> Either SomeException r -> Header)
   -> SocketServerOptions
   -> (SocketServer -> IO ()) -- ^ computation to run while the server is up
   -> IO ()
-withSocketServerOpts handler SocketServerOptions{..} action =
+withSocketServerOpts handler postProcess SocketServerOptions{..} action =
   withProxy protocol $ \protProxy ->
   withServerIO protProxy
                (fmap show desiredPort)
                (fromMaybe maxListenQueue maxQueuedConns)
-               handler $
+               handler
+               postProcess $
     \port -> action (SocketServer port protocol)
 
 -- | Run a Thrift server and some client computations against
@@ -89,11 +91,12 @@ withServer
   -> Maybe ServiceName        -- ^ desired port (if any)
   -> Int                      -- ^ max. number of queued connections
   -> (forall a . s a -> IO a) -- ^ server-side request handler
+  -> (forall a . s a -> Either SomeException a -> Header)
   -> Thrift t ()              -- ^ client computation
   -> IO ()
-withServer protocol mport maxQueuedConns hndl action =
+withServer protocol mport maxQueuedConns hndl postProcess action =
   withProxy protocol $ \proxy ->
-    withServerIO proxy mport maxQueuedConns hndl $ \port ->
+    withServerIO proxy mport maxQueuedConns hndl postProcess $ \port ->
       withSocketChannel
         (SocketConfig localhost (fromIntegral port) protocol)
         action
@@ -106,9 +109,10 @@ withServerIO
   -> Maybe ServiceName       -- ^ desired port (if any)
   -> Int                     -- ^ max. number of queued connections
   -> (forall r. c r -> IO r) -- ^ server handler
+  -> (forall r. c r -> Either SomeException r -> Header)
   -> (Int -> IO ())          -- ^ client computation
   -> IO ()
-withServerIO p mport maxQueuedConns handler client  = do
+withServerIO p mport maxQueuedConns handler postProcess client  = do
   counter <- newCounter
   flip (runServer mport maxQueuedConns)
        (\sock -> client . fromIntegral =<< socketPort sock) $
@@ -151,7 +155,8 @@ withServerIO p mport maxQueuedConns handler client  = do
             -- times, until either we're done or more input is needed to go
             -- further.
             Right (Some cmd, leftover) -> do
-              (response, mexc) <- processCommand p seqNum handler cmd
+              (response, mexc, _headers) <-
+                processCommand p seqNum handler postProcess cmd
               seqNum' <- counter
               case mexc of
                 Just (_exc, _blame) -> do
