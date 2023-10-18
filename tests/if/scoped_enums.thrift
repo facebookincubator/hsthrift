@@ -36,4 +36,3 @@ enum B {
 } (hs.pseudoenum, hs.prefix = 'enum_')
 
 const B prefix = B.B;
-const B prx2 = B;
