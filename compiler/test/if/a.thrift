@@ -10,7 +10,6 @@ const T a = b.i64_value;
 
 struct A {
   1: T a = a;
-  2: b.B b = b;
   3: bool c = b.bool_value;
   4: list<list<i32>> d;
   5: map<i32, string> e;
