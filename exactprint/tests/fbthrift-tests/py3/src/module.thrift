@@ -19,6 +19,7 @@
  */
 
 include "thrift/annotation/cpp.thrift"
+include "thrift/annotation/python.thrift"
 
 namespace cpp2 py3.simple
 
@@ -28,7 +29,8 @@ typedef binary IOBufPtr
 typedef binary IOBuf
 
 enum AnEnum {
-  None = 0 (py3.name = "NOTSET"),
+  @python.Name{name = "NOTSET"}
+  None = 0,
   ONE = 1,
   TWO = 2,
   THREE = 3,
@@ -36,17 +38,21 @@ enum AnEnum {
 }
 
 enum AnEnumRenamed {
-  name = 0 (py3.name = "name_"),
-  value = 1 (py3.name = "value_"),
-  normal = 2 (py3.name = "renamed_"),
+  @python.Name{name = "name_"}
+  name = 0,
+  @python.Name{name = "value_"}
+  value = 1,
+  @python.Name{name = "renamed_"}
+  normal = 2,
 }
 
+@python.Flags
 enum Flags {
   flag_A = 1,
   flag_B = 2,
   flag_C = 4,
   flag_D = 8,
-} (py3.flags)
+}
 
 exception SimpleException {
   1: i16 err_code;
@@ -65,10 +71,12 @@ struct SimpleStruct {
   6: double real;
   7: float smaller_real;
   // The next field should not show up anywhere in the generated code.
-  8: i16 hidden_field (py3.hidden);
+  @python.Py3Hidden
+  8: i16 hidden_field;
 }
 
-typedef binary (cpp.type = "foo::Bar") foo_bar
+@cpp.Type{name = "foo::Bar"}
+typedef binary foo_bar
 
 struct ComplexStruct {
   1: SimpleStruct structOne;
@@ -77,7 +85,8 @@ struct ComplexStruct {
   4: string name;
   5: AnEnum an_enum;
   6: binary some_bytes;
-  7: string from (py3.name = "sender");
+  @python.Name{name = "sender"}
+  7: string from;
   8: string cdef;
   9: foo_bar bytes_with_cpp_type;
 }

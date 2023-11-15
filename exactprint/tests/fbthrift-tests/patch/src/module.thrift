@@ -20,6 +20,7 @@
 
 include "thrift/annotation/thrift.thrift"
 include "thrift/lib/thrift/patch.thrift"
+include "thrift/annotation/cpp.thrift"
 
 @thrift.TerseWrite
 @patch.GeneratePatch
@@ -53,7 +54,8 @@ struct MyStruct {
   6: float floatVal;
   7: double doubleVal;
   8: string stringVal;
-  9: binary (cpp.type = "::folly::IOBuf") binaryVal;
+  @cpp.Type{name = "::folly::IOBuf"}
+  9: binary binaryVal;
   10: MyData structVal;
 
   11: optional bool optBoolVal;
@@ -64,7 +66,8 @@ struct MyStruct {
   16: optional float optFloatVal;
   17: optional double optDoubleVal;
   18: optional string optStringVal;
-  19: optional binary (cpp.type = "::folly::IOBuf") optBinaryVal;
+  @cpp.Type{name = "::folly::IOBuf"}
+  19: optional binary optBinaryVal;
   20: optional MyData optStructVal;
 
   21: optional list<i16> optListVal;
