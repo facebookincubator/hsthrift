@@ -18,14 +18,21 @@
  * limitations under the License.
  */
 
+include "thrift/annotation/thrift.thrift"
+
+@thrift.Uri{value = "facebook.com/thrift/compiler/test/fixtures/any/MyStruct"}
 struct MyStruct {
   1: string myString;
-} (thrift.uri = "facebook.com/thrift/compiler/test/fixtures/any/MyStruct")
+}
 
+@thrift.Uri{value = "facebook.com/thrift/compiler/test/fixtures/any/MyUnion"}
 union MyUnion {
   1: string myString;
-} (thrift.uri = "facebook.com/thrift/compiler/test/fixtures/any/MyUnion")
+}
 
+@thrift.Uri{
+  value = "facebook.com/thrift/compiler/test/fixtures/any/MyException",
+}
 exception MyException {
   1: string myString;
-} (thrift.uri = "facebook.com/thrift/compiler/test/fixtures/any/MyException")
+}
