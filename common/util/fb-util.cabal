@@ -74,6 +74,9 @@ library
 
     exposed-modules:
         Control.Concurrent.Stream
+        Control.Trace
+        Control.Trace.Core
+        Control.Trace.VLog
         Data.MovingAverageRateLimiter
         Data.RateLimiterMap
         Foreign.CPP.Addressable
@@ -202,6 +205,7 @@ library
         QuickCheck,
         scientific,
         haskell-src-exts,
+        some,
         stm,
         base >=4.11.1.0 && <4.15,
         containers >=0.5.11 && <0.7,
