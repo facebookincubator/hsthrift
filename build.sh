@@ -19,7 +19,7 @@ GETDEPS_PATHS=(
 # architecture here for compiling folly.
 arch=$(uname -m)
 if [ "$arch" == x86_64 ] ; then
-    export CXXFLAGS=-march=haswell
+    export CXXFLAGS=-msse4.2
 fi
 
 # when CMAKE_LIBRARY_ARCHITECTURE is not set folly defaults to sse4/x86_64 flavor
