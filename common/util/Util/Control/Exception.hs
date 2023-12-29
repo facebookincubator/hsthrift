@@ -136,5 +136,6 @@ swallow io = void io `catchAll` \exc -> do
 
 -- | Log and rethrow all synchronous exceptions arising from an
 -- IO computation.
-logExceptions :: (String -> String) -> IO a -> IO a
-logExceptions f io = io `onSomeException` (logError . f . show)
+logExceptions :: HasCallStack => (String -> String) -> IO a -> IO a
+logExceptions f io = withFrozenCallStack $
+  io `onSomeException` (logError . f . show)
