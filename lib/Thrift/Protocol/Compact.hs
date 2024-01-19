@@ -183,13 +183,13 @@ instance Protocol Compact where
     byte <- anyWord8
     let _ty = byte .&. 0x0F
     len <- case byte `shiftR` 4 of
-             0x0F -> parseVarint32
+             0x0F -> parseVarint
              size -> pure $ fromIntegral size
     ps <- replicateM (fromIntegral len) p
     return (fromIntegral len, ps)
 
   parseMap _ pk pv _ = do
-    len <- parseVarint32
+    len <- parseVarint
     if len == 0
     then pure []
     else do
@@ -226,18 +226,18 @@ instance Protocol Compact where
   parseSkip _ TI64 _ = void parseCompactI64
   parseSkip _ TDOUBLE _ = P.skipN 8
   parseSkip _ TSTRING _ =
-    void $ parseVarint32 >>= P.skipN . fromIntegral
+    void $ parseVarint >>= P.skipN . fromIntegral
   parseSkip proxy TLIST   _ = do
     byte <- anyWord8
     let ty = byte .&. 0x0F
     len <- case byte `shiftR` 4 of
-             0x0F -> parseVarint32
+             0x0F -> parseVarint
              size -> pure $ fromIntegral size
     void $ replicateM (fromIntegral len) (parseSkip proxy ty Nothing)
 
   parseSkip proxy TSET _ = parseSkip proxy TLIST Nothing
   parseSkip proxy TMAP _ = do
-    len <- parseVarint32
+    len <- parseVarint
     if len == 0
     then pure ()
     else do
@@ -381,6 +381,3 @@ parseVarint = go 0 0
       if not (testBit w 7)
         then return newVal
         else go newVal (n + 7)
-
-parseVarint32 :: Parser Int32
-parseVarint32 = fromIntegral <$> parseVarint
