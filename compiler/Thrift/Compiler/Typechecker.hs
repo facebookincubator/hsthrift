@@ -393,7 +393,13 @@ filterDecls reqSymbols symbolMap =
     filterDecl (D_Typedef t, syms, smap) _ =
       (D_Typedef t {tdSAnns=[]}, syms, smap)
     filterDecl (D_Enum e, syms, smap) _ =
-      (D_Enum e {enumSAnns=[]}, syms, smap)
+        (D_Enum e
+          {enumSAnns=[]
+          , enumConstants = filterEnumConstants $ enumConstants e
+          }, syms, smap)
+      where
+        filterEnumConstants = map filterEnumValue
+        filterEnumValue ev = ev { evSAnns = []}
     filterDecl (D_Const c, syms, smap) _ =
       (D_Const c {constSAnns=[]}, syms, smap)
     filterField field = field {fieldSAnns=[]}
