@@ -15,7 +15,6 @@ module Thrift.Compiler.Plugins.Haskell
   , toCamel
   ) where
 
-import Control.Monad.Trans.Reader
 import Data.ByteString (ByteString)
 import qualified Data.Foldable as Foldable
 import qualified Data.Map as Map
@@ -165,7 +164,7 @@ instance Typecheckable Haskell where
   typecheckSpecialConst HsByteString (UntypedConst _ (StringConst s _)) =
     pure $ Literal $ Text.encodeUtf8 s
   typecheckSpecialConst (HsVector _ u) (UntypedConst _ ListConst{..}) =
-    Literal . List <$> mapT (typecheckConst u . leElem) lvElems
+    Literal . List <$> traverse (typecheckConst u . leElem) lvElems
   typecheckSpecialConst ty val@(UntypedConst Located{..} _) =
     typeError lLocation $ LiteralMismatch (TSpecial ty) val
 

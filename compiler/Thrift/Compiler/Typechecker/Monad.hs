@@ -10,7 +10,8 @@
 {-# LANGUAGE PolyKinds #-}
 module Thrift.Compiler.Typechecker.Monad
   ( TC, Typechecked
-  , typeError, runTypechecker, mapT, mapE, emptyT, orT, ErrCollectable(..)
+  , typeError, runTypechecker, ask, asks, traverseWeird
+  , Alternative(..)
   , lookupType, lookupSchema, lookupUnion, lookupEnum, lookupConst
   , lookupService, lookupEnumInt
   , TypeError(..), ErrorMsg(..), AnnotationPlacement(..)
@@ -18,11 +19,12 @@ module Thrift.Compiler.Typechecker.Monad
   ) where
 
 import Prelude hiding (Enum)
+import Control.Applicative
+import Data.Either ( rights )
 import Data.Int (Int32)
 import Data.Some
 import Data.Text (Text)
-import Control.Monad.Trans.Class
-import Control.Monad.Trans.Reader
+import Control.Monad.Reader
 import qualified Data.Map.Strict as Map
 import qualified Data.Set as Set
 
@@ -33,38 +35,36 @@ import Thrift.Compiler.Types
 
 -- The typechecking monad is a reader transformed either monad. This allows us
 -- to keep track of state and errors
-type TC l = ReaderT (Env l) (Either [TypeError l])
+newtype TC l a = TC (ReaderT (Env l) (Either [TypeError l]) a)
+  deriving (Functor,Monad, MonadReader (Env l))
+
+instance Applicative (TC l) where
+  pure a = TC (pure a)
+  -- | Special Applicative instance which allows us to collect
+  -- type errors from *both* parts of the computation in the
+  -- event that they both fail.
+  TC (ReaderT rf) <*> TC (ReaderT rx) =
+    TC $ ReaderT $ \env -> rf env `collect` rx env
+    where
+        collect (Left e1) (Left e2) = Left $ e1 <> e2
+        collect (Left e)  (Right _) = Left e
+        collect (Right _) (Left e)  = Left e
+        collect (Right f) (Right x) = Right $ f x
 
 type Typechecked (l :: *) (t :: Status -> * -> * -> *) =
   TC l (t 'Resolved l Loc)
 
 typeError :: Loc -> ErrorMsg l -> TC l a
-typeError loc msg = lift $ Left [TypeError loc msg]
+typeError loc msg = TC $ lift $ Left [TypeError loc msg]
 
 runTypechecker :: Env l -> TC l a -> Either [TypeError l] a
-runTypechecker = flip runReaderT
+runTypechecker env (TC t) = runReaderT t env
 
--- | map a typechecking computation over a list and collect all of the type
--- errors. This differs from mapM and mapA because those will terminate with
--- the first type error
-mapT :: (a -> TC l b) -> [a] -> TC l [b]
-mapT f xs = ReaderT $ \env -> mapE (runTypechecker env . f) xs
-
-mapE :: (a -> Either [e] b) -> [a] -> Either [e] [b]
-mapE f = foldr (\x xs -> (:) <$> f x `collect` xs) (Right [])
-
--- | This is the identity for 'orT', and morally @empty@ from Alternative
---
--- This produces an empty list of errors, so should never be used as the
--- first parater of 'orT'.
-emptyT :: TC l a
-emptyT = lift (Left [])
-
--- | Try to run the first typechecker computation, but use the second if it
--- fails.  If both fail then use both errors. See 'emptyT' for identity.
--- Note: this is associative and morally @<|>@ from Alternative
-orT :: TC l a -> TC l a -> TC l a
-orT t1 t2 = do
+instance Alternative (TC l) where
+  -- This produces an empty list of errors, so should never be used as the
+  -- first parater of '<|>'.
+  empty = TC $ lift (Left [])
+  t1 <|> t2 = TC $ do
   env <- ask
   lift $ case runTypechecker env t1 of
     Left err1 -> case runTypechecker env t2 of
@@ -72,21 +72,17 @@ orT t1 t2 = do
       x2@Right{} -> x2
     x1@Right{} -> x1
 
--- | Similar to <*>, but doesn't obey the monad law that ap == (<*>). This
--- allows us to collect type errors from *both* parts of the computation in the
--- event that they both fail. (<*>) will only take the first failure it finds.
-class ErrCollectable m where
-  collect :: m (a -> b) -> m a -> m b
-infixl 4 `collect`
-
-instance Monoid e => ErrCollectable (Either e) where
-  collect (Left e1) (Left e2) = Left $ e1 <> e2
-  collect (Left e)  (Right _) = Left e
-  collect (Right _) (Left e)  = Left e
-  collect (Right f) (Right x) = Right $ f x
-
-instance ErrCollectable m => ErrCollectable (ReaderT a m) where
-  collect (ReaderT f) (ReaderT x) = ReaderT $ \env -> f env `collect` x env
+-- | See T45688659 for the weird tale of how badly-typed keys are getting
+-- ignored.  Try to be similar here, in weird mode, by dropping errors.
+traverseWeird :: Bool -> (a -> TC l b) -> [a] -> TC l [b]
+traverseWeird optsLenient f xs = do
+    if not optsLenient then
+      traverse f xs
+    else
+      TC $ ReaderT $ \env -> Right (mapEWeird (runTypechecker env . f) xs)
+  where
+    mapEWeird :: (a -> Either [e] b) -> [a] -> [b]
+    mapEWeird ff = rights . map ff
 
 -- Lookup Functions ------------------------------------------------------------
 
@@ -129,7 +125,7 @@ envLookup
   -> Loc
   -> TC l u
 envLookup getMap mkError name loc = do
-  env <- ask
+  env <- TC ask
   case doLookup env name of
     Nothing -> typeError loc $ mkError name
     Just u  -> pure u
@@ -145,7 +141,7 @@ envCtxLookup
   -> Loc
   -> TC l u
 envCtxLookup getMap mkError name loc = do
-  env <- ask
+  env <- TC ask
   case doLookup env name of
     Nothing -> typeError loc $ mkError name
     Just u  -> pure u
