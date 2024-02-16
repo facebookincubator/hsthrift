@@ -8,7 +8,7 @@
 
 #pragma once
 
-#include <folly/json.h>
+#include <folly/json/json.h>
 #include "cpp/HsStruct.h"
 
 extern "C" {
