@@ -42,8 +42,8 @@ enum F {
   F = 0,
 }
 
-const list<F> foo = [bar];
 const F bar = F.F;
+const list<F> foo = [bar];
 
 enum G {
   G = 0,
