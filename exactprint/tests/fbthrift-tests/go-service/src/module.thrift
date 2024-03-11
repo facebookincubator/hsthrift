@@ -3,7 +3,7 @@
 // source: thrift/compiler/test/fixtures/*
 // @generated
 /*
- * Copyright (c) Facebook, Inc. and its affiliates.
+ * Copyright (c) Meta Platforms, Inc. and affiliates.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,6 +26,12 @@ struct GetEntityResponse {
   1: string entity;
 }
 
+struct NonComparableStruct {
+  1: string foo;
+  2: list<string> bar;
+  3: map<NonComparableStruct, i64> baz;
+}
+
 service GetEntity {
   GetEntityResponse getEntity(1: GetEntityRequest r);
 
@@ -43,4 +49,18 @@ service GetEntity {
 
   // Legacy method with negative parameter tags
   i32 getLegacyStuff(1: i64 numPos, -1: i64 numNeg1, -2: i64 numNeg2);
+
+  i32 getCtxCollision(1: i64 ctx);
+  i32 getCtx1Collision(1: i64 ctx, 2: i64 ctx1);
+
+  i32 getContextCollision(1: i64 context);
+
+  i32 getOutCollision(1: i64 out);
+  i32 getOut1Collision(1: i64 out, 2: i64 out1);
+
+  i32 getInCollision(1: i64 in);
+  i32 getIn1Collision(1: i64 in, 2: i64 in1);
+
+  i32 getErrCollision(1: i64 err);
+  i32 getErr1Collision(1: i64 err, 2: i64 err1);
 }

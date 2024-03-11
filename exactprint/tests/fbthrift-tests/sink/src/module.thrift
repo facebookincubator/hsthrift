@@ -20,8 +20,6 @@
 
 namespace java.swift test.fixtures.sink
 
-include "thrift/annotation/cpp.thrift"
-
 struct InitialResponse {
   1: string content;
 }
@@ -69,6 +67,5 @@ service SinkService {
     SinkPayload throws (1: SinkException1 ex),
     FinalResponse throws (1: SinkException2 ex)
   > methodBothThrow();
-  @cpp.ProcessInEbThreadUnsafe
-  sink<SinkPayload, FinalResponse> methodFast();
+  sink<SinkPayload, FinalResponse> methodFast() (thread = 'eb');
 }

@@ -20,7 +20,6 @@
 
 include "thrift/annotation/thrift.thrift"
 
-@thrift.GenDefaultEnumValue
 package "test.dev/fixtures/enums"
 
 namespace android test.fixtures.enums
@@ -41,8 +40,8 @@ struct SomeStruct {
   4: set<i32> tags = [];
 }
 
-@thrift.GenDefaultEnumValue{name = "ME1_0"}
 enum MyEnum1 {
+  ME1_0 = 0,
   ME1_1 = 1,
   ME1_2 = 2,
   ME1_3 = 3,
@@ -50,7 +49,6 @@ enum MyEnum1 {
   ME1_6 = 6,
 }
 
-@thrift.GenDefaultEnumValue
 enum MyEnum2 {
   ME2_0 = 0,
   ME2_1 = 1,
@@ -78,4 +76,17 @@ struct MyStruct {
   2: MyEnum3 me3_n3 = -3;
   4: MyEnum1 me1_t1 = 1;
   6: MyEnum1 me1_t2 = MyEnum1.ME1_1;
+}
+
+enum MyBitmaskEnum1 {
+  ONE = 1,
+  TWO = 2,
+  FOUR = 4,
+} (bitmask = 1)
+
+@thrift.BitmaskEnum
+enum MyBitmaskEnum2 {
+  ONE = 1,
+  TWO = 2,
+  FOUR = 4,
 }

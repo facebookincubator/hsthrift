@@ -3,7 +3,7 @@
 // source: thrift/compiler/test/fixtures/*
 // @generated
 /*
- * Copyright (c) Facebook, Inc. and its affiliates.
+ * Copyright (c) Meta Platforms, Inc. and affiliates.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,13 +18,10 @@
  * limitations under the License.
  */
 
-include "thrift/annotation/cpp.thrift"
-
 service MyService {
-  void ping();
+  void ping() (cpp.coroutine);
   string getRandomData();
-  bool hasDataById(1: i64 id);
-  @cpp.ProcessInEbThreadUnsafe
-  string getDataById(1: i64 id);
+  bool hasDataById(1: i64 id) (cpp.coroutine);
+  string getDataById(1: i64 id) (cpp.coroutine, thread = 'eb');
   void putDataById(1: i64 id, 2: string data);
 }

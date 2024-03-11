@@ -19,6 +19,7 @@
  */
 
 include "thrift/annotation/internal.thrift"
+include "thrift/annotation/thrift.thrift"
 include "foo.thrift"
 
 namespace java.swift test.fixtures.injectMetadataFields

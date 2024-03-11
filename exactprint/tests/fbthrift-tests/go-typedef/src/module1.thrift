@@ -3,7 +3,7 @@
 // source: thrift/compiler/test/fixtures/*
 // @generated
 /*
- * Copyright (c) Facebook, Inc. and its affiliates.
+ * Copyright (c) Meta Platforms, Inc. and affiliates.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,7 +25,7 @@ typedef string State
 typedef i32 Year
 typedef list<string> Drivers
 typedef module0.Accessory Accessory
-typedef module0.PartName PartName
+typedef module0.PartName PartName (go.name = "CarPartName")
 
 struct Automobile {
   1: Plate plate;

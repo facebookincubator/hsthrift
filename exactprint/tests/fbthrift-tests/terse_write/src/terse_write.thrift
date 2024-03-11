@@ -19,8 +19,10 @@
  */
 
 include "thrift/annotation/cpp.thrift"
+include "thrift/annotation/hack.thrift"
 include "thrift/annotation/thrift.thrift"
 
+@thrift.Experimental
 package "facebook.com/thrift/test/terse_write"
 
 enum MyEnum {
@@ -29,6 +31,23 @@ enum MyEnum {
 }
 
 struct MyStruct {}
+
+union MyUnion {
+  1: bool bool_field;
+  2: byte byte_field;
+  3: i16 short_field;
+  4: i32 int_field;
+  5: i64 long_field;
+  6: float float_field;
+  7: double double_field;
+  8: string string_field;
+  9: binary binary_field;
+  10: MyEnum enum_field;
+  11: list<i16> list_field;
+  12: set<i16> set_field;
+  13: map<i16, i16> map_field;
+  14: MyStruct struct_field;
+}
 
 struct MyStructWithCustomDefault {
   1: i64 field1 = 1;
@@ -50,6 +69,7 @@ struct StructLevelTerseStruct {
   12: set<i16> set_field;
   13: map<i16, i16> map_field;
   14: MyStruct struct_field;
+  15: MyUnion union_field;
 }
 
 struct FieldLevelTerseStruct {
@@ -82,6 +102,8 @@ struct FieldLevelTerseStruct {
   13: map<i16, i16> terse_map_field;
   @thrift.TerseWrite
   14: MyStruct terse_struct_field;
+  @thrift.TerseWrite
+  29: MyUnion terse_union_field;
 
   // non-terse-write fields
   15: bool bool_field;
@@ -98,6 +120,7 @@ struct FieldLevelTerseStruct {
   26: set<i16> set_field;
   27: map<i16, i16> map_field;
   28: MyStruct struct_field;
+  30: MyUnion union_field;
 }
 
 @thrift.TerseWrite
@@ -118,20 +141,27 @@ struct TerseStructWithCustomDefault {
   14: MyStructWithCustomDefault struct_field;
 }
 
-@cpp.Adapter{name = "my::Adapter"}
+@hack.Adapter{name = '\\Adapter1'}
+@cpp.Adapter{name = "::my::Adapter"}
 typedef i32 MyInteger
 
 @thrift.TerseWrite
 struct AdaptedFields {
   1: MyInteger field1;
-  @cpp.Adapter{name = "my::Adapter"}
+  @hack.Adapter{name = '\\Adapter1'}
+  @cpp.Adapter{name = "::my::Adapter"}
   2: i32 field2;
-  @cpp.Adapter{name = "my::Adapter"}
+  @cpp.Adapter{name = "::my::Adapter"}
   3: MyInteger field3;
 }
 
 @thrift.TerseWrite
-exception TerseException {
-  @thrift.ExceptionMessage
-  1: string msg;
+struct WrappedFields {
+  @hack.FieldWrapper{name = "\\MyFieldWrapper"}
+  1: i32 field1 = 7;
 }
+
+@thrift.TerseWrite
+exception TerseException {
+  1: string msg;
+} (message = 'msg')

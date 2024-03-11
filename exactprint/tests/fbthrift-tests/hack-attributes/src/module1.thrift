@@ -3,7 +3,7 @@
 // source: thrift/compiler/test/fixtures/*
 // @generated
 /*
- * Copyright (c) Facebook, Inc. and its affiliates.
+ * Copyright (c) Meta Platforms, Inc. and affiliates.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,17 +22,20 @@ namespace hack test.fixtures.jsenum
 
 include "thrift/annotation/hack.thrift"
 
+@hack.Attributes{attributes = ["ApiEnum", "JSEnum"]}
 enum MyThriftEnum {
   foo = 1,
   bar = 2,
   baz = 3,
-} (hack.attributes = "ApiEnum, JSEnum")
+}
 
+@hack.Attributes{attributes = ["ClassAttribute"]}
 struct MyThriftStruct {
-  1: string foo (hack.attributes = "FieldAttribute");
+  @hack.Attributes{attributes = ["FieldAttribute"]}
+  1: string foo;
   2: string bar;
   3: string baz;
-} (hack.attributes = "ClassAttribute")
+}
 
 struct MySecondThriftStruct {
   1: MyThriftEnum foo;
@@ -46,13 +49,23 @@ struct MyThirdThriftStruct {
   1: i32 foo;
 }
 
+@hack.UnionEnumAttributes{attributes = ["EnumAttributes"]}
 union UnionTesting {
   1: string foo;
   3: i64 bar;
-} (hack.union_enum_attributes = "EnumAttributes")
+}
 
 @hack.UnionEnumAttributes{attributes = ["EnumAttributes", "EnumAttributes2"]}
 union UnionTestingStructured {
   1: string foo;
   3: i64 bar;
 }
+
+@hack.Attributes{attributes = ["Oncalls('thrift')"]}
+service FooService {
+  i32 ping(1: string str_arg);
+}
+
+service FooService1 {
+  i32 ping(1: string str_arg);
+} (hack.attributes = "Oncalls('thrift')")

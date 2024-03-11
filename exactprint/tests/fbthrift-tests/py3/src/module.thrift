@@ -71,9 +71,36 @@ struct SimpleStruct {
   6: double real;
   7: float smaller_real;
   // The next field should not show up anywhere in the generated code.
-  @python.Py3Hidden
+  @python.Py3Hidden{}
   8: i16 hidden_field;
 }
+
+@cpp.Adapter{name = "Adapter"}
+typedef SimpleStruct AdaptedTypeDef
+@python.Py3Hidden
+typedef SimpleStruct HiddenTypeDef
+
+struct HiddenTypeFieldsStruct {
+  @python.Py3Hidden
+  1: AdaptedTypeDef field1;
+  @python.Py3Hidden
+  2: list<AdaptedTypeDef> field2;
+  @cpp.Type{template = "::std::unordered_map"}
+  @python.Py3Hidden
+  3: map<i32, AdaptedTypeDef> field3;
+}
+
+@cpp.Adapter{name = "Adapter"}
+union AdaptedUnion {
+  1: i16 best;
+}
+
+@python.Py3Hidden
+safe exception HiddenException {
+  1: i16 test;
+}
+
+typedef AdaptedUnion ImplicitlyHiddenTypeDef
 
 @cpp.Type{name = "foo::Bar"}
 typedef binary foo_bar
@@ -116,6 +143,7 @@ const SimpleStruct A_STRUCT = {
   "big_int": 8,
   "real": 9.9,
 };
+const SimpleStruct EMPTY = {};
 const list<string> WORD_LIST = [
   "the",
   "quick",
@@ -183,6 +211,8 @@ service SimpleService {
   set<binary> contain_binary(1: list<binary> binaries);
   list<AnEnum> contain_enum(1: list<AnEnum> the_enum);
   BinaryUnionStruct get_binary_union_struct(1: BinaryUnion u);
+  @python.Py3Hidden
+  SimpleStruct get_struct_hidden();
 }
 
 service DerivedService extends SimpleService {

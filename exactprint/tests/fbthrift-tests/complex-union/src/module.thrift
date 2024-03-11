@@ -20,6 +20,8 @@
 
 namespace java.swift test.fixtures.complex_union
 
+include "thrift/annotation/cpp.thrift"
+
 typedef map<i16, string> containerTypedef
 
 union ComplexUnion {
@@ -28,7 +30,8 @@ union ComplexUnion {
   2: list<i64> intListValue;
   3: list<string> stringListValue;
   9: containerTypedef typedefValue;
-  14: string stringRef (cpp2.ref = "true");
+  @cpp.Ref{type = cpp.RefType.Unique}
+  14: string stringRef;
 }
 
 union ListUnion {

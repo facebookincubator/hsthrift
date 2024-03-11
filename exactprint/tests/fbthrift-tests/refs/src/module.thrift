@@ -18,11 +18,11 @@
  * limitations under the License.
  */
 
-namespace java.swift test.fixtures.refs
-
 include "thrift/annotation/cpp.thrift"
-
+include "thrift/annotation/java.thrift"
 include "thrift/annotation/thrift.thrift"
+
+namespace java.swift test.fixtures.refs
 
 enum MyEnum {
   Zero = 0,
@@ -34,6 +34,11 @@ union MyUnion {
   1: i32 anInteger;
   @cpp.Ref{type = cpp.RefType.Unique}
   2: string aString;
+}
+
+union NonTriviallyDestructibleUnion {
+  @cpp.Ref{type = cpp.RefType.SharedMutable}
+  1: i32 int_field;
 }
 
 struct MyField {
@@ -77,7 +82,8 @@ struct StructWithUnion {
 }
 
 struct RecursiveStruct {
-  1: optional list<RecursiveStruct> mes (swift.recursive_reference = "true");
+  @java.Recursive
+  1: optional list<RecursiveStruct> mes;
 }
 
 struct StructWithContainers {
@@ -128,6 +134,44 @@ struct StructWithBox {
   2: optional list<i64> b;
   @thrift.Box
   3: optional StructWithRef c;
+}
+
+struct StructWithInternBox {
+  @thrift.InternBox
+  1: Empty field1;
+  @thrift.InternBox
+  2: MyField field2;
+}
+
+@thrift.Experimental
+struct StructWithTerseInternBox {
+  @thrift.InternBox
+  @thrift.TerseWrite
+  1: Empty field1;
+  @thrift.InternBox
+  @thrift.TerseWrite
+  2: MyField field2;
+}
+
+struct AdaptedStructWithInternBox {
+  @cpp.Adapter{name = "::my::Adapter1"}
+  @thrift.InternBox
+  1: Empty field1;
+  @cpp.Adapter{name = "::my::Adapter1"}
+  @thrift.InternBox
+  2: MyField field2;
+}
+
+@thrift.Experimental
+struct AdaptedStructWithTerseInternBox {
+  @cpp.Adapter{name = "::my::Adapter1"}
+  @thrift.InternBox
+  @thrift.TerseWrite
+  1: Empty field1;
+  @cpp.Adapter{name = "::my::Adapter1"}
+  @thrift.InternBox
+  @thrift.TerseWrite
+  2: MyField field2;
 }
 
 const StructWithRef kStructWithRef = {

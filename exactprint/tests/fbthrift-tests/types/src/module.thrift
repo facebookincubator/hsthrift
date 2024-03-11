@@ -18,12 +18,15 @@
  * limitations under the License.
  */
 
-include "include.thrift"
+include "included.thrift"
+include "thrift/annotation/cpp.thrift"
+include "thrift/annotation/thrift.thrift"
 
-namespace cpp apache.thrift.fixtures.types
-namespace cpp2 apache.thrift.fixtures.types
+package "apache.org/thrift/fixtures/types"
 
 typedef binary TBinary
+
+struct empty_struct {}
 
 struct decorated_struct {
   1: string field;
@@ -31,23 +34,22 @@ struct decorated_struct {
 
 struct ContainerStruct {
   12: list<i32> fieldA;
-  2: list<i32> (cpp.template = "std::list") fieldB;
-  3: list<i32> (cpp.template = "std::deque") fieldC;
-  4: list<i32> (cpp.template = "folly::fbvector") fieldD;
-  5: list<i32> (cpp.template = "folly::small_vector") fieldE;
-  6: set<i32> (
-    cpp.template = "folly::sorted_vector_set",
-    rust.type = "sorted_vector_map::SortedVectorSet",
-  ) fieldF;
-  7: map<i32, string> (
-    cpp.template = "folly::sorted_vector_map",
-    rust.type = "sorted_vector_map::SortedVectorMap",
-  ) fieldG;
-  8: include.SomeMap fieldH;
+  @cpp.Type{template = "std::list"}
+  2: list<i32> fieldB;
+  @cpp.Type{template = "std::deque"}
+  3: list<i32> fieldC;
+  @cpp.Type{template = "folly::fbvector"}
+  4: list<i32> fieldD;
+  @cpp.Type{template = "folly::small_vector"}
+  5: list<i32> fieldE;
+  6: set_i32_7194 fieldF;
+  7: map_i32_string_1261 fieldG;
+  8: included.SomeMap fieldH;
 }
 
 struct CppTypeStruct {
-  1: list<i32> (cpp.type = "std::list<int32_t>") fieldA;
+  @cpp.Type{name = "std::list<int32_t>"}
+  1: list<i32> fieldA;
 }
 
 enum has_bitwise_ops {
@@ -61,10 +63,10 @@ enum has_bitwise_ops {
 enum is_unscoped {
   hello = 0,
   world = 1,
-}
+} (cpp.deprecated_enum_unscoped)
 
 service SomeService {
-  include.SomeMap bounce_map(1: include.SomeMap m);
+  included.SomeMap bounce_map(1: included.SomeMap m);
   map<TBinary, i64> binary_keyed_map(1: list<i64> r);
 }
 
@@ -102,13 +104,26 @@ struct ComplexNestedWithDefault {
   2: ComplexString n = {'a': '3', 'b': {'a': 3}};
 }
 
+@cpp.MinimizePadding
 struct MinPadding {
   1: required byte small;
   2: required i64 big;
   3: required i16 medium;
   4: required i32 biggish;
   5: required byte tiny;
-} (cpp.minimize_padding)
+}
+
+@thrift.Experimental
+@cpp.MinimizePadding
+@thrift.TerseWrite
+struct MinPaddingWithCustomType {
+  1: byte small;
+  2: i64 big;
+  @cpp.Adapter{name = "::my::Adapter"}
+  3: i16 medium;
+  4: i32 biggish;
+  5: byte tiny;
+}
 
 struct MyStruct {
   1: i64 MyIntField;
@@ -124,8 +139,8 @@ struct Renaming {
 } (cpp.name = "Renamed")
 
 struct AnnotatedTypes {
-  1: TBinary (noop_annotation) binary_field;
-  2: include.SomeListOfTypeMap (noop_annotation) list_field;
+  1: TBinary_8623 binary_field;
+  2: SomeListOfTypeMap_2468 list_field;
 }
 
 # Validates that C++ codegen performes appropriate topological sorting of
@@ -135,64 +150,86 @@ struct ForwardUsageRoot {
   1: optional ForwardUsageStruct ForwardUsageStruct;
   # use the type before it is defined, but mark it as a ref in C++
   # (no need for it to be defined before this struct in generated code)
-  2: optional ForwardUsageByRef ForwardUsageByRef (cpp.ref = "true");
+  @cpp.Ref{type = cpp.RefType.Unique}
+  2: optional ForwardUsageByRef ForwardUsageByRef;
 }
 
 struct ForwardUsageStruct {
+  @cpp.Ref{type = cpp.RefType.Unique}
   1: optional ForwardUsageRoot foo;
 }
 
 struct ForwardUsageByRef {
+  @cpp.Ref{type = cpp.RefType.Unique}
   1: optional ForwardUsageRoot foo;
 }
 
-struct NoexceptMoveEmpty {}
+struct IncompleteMap {
+  1: optional map<i32, IncompleteMapDep> field;
+}
+struct IncompleteMapDep {}
 
-struct NoexceptMoveSimpleStruct {
-  1: i64 boolField;
+struct CompleteMap {
+  @cpp.Type{template = "std::unordered_map"}
+  1: optional map<i32, CompleteMapDep> field;
+}
+struct CompleteMapDep {}
+
+struct IncompleteList {
+  @cpp.Type{template = "::std::list"}
+  1: optional list<IncompleteListDep> field;
+}
+struct IncompleteListDep {}
+
+struct CompleteList {
+  @cpp.Type{template = "folly::small_vector"}
+  1: optional list<CompleteListDep> field;
+}
+struct CompleteListDep {}
+
+struct AdaptedList {
+  1: optional list<AdaptedListDep> field;
+}
+@cpp.Adapter{
+  name = "IdentityAdapter<detail::AdaptedListDep>",
+  adaptedType = "detail::AdaptedListDep",
+}
+struct AdaptedListDep {
+  1: AdaptedList field;
 }
 
-enum MyEnumA {
-  fieldA = 1,
-  fieldB = 2,
-  fieldC = 4,
+struct DependentAdaptedList {
+  1: optional list<DependentAdaptedListDep> field;
 }
-
-struct NoexceptMoveComplexStruct {
-  1: bool MyBoolField;
-  2: i64 MyIntField = 12;
-  3: string MyStringField = "test";
-  4: string MyStringField2;
-  5: binary MyBinaryField;
-  6: optional binary MyBinaryField2;
-  7: required binary MyBinaryField3;
-  8: list<binary> MyBinaryListField4;
-  9: map<MyEnumA, string> MyMapEnumAndInt = {1: "fieldA", 4: "fieldC"};
-}
-
-union NoExceptMoveUnion {
-  1: string string_field;
-  2: i32 i32_field;
+@cpp.Adapter{name = "IdentityAdapter<detail::DependentAdaptedListDep>"}
+struct DependentAdaptedListDep {
+  @thrift.Box
+  1: optional i16 field;
 }
 
 # Allocator-aware struct with allocator-aware fields
 struct AllocatorAware {
-  1: list<i32> (cpp.use_allocator) aa_list;
-  2: set<i32> (cpp.use_allocator) aa_set;
-  3: map<i32, i32> (cpp.use_allocator) aa_map;
-  4: string (cpp.use_allocator) aa_string;
+  1: list_i32_9187 aa_list;
+  2: set_i32_7070 aa_set;
+  3: map_i32_i32_9565 aa_map;
+  4: string_5252 aa_string;
   5: i32 not_a_container;
-  6: i32 (cpp.use_allocator) aa_unique (cpp.ref_type = "unique");
-  7: i32 (cpp.use_allocator) aa_shared (cpp.ref_type = "shared");
+  @cpp.Ref{type = cpp.RefType.Unique}
+  6: i32_9314 aa_unique;
+  @cpp.Ref{type = cpp.RefType.SharedMutable}
+  7: i32_9314 aa_shared;
 } (cpp.allocator = "some_allocator")
 
 # Allocator-aware struct with no allocator-aware fields
 struct AllocatorAware2 {
   1: i32 not_a_container;
+  @thrift.Box
+  2: optional i32 box_field;
 } (cpp.allocator = "some_allocator")
 
 typedef i32 IntTypedef
-typedef IntTypedef UintTypedef (cpp.type = "std::uint32_t")
+@cpp.Type{name = "std::uint32_t"}
+typedef IntTypedef UintTypedef
 
 struct TypedefStruct {
   1: i32 i32_field;
@@ -203,3 +240,20 @@ struct TypedefStruct {
 struct StructWithDoubleUnderscores {
   1: i32 __field;
 }
+
+// The following were automatically generated and may benefit from renaming.
+typedef included.SomeListOfTypeMap (
+  noop_annotation = "1",
+) SomeListOfTypeMap_2468
+typedef TBinary (noop_annotation = "1") TBinary_8623
+typedef i32 (cpp.use_allocator = "1") i32_9314
+typedef list<i32> (cpp.use_allocator = "1") list_i32_9187
+typedef map<i32, i32> (cpp.use_allocator = "1") map_i32_i32_9565
+@cpp.Type{template = "folly::sorted_vector_map"}
+typedef map<i32, string> (
+  rust.type = "sorted_vector_map::SortedVectorMap",
+) map_i32_string_1261
+typedef set<i32> (cpp.use_allocator = "1") set_i32_7070
+@cpp.Type{template = "folly::sorted_vector_set"}
+typedef set<i32> (rust.type = "sorted_vector_map::SortedVectorSet") set_i32_7194
+typedef string (cpp.use_allocator = "1") string_5252

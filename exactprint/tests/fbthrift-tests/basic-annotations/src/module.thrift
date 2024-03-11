@@ -22,52 +22,64 @@ namespace java test.fixtures.basicannotations
 namespace java.swift test.fixtures.basicannotations
 
 include "thrift/annotation/cpp.thrift"
+include "thrift/annotation/go.thrift"
+include "thrift/annotation/hack.thrift"
+include "thrift/annotation/thrift.thrift"
 
+@cpp.Name{value = "YourEnum"}
 enum MyEnum {
   MyValue1 = 0,
   MyValue2 = 1,
-  DOMAIN = 2 (cpp.name = 'REALM'),
-} (cpp.name = "YourEnum")
-
-@cpp.StrongType
-typedef i16 MyId
+  @cpp.Name{value = "REALM"}
+  DOMAIN = 2,
+}
 
 struct MyStructNestedAnnotation {
   1: string name;
 }
 
-@cpp.Adapter{name = 'StaticCast'}
-union MyUnion {} (cpp.name = "YourUnion")
-@cpp.Adapter{name = 'StaticCast'}
-safe exception MyException {} (cpp.name = "YourException")
+@cpp.Adapter{name = '::StaticCast'}
+@cpp.Name{value = "YourUnion"}
+union MyUnion {}
+@cpp.Name{value = "YourException"}
+@cpp.Adapter{name = '::StaticCast'}
+safe exception MyException {}
 
 # We intentionally keep field IDs out of order to check whether this case is handled correctly
-@cpp.Adapter{name = 'StaticCast'}
+@cpp.Name{value = "YourStruct"}
+@hack.Attributes{attributes = ["\SomeClass(\AnotherClass::class)"]}
+@cpp.Adapter{name = '::StaticCast'}
 struct MyStruct {
   # glibc has macros with this name, Thrift should be able to prevent collisions
-  2: i64 major (cpp.name = 'majorVer');
-  # package is a reserved keyword in Java, Thrift should be able to handle this
-  1: string package (java.swift.name = '_package');
+  @cpp.Name{value = "majorVer"}
+  @go.Name{name = "MajorVer"}
+  2: i64 major;
+  # abstract is a reserved keyword in Java, Thrift should be able to handle this
+  @go.Name{name = "AbstractName"}
+  @go.Tag{tag = 'tag:"some_abstract"'}
+  1: string abstract (java.swift.name = '_abstract');
   # should generate valid code even with double quotes in an annotation
-  3: string annotation_with_quote (go.tag = 'tag:"somevalue"');
+  @go.Tag{tag = 'tag:"somevalue"'}
+  3: string annotation_with_quote;
   4: string class_ (java.swift.name = 'class_');
   5: string annotation_with_trailing_comma (custom = 'test');
   6: string empty_annotations ();
   7: MyEnum my_enum;
-  8: list<string> (cpp.type = "std::deque<std::string>") cpp_type_annotation;
+  8: list_string_6884 cpp_type_annotation;
   9: MyUnion my_union;
-  10: MyId my_id;
 } (
-  cpp.name = "YourStruct",
   android.generate_builder,
-  cpp.internal.deprecated._data.method,
   thrift.uri = "facebook.com/thrift/compiler/test/fixtures/basic-annotations/src/module/MyStruct",
-  hack.attributes = "\SomeClass(\AnotherClass::class)",
 )
+
+@go.Name{name = "IncredibleStruct"}
+typedef MyStruct AwesomeStruct
+@go.Name{name = "BrilliantStruct"}
+typedef MyStruct FantasticStruct
 
 const MyStruct myStruct = {
   "major": 42,
-  "package": "package",
+  "abstract": "abstract",
   "my_enum": MyEnum.DOMAIN,
 };
 
@@ -75,6 +87,7 @@ service MyService {
   void ping() throws (1: MyException myExcept);
   string getRandomData();
   bool hasDataById(1: i64 id);
+  @go.Name{name = "GoGetDataById"}
   string getDataById(1: i64 id);
   void putDataById(
     1: i64 id,
@@ -82,28 +95,48 @@ service MyService {
     2: string data,
   );
   oneway void lobDataById(1: i64 id, 2: string data (cpp.name = "dataStr"));
-  void doNothing() (cpp.name = 'cppDoNothing');
+  @cpp.Name{value = "cppDoNothing"}
+  @go.Name{name = "GoDoNothing"}
+  void doNothing();
 }
 
 service MyServicePrioParent {
-  void ping() (priority = 'IMPORTANT');
-  void pong() (priority = 'HIGH_IMPORTANT');
-} (priority = 'HIGH')
+  @thrift.Priority{level = thrift.RpcPriority.IMPORTANT}
+  void ping();
+  @thrift.Priority{level = thrift.RpcPriority.HIGH_IMPORTANT}
+  void pong();
+}
 
 service MyServicePrioChild extends MyServicePrioParent {
-  void pang() (priority = 'BEST_EFFORT');
+  @thrift.Priority{level = thrift.RpcPriority.BEST_EFFORT}
+  void pang();
 }
 
 struct SecretStruct {
   1: i64 id;
-  2: string password (java.sensitive);
+  @thrift.DeprecatedUnvalidatedAnnotations{items = {"java.sensitive": "1"}}
+  2: string password;
 }
 
+@cpp.Name{value = "GoodInteraction"}
 interaction BadInteraction {
   void foo();
-} (cpp.name = "GoodInteraction")
+}
 
+@cpp.Name{value = "GoodService"}
 service BadService {
   performs BadInteraction;
   i32 bar();
-} (cpp.name = "GoodService")
+}
+
+service FooBarBazService {
+  @go.Name{name = "FooStructured"}
+  void foo();
+  @go.Name{name = "BarNonStructured"}
+  void bar();
+  void baz();
+}
+
+// The following were automatically generated and may benefit from renaming.
+@cpp.Type{name = "std::deque<std::string>"}
+typedef list<string> list_string_6884

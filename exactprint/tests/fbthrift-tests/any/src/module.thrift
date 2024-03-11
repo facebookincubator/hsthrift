@@ -3,7 +3,7 @@
 // source: thrift/compiler/test/fixtures/*
 // @generated
 /*
- * Copyright (c) Facebook, Inc. and its affiliates.
+ * Copyright (c) Meta Platforms, Inc. and affiliates.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,21 +18,19 @@
  * limitations under the License.
  */
 
-include "thrift/annotation/thrift.thrift"
+include "thrift/annotation/cpp.thrift"
 
-@thrift.Uri{value = "facebook.com/thrift/compiler/test/fixtures/any/MyStruct"}
+package "facebook.com/thrift/compiler/test/fixtures/any"
+
+@cpp.Adapter{name = '::my::Adapter1'}
 struct MyStruct {
   1: string myString;
 }
 
-@thrift.Uri{value = "facebook.com/thrift/compiler/test/fixtures/any/MyUnion"}
 union MyUnion {
   1: string myString;
 }
 
-@thrift.Uri{
-  value = "facebook.com/thrift/compiler/test/fixtures/any/MyException",
-}
 exception MyException {
   1: string myString;
 }

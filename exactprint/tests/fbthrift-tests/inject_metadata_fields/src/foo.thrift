@@ -24,5 +24,6 @@ struct Fields {
   100: string injected_field;
   @thrift.Box
   101: optional string injected_structured_annotation_field;
-  102: optional string injected_unstructured_annotation_field (thrift.box);
+  @thrift.Box
+  102: optional string injected_unstructured_annotation_field;
 }
