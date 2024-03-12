@@ -7,13 +7,16 @@
 -}
 
 -- | http://www.math.sci.hiroshima-u.ac.jp/m-mat/MT/TINYMT/
+{-# LANGUAGE NumericUnderscores #-}
 module System.Random.TinyMT64
   ( TinyMT64
   , mkTinyMT64
   , nextWord64
-  , generateWord64s
+  , nextIntR
+  , nextDouble
   ) where
 
+import Control.Arrow (first)
 import Data.Bits
 import Data.Word
 
@@ -64,5 +67,35 @@ temper (TinyMT64 s0 s1) = t1 `xor` (negate (t1 .&. 1) .&. tmat)
 nextWord64 :: TinyMT64 -> (Word64, TinyMT64)
 nextWord64 !s = let t = nextState s in (temper t, t)
 
-generateWord64s :: TinyMT64 -> [Word64]
-generateWord64s !s = let (x, t) = nextWord64 s in x: generateWord64s t
+-- [min, max]
+nextIntR :: Int -> Int -> TinyMT64 -> (Int, TinyMT64)
+nextIntR !lo !hi
+  | lo > hi = error "min>max"
+  -- `range == 0` iff `lo == minBound && hi == maxBound`
+  | range == 0 = nextFull
+  -- Use different implementation for large range to make Hack implementation
+  -- easier, where there is no good support for unsinged integers.
+  | range >= 0x8000_0000_0000_0000 = nextLarge 20
+  | otherwise = nextSmall 20
+  where
+    range = fromIntegral hi - fromIntegral lo + 1 :: Word64
+    extra = (maxBound `rem` range + 1) `rem` range
+    nextFull = first fromIntegral <$> nextWord64
+    nextLarge !i !s
+      | lo <= r && r <= hi = (r, t)
+      | i > (1 :: Int) = nextLarge (i - 1) t
+      | r < lo = (r + fromIntegral range, t)
+      | otherwise {- r > hi -} = (r - fromIntegral range, t)
+      where
+        (r, t) = nextFull s
+    nextSmall !i !s
+      | r < extra && i > (1 :: Int) = nextSmall (i - 1) t
+      | otherwise = (lo + fromIntegral (r `rem` range), t)
+      where
+        (r, t) = nextWord64 s
+
+-- [0, 1]
+nextDouble :: TinyMT64 -> (Double, TinyMT64)
+nextDouble !s = (fromIntegral x / 1.8446744073709551616e19, t)
+  where
+    (x, t) = nextWord64 s

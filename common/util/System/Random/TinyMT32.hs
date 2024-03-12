@@ -11,7 +11,6 @@ module System.Random.TinyMT32
   ( TinyMT32
   , mkTinyMT32
   , nextWord32
-  , generateWord32s
   ) where
 
 import Data.Bits
@@ -64,6 +63,3 @@ temper (TinyMT32 s0 _ s2 s3) = t0 `xor` t1 `xor` (negate (t1 .&. 1) .&. tmat)
 
 nextWord32 :: TinyMT32 -> (Word32, TinyMT32)
 nextWord32 !s = let t = nextState s in (temper t, t)
-
-generateWord32s :: TinyMT32 -> [Word32]
-generateWord32s !s = let (x, t) = nextWord32 s in x: generateWord32s t
