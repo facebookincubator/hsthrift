@@ -68,8 +68,8 @@ nextWord64 :: TinyMT64 -> (Word64, TinyMT64)
 nextWord64 !s = let t = nextState s in (temper t, t)
 
 -- [min, max]
-nextIntR :: Int -> Int -> TinyMT64 -> (Int, TinyMT64)
-nextIntR !lo !hi
+nextIntR :: (Int, Int) -> TinyMT64 -> (Int, TinyMT64)
+nextIntR (!lo, !hi)
   | lo > hi = error "min>max"
   -- `range == 0` iff `lo == minBound && hi == maxBound`
   | range == 0 = nextFull
