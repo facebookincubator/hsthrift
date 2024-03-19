@@ -278,23 +278,6 @@
                 {
                     "default_value": {
                         "named_constant": {
-                            "name": "b"
-                        }
-                    },
-                    "id": 2,
-                    "name": "b",
-                    "requiredness": "default",
-                    "type": {
-                        "name": {
-                            "name": "B",
-                            "src": "b"
-                        },
-                        "type": "struct"
-                    }
-                },
-                {
-                    "default_value": {
-                        "named_constant": {
                             "name": "bool_value",
                             "src": "b"
                         }

@@ -12,7 +12,7 @@
 {-# OPTIONS_GHC -fno-warn-incomplete-uni-patterns#-}
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
 module A.Types
-       (T, a, A(A, a_a, a_b, a_c, a_d, a_e, a_f, a_g, a_h),
+       (T, a, A(A, a_a, a_c, a_d, a_e, a_f, a_g, a_h),
         U(U_EMPTY, U_x, U_y, U_z), X(X, x_reason), u, b, default_d, zero)
        where
 import qualified B.Types as B
@@ -48,77 +48,72 @@ type T = Int.Int64
 a :: T
 a = B.i64_value
 
-data A = A{a_a :: T, a_b :: B.B, a_c :: Prelude.Bool,
-           a_d :: [[Int.Int32]], a_e :: Map.Map Int.Int32 Text.Text,
-           a_f :: B.Number, a_g :: Prelude.Maybe Text.Text, a_h :: Text.Text}
+data A = A{a_a :: T, a_c :: Prelude.Bool, a_d :: [[Int.Int32]],
+           a_e :: Map.Map Int.Int32 Text.Text, a_f :: B.Number,
+           a_g :: Prelude.Maybe Text.Text, a_h :: Text.Text}
          deriving (Prelude.Eq, Prelude.Show, Prelude.Ord)
 
 instance Aeson.ToJSON A where
   toJSON
-    (A __field__a __field__b __field__c __field__d __field__e
-       __field__f __field__g __field__h)
+    (A __field__a __field__c __field__d __field__e __field__f
+       __field__g __field__h)
     = Aeson.object
         ("a" .= __field__a :
-           "b" .= __field__b :
-             "c" .= __field__c :
-               "d" .= __field__d :
-                 "e" .= Map.mapKeys Thrift.keyToStr __field__e :
-                   "f" .= __field__f :
-                     Prelude.maybe Prelude.id ((:) . ("g" .=)) __field__g
-                       ("h" .= __field__h : Prelude.mempty))
+           "c" .= __field__c :
+             "d" .= __field__d :
+               "e" .= Map.mapKeys Thrift.keyToStr __field__e :
+                 "f" .= __field__f :
+                   Prelude.maybe Prelude.id ((:) . ("g" .=)) __field__g
+                     ("h" .= __field__h : Prelude.mempty))
 
 instance Thrift.ThriftStruct A where
   buildStruct _proxy
-    (A __field__a __field__b __field__c __field__d __field__e
-       __field__f __field__g __field__h)
+    (A __field__a __field__c __field__d __field__e __field__f
+       __field__g __field__h)
     = Thrift.genStruct _proxy
         (Thrift.genField _proxy "a" (Thrift.getI64Type _proxy) 1 0
            (Thrift.genI64 _proxy __field__a)
            :
-           Thrift.genField _proxy "b" (Thrift.getStructType _proxy) 2 1
-             (Thrift.buildStruct _proxy __field__b)
-             :
-             Thrift.genFieldBool _proxy "c" 3 2 __field__c :
-               Thrift.genField _proxy "d" (Thrift.getListType _proxy) 4 3
-                 (Thrift.genList _proxy (Thrift.getListType _proxy)
-                    (Thrift.genListPrim _proxy (Thrift.getI32Type _proxy)
-                       (Thrift.genI32Prim _proxy))
-                    __field__d)
+           Thrift.genFieldBool _proxy "c" 3 1 __field__c :
+             Thrift.genField _proxy "d" (Thrift.getListType _proxy) 4 3
+               (Thrift.genList _proxy (Thrift.getListType _proxy)
+                  (Thrift.genListPrim _proxy (Thrift.getI32Type _proxy)
+                     (Thrift.genI32Prim _proxy))
+                  __field__d)
+               :
+               Thrift.genField _proxy "e" (Thrift.getMapType _proxy) 5 4
+                 ((Thrift.genMap _proxy (Thrift.getI32Type _proxy)
+                     (Thrift.getStringType _proxy)
+                     Prelude.False
+                     (Thrift.genI32 _proxy)
+                     (Thrift.genText _proxy)
+                     . Map.toList)
+                    __field__e)
                  :
-                 Thrift.genField _proxy "e" (Thrift.getMapType _proxy) 5 4
-                   ((Thrift.genMap _proxy (Thrift.getI32Type _proxy)
-                       (Thrift.getStringType _proxy)
-                       Prelude.False
-                       (Thrift.genI32 _proxy)
-                       (Thrift.genText _proxy)
-                       . Map.toList)
-                      __field__e)
+                 Thrift.genField _proxy "f" (Thrift.getI32Type _proxy) 6 5
+                   ((Thrift.genI32 _proxy . Prelude.fromIntegral .
+                       Thrift.fromThriftEnum)
+                      __field__f)
                    :
-                   Thrift.genField _proxy "f" (Thrift.getI32Type _proxy) 6 5
-                     ((Thrift.genI32 _proxy . Prelude.fromIntegral .
-                         Thrift.fromThriftEnum)
-                        __field__f)
-                     :
-                     let (__cereal__g, __id__g)
-                           = case __field__g of
-                               Prelude.Just _val -> ((:)
-                                                       (Thrift.genField _proxy "g"
-                                                          (Thrift.getStringType _proxy)
-                                                          7
-                                                          6
-                                                          (Thrift.genText _proxy _val)),
-                                                     7)
-                               Prelude.Nothing -> (Prelude.id, 6)
-                       in
-                       __cereal__g
-                         (Thrift.genField _proxy "h" (Thrift.getStringType _proxy) 8 __id__g
-                            (Thrift.genText _proxy __field__h)
-                            : []))
+                   let (__cereal__g, __id__g)
+                         = case __field__g of
+                             Prelude.Just _val -> ((:)
+                                                     (Thrift.genField _proxy "g"
+                                                        (Thrift.getStringType _proxy)
+                                                        7
+                                                        6
+                                                        (Thrift.genText _proxy _val)),
+                                                   7)
+                             Prelude.Nothing -> (Prelude.id, 6)
+                     in
+                     __cereal__g
+                       (Thrift.genField _proxy "h" (Thrift.getStringType _proxy) 8 __id__g
+                          (Thrift.genText _proxy __field__h)
+                          : []))
   parseStruct _proxy
     = ST.runSTT
         (do Prelude.return ()
             __field__a <- ST.newSTRef a
-            __field__b <- ST.newSTRef b
             __field__c <- ST.newSTRef B.bool_value
             __field__d <- ST.newSTRef Default.def
             __field__e <- ST.newSTRef Default.def
@@ -138,14 +133,6 @@ instance Thrift.ThriftStruct A where
                                                                                    (Thrift.parseI64
                                                                                       _proxy)
                                                                         ST.writeSTRef __field__a
-                                                                          _val
-                                                                 2 | _type ==
-                                                                       Thrift.getStructType _proxy
-                                                                     ->
-                                                                     do !_val <- Trans.lift
-                                                                                   (Thrift.parseStruct
-                                                                                      _proxy)
-                                                                        ST.writeSTRef __field__b
                                                                           _val
                                                                  3 | _type ==
                                                                        Thrift.getBoolType _proxy
@@ -216,7 +203,6 @@ instance Thrift.ThriftStruct A where
                                                                            (Prelude.Just _bool))
                                                                _parse _id
                        Thrift.FieldEnd -> do !__val__a <- ST.readSTRef __field__a
-                                             !__val__b <- ST.readSTRef __field__b
                                              !__val__c <- ST.readSTRef __field__c
                                              !__val__d <- ST.readSTRef __field__d
                                              !__val__e <- ST.readSTRef __field__e
@@ -227,8 +213,7 @@ instance Thrift.ThriftStruct A where
                                                Prelude.Nothing -> Prelude.fail
                                                                     "Error parsing type A: missing required field h of type Text.Text"
                                                Prelude.Just __val__h -> Prelude.pure
-                                                                          (A __val__a __val__b
-                                                                             __val__c
+                                                                          (A __val__a __val__c
                                                                              __val__d
                                                                              __val__e
                                                                              __val__f
@@ -236,39 +221,36 @@ instance Thrift.ThriftStruct A where
                                                                              __val__h)
               _idMap
                 = HashMap.fromList
-                    [("a", 1), ("b", 2), ("c", 3), ("d", 4), ("e", 5), ("f", 6),
-                     ("g", 7), ("h", 8)]
+                    [("a", 1), ("c", 3), ("d", 4), ("e", 5), ("f", 6), ("g", 7),
+                     ("h", 8)]
             _parse 0)
 
 instance DeepSeq.NFData A where
   rnf
-    (A __field__a __field__b __field__c __field__d __field__e
-       __field__f __field__g __field__h)
+    (A __field__a __field__c __field__d __field__e __field__f
+       __field__g __field__h)
     = DeepSeq.rnf __field__a `Prelude.seq`
-        DeepSeq.rnf __field__b `Prelude.seq`
-          DeepSeq.rnf __field__c `Prelude.seq`
-            DeepSeq.rnf __field__d `Prelude.seq`
-              DeepSeq.rnf __field__e `Prelude.seq`
-                DeepSeq.rnf __field__f `Prelude.seq`
-                  DeepSeq.rnf __field__g `Prelude.seq`
-                    DeepSeq.rnf __field__h `Prelude.seq` ()
+        DeepSeq.rnf __field__c `Prelude.seq`
+          DeepSeq.rnf __field__d `Prelude.seq`
+            DeepSeq.rnf __field__e `Prelude.seq`
+              DeepSeq.rnf __field__f `Prelude.seq`
+                DeepSeq.rnf __field__g `Prelude.seq`
+                  DeepSeq.rnf __field__h `Prelude.seq` ()
 
 instance Default.Default A where
   def
-    = A a b B.bool_value Default.def Default.def B.Number_Two
+    = A a B.bool_value Default.def Default.def B.Number_Two
         Prelude.Nothing
         ""
 
 instance Hashable.Hashable A where
-  hashWithSalt __salt (A _a _b _c _d _e _f _g _h)
+  hashWithSalt __salt (A _a _c _d _e _f _g _h)
     = Hashable.hashWithSalt
         (Hashable.hashWithSalt
            (Hashable.hashWithSalt
               (Hashable.hashWithSalt
                  (Hashable.hashWithSalt
-                    (Hashable.hashWithSalt
-                       (Hashable.hashWithSalt (Hashable.hashWithSalt __salt _a) _b)
-                       _c)
+                    (Hashable.hashWithSalt (Hashable.hashWithSalt __salt _a) _c)
                     _d)
                  ((Prelude.map (\ (_k, _v) -> (_k, _v)) . Map.toAscList) _e))
               _f)

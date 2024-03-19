@@ -28,7 +28,8 @@ module HsTest.Types
                    testStruct_f_bytestring),
         Number(Number_One, Number_Two, Number_Three, Number__UNKNOWN),
         Perfect(Perfect_A, Perfect_B, Perfect_C, Perfect__UNKNOWN),
-        Void(Void__UNKNOWN))
+        Void(Void__UNKNOWN), List_i64_1894, List_i64_7708,
+        Map_Number_i64_1522, String_1484, String_5858)
        where
 import qualified Control.DeepSeq as DeepSeq
 import qualified Control.Exception as Exception
@@ -70,7 +71,7 @@ import qualified Data.Vector as Vector
 import qualified Data.Vector.Storable as VectorStorable
 {-# LINE 7 "if/hs_test_instances.hs" #-}
 import Prelude ((/=), ($))
-{-# LINE 74 "test/fixtures/gen-hs2/HsTest/Types.hs" #-}
+{-# LINE 75 "test/fixtures/gen-hs2/HsTest/Types.hs" #-}
 
 newtype X = X{unX :: Int.Int64}
             deriving (Prelude.Eq, Prelude.Show, DeepSeq.NFData, Prelude.Ord)
@@ -255,17 +256,17 @@ data TestStruct = TestStruct{testStruct_f_bool :: Prelude.Bool,
                              testStruct_f_text :: Text.Text,
                              testStruct_f_set :: Set.Set Int.Int8,
                              testStruct_o_i32 :: Prelude.Maybe Int.Int32, testStruct_foo :: Foo,
-                             testStruct_f_hash_map :: HashMap.HashMap Number Int.Int64,
+                             testStruct_f_hash_map :: Map_Number_i64_1522,
                              testStruct_f_newtype :: Z, testStruct_f_union :: TUnion,
-                             testStruct_f_string :: Prelude.String,
+                             testStruct_f_string :: String_5858,
                              testStruct_f_binary :: ByteString.ByteString,
                              testStruct_f_optional_newtype :: Prelude.Maybe X,
                              testStruct_bool_map :: Map.Map Int.Int32 Prelude.Bool,
                              testStruct_bool_list :: [Prelude.Bool],
-                             testStruct_i64_vec :: Vector.Vector Int.Int64,
-                             testStruct_i64_svec :: VectorStorable.Vector Int.Int64,
+                             testStruct_i64_vec :: List_i64_7708,
+                             testStruct_i64_svec :: List_i64_1894,
                              testStruct_binary_key :: Map.Map ByteString.ByteString Int.Int64,
-                             testStruct_f_bytestring :: ByteString.ByteString}
+                             testStruct_f_bytestring :: String_1484}
                   deriving (Prelude.Eq, Prelude.Show)
 
 instance Aeson.ToJSON TestStruct where
@@ -1342,6 +1343,16 @@ instance Thrift.ThriftEnum Void where
     = Prelude.Left
         ("toThriftEnumEither: not a valid identifier for enum Void: " ++
            Prelude.show val)
+
+type List_i64_1894 = VectorStorable.Vector Int.Int64
+
+type List_i64_7708 = Vector.Vector Int.Int64
+
+type Map_Number_i64_1522 = HashMap.HashMap Number Int.Int64
+
+type String_1484 = ByteString.ByteString
+
+type String_5858 = Prelude.String
 {-# LINE 9 "if/hs_test_instances.hs" #-}
 instance QuickCheck.Arbitrary Foo where
   arbitrary = Foo <$> QuickCheck.arbitrary <*> QuickCheck.arbitrary
