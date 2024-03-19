@@ -30,20 +30,20 @@ struct C {
   2: E e;
 }
 
-struct D {
-  1: F f;
-}
-
-struct E {
-  1: list<F> f = foo;
-}
-
 enum F {
   F = 0,
 }
 
+struct D {
+  1: F f;
+}
+
 const F bar = F.F;
 const list<F> foo = [bar];
+
+struct E {
+  1: list<F> f = foo;
+}
 
 enum G {
   G = 0,
