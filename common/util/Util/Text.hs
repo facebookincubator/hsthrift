@@ -44,6 +44,7 @@ module Util.Text
   , InvalidConversion(..)
   , textToInt
   , hexToInt
+  , hexToBytes
   , wrapText
   , slice
   ) where
@@ -345,6 +346,33 @@ hexToInt txt@(Text arr off len)
 
   err = Left $ InvalidConversion $
           "hexToInt: string \"" <> txt <> "\" is not an integer"
+
+-- | Convert a hexadecimal representation of an integer to a
+-- big-endian ByteString.
+hexToBytes :: Text -> Either InvalidConversion ByteString
+hexToBytes txt@(Text arr off len)
+  | len == 0 = err
+  | otherwise = go [] (off+len-1)
+  where
+  go acc !i
+    | i < off = Right (BS.pack acc)
+    | i == off, Just x <- nibble l = Right (BS.pack (x:acc))
+    | Just x <- nibble l, Just y <- nibble h =
+        go (y `shiftL` 4 + x : acc) (i-2)
+    | otherwise = err
+    where
+      l = fromIntegral (A.unsafeIndex arr i)
+      h = fromIntegral (A.unsafeIndex arr (i-1))
+
+  {-# INLINE nibble #-}
+  nibble :: Int -> Maybe Word8
+  nibble x
+    | x >= ord '0' && x <= ord '9' = Just (fromIntegral (x - ord '0'))
+    | x >= ord 'a' && x <= ord 'f' = Just (10 + fromIntegral (x - ord 'a'))
+    | otherwise = Nothing
+
+  err = Left $ InvalidConversion $
+    "hexToBytes: string \"" <> txt <> "\" is not a hex integer"
 
 insertCommasAndAnd :: [Text] -> Text
 insertCommasAndAnd [] = ""
