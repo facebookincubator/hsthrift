@@ -30,15 +30,15 @@ import Util.PrettyPrint
 
 -- | Runs an 'IO' operation and prints how long it took. Also returns
 -- the timing value for use.
-reportAndShowTime :: String -> IO a -> IO (Double, Int64, a)
+reportAndShowTime :: MonadIO m => String -> m a -> m (Double, Int64, a)
 reportAndShowTime name io = do
   (t, b, a) <- timeIt io
-  hPrintf stderr "%s: %s, %s\n" name (showTime t) (showAllocs b)
+  liftIO $ hPrintf stderr "%s: %s, %s\n" name (showTime t) (showAllocs b)
   return (t, b, a)
 
 -- | Runs an 'IO' operation and reports how long it took. Useful for
 -- ad-hoc benchmarking.
-reportTime :: String -> IO a -> IO a
+reportTime :: MonadIO m => String -> m a -> m a
 reportTime name io = do
   (_, _, a) <- reportAndShowTime name io
   return a
