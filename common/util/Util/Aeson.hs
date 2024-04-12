@@ -95,7 +95,7 @@ parseValueStrict' :: ByteString -> Either String Value
 parseValueStrict' = A.parseOnly
   (A.skipSpace *> value' <* A.skipSpace <* A.endOfInput)
 
--- Orphan instance to make fromJSON O(1) when converting to an Object
+-- Orphan instance to make from/toJSON O(1) when converting from/to an Object
 -- (aka HashMap Text Value).  Otherwise the default instances provided
 -- by Aeson will rebuild the HashMap.
 --
@@ -106,3 +106,9 @@ parseValueStrict' = A.parseOnly
 instance {-# INCOHERENT #-} FromJSON (HashMap Text Value) where
   parseJSON (Object obj) = return obj
   parseJSON other = typeMismatch "object" other
+
+-- Having same optimization for 'ToJSON' is still valuable when we cannot use
+-- 'Object' directly, e.g., when we are calling a polymorphic function with
+-- a @ToJSON a@ constraint.
+instance {-# INCOHERENT #-} ToJSON (HashMap Text Value) where
+  toJSON = Object
