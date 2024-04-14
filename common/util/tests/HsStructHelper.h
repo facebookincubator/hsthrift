@@ -23,7 +23,7 @@ HS_STRUCT OnlyMovable {
   OnlyMovable(const OnlyMovable&) = delete;
   OnlyMovable& operator=(const OnlyMovable&) = delete;
 
-  OnlyMovable(OnlyMovable &&) = default;
+  OnlyMovable(OnlyMovable&&) = default;
   OnlyMovable& operator=(OnlyMovable&&) = delete;
 };
 
@@ -40,7 +40,7 @@ HS_STRUCT Nonmovable {
   }
 
   Nonmovable(const Nonmovable&) = delete;
-  Nonmovable(Nonmovable &&) = delete;
+  Nonmovable(Nonmovable&&) = delete;
   Nonmovable& operator=(const Nonmovable&) = delete;
   Nonmovable& operator=(Nonmovable&&) = delete;
 };

@@ -19,6 +19,7 @@ namespace thrift {
 
 // Given a callback and map of metadata, build a factory
 using TFactory =
-    AsyncProcessorFactory* (*)(TCallback, AsyncProcessorFactory::MethodMetadataMap&);
+    AsyncProcessorFactory* (*)(TCallback,
+                               AsyncProcessorFactory::MethodMetadataMap&);
 } // namespace thrift
 } // namespace apache
