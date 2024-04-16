@@ -18,7 +18,6 @@ import Control.Monad.Catch (
   ),
  )
 import Control.Trace.Core (
-  MonadTrace (..),
   Tracer (traceMsg_),
  )
 import Data.ByteString (ByteString)
@@ -46,8 +45,7 @@ eventlogTracer
   | userTracingEnabled = mempty {traceMsg_ = trace}
   | otherwise = mempty
   where
-    trace :: MonadTrace m => Trace -> m b -> m b
-    trace Trace {..} act = bracketM acquire release (const act)
+    trace Trace {..} = release <$> acquire
       where
         acquire = beginSpan name
         release sp res = do

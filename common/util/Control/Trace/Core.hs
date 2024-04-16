@@ -19,15 +19,11 @@ module Control.Trace.Core (
   (>$<),
 ) where
 
-import Control.Exception (
-  Exception,
- )
 import Control.Monad.Catch (
   ExitCase (..),
   MonadCatch,
   MonadMask (generalBracket),
   MonadThrow,
-  try,
  )
 import Control.Monad.IO.Class (
   MonadIO (..),
@@ -45,43 +41,41 @@ import Data.Coerce
 -- | A contravariant tracing abstraction
 data Tracer msg = Tracer
   { -- | Log a message
-    logMsg_ :: forall m. (HasCallStack, MonadTrace m) => msg -> m ()
-  , -- | Trace the begin and end of a computation
-    traceMsg_ :: forall a m. (HasCallStack, MonadTrace m) => msg -> m a -> m a
+    logMsg_ :: msg -> IO ()
+  , -- | Starts a trace and returns an action to end it
+    traceMsg_
+      :: forall a. HasCallStack => msg -> IO (ExitCase a -> IO ())
   }
 
--- Explicit record accessors to preserve call stacks
+logMsg :: (HasCallStack, MonadIO m) => Tracer msg -> msg -> m ()
+logMsg logger msg = withFrozenCallStack $ liftIO $ logMsg_ logger msg
 
-logMsg :: (HasCallStack, MonadTrace m) => Tracer msg -> msg -> m ()
-logMsg logger msg = withFrozenCallStack $ logMsg_ logger msg
-
-traceMsg :: (HasCallStack, MonadTrace m) => Tracer msg -> msg -> m a -> m a
-traceMsg logger msg act = withFrozenCallStack $ traceMsg_ logger msg act
+traceMsg ::
+  (HasCallStack, MonadTrace m) => Tracer msg -> msg -> m a -> m a
+traceMsg logger msg act = withFrozenCallStack $
+  bracketM (traceMsg_ logger msg) id (const act)
 
 instance Contravariant Tracer where
   contramap f (Tracer logf traceF) = Tracer (logf . f) (traceF . f)
 
 instance Monoid (Tracer msg) where
-  mempty = Tracer (\_ -> pure ()) (const id)
+  mempty = Tracer (\_ -> pure ()) (const $ pure $ const $ pure ())
 
 instance Semigroup (Tracer msg) where
   l1 <> l2 =
     Tracer
       { logMsg_ = \m -> logMsg_ l1 m *> logMsg_ l2 m
-      , traceMsg_ = \msg -> traceMsg_ l1 msg . traceMsg_ l2 msg
+      , traceMsg_ = \msg -> do
+        end1 <- traceMsg_ l1 msg
+        end2 <- traceMsg_ l2 msg
+        return (\res -> end2 res >> end1 res)
       }
 
--------------------------------------------------------------------------------
--- Exceptions
-
 class MonadIO m => MonadTrace m where
-  tryM :: Exception e => m a -> m (Either e a)
   bracketM :: IO a -> (a -> ExitCase b -> IO ()) -> (a -> m b) -> m b
 
 -- deriving via (MonadMaskInstance IO) instance MonadTrace IO
 instance MonadTrace IO where
-  tryM :: forall e a . Exception e => IO a -> IO (Either e a)
-  tryM = coerce (tryM @(MonadMaskInstance IO) @e @a)
   bracketM
     :: forall a b . IO a -> (a -> ExitCase b -> IO ()) -> (a -> IO b) -> IO b
   bracketM = coerce (bracketM @(MonadMaskInstance IO) @a @b)
@@ -92,6 +86,5 @@ newtype MonadMaskInstance m a = MonadMaskInstance (m a)
     (Applicative, Functor, Monad, MonadCatch, MonadIO, MonadMask, MonadThrow)
 
 instance (MonadIO m, MonadMask m) => MonadTrace (MonadMaskInstance m) where
-  tryM = try
   bracketM acquire release =
     fmap fst . generalBracket (liftIO acquire) ((liftIO .) . release)

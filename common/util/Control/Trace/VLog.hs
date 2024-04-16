@@ -68,30 +68,24 @@ vlogTracerWithPriority = Tracer {..}
       S p s -> String.vlog p s
       Skip -> error "unreachable"
 
-    traceMsg_ :: (HasCallStack, MonadTrace m) => TraceWithPriority -> m b -> m b
-    traceMsg_ Skip act = act
-    traceMsg_ msg act = withFrozenCallStack $ do
+    traceMsg_ msg =
       case msg of
-        T p t ->
-          bracketM
-            (vlog p ("BEGIN " <> t))
-            ( \() res -> case res of
+        T p t -> do
+            vlog p ("BEGIN " <> t)
+            return ( \res -> case res of
                 ExitCaseSuccess {} -> vlog p ("END " <> t)
                 ExitCaseAbort {} -> vlog p ("ABORTED " <> t)
                 ExitCaseException e -> vlog p ("FAILED " <> t <> ": " <> showt e)
-            )
-            (\() -> act)
-        S p t ->
-          bracketM
-            (String.vlog p ("BEGIN " <> t))
-            ( \() res -> case res of
+              )
+        S p t -> do
+            String.vlog p ("BEGIN " <> t)
+            return ( \res -> case res of
                 ExitCaseSuccess {} -> String.vlog p ("END " <> t)
                 ExitCaseAbort {} -> String.vlog p ("ABORTED " <> t)
                 ExitCaseException e ->
                   String.vlog p ("FAILED " <> t <> ": " <> show e)
-            )
-            (\() -> act)
-        Skip -> error "unreachable"
+              )
+        Skip -> return $ const $ return ()
 
 vlogTracer ::
   forall a.
@@ -104,16 +98,15 @@ vlogTracer ::
   Tracer a
 vlogTracer beginend log_ prio = Tracer {..}
   where
-    logMsg_ :: (HasCallStack, MonadIO m) => a -> m ()
+    logMsg_ :: a -> IO ()
     logMsg_ msg =
-      withFrozenCallStack $
         let p = prio msg
          in when (p >= 0) $ vlog p $ log_ msg
 
-    traceMsg_ :: (HasCallStack, MonadTrace m) => a -> m b -> m b
-    traceMsg_ msg act = withFrozenCallStack $ do
+    traceMsg_ :: a -> IO (ExitCase b -> IO ())
+    traceMsg_ msg = do
       let p = prio msg
           (b, e) = beginend msg
       if p >= 0
-        then bracketM (vlog p b) (\() res -> vlog p (e $ mkSome res)) (\() -> act)
-        else act
+        then vlog p b >> return (\res -> vlog p (e $ mkSome res))
+        else return $ const $ return ()
