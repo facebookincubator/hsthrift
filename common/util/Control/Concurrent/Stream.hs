@@ -13,7 +13,7 @@ module Control.Concurrent.Stream
   ( stream
   , streamBound
   , streamWithState
-  , streamWithStateBound
+  , streamWithResourceBound
   , mapConcurrently_unordered
   , forConcurrently_unordered
   ) where
@@ -50,8 +50,8 @@ stream
   -> ((a -> IO ()) -> IO ()) -- ^ Producer
   -> (a -> IO ()) -- ^ Worker
   -> IO ()
-stream maxConcurrency producer worker = stream_ UnboundThreads
-  ThrowExceptions producer (replicate maxConcurrency ()) $ const worker
+stream maxConcurrency producer worker =
+  streamWithState producer (replicate maxConcurrency ()) $ const worker
 
 -- | Like stream, but uses bound threads for the workers.  See
 -- 'Control.Concurrent.forkOS' for details on bound threads.
@@ -60,8 +60,8 @@ streamBound
   -> ((a -> IO ()) -> IO ()) -- ^ Producer
   -> (a -> IO ()) -- ^ Worker
   -> IO ()
-streamBound maxConcurrency producer worker = stream_ BoundThreads
-  ThrowExceptions producer (replicate maxConcurrency ()) $ const worker
+streamBound maxConcurrency producer worker =
+  streamWithResourceBound maxConcurrency ($ ()) producer $ const worker
 
 -- | Like stream, but each worker keeps a state: the state can be a parameter
 -- to the worker function, or a state that you can build upon (for example the
@@ -72,24 +72,30 @@ streamWithState
   -> [b] -- ^ Worker state
   -> (b -> a -> IO ()) -- ^ Worker
   -> IO ()
-streamWithState = stream_ UnboundThreads ThrowExceptions
+streamWithState producer states worker = stream_ UnboundThreads ThrowExceptions
+  ($ ()) producer states (const worker)
 
 -- | Like streamWithState but uses bound threads for the workers.
-streamWithStateBound
-  :: ((a -> IO ()) -> IO ()) -- ^ Producer
-  -> [b] -- ^ Worker state
-  -> (b -> a -> IO ()) -- ^ Worker
+streamWithResourceBound
+  :: Int  -- ^ Maximum concurrency
+  -> ((resource -> IO ()) -> IO ()) -- ^ Worker resource acquisition, per thread
+  -> ((a -> IO ()) -> IO ()) -- ^ Producer
+  -> (resource -> a -> IO ()) -- ^ Worker
   -> IO ()
-streamWithStateBound = stream_ BoundThreads ThrowExceptions
+streamWithResourceBound maxConcurrency withResource producer worker =
+  stream_ BoundThreads ThrowExceptions
+    withResource producer (replicate maxConcurrency ()) (\r _ -> worker r)
 
 stream_
   :: ShouldBindThreads -- use bound threads?
   -> ShouldThrow -- propagate worker exceptions?
+  -> ((resource -> IO ()) -> IO ()) -- ^ resource acquisition
   -> ((a -> IO ()) -> IO ()) -- ^ Producer
   -> [b] -- Worker state
-  -> (b -> a -> IO ()) -- ^ Worker
+  -> (resource -> b -> a -> IO ()) -- ^ Worker
   -> IO ()
-stream_ useBoundThreads shouldThrow producer workerStates worker = do
+stream_ useBoundThreads shouldThrow withResource producer workerStates worker
+  = do
   let maxConcurrency = length workerStates
   q <- atomically $ newTBQueue (fromIntegral maxConcurrency)
   let write x = atomically $ writeTBQueue q (Just x)
@@ -103,26 +109,28 @@ stream_ useBoundThreads shouldThrow producer workerStates worker = do
   where
     runWorkers unmask q = case useBoundThreads of
       BoundThreads ->
-         foldr1 concurrentlyBound $ map (runWorker unmask q) workerStates
-      UnboundThreads -> mapConcurrently_ (runWorker unmask q) workerStates
+        foldr1 concurrentlyBound $
+          map (withResource . runWorker unmask q) workerStates
+      UnboundThreads ->
+        mapConcurrently_ (withResource . runWorker unmask q) workerStates
 
     concurrentlyBound l r =
       withAsyncBound l $ \a ->
       withAsyncBound r $ \b ->
       void $ waitBoth a b
 
-    runWorker unmask q s = do
+    runWorker unmask q s resource = do
       v <- atomically $ readTBQueue q
       case v of
         Nothing -> return ()
         Just t -> do
-          e <- tryAll $ unmask $ worker s t
+          e <- tryAll $ unmask $ worker resource s t
           case e of
             Left ex -> case shouldThrow of
               ThrowExceptions -> throw ex
               SwallowExceptions -> logError $ show ex
             Right _ -> return ()
-          runWorker unmask q s
+          runWorker unmask q s resource
 
 -- | Concurrent map over a stream of values. Results are unordered.
 --
