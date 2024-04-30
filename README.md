@@ -131,6 +131,7 @@ not have IPv6 configured.
 
 ### Debian / Ubuntu
 
+```
 sudo apt install \
     libgoogle-glog-dev \
     libgflags-dev \
@@ -139,6 +140,7 @@ sudo apt install \
     ninja-build \
     cmake \
     libzstd-dev
+```
 
 (TODO: this list is probably incomplete, please file an issue if you
 encounter something missing)
