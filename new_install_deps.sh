@@ -33,6 +33,17 @@ if [ -z "${INSTALL_PREFIX}" ]; then
     INSTALL_PREFIX="${HOME}/.hsthrift"
 fi
 
+
+if [ ! -d "${INSTALL_PREFIX}/bin" ]; then
+    mkdir -p ${INSTALL_PREFIX}/bin
+fi
+
+# getdeps.py assumes fbpython exists
+if [ ! -L "${INSTALL_PREFIX}/bin/fbpython" ]; then
+    ln -s $(which python3) ${INSTALL_PREFIX}/bin/fbpython
+fi
+export PATH=${PATH}:${INSTALL_PREFIX}/bin
+
 # build in order
 for dep in $DEPS; do
     ${BUILDER} build --no-deps --install-dir "${INSTALL_PREFIX}" \
