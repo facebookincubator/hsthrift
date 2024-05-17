@@ -34,6 +34,7 @@ import qualified Thrift.Binary.Parser as Parser
 import qualified Thrift.Codegen as Thrift
 import qualified Thrift.Protocol.ApplicationException.Types
        as Thrift
+import qualified Thrift.Types as Thrift
 import Data.Monoid ((<>))
 import Prelude ((==), (=<<), (>>=), (<$>), (.))
 import Service.Types
@@ -72,7 +73,7 @@ send_testFunc _proxy _channel _counter _sendCob _recvCob _rpcOpts
                (ByteString.toLazyByteString (_build_testFunc _proxy _seqNum))
        Thrift.sendRequest _channel
          (Thrift.Request _callMsg
-            (Thrift.setRpcPriority _rpcOpts Thrift.High))
+            (Thrift.setRpcPriority _rpcOpts Thrift.NormalPriority))
          _sendCob
          _recvCob
 

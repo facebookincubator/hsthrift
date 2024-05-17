@@ -33,6 +33,7 @@ import qualified Data.Text.Encoding as Text
 import qualified Prelude as Prelude
 import qualified Thrift.Binary.Parser as Parser
 import qualified Thrift.CodegenTypesOnly as Thrift
+import qualified Thrift.Types as Thrift
 import Control.Applicative ((<|>), (*>), (<*))
 import Data.Aeson ((.:), (.:?), (.=), (.!=))
 import Data.Monoid ((<>))
