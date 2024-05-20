@@ -16,7 +16,10 @@ import Data.List.Extra
 import qualified Data.Text.Lazy as Text
 import qualified Data.Text.Lazy.Encoding as Text
 import Data.Typeable
+import System.Exit
 import System.FilePath
+import System.IO.Temp (withSystemTempDirectory)
+import System.Process
 import Test.HUnit
 import TestRunner
 
@@ -97,15 +100,16 @@ assertParseOk path contents exts =
         show (srcLine loc) ++ ":" ++ show (srcColumn loc) ++ "): " ++ str
 
 assertFileEqual :: FilePath -> String -> String -> IO ()
-assertFileEqual path expected obtained =
-  unless (normalize expected == normalize obtained) $ do
-    putStrLn path
-    putStrLn "Expected:"
-    putStrLn expected
-    putStrLn "-------------------------------------------------------------------"
-    putStrLn "But got:"
-    putStrLn obtained
-    assertFailure "expectation failure"
+assertFileEqual _path expected obtained =
+  unless (normalize expected == normalize obtained) $ withSystemTempDirectory "diff" $ \dir -> do
+    let expectPath = dir </> "expect"
+        obtainPath = dir </> "obtain"
+    writeFile expectPath (normalize expected)
+    writeFile obtainPath (normalize obtained)
+    let cp = proc "diff" ["-U", "10", expectPath, obtainPath]
+    (ec, out, _err) <- readCreateProcessWithExitCode cp ""
+    unless (ExitSuccess == ec) $ do
+      assertFailure out
   where
     -- In dependent-sum > 0.6 the This constructor was renamed to Some
     normalize
