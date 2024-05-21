@@ -6,6 +6,9 @@
   LICENSE file in the root directory of this source tree.
 -}
 
+-- | Utilities for dealing with time in seconds. This is mostly for
+-- interacting with external systems that store or communicate using
+-- time in seconds. For higher-resolution times, see "Util.Timing".
 module Util.TimeSec
   ( Time(..)
   , TimeSpan(..)
@@ -23,6 +26,7 @@ module Util.TimeSec
   , trLast
   , ppUTCTime, ppDate, ppTime, ppTimeSpan, ppTimeSpanWithGranularity
   , PPTimeSpanGranularity(..)
+  , showNominalDiffTime
   ) where
 
 import Data.Aeson
@@ -170,3 +174,6 @@ ppTimeSpanWithGranularity Second ts =
 
 ppTimeSpan :: TimeSpan -> Text
 ppTimeSpan = ppTimeSpanWithGranularity Second
+
+showNominalDiffTime :: NominalDiffTime -> String
+showNominalDiffTime t = Text.unpack (ppTimeSpan (TimeSpan (round t)))

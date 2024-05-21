@@ -6,6 +6,7 @@
   LICENSE file in the root directory of this source tree.
 -}
 
+-- | Utilities for timing things and working with time differences
 module Util.Timing
   ( reportTime
   , reportAndShowTime
@@ -19,7 +20,6 @@ module Util.Timing
 import Control.DeepSeq (NFData, force)
 import Control.Exception (evaluate)
 import Control.Monad.IO.Class
-import Data.Time.Clock
 import Data.Int
 import Text.Printf
 import GHC.Stats
@@ -27,6 +27,7 @@ import GHC.Conc
 import System.IO (stderr)
 
 import Util.PrettyPrint
+import Util.Time
 
 -- | Runs an 'IO' operation and prints how long it took. Also returns
 -- the timing value for use.
@@ -62,23 +63,17 @@ showAllocs = renderBytesString . fromIntegral
 -- the number of bytes it allocated, and the result it returned.
 timeIt :: MonadIO m => m a -> m (Double, Int64, a)
 timeIt action = do
-  t0 <- liftIO getCurrentTime
+  t0 <- liftIO getTimePoint
   a0 <- liftIO getAllocationCounter
   ret <- action
   a1 <- liftIO getAllocationCounter
-  t1 <- liftIO getCurrentTime
-  return (realToFrac $ t1 `diffUTCTime` t0, a0 - a1, ret)
+  t <- liftIO $ getElapsedTime t0
+  return (toDiffSeconds t, a0 - a1, ret)
 
 -- | Runs an 'IO' action, reduces the result to normal form and returns a pair
 -- of the time it consumed and the result it returned.
 timeNF :: NFData a => IO a -> IO (Double, Int64, a)
-timeNF action = do
-  t0 <- getCurrentTime
-  a0 <- getAllocationCounter
-  ret <- evaluate . force =<< action
-  a1 <- getAllocationCounter
-  t1 <- getCurrentTime
-  return (realToFrac $ t1 `diffUTCTime` t0, a0 - a1, ret)
+timeNF action = timeIt $ evaluate . force =<< action
 
 -- | Records the time to run an action excluding GC time.  Probably
 -- more expensive than 'timeIt'.
