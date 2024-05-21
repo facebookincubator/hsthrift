@@ -137,5 +137,6 @@ test-suite thrift-compiler-tests
                  hspec,
                  hspec-contrib,
                  HUnit ^>= 1.6.1,
+                 temporary,
                  text,
                  thrift-compiler
