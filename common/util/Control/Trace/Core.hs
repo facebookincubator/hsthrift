@@ -15,10 +15,12 @@ module Control.Trace.Core (
   MonadMaskInstance (..),
   logMsg,
   traceMsg,
+  traceIf,
   Contravariant,
   (>$<),
 ) where
 
+import Control.Monad (when)
 import Control.Monad.Catch (
   ExitCase (..),
   MonadCatch,
@@ -28,6 +30,7 @@ import Control.Monad.Catch (
 import Control.Monad.IO.Class (
   MonadIO (..),
  )
+import Data.Coerce
 import Data.Functor.Contravariant (
   Contravariant (contramap),
   (>$<),
@@ -36,7 +39,6 @@ import GHC.Stack (
   HasCallStack,
   withFrozenCallStack,
  )
-import Data.Coerce
 
 -- | A contravariant tracing abstraction
 data Tracer msg = Tracer
@@ -70,6 +72,27 @@ instance Semigroup (Tracer msg) where
         end2 <- traceMsg_ l2 msg
         return (\res -> end2 res >> end1 res)
       }
+
+--------------------------------------------------------------------------------
+-- useful combinators
+
+-- | Gate every trace behind a condition
+traceIf :: forall msg. IO Bool -> Tracer msg -> Tracer msg
+traceIf cond tracer =
+  let
+    logMsg' msg = do
+      value <- cond
+      when value $ logMsg_ tracer msg
+    traceMsg' :: msg -> IO (ExitCase b -> IO ())
+    traceMsg' msg = do
+      value <- cond
+      if value
+        then traceMsg_ tracer msg
+        else pure $ pure $ pure ()
+  in Tracer logMsg' traceMsg'
+
+--------------------------------------------------------------------------------
+-- A Monad for 'bracket'
 
 class MonadIO m => MonadTrace m where
   bracketM :: IO a -> (a -> ExitCase b -> IO ()) -> (a -> m b) -> m b

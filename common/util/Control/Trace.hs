@@ -23,6 +23,7 @@ module Control.Trace
   ( Tracer
   , logMsg
   , traceMsg
+  , traceIf
   , (>$<)
   , vlogTracer
   , vlogTracerWithPriority
