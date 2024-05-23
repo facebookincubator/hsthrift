@@ -187,6 +187,7 @@ library
         aeson,
         attoparsec,
         bytestring-lexing,
+        clock,
         concurrent-extra,
         exceptions,
         ghc,
