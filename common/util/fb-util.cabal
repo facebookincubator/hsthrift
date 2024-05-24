@@ -151,6 +151,7 @@ library
         Util.String.Quasi
         Util.Testing
         Util.Text
+        Util.Time
         Util.TimeSec
         Util.Timing
         Util.ToExp
