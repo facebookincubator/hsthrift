@@ -6,8 +6,6 @@
  * LICENSE file in the root directory of this source tree.
  */
 
-include "thrift/annotation/thrift.thrift"
-
 struct Z {
   1: string name;
 }
@@ -21,7 +19,6 @@ service MyService {
 }
 
 service X {
-  @thrift.Priority{level = thrift.RpcPriority.HIGH}
   i32 testFunc();
 }
 
