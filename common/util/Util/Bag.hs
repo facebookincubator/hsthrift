@@ -10,6 +10,7 @@ module Util.Bag
   ( Bag -- Do not export constructors.
   , singleton
   , empty
+  , fromList
   ) where
 
 import Data.Foldable (toList)
@@ -46,6 +47,9 @@ singleton x = OneItem x
 empty :: Bag a -> Bool
 empty EmptyBag = True
 empty _ = False
+
+fromList :: [a] -> Bag a
+fromList = mconcat . map singleton
 
 instance Show a => Show (Bag a) where
   show b = "fromList " ++ show (toList b)
