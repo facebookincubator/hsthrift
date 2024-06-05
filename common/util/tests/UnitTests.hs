@@ -18,9 +18,6 @@ import qualified Util.Text as UT
 import Data.Aeson.Types
 import Data.Aeson (decode)
 import Data.ByteString (packCString, packCStringLen, ByteString)
-import Data.Complex
-import qualified Data.Vector as V
-import Numeric.FFT.Vector.Unitary as FFTW
 
 import Foreign.Storable
 import Foreign.C.String
@@ -53,23 +50,6 @@ parseNaN = TestCase $
       assertBool "NaN" $ isNaN a
     _ -> assertFailure "couldn't parse NaN"
 #endif
-
--- | Check that we can still call vector-fftw after T22849884
-useFFTW :: Test
-useFFTW = TestCase $
-  assertEqual "useFFTW" [17,5,2,1,1,1,1,1,2,5] $
-    applyFFT [1..10]
-  where
-    applyFFT :: [Int] -> [Int]
-    applyFFT series =
-      map (floor . magnitude)
-      . V.toList
-      . FFTW.execute (FFTW.plan FFTW.dft $ length series)
-      . V.fromList
-      $ map (doubleToComplex . fromIntegral) series
-      where
-        doubleToComplex :: Double -> Complex Double
-        doubleToComplex d = d :+ 0.0
 
 withCStringLenTest :: Test
 withCStringLenTest = TestCase $
@@ -132,7 +112,6 @@ main = testRunner $ TestList
 #ifdef FACEBOOK
   , TestLabel "parseNaN" parseNaN
 #endif
-  , TestLabel "useFFTW" useFFTW
   , TestLabel "withCStringLen" withCStringLenTest
   , TestLabel "useByteStringsAsCStrings" useByteStringsAsCStringsTest
   , TestLabel "bsListAsCStrLenArr" (bsListAsCStrLenArrTest ["hello", "world"])

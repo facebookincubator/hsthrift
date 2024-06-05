@@ -278,8 +278,7 @@ common test-common
                  text-show,
                  transformers,
                  unordered-containers,
-                 vector,
-                 vector-fftw
+                 vector
 
   build-tool-depends: hsc2hs:hsc2hs
 
