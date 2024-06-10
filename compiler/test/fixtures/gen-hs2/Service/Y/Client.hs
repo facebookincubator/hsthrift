@@ -16,7 +16,6 @@
 module Service.Y.Client (Y) where
 import qualified Service.X.Client as X
 import qualified Thrift.Codegen as Thrift
-import qualified Thrift.Types as Thrift
 import Service.Types
 
 data Y

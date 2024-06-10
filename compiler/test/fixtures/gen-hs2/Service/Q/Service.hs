@@ -31,7 +31,6 @@ import qualified Thrift.Codegen as Thrift
 import qualified Thrift.Processor as Thrift
 import qualified Thrift.Protocol.ApplicationException.Types
        as Thrift
-import qualified Thrift.Types as Thrift
 import Control.Applicative ((<*), (*>))
 import Data.Monoid ((<>))
 import Prelude ((<$>), (<*>), (++), (.), (==))

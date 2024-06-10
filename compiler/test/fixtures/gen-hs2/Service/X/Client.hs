@@ -34,7 +34,6 @@ import qualified Thrift.Binary.Parser as Parser
 import qualified Thrift.Codegen as Thrift
 import qualified Thrift.Protocol.ApplicationException.Types
        as Thrift
-import qualified Thrift.Types as Thrift
 import Data.Monoid ((<>))
 import Prelude ((==), (=<<), (>>=), (<$>), (.))
 import Service.Types
