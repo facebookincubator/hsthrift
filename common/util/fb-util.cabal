@@ -160,7 +160,6 @@ library
 
     cxx-sources:
         cpp/cdynamic.cpp
-        cpp/ffi.cpp
         cpp/logging.cpp
         cpp/HsStruct.cpp
         cpp/IOBuf.cpp
@@ -175,7 +174,6 @@ library
         cpp/HsStdVariant.h
         cpp/HsStruct.h
         cpp/HsStructDefines.h
-        cpp/ffi.h
         cpp/memory.h
         cpp/wrap.h
         Util/AsanAlloc.h

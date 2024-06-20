@@ -15,11 +15,15 @@ namespace facebook {
 namespace hs {
 namespace ffi {
 
-extern const char* outOfMemory;
-extern const char* unknownError;
-
 template <typename F>
 const char* wrap(F&& f) noexcept {
+  // The '\1' prefix instructs the marshaller in FFI.hs to not free those
+  // strings. The prefix itself will be stripped out. This is only really
+  // necessary specifically for the outOfMemory message where we might not be
+  // able to allocate a new message string - although arguably, we might just
+  // want to abort in such a case.
+  static const char *outOfMemory = "\1out of memory";
+  static const char *unknownError = "\1unknown error";
   try {
     f();
     return nullptr;
