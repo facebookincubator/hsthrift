@@ -110,7 +110,6 @@ library
         thrift-core
         async
         wangle
-        fmt
         fizz
         stdc++
         -- TODO: I needed this to satisfy an undefined reference to
