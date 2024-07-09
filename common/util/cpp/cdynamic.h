@@ -10,7 +10,7 @@
 
 #include <folly/json/dynamic.h>
 
-typedef folly::dynamic Dynamic;
+using Dynamic = folly::dynamic;
 
 enum DType { tNull, tArray, tBool, tDouble, tInt64, tObject, tString };
 
