@@ -30,7 +30,7 @@ void get_iobuf_data(IOBuf* iobuf, IOBufData* iobuf_data) {
   iobuf_data->next_ = iobuf->pop().release();
 }
 
-void destroy_iobuf(IOBuf* iobuf, uint8_t* buffer) {
+void destroy_iobuf(IOBuf* iobuf, uint8_t* /* buffer */) {
   delete iobuf;
 }
 }
