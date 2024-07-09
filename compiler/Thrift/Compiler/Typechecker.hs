@@ -1084,11 +1084,9 @@ typecheckConst e@(TEnum Name{..} _loc _)
     Nothing -> typeError lLocation $ LiteralMismatch e lit
     Just (constName, constLoc) -> literal $ EnumVal constName constLoc
 typecheckConst enum@(TEnum name _loc _)
-               (UntypedConst Located{..} (IdConst ident)) = do
-  result <- typecheckEnum lLocation name ident
-  case result of
-    Just eval -> return eval
-    Nothing   -> typecheckIdent enum lLocation ident
+               (UntypedConst Located{..} (IdConst ident)) =
+  typecheckEnum enum lLocation name ident <|>
+    typecheckIdent enum lLocation ident
 
 -- Typedefs
 typecheckConst (TTypedef _ ty _loc) val = typecheckConst ty val
@@ -1209,26 +1207,53 @@ typecheckEnumAsInt loc ident = do
       i <- lookupEnumInt k loc
       literal $ fromIntegral i
 
+-- NOTE: This function only handles identifiers that end in an enum value,
+-- not identifiers that are other constants. Those are handled in a
+-- separate typecheckIdent call in typecheckConst.
+-- Also, enumTy and enumTyName need to match.
 typecheckEnum
-  :: Loc
+  :: Typecheckable l
+  => Type l t
+  -> Loc
   -> Name
   -> Text
-  -> TC l (Maybe (TypedConst l EnumVal))
-typecheckEnum loc Name{..} ident = do
-  name <- mkThriftName ident
-  (_, nameMap) <- lookupEnum sourceName loc
-  Env{..} <- ask
-  return $ do
-    -- Get the local names. The qualifying modules much match
-    (identLocal, enumLocal) <- case (name, sourceName) of
-      (UName i, UName e) -> Just (i, e)
-      (QName mi i, QName me e) | mi == me -> Just (i, e)
-      _ -> Nothing
-    let
-      identUnscoped = fromMaybe identLocal $ Text.stripPrefix pfx identLocal
-      pfx = enumLocal <> "."
-    (targetName, targetLoc) <- Map.lookup identUnscoped nameMap
-    return $ Literal $ EnumVal targetName targetLoc
+  -> TC l (TypedConst l EnumVal)
+typecheckEnum enumTy loc enumTyName ident = do
+  -- Parse the identifier and look up its type.
+  (identTyName, identValue) <- parseIdentifier
+  identEnumType <- lookupType identTyName loc
+  -- Check whether this is the same type as
+  -- the declaration.
+  -- Explicit () needed to avoid type error about GADTs and "untouchable"
+  -- types.
+  () <- case identEnumType of
+    Some identEnumType' ->
+      case enumTy `eqOrAlias` identEnumType' of
+          Just Refl -> return ()
+          Nothing -> typeError loc $ TypeMismatch enumTy identEnumType'
+  -- Look up the enum values and see if `identValue` is one of them
+  (_, nameMap) <- lookupEnum (sourceName enumTyName) loc
+  Env {..} <- ask
+  case Map.lookup identValue nameMap of
+    Nothing -> typeError loc $ UnknownEnumValue (sourceName enumTyName)
+    Just (targetName, targetLoc) ->
+      return $ Literal $ EnumVal targetName targetLoc
+  where
+    parseIdentifier = do
+      -- This strips off the filename, if present, leaving us with either
+      -- <enum>.<value> or just <value>. The latter case is technically
+      -- out of spec, but it's out there, so we deal with it by substituting
+      -- the expected enum typename in.
+      tName <- mkThriftName ident
+      -- We use the OnEnd methods so that if there is no dot, the content
+      -- ends up in the suffix.
+      let (pre, value) = Text.breakOnEnd "." (localName tName)
+          enumName = if Text.null pre
+            then localName $ sourceName enumTyName
+            else Text.dropEnd 1 pre
+          tyName = mapName (const enumName) tName
+      return (tyName, value)
+
 
 typecheckPseudoEnum
   :: (Typecheckable l)
@@ -1237,10 +1262,10 @@ typecheckPseudoEnum
   -> Name
   -> Text
   -> TC l (TypedConst l t)
-typecheckPseudoEnum ty loc n@Name{..} ident = do
-  result <- typecheckEnum loc n ident
+typecheckPseudoEnum ty loc name@Name{..} ident = do
+  result <- typecheckEnum ty loc name ident
   case result of
-    Just (Literal (EnumVal renamed locDefined)) -> do
+    Literal (EnumVal renamed locDefined) -> do
       thistrueTy <- lookupType sourceName loc
       case thistrueTy of
         Some trueTy -> case trueTy `eqOrAlias` ty of
