@@ -9,15 +9,11 @@
 #include "cpp/CppServer.h"
 
 #include <memory>
-#include <unordered_set>
 
 #include <folly/CppAttributes.h>
 #include <folly/Memory.h>
-#include <folly/io/IOBuf.h>
-#include <folly/io/async/EventBase.h>
 #include <glog/logging.h>
 
-#include <thrift/lib/cpp/TApplicationException.h>
 #include <thrift/lib/cpp2/async/AsyncProcessor.h>
 #include <thrift/lib/cpp2/server/ThriftServer.h>
 
