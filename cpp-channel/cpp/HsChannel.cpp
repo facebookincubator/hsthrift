@@ -98,6 +98,7 @@ void ChannelWrapper::sendRequestImpl(
   // object itself.
   auto contextStack = apache::thrift::ContextStack::createWithClientContext(
       handlers_,
+      nullptr /* clientInterceptors */,
       "" /* service name */,
       callback->getMethodName().c_str(),
       *header);
