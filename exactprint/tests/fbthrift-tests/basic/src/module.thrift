@@ -26,17 +26,33 @@ namespace java.swift test.fixtures.basic
 namespace hack.module hack.module.test
 
 include "thrift/annotation/hack.thrift"
+include "thrift/annotation/thrift.thrift"
+
+const bool FLAG = true;
+const byte OFFSET = -10; // byte is an 8-bit signed integer
+const i16 COUNT = 200;
+const i32 MASK = 0xFA12EE;
+const double E = 2.718281828459;
+const string DATE = "June 28, 2017";
+
+const list<i32> AList = [2, 3, 5, 7];
+
+const set<string> ASet = ["foo", "bar", "baz"];
+
+const map<string, list<i32>> AMap = {"foo": [1, 2, 3, 4], "bar": [10, 32, 54]};
 
 enum MyEnum {
   MyValue1 = 0,
   MyValue2 = 1,
 }
 
+typedef MyEnum MyEnumAlias
+
 struct MyStruct {
   1: i64 MyIntField;
   2: string MyStringField;
   # use the type before it is defined. Thrift should be able to handle this
-  3: MyDataItem MyDataField;
+  3: MyDataItemAlias MyDataField;
   4: MyEnum myEnum;
   5: bool oneway;
   6: bool readonly;
@@ -47,14 +63,36 @@ struct MyStruct {
   9: string no_hack_codegen_field;
 }
 
+struct Containers {
+  1: list<i32> I32List;
+  2: set<string> StringSet;
+  3: map<string, i64> StringToI64Map;
+}
+
 struct MyDataItem {}
+typedef MyDataItem MyDataItemAlias
 
 union MyUnion {
-  1: MyEnum myEnum;
+  1: MyEnumAlias myEnum;
   2: MyStruct myStruct;
   3: MyDataItem myDataItem;
   @hack.SkipCodegen{reason = "Invalid key type"}
   4: set<float> floatSet;
+}
+
+exception MyException {
+  1: i64 MyIntField;
+  2: string MyStringField;
+  3: MyStruct myStruct;
+  4: MyUnion myUnion;
+}
+
+exception MyExceptionWithMessage {
+  1: i64 MyIntField;
+  @thrift.ExceptionMessage
+  2: string MyStringField;
+  3: MyStruct myStruct;
+  4: MyUnion myUnion;
 }
 
 @hack.Name{name = "MyRenamedStruct"}

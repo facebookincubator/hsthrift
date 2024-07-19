@@ -21,6 +21,7 @@
 namespace java.swift test.fixtures.basic_swift_bean
 
 include "thrift/annotation/java.thrift"
+include "thrift/annotation/cpp.thrift"
 
 enum MyEnum {
   MyValue1 = 0,
@@ -34,7 +35,8 @@ struct MyStruct1 {
   # use the type before it is defined. Thrift should be able to handle this
   3: MyDataItem MyDataField;
   # glibc has macros with this name, Thrift should be able to prevent collisions
-  4: i64 major (cpp.name = "majorVer");
+  @cpp.Name{value = "majorVer"}
+  4: i64 major;
 }
 
 @java.Mutable

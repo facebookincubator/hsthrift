@@ -2,16 +2,8 @@
 // generated-by : fbcode/common/hs/thrift/exactprint/tests/sync-fbthrift-tests.sh
 // source: thrift/compiler/test/fixtures/*
 // @generated
-// THIS FILE IS COPIED FROM FBTHRIFT, DO NOT MODIFY ITS CONTENTS DIRECTLY
-// generated-by : fbcode/common/hs/thrift/exactprint/tests/sync-fbthrift-tests.sh
-// source: thrift/compiler/test/fixtures/*
-// @generated
-// THIS FILE IS COPIED FROM FBTHRIFT, DO NOT MODIFY ITS CONTENTS DIRECTLY
-// generated-by : fbcode/common/hs/thrift/exactprint/tests/sync-fbthrift-tests.sh
-// source: thrift/compiler/test/fixtures/*
-// @generated
 /*
- * Copyright (c) Facebook, Inc. and its affiliates.
+ * Copyright (c) Meta Platforms, Inc. and affiliates.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,8 +18,12 @@
  * limitations under the License.
  */
 
-namespace cpp apache.thrift.fixtures.types
-namespace cpp2 apache.thrift.fixtures.types
+namespace go 'my/namespacing/test/module'
 
-typedef map<i32, string> (cpp.template = "std::unordered_map") SomeMap
-typedef list<SomeMap> SomeListOfTypeMap
+struct Foo {
+  1: i64 MyInt;
+}
+
+service TestService {
+  i64 init(1: i64 int1);
+}

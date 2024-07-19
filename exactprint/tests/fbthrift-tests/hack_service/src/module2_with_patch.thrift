@@ -2,16 +2,8 @@
 // generated-by : fbcode/common/hs/thrift/exactprint/tests/sync-fbthrift-tests.sh
 // source: thrift/compiler/test/fixtures/*
 // @generated
-// THIS FILE IS COPIED FROM FBTHRIFT, DO NOT MODIFY ITS CONTENTS DIRECTLY
-// generated-by : fbcode/common/hs/thrift/exactprint/tests/sync-fbthrift-tests.sh
-// source: thrift/compiler/test/fixtures/*
-// @generated
-// THIS FILE IS COPIED FROM FBTHRIFT, DO NOT MODIFY ITS CONTENTS DIRECTLY
-// generated-by : fbcode/common/hs/thrift/exactprint/tests/sync-fbthrift-tests.sh
-// source: thrift/compiler/test/fixtures/*
-// @generated
 /*
- * Copyright (c) Facebook, Inc. and its affiliates.
+ * Copyright (c) Meta Platforms, Inc. and affiliates.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,8 +18,23 @@
  * limitations under the License.
  */
 
-namespace cpp apache.thrift.fixtures.types
-namespace cpp2 apache.thrift.fixtures.types
+include "module.thrift"
 
-typedef map<i32, string> (cpp.template = "std::unordered_map") SomeMap
-typedef list<SomeMap> SomeListOfTypeMap
+include "thrift/lib/thrift/patch.thrift"
+
+package "test.dev/hack/ns2"
+
+namespace hack hack_ns2
+
+enum Status {
+  Unknown = 0,
+}
+
+@patch.GeneratePatch
+struct FBStruct {
+  1: string str_value;
+}
+
+service TestService extends module.FooHackService {
+  i32 ping(1: string str_arg) throws (1: module.ExTypedef ex);
+}

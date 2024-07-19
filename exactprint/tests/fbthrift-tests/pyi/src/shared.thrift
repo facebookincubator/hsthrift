@@ -29,6 +29,7 @@ namespace py.asyncio simple.example_asyncio
 namespace py3 simple.example
 
 include 'dependent.thrift'
+include "thrift/annotation/thrift.thrift"
 
 enum AnEnum {
   ONE = 1,
@@ -42,9 +43,10 @@ exception SimpleException {
 }
 
 exception MessageException {
+  @thrift.ExceptionMessage
   1: string message;
   2: i16 err_code;
-} (message = 'message')
+}
 
 typedef list<SimpleStruct> ListOfSimpleStructs
 

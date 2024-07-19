@@ -18,13 +18,28 @@
  * limitations under the License.
  */
 
-namespace py3 ""
-namespace go ""
+package "facebook.com/thrift/compiler/test/fixtures/default_values"
 
-struct Foo {
-  1: i64 MyInt;
+struct TrivialStruct {
+  1: i32 int_value;
 }
 
-service TestService {
-  i64 init(1: i64 int1);
+struct StructWithNoCustomDefaultValues {
+  1: i32 unqualified_integer;
+  2: optional i32 optional_integer;
+  3: required i32 required_integer;
+
+  4: TrivialStruct unqualified_struct;
+  5: optional TrivialStruct optional_struct;
+  6: required TrivialStruct required_struct;
+}
+
+struct StructWithCustomDefaultValues {
+  1: i32 unqualified_integer = 42;
+  2: optional i32 optional_integer = 43;
+  3: required i32 required_integer = 44;
+
+  4: TrivialStruct unqualified_struct = TrivialStruct{int_value = 123};
+  5: optional TrivialStruct optional_struct = TrivialStruct{int_value = 456};
+  6: required TrivialStruct required_struct = TrivialStruct{int_value = 789};
 }
