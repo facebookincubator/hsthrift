@@ -21,7 +21,7 @@
       "deriveHsOptionUnsafe \"%s\" %lu ",                    \
       #cxx_name,                                             \
       (unsigned long)sizeof(HsOption<hs_option::cxx_name>)); \
-  hsc_printf("%lu", (unsigned long)sizeof(HsOption<hs_option::cxx_name>));
+  hsc_printf("%lu", (unsigned long)alignof(HsOption<hs_option::cxx_name>));
 
 #define HS_OPTION_H(Name, Type) \
   namespace hs_option {         \

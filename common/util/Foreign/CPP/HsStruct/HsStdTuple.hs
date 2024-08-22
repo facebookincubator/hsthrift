@@ -24,8 +24,8 @@ import Foreign.CPP.Marshallable
 newtype HsStdTuple a = HsStdTuple { unHsStdTuple :: a }
 
 deriveHsStdTupleUnsafe
-  :: String -> Int -> TypeQ -> Q [Dec]
-deriveHsStdTupleUnsafe cppType sizeVal hsType = do
+  :: String -> Int -> Int -> TypeQ -> Q [Dec]
+deriveHsStdTupleUnsafe cppType sizeVal alignmentVal hsType = do
   hsStdTupleType <- [t| HsStdTuple |]
   hsTRaw <- hsType
   let
@@ -51,7 +51,7 @@ deriveHsStdTupleUnsafe cppType sizeVal hsType = do
 
     alignmentFn = funD (mkName "alignment")
       [ clause [wildP] (normalB $
-          litE $ integerL $ fromIntegral sizeVal) []
+          litE $ integerL $ fromIntegral alignmentVal) []
       ]
 
     ptrN = mkName "ptr"

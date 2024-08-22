@@ -49,11 +49,12 @@ void peekVals(std::tuple<T...>* t, va_list& args, std::index_sequence<I...>) {
 
 } // namespace hs_std_tuple::detail
 
-#define hsc_derive_hs_std_tuple_unsafe(cxx_name...) \
-  hsc_printf(                                       \
-      "deriveHsStdTupleUnsafe \"%s\" %lu ",         \
-      #cxx_name,                                    \
-      (unsigned long)sizeof(hs_std_tuple::cxx_name));
+#define hsc_derive_hs_std_tuple_unsafe(cxx_name...)  \
+  hsc_printf(                                        \
+      "deriveHsStdTupleUnsafe \"%s\" %lu %lu ",      \
+      #cxx_name,                                     \
+      (unsigned long)sizeof(hs_std_tuple::cxx_name), \
+      (unsigned long)alignof(hs_std_tuple::cxx_name));
 
 #define HS_STD_TUPLE_H(Name, Types) \
   namespace hs_std_tuple {          \
