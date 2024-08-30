@@ -25,8 +25,6 @@ import Test.HUnit.Lang (HUnitFailure)
 import Util.Control.Exception
 import qualified Test.QuickCheck as QC
 
-import DynFlags (rtsIsProfiled)
-
 skip :: String -> IO ()
 skip msg = hPutStr stderr $ unlines [msg, "***SKIP***"]
 
@@ -42,7 +40,7 @@ skipTest :: Test -> Test
 skipTest = skipTestIf $ const True
 
 skipTestIfRtsIsProfiled :: Test -> Test
-skipTestIfRtsIsProfiled = skipTestIf $ const rtsIsProfiled
+skipTestIfRtsIsProfiled = skipTestIf $ const (rtsIsProfiled /= 0)
 
 assertProperty
   :: (HasCallStack, QC.Testable prop) => String -> prop -> Assertion
@@ -74,3 +72,5 @@ assertProperty msg prop = do
       | usedSize /= QC.maxSize QC.stdArgs
       ]
     _ -> assertFailure msg
+
+foreign import ccall unsafe "rts_isProfiled" rtsIsProfiled :: Int

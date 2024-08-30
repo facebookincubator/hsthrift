@@ -7,11 +7,12 @@
 -}
 
 {-# LANGUAGE QuasiQuotes #-}
+{-# OPTIONS_GHC -Wno-incomplete-uni-patterns #-}
 module JSONPrettyTest (main) where
 
 import qualified Data.Aeson as Aeson
 import qualified Data.ByteString.Lazy.Char8 as B
-import Data.Text.Prettyprint.Doc as Pretty hiding ((<>))
+import Prettyprinter as Pretty hiding ((<>))
 import Text.JSON
 
 import Test.HUnit

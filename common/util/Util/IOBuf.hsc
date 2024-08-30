@@ -35,7 +35,7 @@ data IOBuf
 -- We need a Storable instance in order to alloca an HS_IOBuf from haskell
 instance Storable IOBuf where
   sizeOf _ = (#size HS_IOBuf)
-  alignment = sizeOf
+  alignment _ = alignment (undefined :: Ptr ())
   -- IOBuf is an uninhabited type, so peek and poke are not implemented
   peek = error "peek: unimplemented"
   poke = error "poke: unimplemented"

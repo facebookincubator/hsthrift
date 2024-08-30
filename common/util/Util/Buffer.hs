@@ -85,6 +85,11 @@ instance Applicative (Fill s) where
   {-# INLINE pure #-}
   pure x = Fill 0 $ \ !buf -> return (buf, x)
 
+  {-# INLINE (*>) #-}
+  Fill m f *> Fill n g = Fill (m+n) $ \ !buf -> do
+    (!buf,_) <- f buf
+    g buf
+
   {-# INLINE (<*>) #-}
   Fill m f <*> Fill n g = Fill (m+n) $ \ !buf -> do
     (!buf, h) <- f buf
@@ -99,11 +104,6 @@ instance Monad (Fill s) where
   Fill m f >>= g = Fill m $ \ !buf -> do
     (!buf, x) <- f buf
     fill buf $ g x
-
-  {-# INLINE (>>) #-}
-  Fill m f >> Fill n g = Fill (m+n) $ \ !buf -> do
-    (!buf,_) <- f buf
-    g buf
 
 -- | Fill a buffer. The old buffer may not be used after this.
 fill :: Buffer s -> Fill s a -> ST s (Buffer s, a)

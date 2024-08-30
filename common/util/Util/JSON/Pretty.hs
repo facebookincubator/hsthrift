@@ -22,11 +22,12 @@ module Util.JSON.Pretty
   ( -- instance Pretty JSValue
   ) where
 
-import Data.Text.Prettyprint.Doc as Pretty
 import Data.Ratio
 import Data.Char
 import Numeric
 import Text.JSON
+
+import Compat.Prettyprinter
 
 instance Pretty JSValue where
   pretty v = case v of

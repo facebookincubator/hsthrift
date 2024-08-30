@@ -73,6 +73,7 @@ library
     import: fb-haskell, fb-cpp
 
     exposed-modules:
+        Compat.Prettyprinter
         Control.Concurrent.Stream
         Control.Trace
         Control.Trace.Core

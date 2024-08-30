@@ -6,7 +6,7 @@
   LICENSE file in the root directory of this source tree.
 -}
 
-{-# OPTIONS_GHC -fno-warn-name-shadowing #-}
+{-# OPTIONS_GHC -fno-warn-name-shadowing -Wno-incomplete-uni-patterns #-}
 {-# LANGUAGE OverloadedStrings #-}
 
 module ExceptionTest (main) where

@@ -39,6 +39,7 @@ import Foreign hiding (alloca, allocaBytes, allocaArray)
 import Util.Memory
 import Util.ByteString
 import GHC.Generics
+import Data.Coerce
 
 import Control.Applicative ((<$>))
 import Control.Exception (bracket)
@@ -51,6 +52,7 @@ import Data.Scientific
 
 import Mangle.TH
 import Foreign.CPP.Marshallable.TH
+import Util.Aeson
 import Util.Text
   ( cStringToText
   , cStringToTextLenient
@@ -272,17 +274,17 @@ peekImpl peekCString p = do
         getDynObject pdyn = do
           size <- peek (castPtr pval :: Ptr CSize)
           allocaArray (fromIntegral size) $ \pkeys -> do
-          allocaArray (fromIntegral size) $ \pvals -> do
-            num <- c_readDynamicObject pdyn size pkeys pvals
-            let
-                go !i !obj
-                  | i >= fromIntegral num = return (Object obj)
-                  | otherwise = do
-                    key <- peekElemOff pkeys i >>= getDynKey
-                    val <- peekElemOff pvals i >>= getDyn
-                    go (i+1) (HashMap.insert key val obj)
+            allocaArray (fromIntegral size) $ \pvals -> do
+              num <- c_readDynamicObject pdyn size pkeys pvals
+              let
+                  go !i !obj
+                    | i >= fromIntegral num = return (Object obj)
+                    | otherwise = do
+                      key <- peekElemOff pkeys i >>= getDynKey
+                      val <- peekElemOff pvals i >>= getDyn
+                      go (i+1) (insertKeyMap (keyFromText key) val obj)
 
-            go 0 HashMap.empty
+              go 0 emptyKeyMap
     in
     Dynamic <$> getDyn p
 
@@ -316,9 +318,9 @@ instance Storable Dynamic where
               c_createDynamicArray pdyn (fromIntegral $ size) pelems
 
           putDyn pdyn (Object obj) = do
-            let size = HashMap.size obj
-                (keys, vals) = unzip $ HashMap.toList obj
-            useTextsAsCStrings keys $ \pkeys ->
+            let size = keyMapSize obj
+                (keys, vals) = unzip $ objectToList obj
+            useTextsAsCStrings (map keyToText keys) $ \pkeys ->
               withArray' size (map Dynamic vals) $ \pvals ->
                 c_createDynamicObject pdyn (fromIntegral $ size) pkeys pvals
       in

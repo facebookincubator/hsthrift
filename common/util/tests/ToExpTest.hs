@@ -44,7 +44,7 @@ tests = TestList
         -- the result is non-deterministic. Rather than add the
         -- overhead of sorting the elements all the time, let's just
         -- sort the test output.
-        (sort "Object (HashMap.fromList [(\"foo\", Number (-3)), (\"bar\", Bool True)])")
+        (sort "Object (fromList [(fromText \"foo\", Number (-3)), (fromText \"bar\", Bool True)])")
         (sort $ pp $ object
           [ "foo" .= Number (-3)
           , "bar" .= Bool True

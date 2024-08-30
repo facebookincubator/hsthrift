@@ -8,6 +8,7 @@
 
 -- FromJSON instance below is an orphan (deliberately)
 {-# OPTIONS_GHC -Wno-orphans #-}
+{-# LANGUAGE CPP #-}
 
 module Util.Aeson
   ( toJSONText
@@ -18,10 +19,30 @@ module Util.Aeson
   , prettyJSON
   , parseValueStrict'
   , parseValueStrict
+    -- * Backwards compatibility
+  , ObjectKey
+  , KeyMap
+  , keyToText
+  , keyFromText
+  , objectToList
+  , objectFromList
+  , objectToHashMap
+  , objectFromHashMap
+  , objectToHashMapText
+  , objectFromHashMapText
+  , emptyKeyMap
+  , insertKeyMap
+  , unionKeyMap
+  , keyMapSize
+  , lookupKeyMap
   ) where
 
 import Data.Aeson
 import Data.Aeson.Parser (value, value')
+#if MIN_VERSION_aeson(2,0,0)
+import Data.Aeson.Key
+import qualified Data.Aeson.KeyMap as KeyMap
+#endif
 import Data.Aeson.Types (typeMismatch)
 import Data.ByteString (ByteString)
 import qualified Data.Attoparsec.ByteString as A
@@ -77,11 +98,10 @@ prettyJSON val = show (pp val)
   pp (Object hm) =
     braces $ sep $
       punctuate (char ',')
-        [ sep [ pp (String key) <+> char ':', nest 2 (pp v) ]
-        | (key, v) <- HashMap.toList hm ]
+        [ sep [ pp (String (keyToText key)) <+> char ':', nest 2 (pp v) ]
+        | (key, v) <- HashMap.toList (objectToHashMap hm) ]
   pp (Array arr) =
     brackets $ sep $ punctuate (char ',') $ map pp $ Vector.toList arr
-
 
 -- eitherDecode family of function  strictly requires that the Value is
 -- either an object or an array.
@@ -103,12 +123,60 @@ parseValueStrict' = A.parseOnly
 -- otherwise a constraint "FromJSON (HashMap Text a)" doesn't have a
 -- single most-specific instance to resolve to.  INCOHERENT is ok;
 -- the worst that can happen is that we lose the optimisation.
-instance {-# INCOHERENT #-} FromJSON (HashMap Text Value) where
+instance {-# INCOHERENT #-} FromJSON Object where
   parseJSON (Object obj) = return obj
   parseJSON other = typeMismatch "object" other
 
 -- Having same optimization for 'ToJSON' is still valuable when we cannot use
 -- 'Object' directly, e.g., when we are calling a polymorphic function with
 -- a @ToJSON a@ constraint.
-instance {-# INCOHERENT #-} ToJSON (HashMap Text Value) where
+instance {-# INCOHERENT #-} ToJSON Object where
   toJSON = Object
+
+keyToText :: ObjectKey -> Text
+keyFromText :: Text -> ObjectKey
+objectToList :: KeyMap v -> [(ObjectKey, v)]
+objectFromList :: [(ObjectKey, v)] -> KeyMap v
+objectToHashMap :: KeyMap v -> HashMap ObjectKey v
+objectFromHashMap :: HashMap ObjectKey Value -> Object
+objectToHashMapText :: Object -> HashMap Text Value
+objectFromHashMapText :: HashMap Text Value -> Object
+emptyKeyMap :: KeyMap v
+insertKeyMap :: ObjectKey -> v -> KeyMap v -> KeyMap v
+unionKeyMap :: KeyMap v -> KeyMap v -> KeyMap v
+keyMapSize :: KeyMap v -> Int
+lookupKeyMap :: ObjectKey -> KeyMap v -> Maybe v
+
+#if MIN_VERSION_aeson(2,0,0)
+type ObjectKey = Key
+type KeyMap = KeyMap.KeyMap
+keyToText = toText
+keyFromText = fromText
+objectToList = KeyMap.toList
+objectFromList = KeyMap.fromList
+objectToHashMap = KeyMap.toHashMap
+objectFromHashMap = KeyMap.fromHashMap
+objectToHashMapText = KeyMap.toHashMapText
+objectFromHashMapText = KeyMap.fromHashMapText
+emptyKeyMap = KeyMap.empty
+insertKeyMap = KeyMap.insert
+unionKeyMap = KeyMap.union
+keyMapSize = KeyMap.size
+lookupKeyMap = KeyMap.lookup
+#else
+type ObjectKey = Text
+type KeyMap v = HashMap Text v
+keyToText = id
+keyFromText = id
+objectToList = HashMap.toList
+objectFromList = HashMap.fromList
+objectToHashMap = id
+objectFromHashMap = id
+objectToHashMapText = id
+objectFromHashMapText = id
+emptyKeyMap = HashMap.empty
+insertKeyMap = HashMap.insert
+unionKeyMap = HashMap.union
+keyMapSize = HashMap.size
+lookupKeyMap = HashMap.lookup
+#endif

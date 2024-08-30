@@ -7,6 +7,7 @@
 -}
 
 {-# LANGUAGE TypeOperators #-}
+{-# OPTIONS_GHC -Wno-star-is-type #-}
 module Util.FFI (
   FFIError, ffiErrorMessage, call,
   List(..), FFIFun(..), Tuple(..), invoke,

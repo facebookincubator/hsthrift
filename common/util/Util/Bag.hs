@@ -22,14 +22,12 @@ data Bag a
   | ConcatBags (Bag a) (Bag a) -- INVARIANT: Neither sub-bag is empty
 
 instance Semigroup (Bag a) where
-  (<>) = mappend
+  (<>) EmptyBag y = y
+  (<>) x EmptyBag = x
+  (<>) x y = ConcatBags x y
 
 instance Monoid (Bag a) where
   mempty = EmptyBag
-
-  mappend EmptyBag y = y
-  mappend x EmptyBag = x
-  mappend x y = ConcatBags x y
 
 instance Foldable Bag where
   foldr _ b EmptyBag = b

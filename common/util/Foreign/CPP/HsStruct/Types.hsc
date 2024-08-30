@@ -79,6 +79,7 @@ import Foreign.CPP.HsStruct.HsStdTuple
 import Foreign.CPP.HsStruct.Utils
 import Foreign.CPP.Marshallable.TH
 import Mangle.TH
+import Util.Aeson
 import Util.Text (cStringLenToText, cStringLenToTextLenient)
 
 #include <hsc.h>
@@ -249,8 +250,6 @@ instance Constructible HsText where
   constructValue p (HsText txt) =
     constructStrImpl (castPtr p) (Text.encodeUtf8 txt)
 
-instance Assignable HsText
-
 instance Storable HsText where
   sizeOf _ = #{size HsString}
   alignment _ = #{alignment HsString}
@@ -329,11 +328,6 @@ instance (Constructible a, Constructible b)
     p_right <- newValue b
     #{poke DummyHsEither, right} p p_right
 
-instance Assignable (HsEither HsText Int)
-instance Assignable (HsEither HsText Double)
-instance Assignable (HsEither HsText HsByteString)
-instance Assignable (HsEither HsText HsText)
-
 -- HsPair ---------------------------------------------------------------------
 
 newtype HsPair a b = HsPair
@@ -378,8 +372,6 @@ instance Constructible HsByteString where
   newValue (HsByteString bs) = newStrImpl bs
   constructValue p (HsByteString bs) = constructStrImpl (castPtr p) bs
 
-instance Assignable HsByteString
-
 instance Storable HsByteString where
   sizeOf _ = #{size HsString}
   alignment _ = #{alignment HsString}
@@ -404,8 +396,6 @@ instance Constructible HsLenientText where
   newValue (HsLenientText txt) = newStrImpl (Text.encodeUtf8 txt)
   constructValue p (HsLenientText txt) =
     constructStrImpl (castPtr p) (Text.encodeUtf8 txt)
-
-instance Assignable HsLenientText
 
 instance Storable HsLenientText where
   sizeOf _ = #{size HsString}
@@ -575,7 +565,7 @@ instance (Addressable k, Eq k, Hashable k, Storable k)
   peekWith f p = HsHashMap <$> peekMapWith HashMap.empty HashMap.insert peek f p
 
 newtype HsObject v = HsObject
-  { hsObject :: HashMap Text v
+  { hsObject :: KeyMap v
   }
 
 instance Addressable1 HsObject where
@@ -588,9 +578,9 @@ instance Addressable (HsObject v) where
 
 instance StorableContainer HsObject where
   pokeWith = notPokeable "HsObject"
-  peekWith f p = HsObject <$> peekMapWith HashMap.empty HashMap.insert fk f p
+  peekWith f p = HsObject <$> peekMapWith emptyKeyMap insertKeyMap fk f p
     where
-    fk = fmap hsText . peek
+    fk = fmap (keyFromText . hsText) . peek
 
 mapSizeOf, mapAlignment :: a -> Int
 mapSizeOf _ = #{size DummyHsObject}
@@ -602,15 +592,6 @@ foreign import ccall unsafe "common_hs_ctorHsObjectJSON"
     -> Ptr (HsArray HsText)
     -> Ptr (HsArray HsJSON)
     -> IO ()
-
-instance Constructible (HsObject HsJSON) where
-  newValue (HsObject _o) = error "HsObject HsJSON cannot be made on heap"
-  constructValue ptr (HsObject m) =
-    withCxxObject (HsArray (Vector.fromList (map HsText keys))) $ \keys_p ->
-    withCxxObject (HsArray (Vector.fromList vals)) $ \vals_p ->
-      c_constructHsObjectJSON ptr keys_p vals_p
-    where
-      (keys, vals) = unzip $ HashMap.toList m
 
 {-# INLINE peekMapWith #-}
 peekMapWith
@@ -716,23 +697,6 @@ $(mangle
       c_constructHsJSONObject :: Ptr HsJSON -> Ptr (HsObject HsJSON) -> IO ()
   |])
 
-instance Constructible HsJSON where
-  newValue (HsJSON _val) = error $ "HsStruct.HsJSON cannot be built on heap"
-  constructValue ptr (HsJSON val) =
-    case val of
-      Null -> c_constructHsJSONNull ptr
-      Bool b -> c_constructHsJSONBool ptr (fromBool b)
-      Number n -> case (floatingOrInteger n :: Either CDouble CLong) of
-        Left r -> c_constructHsJSONDouble ptr r
-        Right _ -> case toBoundedInteger n of
-          Just i -> c_constructHsJSONInt ptr i
-          Nothing -> c_constructHsJSONDouble ptr $ toRealFloat n
-      String txt -> withCxxObject (HsText txt) $ c_constructHsJSONString ptr
-      Array v -> withCxxObject (HsArray (Vector.map HsJSON v)) $
-        c_constructHsJSONArray ptr
-      Object o -> withCxxObject (HsObject (HsJSON <$> o)) $
-        c_constructHsJSONObject ptr
-
 -- Derive Marshallables first
 $(deriveMarshallableUnsafe "HsMaybeInt" [t| HsMaybe Int |])
 $(deriveMarshallableUnsafe "HsMaybeDouble" [t| HsMaybe Double |])
@@ -758,10 +722,19 @@ $(deriveMarshallableUnsafe "HsEitherStringArrayDouble" [t| HsEither HsLenientTex
 $(deriveMarshallableUnsafe "HsEitherStringArrayString" [t| HsEither HsLenientText (HsList HsByteString) |])
 $(deriveMarshallableUnsafe "HsEitherStringArrayString" [t| HsEither HsLenientText (HsList HsLenientText) |])
 
+instance Assignable (HsEither HsText Int)
+instance Assignable (HsEither HsText Double)
+instance Assignable (HsEither HsText HsByteString)
+instance Assignable (HsEither HsText HsText)
+
 $(deriveMarshallableUnsafe "HsString" [t| HsString |])
 $(deriveMarshallableUnsafe "HsString" [t| HsByteString |])
-$(deriveMarshallableUnsafe "HsString" [t| HsText |])
 $(deriveMarshallableUnsafe "HsString" [t| HsLenientText |])
+$(deriveMarshallableUnsafe "HsString" [t| HsText |])
+
+instance Assignable HsText
+instance Assignable HsByteString
+instance Assignable HsLenientText
 
 $(deriveMarshallableUnsafe "HsStringPiece" [t| HsStringPiece |])
 
@@ -889,6 +862,40 @@ $(deriveMarshallableUnsafe "HsMapStringString" [t| HsHashMap HsByteString HsByte
 $(deriveMarshallableUnsafe "HsObjectJSON" [t| HsObject HsJSON |])
 $(deriveMarshallableUnsafe "HsJSON" [t| HsJSON |])
 
+-- These are mutually recurisve, we have to splice them together
+$(do
+  a <- deriveHsArrayUnsafe "HsJSON" [t| HsJSON |]
+  b <- deriveHsArrayUnsafe "String" [t| HsText |]
+  c <- [d|
+    instance Constructible HsJSON where
+      newValue (HsJSON _val) = error $ "HsStruct.HsJSON cannot be built on heap"
+      constructValue ptr (HsJSON val) =
+        case val of
+          Null -> c_constructHsJSONNull ptr
+          Bool b -> c_constructHsJSONBool ptr (fromBool b)
+          Number n -> case (floatingOrInteger n :: Either CDouble CLong) of
+            Left r -> c_constructHsJSONDouble ptr r
+            Right _ -> case toBoundedInteger n of
+              Just i -> c_constructHsJSONInt ptr i
+              Nothing -> c_constructHsJSONDouble ptr $ toRealFloat n
+          String txt -> withCxxObject (HsText txt) $ c_constructHsJSONString ptr
+          Array v -> withCxxObject (HsArray (Vector.map HsJSON v)) $
+            c_constructHsJSONArray ptr
+          Object o -> withCxxObject (HsObject (HsJSON <$> o)) $
+            c_constructHsJSONObject ptr
+
+    instance Constructible (HsObject HsJSON) where
+      newValue (HsObject _o) = error "HsObject HsJSON cannot be made on heap"
+      constructValue ptr (HsObject m) =
+        withCxxObject (HsArray (Vector.fromList (map (HsText . keyToText) keys))) $ \keys_p ->
+        withCxxObject (HsArray (Vector.fromList vals)) $ \vals_p ->
+          c_constructHsObjectJSON ptr keys_p vals_p
+        where
+          (keys, vals) = unzip $ objectToList m
+   |]
+  return $ a ++ b ++ c
+ )
+
 -- Derive constructions after marshallable
 $(#{derive_hs_option_unsafe Bool} [t| Bool |])
 $(#{derive_hs_option_unsafe Bool} [t| CBool |])
@@ -931,11 +938,9 @@ $(deriveHsArrayUnsafe "Float" [t| Float |])
 $(deriveHsArrayUnsafe "Float" [t| CFloat |])
 $(deriveHsArrayUnsafe "Double" [t| Double |])
 $(deriveHsArrayUnsafe "Double" [t| CDouble |])
-$(deriveHsArrayUnsafe "String" [t| HsText |])
 $(deriveHsArrayUnsafe "String" [t| HsLenientText |])
 $(deriveHsArrayUnsafe "String" [t| HsByteString |])
 $(deriveHsArrayUnsafe "StringView" [t| HsStringPiece |])
-$(deriveHsArrayUnsafe "HsJSON" [t| HsJSON |])
 
 $(deriveHsHashSetUnsafe "Int16" [t| CShort |])
 $(deriveHsHashSetUnsafe "Int16" [t| Int16 |])

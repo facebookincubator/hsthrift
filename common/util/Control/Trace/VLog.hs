@@ -6,7 +6,7 @@
   LICENSE file in the root directory of this source tree.
 -}
 
-{-# LANGUAGE ViewPatterns #-}
+{-# LANGUAGE ViewPatterns, CPP #-}
 module Control.Trace.VLog (
   vlogTracer,
   TraceWithPriority (..),
@@ -66,7 +66,9 @@ vlogTracerWithPriority = Tracer {..}
     logMsg_ x = withFrozenCallStack $ case x of
       T p t -> vlog p t
       S p s -> String.vlog p s
+#if __GLASGOW_HASKELL__ < 902
       Skip -> error "unreachable"
+#endif
 
     traceMsg_ msg =
       case msg of

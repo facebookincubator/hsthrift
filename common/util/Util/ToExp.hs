@@ -6,6 +6,7 @@
   LICENSE file in the root directory of this source tree.
 -}
 
+{-# LANGUAGE CPP #-}
 module Util.ToExp
   ( ToExp(..)
   , intE
@@ -33,6 +34,9 @@ import qualified Data.Text as Text
 import qualified Data.Vector as Vector
 import qualified Data.Vector.Storable as SVector
 import Language.Haskell.Exts hiding (intE)
+#if MIN_VERSION_aeson(2,0,0)
+import Util.Aeson
+#endif
 import Util.Text
 
 infixl 1 =.=
@@ -123,6 +127,14 @@ instance ToExp a => ToExp (Vector.Vector a) where
 instance (SVector.Storable a, ToExp a)
     => ToExp (SVector.Vector a) where
   toExp v = fun "SVector.fromList" =$= SVector.toList v
+
+#if MIN_VERSION_aeson(2,0,0)
+instance ToExp A.Key where
+  toExp k = fun "fromText" =$= toExp (keyToText k)
+
+instance ToExp A.Object where
+  toExp m = fun "fromList" =$= objectToList m
+#endif
 
 instance (ToExp k, ToExp v) => ToExp (HashMap k v) where
   toExp m = fun "HashMap.fromList" =$= HashMap.toList m

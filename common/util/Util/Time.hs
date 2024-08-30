@@ -26,11 +26,12 @@ module Util.Time
 import Control.Concurrent
 import Data.Ratio
 import qualified Data.Text as T
-import qualified Data.Text.Prettyprint.Doc as P
 import qualified Data.Time.Clock as TC ( UTCTime )
 import Data.Time.Clock.POSIX ( posixSecondsToUTCTime, POSIXTime )
 import Data.Time.Format ( defaultTimeLocale, formatTime, parseTimeM )
 import qualified System.Clock as SC
+
+import Compat.Prettyprinter as P
 
 newtype EpochClock = EpochClock SC.TimeSpec deriving (Eq, Ord, Show)
 

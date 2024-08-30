@@ -32,7 +32,7 @@ shallowCopyRequestContextScopeGuardTest =
         setCurrentTestValue 101
         assertEqual "inner1" 101 =<< getCurrentTestValue
       assertEqual "outer:before2" 10 =<< getCurrentTestValue
-      handle (\(ErrorCall "test") -> return ()) $
+      handle (\(ErrorCall s) -> assertEqual "exception" "test" s) $
         withShallowCopyRequestContextScopeGuard $ do
           setCurrentTestValue 102
           assertEqual "inner2" 102 =<< getCurrentTestValue

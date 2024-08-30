@@ -15,7 +15,6 @@ import Control.Exception
 import qualified Data.Aeson as Aeson
 import Data.ByteString (ByteString, useAsCStringLen)
 import Data.ByteString.Unsafe (unsafeUseAsCStringLen)
-import Data.HashMap.Strict (HashMap)
 import qualified Data.HashMap.Strict as HashMap
 import qualified Data.HashSet as HashSet
 import Data.IntMap.Strict (IntMap)
@@ -32,6 +31,7 @@ import Foreign.C.Types (CBool (..), CChar)
 
 import Foreign.CPP.HsStruct
 import Foreign.CPP.Marshallable
+import Util.Aeson
 
 import qualified HsStructTestTypes as TT
 
@@ -413,7 +413,7 @@ pairTest = TestLabel "Pair" $
 foreign import ccall unsafe "getPair"
   getPair :: IO (Ptr a)
 
-type Nested = HashMap Text (IntMap [Maybe Text])
+type Nested = KeyMap (IntMap [Maybe Text])
 type HsNested = HsObject (HsIntMap (HsList (HsMaybe HsText)))
 
 nestedTest :: Test
@@ -423,12 +423,12 @@ nestedTest = TestLabel "nested" $
     assertEqual "Nested" expected actual
   where
     expected =
-      HashMap.fromList
-        [ ("zero", IntMap.empty)
-        , ("one", IntMap.singleton 1 [])
-        , ("two", IntMap.singleton 2 [Nothing])
+      objectFromList
+        [ (keyFromText "zero", IntMap.empty)
+        , (keyFromText "one", IntMap.singleton 1 [])
+        , (keyFromText "two", IntMap.singleton 2 [Nothing])
         ,
-          ( "more"
+          ( keyFromText "more"
           , IntMap.fromList
               [ (3, [Nothing])
               , (4, [Just "two"])
@@ -461,8 +461,8 @@ jsonRoundTrip = TestLabel "json" $
       )
     roundTrip
       ( Aeson.Object $
-          HashMap.fromList
-            [("foo", Aeson.Bool True), ("bar", Aeson.Bool False)]
+          objectFromList
+            [(keyFromText "foo", Aeson.Bool True), (keyFromText "bar", Aeson.Bool False)]
       )
   where
     roundTrip j = withCxxObject (HsJSON j) $ \p -> do

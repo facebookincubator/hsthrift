@@ -6,6 +6,7 @@
   LICENSE file in the root directory of this source tree.
 -}
 
+{-# LANGUAGE CPP #-}
 module Util.OptParse
   ( -- * Options
     intOption
@@ -23,6 +24,7 @@ module Util.OptParse
   , maybeAbsFilePathOption
   , maybeRelativeFilePathOption
   , jsonOption
+  , showHelpText
     -- * Commands
   , commandParser
     -- * Pure Parser
@@ -129,6 +131,13 @@ runParserOnString cmdName p args =
         "" -> []
         ('"':cs) -> recurse . second tail $ break (=='"') cs
         s' -> recurse $ break isSpace s'
+
+showHelpText :: ParseError
+#if MIN_VERSION_optparse_applicative(0,16,0)
+showHelpText = ShowHelpText Nothing
+#else
+showHelpText = ShowHelpText
+#endif
 
 -- -----------------------------------------------------------------------------
 -- Things from Options.Applicative that have changed

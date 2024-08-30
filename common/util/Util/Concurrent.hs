@@ -7,6 +7,7 @@
 -}
 
 {-# OPTIONS_GHC -fno-warn-missing-signatures #-}
+{-# LANGUAGE CPP #-}
 module Util.Concurrent
   ( concurrently3
   , concurrently4
@@ -26,7 +27,11 @@ import Control.Concurrent.Async
 import Control.Monad (void)
 import Control.Monad.IO.Class
 
+#if __GLASGOW_HASKELL__ >= 902
+import Control.Monad.Catch
+#else
 import Exception (ExceptionMonad(..))
+#endif
 
 c :: IO a -> IO b -> IO (a, b)
 c = concurrently
@@ -73,9 +78,15 @@ newThreadLock = do
 
 -- | withThreadLock guarantees that only one thread holds the lock at the same
 -- time. It can be nested so it is safe to use it in a recursive function.
+#if __GLASGOW_HASKELL__ >= 902
+withThreadLock :: (MonadIO m, MonadMask m) => ThreadLock -> m a -> m a
+withThreadLock (ThreadLock takeIO) action = do
+  fmap fst $ generalBracket (liftIO takeIO) (\releaseIO _ -> liftIO releaseIO) $ const action
+#else
 withThreadLock :: ExceptionMonad m => ThreadLock -> m a -> m a
 withThreadLock (ThreadLock takeIO) action = do
   gbracket (liftIO takeIO) (\releaseIO -> liftIO releaseIO) $ const action
+#endif
 
 -- | Build an IO action that will cache its result the first time it
 -- runs successfullly to completion. If it fails with an exception,
