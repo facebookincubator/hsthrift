@@ -6,6 +6,7 @@
   LICENSE file in the root directory of this source tree.
 -}
 
+{-# LANGUAGE CPP #-}
 module ToExpTest where
 
 import Test.HUnit
@@ -44,7 +45,11 @@ tests = TestList
         -- the result is non-deterministic. Rather than add the
         -- overhead of sorting the elements all the time, let's just
         -- sort the test output.
+#if MIN_VERSION_aeson(2,0,0)
         (sort "Object (fromList [(fromText \"foo\", Number (-3)), (fromText \"bar\", Bool True)])")
+#else
+        (sort "Object (HashMap.fromList [(\"foo\", Number (-3)), (\"bar\", Bool True)])")
+#endif
         (sort $ pp $ object
           [ "foo" .= Number (-3)
           , "bar" .= Bool True

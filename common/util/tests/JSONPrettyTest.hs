@@ -12,7 +12,7 @@ module JSONPrettyTest (main) where
 
 import qualified Data.Aeson as Aeson
 import qualified Data.ByteString.Lazy.Char8 as B
-import Prettyprinter as Pretty hiding ((<>))
+import Compat.Prettyprinter as Pretty hiding ((<>))
 import Text.JSON
 
 import Test.HUnit
