@@ -364,8 +364,14 @@ buildVarintBase :: BoundedPrim Word -> BoundedPrim Word
 buildVarintBase base = condB (\n -> n .&. complement 0x7F == 0)
   buildVarint0
   ((\(W# n) ->
-     (W8# (0x80## `or#` (n `and#` 0x7f##)), W# (n `uncheckedShiftRL#` 7#))) >$<
+     (mkW8# (0x80## `or#` (n `and#` 0x7f##)), W# (n `uncheckedShiftRL#` 7#))) >$<
    (liftFixedToBounded Prim.word8 >*< base))
+  where
+#if __GLASGOW_HASKELL__ >= 902
+  mkW8# x = W8# (wordToWord8# x)
+#else
+  mkW8# = W8#
+#endif
 
 {-# INLINE zigZagToInt #-}
 zigZagToInt :: (Bits i, Integral i) => Word -> i

@@ -9,6 +9,7 @@
 {-# OPTIONS_GHC -fprof-auto #-}
 {-# LANGUAGE ApplicativeDo #-}
 {-# LANGUAGE LambdaCase #-}
+{-# LANGUAGE NondecreasingIndentation #-}
 module Thrift.Protocol.JSON.String
   ( parseJSONString
   ) where

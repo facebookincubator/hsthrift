@@ -10,6 +10,7 @@
 {-# LANGUAGE ConstraintKinds #-}
 {-# LANGUAGE PolyKinds #-}
 {-# LANGUAGE TypeOperators #-}
+{-# OPTIONS_GHC -Wno-star-is-type #-}
 module Thrift.Compiler.Types
   ( Status(..), IfResolved, Parsed
   , Program(..), Header(..), ParsedStatement(..), IncludeType(..), Decl(..), SpliceFile
@@ -625,10 +626,6 @@ data Super s a = Super
   , supExtends      :: Located a -- ^ location of "extends" keyword
   , supLoc          :: Located a -- ^ location of "supName" after "extends"
   }
-
-type family SuperOf (s :: Status) :: * where
-  SuperOf 'Resolved   = Name
-  SuperOf 'Unresolved = Text
 
 data ServiceStmt s l a
   = FunctionStmt (Function s l a)

@@ -8,6 +8,7 @@
 
 {-# LANGUAGE TypeOperators #-}
 {-# LANGUAGE UndecidableInstances #-}
+{-# OPTIONS_GHC -Wno-star-is-type #-}
 module Thrift.Monad
   ( ThriftM
   , ThriftEnv(..)

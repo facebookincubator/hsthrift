@@ -35,7 +35,7 @@ import Thrift.Compiler.Types hiding (Decl(..))
 -- | All things required to generate a Service.hs file
 
 genServiceExports :: HS Service -> [HS.ExportSpec ()]
-genServiceExports s@Service{..} =
+genServiceExports s =
   (if isEmptyService s
   then HS.EAbs () (NoNamespace ()) (unqualSym $ commandTypeName s)
   else HS.EThingWith () (EWildcard () 0) (unqualSym $ commandTypeName s) [])
@@ -83,7 +83,7 @@ genServiceImports this s@Service{..} =
       Set.singleton $ QImport (Text.intercalate "." [m, n, "Service"]) n
 
 genServiceDecls :: HS Service -> [HS.Decl ()]
-genServiceDecls s@Service{..} =
+genServiceDecls s =
   [ genCommandDT s
   , processorInstance
   ] ++ concat
