@@ -79,6 +79,7 @@ jobs:
           libxxhash-dev
           libgtest-dev
           libtinfo-dev
+          libfast-float-dev
 
       - name: Setup Haskell
         run: |
