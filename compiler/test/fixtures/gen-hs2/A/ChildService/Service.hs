@@ -10,6 +10,7 @@
 {-# OPTIONS_GHC -fno-warn-overlapping-patterns#-}
 {-# OPTIONS_GHC -fno-warn-incomplete-patterns#-}
 {-# OPTIONS_GHC -fno-warn-incomplete-uni-patterns#-}
+{-# OPTIONS_GHC -fno-warn-incomplete-record-updates#-}
 {-# LANGUAGE GADTs #-}
 module A.ChildService.Service
        (ChildServiceCommand(..), reqName', reqParser', respWriter',

@@ -284,7 +284,7 @@ pruneModules
   -> [ThriftFile SpliceFile Loc]
   -> [ThriftFile SpliceFile Loc]
 pruneModules Options { optsReqSymbols = Nothing } files = files
-pruneModules opts@Options { optsReqSymbols = Just syms, .. } files =
+pruneModules opts@Options { optsReqSymbols = Just syms } files =
   prunesFiles
     where
       (prunesFiles, _, _) =
@@ -312,7 +312,7 @@ pruneModule
   -> ThriftFile SpliceFile Loc
   -> ([ThriftFile SpliceFile Loc], SymbolMap, Interface l)
   -> ([ThriftFile SpliceFile Loc], SymbolMap, Interface l)
-pruneModule opts@Options{..} file@ThriftFile{..} (fs, symbolMap, iface) =
+pruneModule opts file@ThriftFile{..} (fs, symbolMap, iface) =
   (prunedFile : fs, newMap, iface')
   where
     prunedFile = file { thriftDecls = prunedDecls }
@@ -761,7 +761,6 @@ resolveStmt (FunctionStmt f) = do
   r <- resolveFunction f
   pure $ FunctionStmt r
 resolveStmt (PerformsStmt Performs{..}) = do
-  Env{..} <- ask
   pure $ PerformsStmt $ Performs {..}
 
 resolveInteraction :: Typecheckable l => Parsed Interaction -> Typechecked l Interaction
@@ -770,7 +769,6 @@ resolveInteraction Interaction{..} = do
     <- (,,) <$> sequence (resolveSuper <$> interactionSuper)
             <*> traverse resolveFunction interactionFunctions
             <*> resolveStructuredAnns interactionSAnns
-  Env{..} <- ask
   pure Interaction
     { interactionResolvedName = interactionName
     , interactionSuper        = super
@@ -910,7 +908,7 @@ mkConstMap
   -> TypeMap l
   -> [Parsed Decl]
   -> Either [TypeError l] (ConstMap l)
-mkConstMap (thriftName, opts@Options{..}) imap tmap = foldM insertC emptyContext
+mkConstMap (thriftName, opts) imap tmap = foldM insertC emptyContext
   where
     -- Structs don't define constants, but they have symbols in scope
     insertC m (D_Struct s@Struct{..}) = do
@@ -986,7 +984,7 @@ mkConstMap (thriftName, opts@Options{..}) imap tmap = foldM insertC emptyContext
     insertC m D_Interaction{} = pure m
 
 getEnumType :: Typecheckable l => Options l -> Parsed Enum -> Some (Type l)
-getEnumType opts@Options{..} enum@Enum{..} = case enumFlavourTag opts enum of
+getEnumType opts enum@Enum{..} = case enumFlavourTag opts enum of
   PseudoEnum{} -> Some $ TNewtype name enumValueType loc
   SumTypeEnum noUnknown -> Some $ TEnum name loc noUnknown
   where
@@ -1233,7 +1231,6 @@ typecheckEnum enumTy loc enumTyName ident = do
           Nothing -> typeError loc $ TypeMismatch enumTy identEnumType'
   -- Look up the enum values and see if `identValue` is one of them
   (_, nameMap) <- lookupEnum (sourceName enumTyName) loc
-  Env {..} <- ask
   case Map.lookup identValue nameMap of
     Nothing -> typeError loc $ UnknownEnumValue (sourceName enumTyName)
     Just (targetName, targetLoc) ->
@@ -1526,7 +1523,7 @@ mkTypemap
   -> ImportMap l
   -> [Parsed Decl]
   -> Either [TypeError l] (TypeMap l)
-mkTypemap (thriftName, opts@Options{..}) imap =
+mkTypemap (thriftName, opts) imap =
     foldM resolve emptyContext <=< sortDecls
   where
     resolve :: TypeMap l -> Parsed Decl -> Either [TypeError l] (TypeMap l)
@@ -1703,7 +1700,7 @@ mkSchema Struct{..} = buildSchema structMembers
       (rty, tschema) <- (,)
         <$> resolveAnnotatedType fieldType
         <*> buildSchema fields
-      opts@Options{..} <- options <$> ask
+      opts <- options <$> ask
       let renamed =
             Text.unpack $ renameField opts (getAnns structAnns) structName field
       case (someSymbolVal renamed, rty, tschema) of
@@ -1741,7 +1738,7 @@ mkUSchema u@Union{..} =
   where
     buildSchema (Some schema) alt@UnionAlt{..} = do
       rty <- resolveAnnotatedType altType
-      opts@Options{..} <- options <$> ask
+      opts <- options <$> ask
       let renamed = Text.unpack $ renameUnionAlt opts u alt
       case (someSymbolVal renamed, rty) of
         (SomeSymbol proxy, Some ty) ->
@@ -1750,7 +1747,7 @@ mkUSchema u@Union{..} =
 -- We need the enums to be resolved in order to build the map because we need to
 -- know the numeric values for each field
 mkEnumMap :: Typecheckable l => Options l -> [Parsed Enum] -> EnumMap
-mkEnumMap opts@Options{..} = Map.fromList . map mkAssoc
+mkEnumMap opts = Map.fromList . map mkAssoc
   where
     mkAssoc :: Parsed Enum -> (Text, EnumValues)
     mkAssoc e@Enum{..} = (enumName, enumValues)
@@ -1792,7 +1789,7 @@ mkServiceMap
   -> ImportMap l
   -> [Parsed Service]
   -> Either [TypeError l] ServiceMap
-mkServiceMap (thriftName, opts@Options{..}) imap =
+mkServiceMap (thriftName, opts) imap =
     foldM addToMap Map.empty <=< sortServices
   where
     addToMap ctx s@Service{..} = do

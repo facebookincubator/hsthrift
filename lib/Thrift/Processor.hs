@@ -22,7 +22,9 @@ import Control.Exception
 import Thrift.Binary.Parser
 import Data.ByteString
 import Data.ByteString.Builder
+#if __GLASGOW_HASKELL__ < 902
 import Data.ByteString.Lazy (toStrict)
+#endif
 import Data.Int
 import Data.Some
 import Data.Map (Map)

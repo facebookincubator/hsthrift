@@ -10,6 +10,7 @@
 {-# OPTIONS_GHC -fno-warn-overlapping-patterns#-}
 {-# OPTIONS_GHC -fno-warn-incomplete-patterns#-}
 {-# OPTIONS_GHC -fno-warn-incomplete-uni-patterns#-}
+{-# OPTIONS_GHC -fno-warn-incomplete-record-updates#-}
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
 module Namespace.E.Types
        (TU__Type, TU__Exception(TU__Exception, _Exception_reason), a,

@@ -64,12 +64,12 @@ data instance SpecialType Haskell t where
 data HsInterface = HsInterface Environment RenameMap
 
 instance Semigroup HsInterface where
-  (<>) = mappend
+  HsInterface e1 r1 <> HsInterface e2 r2 =
+    HsInterface (Map.unionWith (++) e1 e2) (Map.union r1 r2)
 
 instance Monoid HsInterface where
   mempty = HsInterface Map.empty Map.empty
-  mappend (HsInterface e1 r1) (HsInterface e2 r2) =
-    HsInterface (Map.unionWith (++) e1 e2) (Map.union r1 r2)
+
 
 -- | Map from Haskell name qualified Thrift name
 type RenameMap = Map.Map Symbol Text
@@ -213,7 +213,7 @@ instance Typecheckable Haskell where
 
   renameEnum _ Enum{..} = toConstructorName enumName
 
-  renameEnumAlt opts@Options{..} e@Enum{..} name =
+  renameEnumAlt opts e@Enum{..} name =
     fixCase $ if
       | Just prefix <- getPrefix (getAnns enumAnns) -> prefix <> name
       | otherwise -> enumName <> "_" <> name
@@ -234,7 +234,7 @@ instance Typecheckable Haskell where
 
   fieldsAreUnique Options{ optsLangSpecific = HsOpts{..} } = not hsoptsDupNames
   unionAltsAreUnique _ = True
-  enumAltsAreUnique Options{..} = True
+  enumAltsAreUnique Options{} = True
 
   enumFlavourTag _ Enum{..}
     | hasSimpleAnn "hs.pseudoenum" = PseudoEnum False
@@ -360,15 +360,15 @@ getHsIncludeDeps
   -> ThriftFile a l
   -> E.Module SrcSpanInfo
   -> [Text]
-getHsIncludeDeps opts (HsInterface env rmap) tf (E.Module loc mhead ps is ds) =
-  [ thriftSym
-  | decl <- decls
-  , (Scoped (GlobalSymbol hsSymbol _) _) <- Foldable.toList decl
-  , Just thriftSym <- [Map.lookup hsSymbol rmap]
-  ]
+getHsIncludeDeps opts (HsInterface env rmap) tf (E.Module loc mhead ps is ds)
+  | E.Module _ _ _ _ decls <- annotate env m' =
+    [ thriftSym
+    | decl <- decls
+    , (Scoped (GlobalSymbol hsSymbol _) _) <- Foldable.toList decl
+    , Just thriftSym <- [Map.lookup hsSymbol rmap]
+    ]
+  | otherwise = error "getHsIncludeDeps"
   where
-    E.Module _ _ _ _ decls = annotate env m'
-
     -- Add types module to imports so that haskell-names knows where the symbols
     -- come from
     m' = E.Module loc mhead ps (thriftImport : is) ds

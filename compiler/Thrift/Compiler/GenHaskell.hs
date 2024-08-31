@@ -231,6 +231,7 @@ commonPragmas Options{ optsLangSpecific = HsOpts{..} } =
   , OptionsPragma () (Just GHC) "-fno-warn-overlapping-patterns"
   , OptionsPragma () (Just GHC) "-fno-warn-incomplete-patterns"
   , OptionsPragma () (Just GHC) "-fno-warn-incomplete-uni-patterns"
+  , OptionsPragma () (Just GHC) "-fno-warn-incomplete-record-updates"
   ]
 
 genModule

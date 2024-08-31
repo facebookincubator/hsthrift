@@ -8,6 +8,7 @@
 
 {-# LANGUAGE KindSignatures #-}
 {-# LANGUAGE PolyKinds #-}
+{-# OPTIONS_GHC -Wno-star-is-type #-}
 module Thrift.Compiler.Typechecker.Monad
   ( TC, Typechecked
   , typeError, runTypechecker, ask, asks, traverseWeird
