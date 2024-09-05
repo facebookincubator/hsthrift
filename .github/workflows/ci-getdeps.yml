@@ -119,6 +119,5 @@ jobs:
         run: cabal build all
         working-directory: ./_sdists
       - name: Run testsuites
-        run: cabal test mangle fb-util thrift-compiler thrift-lib thrift-tests --keep-going
-        # thrift-server: temporarily omitted due to test failures
+        run: cabal test mangle fb-util thrift-compiler thrift-lib thrift-tests thrift-server --keep-going
         working-directory: ./_sdists
