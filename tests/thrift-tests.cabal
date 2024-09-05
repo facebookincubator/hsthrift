@@ -61,8 +61,13 @@ common fb-haskell
 
 common fb-cpp
   cxx-options: -std=c++17
+  if !flag(clang)
+     cxx-options: -fcoroutines
   if arch(x86_64)
      cxx-options: -march=haswell
+
+flag clang
+     default: False
 
 common test-common
   hs-source-dirs: ., gen-hs2/
