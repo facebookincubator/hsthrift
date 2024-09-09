@@ -132,7 +132,7 @@ instance (SVector.Storable a, ToExp a)
 instance ToExp A.Key where
   toExp k = fun "fromText" =$= toExp (keyToText k)
 
-instance ToExp A.Object where
+instance ToExp v => ToExp (KeyMap v) where
   toExp m = fun "fromList" =$= objectToList m
 #endif
 
