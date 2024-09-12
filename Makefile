@@ -10,7 +10,7 @@ CABAL := $(CABAL_BIN) $(GETDEPS_CABAL_FLAGS)
 # Targets in this file invoke Cabal and hence can't be built in parallel
 .NOTPARALLEL:
 
-all:: compiler thrift-hs thrift-cpp server
+all:: compiler thrift-hs thrift-cpp server thrift-http
 
 compiler::
 	$(CABAL) build thrift-compiler
@@ -20,6 +20,9 @@ server::
 
 util::
 	$(CABAL) build fb-util
+
+thrift-http::
+	$(CABAL) build thrift-http
 
 thrift:: thrift-cpp thrift-hs
 

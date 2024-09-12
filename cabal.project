@@ -12,4 +12,6 @@ packages:
     cpp-channel/thrift-cpp-channel.cabal
     http/thrift-http.cabal
 
+allow-newer: haskell-names:aeson, haskell-names:bytestring
+
 tests: true
