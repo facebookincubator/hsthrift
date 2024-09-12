@@ -33,6 +33,8 @@ import Data.Text.Internal (Text(..))
 import Data.Text.Encoding (encodeUtf8)
 import qualified Data.Text.Foreign as TF
 
+import Util.FFI
+
 -- The following functions already support ASan (they already allocate using
 -- malloc):
 -- newCStringFromText
@@ -79,7 +81,7 @@ textWithCString = byteStringWithCString . encodeUtf8
 byteStringWithCString :: BS.ByteString -> (CString -> IO a) -> IO a
 byteStringWithCString (BI.PS fp off len) fun =
   allocaBytes (len+1) $ \ptr' -> do
-    withForeignPtr fp $ \ptr -> do
+    unsafeWithForeignPtr fp $ \ptr -> do
       copyBytes ptr' (ptr `plusPtr` off) len
       poke (ptr' `plusPtr` len) (0 :: Word8)
     fun ptr'
@@ -92,7 +94,7 @@ byteStringWithCStringLen :: BS.ByteString -> (CStringLen -> IO a) -> IO a
 byteStringWithCStringLen (BI.PS _ _ 0) fun = fun (nullPtr, 0)
 byteStringWithCStringLen (BI.PS fp off len) fun =
   allocaBytes len $ \ptr' -> do
-    withForeignPtr fp $ \ptr -> copyBytes ptr' (ptr `plusPtr` off) len
+    unsafeWithForeignPtr fp $ \ptr -> copyBytes ptr' (ptr `plusPtr` off) len
     fun (ptr', len)
 
 -- Text marshalling

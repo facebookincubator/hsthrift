@@ -28,6 +28,8 @@ import Foreign.CPP.Marshallable.TH
 import Foreign.ForeignPtr
 import Foreign.Ptr
 
+import Util.FFI
+
 data CRequestContextPtr
 
 $(deriveDestructibleUnsafe "RequestContextPtr" [t|CRequestContextPtr|])
@@ -49,16 +51,16 @@ saveRequestContext = createRequestContext c_saveContext
 -- | 'setRequestContext' should only be used in bound thread created by
 -- 'forkOS', 'main' or @foreign export@.
 setRequestContext :: RequestContext -> IO ()
-setRequestContext (RequestContext rc) = withForeignPtr rc c_setContext
+setRequestContext (RequestContext rc) = unsafeWithForeignPtr rc c_setContext
 
 -- | Creates a **shallow** copy of the 'RequestContext'. This allows to
 -- overwrite a specific RequestData pointer.
 createShallowCopyRequestContext :: RequestContext -> IO RequestContext
 createShallowCopyRequestContext (RequestContext rc) =
-  withForeignPtr rc $ createRequestContext . c_createShallowCopy
+  unsafeWithForeignPtr rc $ createRequestContext . c_createShallowCopy
 
 withRequestContext :: RequestContext -> (Ptr CRequestContextPtr -> IO a) -> IO a
-withRequestContext (RequestContext rc) = withForeignPtr rc
+withRequestContext (RequestContext rc) = unsafeWithForeignPtr rc
 
 finalizeRequestContext :: RequestContext -> IO ()
 finalizeRequestContext (RequestContext rc) = finalizeForeignPtr rc

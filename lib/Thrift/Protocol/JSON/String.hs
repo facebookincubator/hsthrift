@@ -31,6 +31,8 @@ import Foreign.Ptr
 import Foreign.Storable
 import System.IO.Unsafe
 
+import Util.FFI
+
 parseJSONString :: Parser Text
 parseJSONString = do
   skipSpaces *> word8 _quotedbl
@@ -68,7 +70,7 @@ unescape rawBytes = unsafeDupablePerformIO $ try $
 
   -- Allocate a buffer for the output
   outBuf <- mallocForeignPtrArray outLen
-  withForeignPtr outBuf $ \output -> do
+  unsafeWithForeignPtr outBuf $ \output -> do
     let
       -- Unescape the input character by character.
       -- i is the input index and j is the output index

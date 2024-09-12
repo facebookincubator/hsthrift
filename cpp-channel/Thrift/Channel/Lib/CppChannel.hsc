@@ -34,6 +34,7 @@ import Thrift.Monad
 import Thrift.Protocol.Binary
 import Util.Control.Exception
 import Util.Log
+import Util.FFI
 
 -- | Encapsulation for using the C++ thrift libraries to make requests
 --
@@ -90,8 +91,8 @@ instance ClientChannel (WrappedChannel t) where
     forkIO $ do
       cont <- sendCollector send_mvar send_result sendCob reqMsg
       when cont $ recvCollector recv_mvar recv_result recvCob
-    withForeignPtr send_result $ \send_result_p -> do
-    withForeignPtr recv_result $ \recv_result_p -> do
+    unsafeWithForeignPtr send_result $ \send_result_p -> do
+    unsafeWithForeignPtr recv_result $ \recv_result_p -> do
     unsafeUseAsCStringLen reqMsg $ \(buf, len) -> do
     unsafeUseAsCStringLen (serializeBinary reqOptions) $ \(oBuf, oLen) ->
       c_sendReq
@@ -110,7 +111,7 @@ instance ClientChannel (WrappedChannel t) where
     (send_mvar, send_sp, send_result) <- newCallbackMVar
     forkIO $ void $ sendCollector send_mvar send_result sendCob reqMsg
     (cap,_) <- threadCapability =<< myThreadId
-    withForeignPtr send_result $ \send_result_p -> do
+    unsafeWithForeignPtr send_result $ \send_result_p -> do
     unsafeUseAsCStringLen reqMsg $ \(buf, len) -> do
     unsafeUseAsCStringLen (serializeBinary reqOptions) $ \(oBuf, oLen) ->
       c_sendOnewayReq
@@ -129,7 +130,7 @@ sendCollector
 sendCollector send_mvar send_result sendCob reqMsg = do
   takeMVar send_mvar
   touchReq reqMsg
-  withForeignPtr send_result $ \ptr -> do
+  unsafeWithForeignPtr send_result $ \ptr -> do
     statusi <- (#peek FinishedRequest, status) ptr :: IO CInt
     case statusi of
       (#const SEND_ERROR) -> do
@@ -152,7 +153,7 @@ sendCollector send_mvar send_result sendCob reqMsg = do
 recvCollector :: MVar () -> ForeignPtr CFinishedRequest -> RecvCallback -> IO ()
 recvCollector recv_mvar recv_result recvCob = do
   takeMVar recv_mvar
-  withForeignPtr recv_result $ \ptr -> do
+  unsafeWithForeignPtr recv_result $ \ptr -> do
     statusi <- (#peek FinishedRequest, status) ptr :: IO CInt
     msg <- peekFinishedRequestMsg ptr
     catchAndLog $ case statusi of

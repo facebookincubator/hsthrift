@@ -80,6 +80,7 @@ import Foreign.CPP.HsStruct.Utils
 import Foreign.CPP.Marshallable.TH
 import Mangle.TH
 import Util.Aeson
+import Util.FFI
 import Util.Text (cStringLenToText, cStringLenToTextLenient)
 
 #include <hsc.h>
@@ -436,7 +437,7 @@ instance Storable a => Storable (HsArrayStorable a) where
   peek p = do
     (a, n) <- peekDataSize p
     arr <- mallocForeignPtrArray n
-    withForeignPtr arr $ \parr -> copyBytes parr a (n * sizeOf (undefined :: a))
+    unsafeWithForeignPtr arr $ \parr -> copyBytes parr a (n * sizeOf (undefined :: a))
     return (HsArrayStorable (VS.unsafeFromForeignPtr0 arr n))
 
 -- HsList

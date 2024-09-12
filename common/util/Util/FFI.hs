@@ -7,17 +7,28 @@
 -}
 
 {-# LANGUAGE TypeOperators #-}
+{-# LANGUAGE CPP #-}
 {-# OPTIONS_GHC -Wno-star-is-type #-}
 module Util.FFI (
   FFIError, ffiErrorMessage, call,
   List(..), FFIFun(..), Tuple(..), invoke,
+
+  unsafeWithForeignPtr,
 ) where
 
 import Foreign hiding (with, withMany)
 import Foreign.C
+#if __GLASGOW_HASKELL__ >= 902
+import GHC.ForeignPtr
+#endif
 import System.IO.Unsafe (unsafePerformIO)
 import Control.Exception
 import Control.Monad
+
+#if __GLASGOW_HASKELL__ < 902
+unsafeWithForeignPtr :: ForeignPtr a -> (Ptr a -> IO b) -> IO b
+unsafeWithForeignPtr = withForeignPtr
+#endif
 
 foreign import ccall unsafe "&hs_ffi_free_error" hs_ffi_free_error
   :: FunPtr (CString -> IO ())
@@ -26,7 +37,7 @@ newtype FFIError = FFIError (ForeignPtr CChar)
 
 ffiErrorMessage :: FFIError -> String
 ffiErrorMessage (FFIError fp) =
-  unsafePerformIO $ withForeignPtr fp peekCString
+  unsafePerformIO $ unsafeWithForeignPtr fp peekCString
 
 instance Show FFIError where
   show = ffiErrorMessage
@@ -36,12 +47,16 @@ instance Exception FFIError
 -- | Call an FFI function that returns 'nullPtr' if it succeeds, or a
 -- 'CString' containing the error message if it fails.  On failure the
 -- error is thrown as an 'FFIError' exception.
+{-# INLINE call #-}
 call :: IO CString -> IO ()
 call f = do
   p <- f
-  when (p /= nullPtr) $ do
-    fp <- newForeignPtr hs_ffi_free_error p
-    throwIO $ FFIError fp
+  when (p /= nullPtr) $ callError p
+
+callError :: CString -> IO ()
+callError p = do
+  fp <- newForeignPtr hs_ffi_free_error p
+  throwIO $ FFIError fp
 
 infixr 5 :>
 
