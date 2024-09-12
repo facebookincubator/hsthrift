@@ -23,9 +23,11 @@ module Util.Aeson
   , ObjectKey
   , KeyMap
   , keyToText
+  , keysToTexts
   , keyFromText
   , objectToList
   , objectFromList
+  , objectKeys
   , objectToHashMap
   , objectFromHashMap
   , objectToHashMapText
@@ -41,7 +43,10 @@ import Data.Aeson
 import Data.Aeson.Parser (value, value')
 #if MIN_VERSION_aeson(2,0,0)
 import Data.Aeson.Key
+import qualified Data.Aeson.Key as Key
 import qualified Data.Aeson.KeyMap as KeyMap
+import Data.Coerce
+import Data.Type.Coercion
 #endif
 import Data.Aeson.Types (typeMismatch)
 import Data.ByteString (ByteString)
@@ -134,9 +139,11 @@ instance {-# INCOHERENT #-} ToJSON Object where
   toJSON = Object
 
 keyToText :: ObjectKey -> Text
+keysToTexts :: [ObjectKey] -> [Text]  -- zero-cost coercion
 keyFromText :: Text -> ObjectKey
 objectToList :: KeyMap v -> [(ObjectKey, v)]
 objectFromList :: [(ObjectKey, v)] -> KeyMap v
+objectKeys :: KeyMap v -> [ObjectKey]
 objectToHashMap :: KeyMap v -> HashMap ObjectKey v
 objectFromHashMap :: HashMap ObjectKey Value -> Object
 objectToHashMapText :: Object -> HashMap Text Value
@@ -151,9 +158,13 @@ lookupKeyMap :: ObjectKey -> KeyMap v -> Maybe v
 type ObjectKey = Key
 type KeyMap = KeyMap.KeyMap
 keyToText = toText
+keysToTexts = case Key.coercionToText of
+  Just Coercion -> coerce
+  _ -> map keyToText
 keyFromText = fromText
 objectToList = KeyMap.toList
 objectFromList = KeyMap.fromList
+objectKeys = KeyMap.keys
 objectToHashMap = KeyMap.toHashMap
 objectFromHashMap = KeyMap.fromHashMap
 objectToHashMapText = KeyMap.toHashMapText
@@ -167,9 +178,11 @@ lookupKeyMap = KeyMap.lookup
 type ObjectKey = Text
 type KeyMap v = HashMap Text v
 keyToText = id
+keysToTexts = id
 keyFromText = id
 objectToList = HashMap.toList
 objectFromList = HashMap.fromList
+objectKeys = HashMap.keys
 objectToHashMap = id
 objectFromHashMap = id
 objectToHashMapText = id

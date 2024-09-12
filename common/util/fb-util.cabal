@@ -79,6 +79,8 @@ library
 
     exposed-modules:
         Compat.Prettyprinter
+        Compat.Prettyprinter.Util
+        Compat.Prettyprinter.Render.Text
         Control.Concurrent.Stream
         Control.Trace
         Control.Trace.Core
