@@ -70,9 +70,9 @@ library
   build-depends:
       fb-util,
       thrift-lib,
-      base >=4.11.1 && <4.15,
+      base >=4.11.1 && <4.17,
       text ^>=1.2.3.0,
-      bytestring ^>=0.10.8.2,
+      bytestring >=0.10.8.2 && <0.12,
       async ^>=2.2.1,
       utf8-string,
       containers,
