@@ -56,6 +56,12 @@ class HaskellAsyncProcessor : public AsyncProcessor {
       ServerRequest&& request,
       const AsyncProcessorFactory::MethodMetadata& methodMetadata) override;
 
+  void processInteraction(ServerRequest&&) override {
+    LOG(FATAL)
+        << "This AsyncProcessor doesn't support Thrift interactions. "
+        << "Please implement processInteraction to support interactions.";
+  }
+
  protected:
   TCallback callback_;
   AsyncProcessorFactory::MethodMetadataMap& metadataMap_;
