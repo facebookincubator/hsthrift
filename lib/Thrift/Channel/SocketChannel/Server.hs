@@ -160,13 +160,13 @@ withServerIO p mport maxQueuedConns handler postProcess client  = do
               seqNum' <- counter
               case mexc of
                 Just (_exc, _blame) -> do
-                  _ <- sendBS sock (toStrict $ toLazyByteString response)
+                  _ <- sendBS sock response
                   return (Nothing, seqNum')
                 Nothing -> do
                   let info = Map.lookup (reqName cmd) (methodsInfo (Proxy :: Proxy c))
                       isOneway = maybe False methodIsOneway info
                   unless isOneway $
-                    void $ sendBS sock (toStrict $ toLazyByteString response)
+                    void $ sendBS sock response
                   if BS.null leftover
                     then return (Nothing, seqNum')
                     else processInput seqNum' counter leftover sock

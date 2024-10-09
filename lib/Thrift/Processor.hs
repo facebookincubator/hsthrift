@@ -85,13 +85,14 @@ process proxy seqNum handler postProcess input = do
       let ex = ApplicationException (Text.pack err)
             ApplicationExceptionType_ProtocolError
       return
-        ( genMsgBegin proxy "" 3 seqNum
-          <> buildStruct proxy ex
-          <> genMsgEnd proxy
+        ( toStrict $ toLazyByteString $
+            genMsgBegin proxy "" 3 seqNum
+            <> buildStruct proxy ex
+            <> genMsgEnd proxy
         , Just (toException ex, ClientError)
         , [] )
     Right (Some cmd) -> processCommand proxy seqNum handler postProcess cmd
-  return (toStrict (toLazyByteString response), exc, headers)
+  return (response, exc, headers)
 
 processCommand
   :: (Processor s, Protocol p)
@@ -100,14 +101,27 @@ processCommand
   -> (forall r . s r -> IO r) -- ^ Handler for user-code
   -> (forall r . s r -> Either SomeException r -> Header)
   -> s r                      -- ^ input command
-  -> IO (Builder, Maybe (SomeException, Blame), Header)
-processCommand proxy seqNum handler postProcess cmd = do
-  -- Run the handler and generate its return struct, forcing evaluation
-  res <- try (handler cmd)
-  let (builder, exc) = respWriter proxy seqNum cmd res
-      headers = postProcess cmd res
-  builder' <- evaluate builder
-  return (builder', exc, headers)
+  -> IO (ByteString, Maybe (SomeException, Blame), Header)
+processCommand proxy seqNum handler postProcess cmd =
+  -- in case we cannot serialize the uncaught exception itself (e.g. due to
+  -- another exception being thrown when serializing it), we fallback to an
+  -- predefined one, assuming @respWriter@ and @postProcess@ never fail on
+  -- it.
+  handle (\(_ :: SomeException) -> buildResp $ Left nonserializableError) $
+  -- catch all uncaught exception from handler to prevent it from being leaked.
+  handle (\e -> buildResp $ Left e) $
+  buildResp . Right =<< handler cmd
+  where
+    nonserializableError = toException $ ApplicationException
+      "processCommand: uncaught non-serializable error"
+      ApplicationExceptionType_InternalError
+    buildResp res =
+      -- force evaluation of the response
+      evaluate $ bs `seq` exc `seq` headers `seq` (bs, exc, headers)
+      where
+        (builder, exc) = respWriter proxy seqNum cmd res
+        headers = postProcess cmd res
+        bs = toStrict $ toLazyByteString builder
 
 msgParser
   :: (Processor s, Protocol p)

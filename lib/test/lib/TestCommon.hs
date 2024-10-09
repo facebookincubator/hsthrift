@@ -37,6 +37,7 @@ processCommand _ (SuperAdder (Add x y)) = pure $ x + y
 processCommand _ (Divide x y)
   | y == 0    = throwIO DivideByZero
   | otherwise = pure $ x / y
+processCommand _ (QuotRem x y) = pure $ QuotRemResponse (x `quot` y) (x `rem` y)
 processCommand state (Put x) = writeIORef state x
 processCommand state (PutMany xs) = mapM_ (writeIORef state) xs
 processCommand state Get = readIORef state

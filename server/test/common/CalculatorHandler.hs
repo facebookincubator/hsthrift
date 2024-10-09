@@ -32,6 +32,9 @@ calculatorHandler _ (SuperAdder (Add x y)) = return $ x + y
 calculatorHandler _ (Divide x y)
   | y == 0    = throw DivideByZero
   | otherwise = return $ x / y
+calculatorHandler _ (QuotRem x y) =
+  -- Intentionally leak an unhandled error
+  return $ QuotRemResponse (x `quot` y) (x `rem` y)
 calculatorHandler (CalculatorState ref) (Put v) =
   writeIORef ref (fromIntegral v)
 calculatorHandler (CalculatorState ref) (PutMany v) =
