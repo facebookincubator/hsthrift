@@ -168,14 +168,14 @@ apache::thrift::RpcOptions getRpcOptions(
       thrift::protocol::RpcOptions>(
       folly::ByteRange(rpcOptionsPtr, rpcOptionsLen));
   rpcOpts.setTimeout(std::chrono::milliseconds(*tRpcOpts.timeout()));
-  auto priority = tRpcOpts.get_priority() == nullptr
+  auto priority = apache::thrift::get_pointer(tRpcOpts.priority()) == nullptr
       ? apache::thrift::RpcOptions::PRIORITY::NORMAL
       : static_cast<apache::thrift::RpcOptions::PRIORITY>(
             tRpcOpts.priority().value_unchecked());
   rpcOpts.setPriority(priority);
   rpcOpts.setChunkTimeout(std::chrono::milliseconds(*tRpcOpts.chunkTimeout()));
   rpcOpts.setQueueTimeout(std::chrono::milliseconds(*tRpcOpts.queueTimeout()));
-  if (tRpcOpts.get_headers() != nullptr) {
+  if (apache::thrift::get_pointer(tRpcOpts.headers()) != nullptr) {
     for (auto const& header : tRpcOpts.headers().value_unchecked()) {
       rpcOpts.setWriteHeader(header.first, header.second);
     }
