@@ -9,6 +9,9 @@
 {-# LANGUAGE NamedFieldPuns #-}
 module Util.Testing
   ( assertProperty
+  , assertPropertyWithArgs
+  , QC.stdArgs
+  , QC.Args(..)
   , skip
   , skipTest
   , skipTestIf
@@ -44,12 +47,17 @@ skipTestIfRtsIsProfiled = skipTestIf $ const (rtsIsProfiled /= 0)
 
 assertProperty
   :: (HasCallStack, QC.Testable prop) => String -> prop -> Assertion
-assertProperty msg prop = do
-  size <- maybe (QC.maxSize QC.stdArgs) read <$> lookupEnv "QUICKCHECK_SIZE"
+assertProperty msg prop =
+  assertPropertyWithArgs msg QC.stdArgs prop
+
+assertPropertyWithArgs
+  :: (HasCallStack, QC.Testable prop) => String -> QC.Args -> prop -> Assertion
+assertPropertyWithArgs msg qcArgs prop = do
+  size <- maybe (QC.maxSize qcArgs) read <$> lookupEnv "QUICKCHECK_SIZE"
   success <-
-    maybe (QC.maxSuccess QC.stdArgs )read <$> lookupEnv "QUICKCHECK_RUNS"
+    maybe (QC.maxSuccess qcArgs) read <$> lookupEnv "QUICKCHECK_RUNS"
   mbSeed <- lookupEnv "QUICKCHECK_SEED"
-  let args = QC.stdArgs {
+  let args = qcArgs {
         QC.maxSize = size,
         QC.maxSuccess = success,
         QC.replay = (,size) . read <$> mbSeed
