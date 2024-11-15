@@ -70,6 +70,8 @@ struct SimpleStruct {
   5: i64 big_int;
   6: double real;
   7: float smaller_real;
+  @cpp.Type{template = "::std::unordered_map"}
+  9: map<i32, i32> something;
   // The next field should not show up anywhere in the generated code.
   @python.Py3Hidden{}
   8: i16 hidden_field;
@@ -221,4 +223,87 @@ service DerivedService extends SimpleService {
 
 service RederivedService extends DerivedService {
   i32 get_seven();
+}
+
+@cpp.Type{name = "::MyType"}
+typedef bool CustomBool
+@cpp.Type{name = "::MyType"}
+typedef i64 CustomInteger
+@cpp.Type{name = "::MyType"}
+typedef double CustomDouble
+@cpp.Type{name = "::MyType"}
+typedef string CustomString
+@cpp.Type{name = "::MyType"}
+typedef binary CustomBinary
+@cpp.Type{name = "::MyType"}
+typedef list<i32> CustomList
+@cpp.Type{name = "::MyType"}
+typedef set<i32> CustomSet
+@cpp.Type{name = "::MyType"}
+typedef map<i32, i32> CustomMap
+@cpp.Type{name = "::MyType"}
+typedef SimpleStruct CustomStruct
+
+@cpp.Adapter{name = "::MyAdapter"}
+typedef bool AdaptedBool
+@cpp.Adapter{name = "::MyAdapter"}
+typedef i64 AdaptedInteger
+@cpp.Adapter{name = "::MyAdapter"}
+typedef double AdaptedDouble
+@cpp.Adapter{name = "::MyAdapter"}
+typedef string AdaptedString
+@cpp.Adapter{name = "::MyAdapter"}
+typedef binary AdaptedBinary
+@cpp.Adapter{name = "::MyAdapter"}
+typedef list<i32> AdaptedList
+@cpp.Adapter{name = "::MyAdapter"}
+typedef set<i32> AdaptedSet
+@cpp.Adapter{name = "::MyAdapter"}
+typedef map<i32, i32> AdaptedMap
+@cpp.Adapter{name = "::MyAdapter"}
+typedef SimpleStruct AdaptedStruct
+
+struct CustomFields {
+  @cpp.Type{name = "::MyType"}
+  1: bool bool_field;
+  @cpp.Type{name = "::MyType"}
+  2: i64 integer_field;
+  @cpp.Type{name = "::MyType"}
+  3: double double_field;
+  @cpp.Type{name = "::MyType"}
+  4: string string_field;
+  @cpp.Type{name = "::MyType"}
+  5: binary binary_field;
+  @cpp.Type{name = "::MyType"}
+  6: list<i32> list_field;
+  @cpp.Type{name = "::MyType"}
+  7: set<i32> set_field;
+  @cpp.Type{name = "::MyType"}
+  8: map<i32, i32> map_field;
+  @cpp.Type{name = "::MyType"}
+  9: SimpleStruct struct_field;
+}
+
+struct CustomTypedefFields {
+  1: CustomBool bool_field;
+  2: CustomInteger integer_field;
+  3: CustomDouble double_field;
+  4: CustomString string_field;
+  5: CustomBinary binary_field;
+  6: CustomList list_field;
+  7: CustomSet set_field;
+  8: CustomMap map_field;
+  9: CustomStruct struct_field;
+}
+
+struct AdaptedTypedefFields {
+  1: AdaptedBool bool_field;
+  2: AdaptedInteger integer_field;
+  3: AdaptedDouble double_field;
+  4: AdaptedString string_field;
+  5: AdaptedBinary binary_field;
+  6: AdaptedList list_field;
+  7: AdaptedSet set_field;
+  8: AdaptedMap map_field;
+  9: AdaptedStruct struct_field;
 }

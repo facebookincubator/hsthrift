@@ -21,6 +21,7 @@
 namespace java.swift test.fixtures.exceptions
 
 include "thrift/annotation/thrift.thrift"
+include "thrift/annotation/python.thrift"
 
 transient server exception Fiery {
   @thrift.ExceptionMessage
@@ -29,6 +30,7 @@ transient server exception Fiery {
 
 safe stateful exception Serious {
   @thrift.ExceptionMessage
+  @python.Name{name = "not_sonnet"}
   1: optional string sonnet;
 }
 

@@ -23,8 +23,8 @@ namespace java.swift test.fixtures.interactions
 namespace py test.fixtures.interactions
 namespace py3 test.fixtures.interactions
 
+include "shared.thrift"
 include "thrift/annotation/cpp.thrift"
-
 include "thrift/annotation/thrift.thrift"
 
 exception CustomException {
@@ -75,4 +75,10 @@ service Perform {
   performs MyInteractionFast;
   performs SerialInteraction;
   void foo();
+}
+
+service InteractWithShared {
+  shared.DoSomethingResult do_some_similar_things();
+  performs MyInteraction;
+  performs shared.SharedInteraction;
 }

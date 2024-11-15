@@ -18,6 +18,8 @@
  * limitations under the License.
  */
 
+include "include.thrift"
+
 namespace java.swift test.fixtures.service_schema
 
 enum Result {

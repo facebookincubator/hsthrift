@@ -108,6 +108,12 @@ struct Foo {
   @rust.Adapter{name = "::my::Adapter2"}
   10: MyI64 adaptedLongField;
   11: DoubleTypedefI64 doubleAdaptedField;
+  @python.Adapter{name = "my.ListAdapter", typeHint = "typing.Sequence[int]"}
+  12: list<i32> adapted_list;
+  @python.Adapter{name = "my.SetAdapter", typeHint = "typing.AbstractSet[int]"}
+  13: set<i32> adapted_set;
+  @python.Adapter{name = "my.MapAdapter", typeHint = "typing.Mapping[str, int]"}
+  14: map<string, i32> adapted_map;
 } (
   thrift.uri = "facebook.com/thrift/compiler/test/fixtures/adapter/src/module/Foo",
 )
@@ -515,3 +521,12 @@ typedef i32 (py.adapter = "my.Adapter1") i32_5137
 typedef map<string, ListWithElemAdapter_withAdapter_2312> (
   py.adapter = "my.Adapter3",
 ) map_string_ListWithElemAdapter_withAdapter_8454
+
+@cpp.Adapter{
+  name = "::apache::thrift::test::StructAdapter",
+  underlyingName = "Renamed",
+}
+struct RenamedStructWithStructAdapterAndFieldAdapter {
+  @cpp.Adapter{name = "::apache::thrift::test::FieldAdapter"}
+  1: i32 field;
+}
