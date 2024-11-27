@@ -155,6 +155,14 @@ HS_STRUCT HsStdTuple {
     return std::move(data_.tup);
   }
 
+  template <
+      typename T = HsStdTuple<Ts...>,
+      typename = std::enable_if_t<std::tuple_size_v<T> == 2>>
+  auto toStdPair()&& {
+    return std::make_pair(
+        std::move(std::get<0>(data_.tup)), std::move(std::get<1>(data_.tup)));
+  }
+
   static constexpr auto tuple_size = std::tuple_size_v<std::tuple<Ts...>>;
 
  private:
@@ -176,3 +184,12 @@ HS_STRUCT HsStdTuple {
     }
   }
 };
+
+namespace std {
+
+template <typename... Ts>
+struct tuple_size<HsStdTuple<Ts...>> {
+  static constexpr size_t value = sizeof...(Ts);
+};
+
+} // namespace std
