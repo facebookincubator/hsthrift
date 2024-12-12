@@ -889,15 +889,6 @@ resolveStructuredAnn StructuredAnn{..} = do
       -- locEndLine defLoc == locStartLine loc
       | locEndCol defLoc <= locStartCol loc = True
       | otherwise = False
-    lookupSchemaRec :: ThriftName -> Loc -> TC l (Some (Schema l))
-    lookupSchemaRec name loc = do
-      thisty <- lookupType name loc
-      case thisty of
-        Some ty -> do
-          let nm = case getAliasedType ty of
-                TStruct Name{..} _ -> sourceName
-                _ -> name
-          lookupSchema nm loc
 
 -- Build the Constant Map ------------------------------------------------------
 
@@ -1121,7 +1112,7 @@ typecheckConst tyTop@(TStruct Name{} _loc)
   -- First typecheck the struct with the type annotated then check this matches
   -- the type given at the top level
   svTypeName <- mkThriftName svType
-  tschema <- lookupSchema svTypeName lLocation
+  tschema <- lookupSchemaRec svTypeName lLocation
   ttyAnn <- lookupType svTypeName lLocation
   case (tschema, ttyAnn) of
     (Some schema, Some tyAnn) -> do
@@ -1411,6 +1402,16 @@ eqOrAlias TSpecial{} _ = Nothing
 getAliasedType :: Type l t -> Type l t
 getAliasedType (TTypedef _ ty _loc) = getAliasedType ty
 getAliasedType ty = ty
+
+lookupSchemaRec :: ThriftName -> Loc -> TC l (Some (Schema l))
+lookupSchemaRec name loc = do
+  thisty <- lookupType name loc
+  case thisty of
+    Some ty -> do
+      let nm = case getAliasedType ty of
+            TStruct Name{..} _ -> sourceName
+            _ -> name
+      lookupSchema nm loc
 
 mkFieldMap
   :: [ListElem MapPair Loc]
