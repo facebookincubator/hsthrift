@@ -99,7 +99,7 @@ library
         haskell-src-exts >=1.20.3 && <1.24,
         either,
         optparse-applicative,
-        haskell-names,
+        haskell-names < 0.10,
         text-show,
         base >=4.11.1 && <4.17,
         async ^>=2.2.1,

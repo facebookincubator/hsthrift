@@ -193,7 +193,7 @@ library
 
     build-depends:
         atomic-primops,
-        aeson,
+        aeson < 2.1,
         attoparsec,
         bytestring-lexing,
         clock,
@@ -206,7 +206,7 @@ library
         lifted-base,
         mangle,
         monad-control,
-        primitive,
+        primitive < 0.8,
         text-show,
         optparse-applicative,
         extra,
@@ -240,7 +240,7 @@ library
         integer-gmp >=1.0.2.0 && <1.2,
         mtl ^>=2.2.2,
         array ^>=0.5.2.0,
-        prettyprinter >=1.2.1 && <1.7,
+        prettyprinter >=1.2.1 && <1.8,
         data-default,
 
     build-tool-depends: hsc2hs:hsc2hs
