@@ -146,8 +146,8 @@ objectFromList :: [(ObjectKey, v)] -> KeyMap v
 objectKeys :: KeyMap v -> [ObjectKey]
 objectToHashMap :: KeyMap v -> HashMap ObjectKey v
 objectFromHashMap :: HashMap ObjectKey Value -> Object
-objectToHashMapText :: Object -> HashMap Text Value
-objectFromHashMapText :: HashMap Text Value -> Object
+objectToHashMapText :: KeyMap v -> HashMap Text v
+objectFromHashMapText :: HashMap Text v -> KeyMap v
 emptyKeyMap :: KeyMap v
 insertKeyMap :: ObjectKey -> v -> KeyMap v -> KeyMap v
 unionKeyMap :: KeyMap v -> KeyMap v -> KeyMap v
