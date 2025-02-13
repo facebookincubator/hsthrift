@@ -13,5 +13,7 @@ HEADER="// THIS FILE IS COPIED FROM FBTHRIFT, DO NOT MODIFY ITS CONTENTS DIRECTL
 // @"
 HEADER="${HEADER}generated"
 
-rsync -am --include='*.thrift' --include='*/' --exclude='*' ../xplat/thrift/compiler/test/fixtures/ common/hs/thrift/exactprint/tests/fbthrift-tests
-find common/hs/thrift/exactprint/tests/fbthrift-tests -type f -exec sed -i 1i"$HEADER" {} \;
+cd "$(cd -P -- "$(dirname "${BASH_SOURCE[0]}")" >/dev/null && hg root)"
+
+rsync -am --include='*.thrift' --include='*/' --exclude='*' xplat/thrift/compiler/test/fixtures/ fbcode/common/hs/thrift/exactprint/tests/fbthrift-tests
+find fbcode/common/hs/thrift/exactprint/tests/fbthrift-tests -type f -exec sed -i 1i"$HEADER" {} \;
