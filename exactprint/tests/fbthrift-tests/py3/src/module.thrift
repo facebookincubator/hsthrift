@@ -251,14 +251,19 @@ typedef i64 AdaptedInteger
 @cpp.Adapter{name = "::MyAdapter"}
 typedef double AdaptedDouble
 @cpp.Adapter{name = "::MyAdapter"}
+@python.Py3EnableCppAdapter
 typedef string AdaptedString
 @cpp.Adapter{name = "::MyAdapter"}
+@python.Py3EnableCppAdapter
 typedef binary AdaptedBinary
 @cpp.Adapter{name = "::MyAdapter"}
+@python.Py3EnableCppAdapter
 typedef list<i32> AdaptedList
 @cpp.Adapter{name = "::MyAdapter"}
+@python.Py3EnableCppAdapter
 typedef set<i32> AdaptedSet
 @cpp.Adapter{name = "::MyAdapter"}
+@python.Py3EnableCppAdapter
 typedef map<i32, i32> AdaptedMap
 @cpp.Adapter{name = "::MyAdapter"}
 typedef SimpleStruct AdaptedStruct

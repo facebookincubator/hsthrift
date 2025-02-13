@@ -217,3 +217,52 @@ typedef map<i32, FMap> (
 typedef map<i64, string> (
   java.swift.type = "it.unimi.dsi.fastutil.longs.Long2ObjectArrayMap<String>",
 ) map_i64_string_5732
+
+struct Containers {
+  1: list<MyStruct> struct_list;
+  2: list<MyUnion> union_list;
+  3: list<MyEnum> enum_list;
+
+  4: set<MyStruct> struct_set;
+  5: set<MyUnion> union_set;
+  6: set<MyEnum> enum_set;
+
+  7: map<MyStruct, i64> struct_map;
+  8: map<MyUnion, i64> union_map;
+  9: map<MyEnum, i64> enum_map;
+
+  10: map<i32, MyStruct> struct_map_2;
+  11: map<i32, MyUnion> union_map_2;
+  12: map<i32, MyEnum> enum_map_2;
+
+  13: map<list<i32>, i32> list_map;
+  14: map<i32, list<i32>> list_map_2;
+
+  15: map<set<i32>, i32> set_map;
+  16: map<i32, set<i32>> set_map_2;
+
+  17: map<map<i32, i32>, i32> map_map;
+  18: map<i32, map<i32, i32>> map_map_2;
+
+  19: list<list<i32>> list_list_i32;
+  20: list<list<MyStruct>> list_list_struct;
+  21: list<set<i32>> list_set_i32;
+  22: list<set<MyStruct>> list_set_struct;
+  23: list<map<i32, i32>> list_map_i32_i32;
+  24: list<map<i32, MyStruct>> list_map_i32_struct;
+  25: list<map<MyStruct, i32>> list_map_struct_i32;
+
+  26: set<list<i32>> set_list_i32;
+  27: set<list<MyStruct>> set_list_struct;
+  28: set<set<i32>> set_set_i32;
+  29: set<set<MyStruct>> set_set_struct;
+  30: set<map<i32, i32>> set_map_i32_i32;
+  31: set<map<i32, MyStruct>> set_map_i32_struct;
+  32: set<map<MyStruct, i32>> set_map_struct_i32;
+
+  33: map<i32, map<i32, i32>> map_i32_map_i32_i32;
+  34: map<i32, map<MyStruct, i32>> map_i32_map_struct_i32;
+  35: map<i32, map<i32, MyStruct>> map_i32_map_i32_struct;
+  36: map<i32, list<map<i32, i32>>> map_i32_map_list_i32_i32;
+  37: map<i32, list<map<MyStruct, i32>>> map_i32_map_list_struct_i32;
+}

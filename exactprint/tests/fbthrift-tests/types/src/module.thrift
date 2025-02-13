@@ -119,10 +119,10 @@ struct MinPadding {
 @thrift.TerseWrite
 struct MinPaddingWithCustomType {
   1: byte small;
-  2: i64 big;
+  2: i32 biggish;
   @cpp.Adapter{name = "::my::Adapter"}
   3: i16 medium;
-  4: i32 biggish;
+  4: i64 big;
   5: byte tiny;
 }
 
@@ -218,8 +218,10 @@ struct AllocatorAware {
   4: string_5252 aa_string;
   5: i32 not_a_container;
   @cpp.Ref{type = cpp.RefType.Unique}
+  @cpp.AllowLegacyNonOptionalRef
   6: i32_9314 aa_unique;
   @cpp.Ref{type = cpp.RefType.SharedMutable}
+  @cpp.AllowLegacyNonOptionalRef
   7: i32_9314 aa_shared;
 } (cpp.allocator = "some_allocator")
 

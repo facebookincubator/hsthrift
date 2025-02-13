@@ -18,6 +18,7 @@
  * limitations under the License.
  */
 
+package;
 namespace java.swift test.fixtures.swift.enumstrict
 namespace java test.fixtures.enumstrict
 namespace cpp2 test.fixtures.enumstrict

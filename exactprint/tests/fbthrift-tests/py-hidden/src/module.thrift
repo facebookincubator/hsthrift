@@ -2,20 +2,8 @@
 // generated-by : fbcode/common/hs/thrift/exactprint/tests/sync-fbthrift-tests.sh
 // source: thrift/compiler/test/fixtures/*
 // @generated
-// THIS FILE IS COPIED FROM FBTHRIFT, DO NOT MODIFY ITS CONTENTS DIRECTLY
-// generated-by : fbcode/common/hs/thrift/exactprint/tests/sync-fbthrift-tests.sh
-// source: thrift/compiler/test/fixtures/*
-// @generated
-// THIS FILE IS COPIED FROM FBTHRIFT, DO NOT MODIFY ITS CONTENTS DIRECTLY
-// generated-by : fbcode/common/hs/thrift/exactprint/tests/sync-fbthrift-tests.sh
-// source: thrift/compiler/test/fixtures/*
-// @generated
-// THIS FILE IS COPIED FROM FBTHRIFT, DO NOT MODIFY ITS CONTENTS DIRECTLY
-// generated-by : fbcode/common/hs/thrift/exactprint/tests/sync-fbthrift-tests.sh
-// source: thrift/compiler/test/fixtures/*
-// @generated
 /*
- * Copyright (c) Facebook, Inc. and its affiliates.
+ * Copyright (c) Meta Platforms, Inc. and affiliates.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,6 +18,19 @@
  * limitations under the License.
  */
 
-struct Foo {
-  1: optional i32 bar;
+include "thrift/annotation/python.thrift"
+
+namespace py test.fixtures.hidden_test
+
+struct StructuredKey {}
+
+struct S1 {
+  1: i32 normalField;
+
+  @python.PyDeprecatedHidden{reason = "Structured keys not supported"}
+  2: map<StructuredKey, StructuredKey> mapField;
+}
+
+struct S2 {
+  1: S1 s1;
 }

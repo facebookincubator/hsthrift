@@ -18,27 +18,24 @@
  * limitations under the License.
  */
 
-cpp_include "folly/sorted_vector_types.h"
+package "facebook.com/thrift/compiler/test/fixtures/default_values_rectification"
 
-namespace cpp2 a.different.ns
+struct EmptyStruct {}
 
-include "thrift/annotation/cpp.thrift"
+struct TestStruct {
+  1: i32 unqualified_int_field;
 
-typedef i64 IncludedInt64
+  2: bool unqualified_bool_field;
 
-const i64 IncludedConstant = 42;
+  3: list<i32> unqualified_list_field;
 
-enum AnEnum {
-  FIELDA = 2,
-  FIELDB = 4,
-}
+  4: EmptyStruct unqualified_struct_field;
 
-struct AStruct {
-  1: i32 FieldA;
-}
+  5: optional i32 optional_int_field;
 
-struct AStructB {
-  @cpp.Ref{type = cpp.RefType.Shared}
-  @cpp.AllowLegacyNonOptionalRef
-  1: AStruct FieldA;
+  6: optional bool optional_bool_field;
+
+  7: optional list<i32> optional_list_field;
+
+  8: optional EmptyStruct optional_struct_field;
 }

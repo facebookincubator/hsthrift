@@ -18,27 +18,22 @@
  * limitations under the License.
  */
 
-cpp_include "folly/sorted_vector_types.h"
+namespace cpp2 thrift.shared_interactions
+namespace java.swift test.fixtures.another_interactions
+namespace py test.fixtures.another_interactions
+namespace py3 test.fixtures.another_interactions
 
-namespace cpp2 a.different.ns
-
-include "thrift/annotation/cpp.thrift"
-
-typedef i64 IncludedInt64
-
-const i64 IncludedConstant = 42;
-
-enum AnEnum {
-  FIELDA = 2,
-  FIELDB = 4,
+struct DoSomethingResult {
+  1: string s_res;
+  2: i32 i_res;
 }
 
-struct AStruct {
-  1: i32 FieldA;
+interaction SharedInteraction {
+  i32 init();
+  DoSomethingResult do_something();
+  void tear_down();
 }
 
-struct AStructB {
-  @cpp.Ref{type = cpp.RefType.Shared}
-  @cpp.AllowLegacyNonOptionalRef
-  1: AStruct FieldA;
+service InteractLocally {
+  performs SharedInteraction;
 }

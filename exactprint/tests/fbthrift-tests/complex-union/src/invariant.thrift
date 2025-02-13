@@ -18,27 +18,18 @@
  * limitations under the License.
  */
 
-cpp_include "folly/sorted_vector_types.h"
+namespace java.swift test.fixtures.complex_union
 
-namespace cpp2 a.different.ns
-
-include "thrift/annotation/cpp.thrift"
-
-typedef i64 IncludedInt64
-
-const i64 IncludedConstant = 42;
-
-enum AnEnum {
-  FIELDA = 2,
-  FIELDB = 4,
+struct StructForInvariantTypes {
+  1: i64 num;
 }
 
-struct AStruct {
-  1: i32 FieldA;
+struct UnionForInvariantTypes {
+  1: i32 num32;
+  2: i64 num64;
 }
 
-struct AStructB {
-  @cpp.Ref{type = cpp.RefType.Shared}
-  @cpp.AllowLegacyNonOptionalRef
-  1: AStruct FieldA;
+union InvariantTypes {
+  1: map<StructForInvariantTypes, i64> struct_map;
+  2: map<UnionForInvariantTypes, i64> union_map;
 }

@@ -2,14 +2,6 @@
 // generated-by : fbcode/common/hs/thrift/exactprint/tests/sync-fbthrift-tests.sh
 // source: thrift/compiler/test/fixtures/*
 // @generated
-// THIS FILE IS COPIED FROM FBTHRIFT, DO NOT MODIFY ITS CONTENTS DIRECTLY
-// generated-by : fbcode/common/hs/thrift/exactprint/tests/sync-fbthrift-tests.sh
-// source: thrift/compiler/test/fixtures/*
-// @generated
-// THIS FILE IS COPIED FROM FBTHRIFT, DO NOT MODIFY ITS CONTENTS DIRECTLY
-// generated-by : fbcode/common/hs/thrift/exactprint/tests/sync-fbthrift-tests.sh
-// source: thrift/compiler/test/fixtures/*
-// @generated
 /*
  * Copyright (c) Meta Platforms, Inc. and affiliates.
  *
@@ -26,18 +18,4 @@
  * limitations under the License.
  */
 
-include "module.thrift"
-
-namespace hack hack_ns2
-
-enum Status {
-  Unknown = 0,
-}
-
-struct FBStruct {
-  1: string str_value;
-}
-
-service TestService extends module.FooHackService {
-  i32 ping(1: string str_arg) throws (1: module.ExTypedef ex);
-}
+struct I {}

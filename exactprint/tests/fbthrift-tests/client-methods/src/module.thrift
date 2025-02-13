@@ -18,27 +18,24 @@
  * limitations under the License.
  */
 
-cpp_include "folly/sorted_vector_types.h"
-
-namespace cpp2 a.different.ns
-
 include "thrift/annotation/cpp.thrift"
 
-typedef i64 IncludedInt64
-
-const i64 IncludedConstant = 42;
-
-enum AnEnum {
-  FIELDA = 2,
-  FIELDB = 4,
+struct EchoRequest {
+  1: string text;
 }
 
-struct AStruct {
-  1: i32 FieldA;
+struct EchoResponse {
+  1: string text;
 }
 
-struct AStructB {
-  @cpp.Ref{type = cpp.RefType.Shared}
-  @cpp.AllowLegacyNonOptionalRef
-  1: AStruct FieldA;
+@cpp.GenerateDeprecatedHeaderClientMethods
+service HeaderClientMethodsAnnotationOnService {
+  EchoResponse echo(1: EchoRequest request);
+  EchoResponse echo_2(1: EchoRequest request);
+}
+
+service HeaderClientMethodsAnnotationOnFunction {
+  @cpp.GenerateDeprecatedHeaderClientMethods
+  EchoResponse echo(1: EchoRequest request);
+  EchoResponse echo_2(1: EchoRequest request);
 }

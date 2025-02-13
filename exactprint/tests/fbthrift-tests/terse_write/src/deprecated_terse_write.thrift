@@ -18,6 +18,7 @@
  * limitations under the License.
  */
 
+include "thrift/annotation/cpp.thrift"
 include "thrift/annotation/thrift.thrift"
 
 @thrift.Experimental
@@ -29,6 +30,7 @@ enum MyEnum {
 }
 
 struct MyStruct {}
+union MyUnion {}
 
 @thrift.TerseWrite
 struct StructLevelTerseStruct {
@@ -46,6 +48,7 @@ struct StructLevelTerseStruct {
   12: set<i16> set_field;
   13: map<i16, i16> map_field;
   14: MyStruct struct_field;
+  15: MyUnion union_field;
 }
 
 struct FieldLevelTerseStruct {
@@ -80,18 +83,106 @@ struct FieldLevelTerseStruct {
   14: MyStruct terse_struct_field;
 
   // non-terse-write fields
+  @cpp.DeprecatedTerseWrite
   15: bool bool_field;
+  @cpp.DeprecatedTerseWrite
   16: byte byte_field;
+  @cpp.DeprecatedTerseWrite
   17: i16 short_field;
+  @cpp.DeprecatedTerseWrite
   18: i32 int_field;
+  @cpp.DeprecatedTerseWrite
   19: i64 long_field;
+  @cpp.DeprecatedTerseWrite
   20: float float_field;
+  @cpp.DeprecatedTerseWrite
   21: double double_field;
+  @cpp.DeprecatedTerseWrite
   22: string string_field;
+  @cpp.DeprecatedTerseWrite
   23: binary binary_field;
+  @cpp.DeprecatedTerseWrite
   24: MyEnum enum_field;
+  @cpp.DeprecatedTerseWrite
   25: list<i16> list_field;
+  @cpp.DeprecatedTerseWrite
   26: set<i16> set_field;
+  @cpp.DeprecatedTerseWrite
   27: map<i16, i16> map_field;
   28: MyStruct struct_field;
+  29: MyUnion union_field;
+  @cpp.DeprecatedTerseWrite
+  @cpp.Type{name = "std::unique_ptr<folly::IOBuf>"}
+  30: byte iobuf_ptr_field;
+}
+
+struct CppRefStructFields {
+  @cpp.AllowLegacyNonOptionalRef
+  @cpp.DeprecatedTerseWrite
+  @cpp.AllowLegacyDeprecatedTerseWritesRef
+  @cpp.Ref{type = cpp.RefType.Unique}
+  1: i32 primitive_ref_field;
+  @cpp.AllowLegacyNonOptionalRef
+  @cpp.DeprecatedTerseWrite
+  @cpp.AllowLegacyDeprecatedTerseWritesRef
+  @cpp.Ref{type = cpp.RefType.Unique}
+  2: MyStruct struct_ref_field;
+}
+
+struct DeprecatedTerseWriteWithCustomDefault {
+  @cpp.DeprecatedTerseWrite
+  1: bool bool_field = true;
+  @cpp.DeprecatedTerseWrite
+  2: byte byte_field = 42;
+  @cpp.DeprecatedTerseWrite
+  3: i16 short_field = 42;
+  @cpp.DeprecatedTerseWrite
+  4: i32 int_field = 42;
+  @cpp.DeprecatedTerseWrite
+  5: i64 long_field = 42;
+  @cpp.DeprecatedTerseWrite
+  6: float float_field = 42.0;
+  @cpp.DeprecatedTerseWrite
+  7: double double_field = 42.0;
+  @cpp.DeprecatedTerseWrite
+  8: string string_field = "hello";
+  @cpp.DeprecatedTerseWrite
+  9: binary binary_field = "world";
+  @cpp.DeprecatedTerseWrite
+  10: MyEnum enum_field = MyEnum.ME1;
+  @cpp.DeprecatedTerseWrite
+  11: list<i16> list_field = [1];
+  @cpp.DeprecatedTerseWrite
+  12: set<i16> set_field = [1];
+  @cpp.DeprecatedTerseWrite
+  13: map<i16, i16> map_field = {1: 1};
+}
+
+struct DeprecatedTerseWriteWithRedundantCustomDefault {
+  @cpp.DeprecatedTerseWrite
+  1: bool bool_field = false;
+  @cpp.DeprecatedTerseWrite
+  2: byte byte_field = 0;
+  @cpp.DeprecatedTerseWrite
+  3: i16 short_field = 0;
+  @cpp.DeprecatedTerseWrite
+  4: i32 int_field = 0;
+  @cpp.DeprecatedTerseWrite
+  5: i64 long_field = 0;
+  @cpp.DeprecatedTerseWrite
+  6: float float_field = 0.0;
+  @cpp.DeprecatedTerseWrite
+  7: double double_field = 0.0;
+  @cpp.DeprecatedTerseWrite
+  8: string string_field = "";
+  @cpp.DeprecatedTerseWrite
+  9: binary binary_field = "";
+  @cpp.DeprecatedTerseWrite
+  10: MyEnum enum_field = MyEnum.ME0;
+  @cpp.DeprecatedTerseWrite
+  11: list<i16> list_field = [];
+  @cpp.DeprecatedTerseWrite
+  12: set<i16> set_field = [];
+  @cpp.DeprecatedTerseWrite
+  13: map<i16, i16> map_field = {};
 }

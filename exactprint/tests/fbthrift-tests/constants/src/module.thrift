@@ -54,6 +54,7 @@ enum Company {
   WHATSAPP = 1,
   OCULUS = 2,
   INSTAGRAM = 3,
+  __FRIEND__FEED = 4,
 }
 
 typedef Company MyCompany
@@ -74,6 +75,7 @@ typedef map<string, string> MyMapIdentifier
 const MyStringIdentifier foo = "foo";
 const MyIntIdentifier bar = 42;
 const MyMapIdentifier mymap = {"keys": "values"};
+const list<Company> my_apps = [Company.FACEBOOK, Company.__FRIEND__FEED];
 
 const Internship instagram = {
   "weeks": 12,
@@ -235,6 +237,8 @@ const list<string> escaped_strings = [
   "zzz\xc2\xa6yyy",
 ];
 
+const list<string> unicode_list = ["Bulgaria", "Benin", "Saint Barthélemy"];
+
 const bool false_c = false;
 const bool true_c = true;
 const byte zero_byte = 0;
@@ -251,6 +255,7 @@ const map<i32, i32> empty_int_int_map = {};
 const map<i32, string> empty_int_string_map = {};
 const map<string, i32> empty_string_int_map = {};
 const map<string, string> empty_string_string_map = {};
+const map<string, string> unicode_map = {"BG": "Bulgaria", "BH": "Bahrain", "BÉ": "Saint Barthélemy"};
 
 const i64 maxIntDec = 9223372036854775807;
 const i64 maxIntOct = 0777777777777777777777;

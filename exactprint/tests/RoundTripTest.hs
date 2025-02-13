@@ -31,12 +31,14 @@ failingTests :: [FilePath]
 failingTests =
   [ "common/hs/thrift/exactprint/tests/fbthrift-tests/basic/src/module.thrift"
   , "common/hs/thrift/exactprint/tests/fbthrift-tests/basic-annotations/src/module.thrift"
+  , "common/hs/thrift/exactprint/tests/fbthrift-tests/basic-enum/src/module.thrift"
   , "common/hs/thrift/exactprint/tests/fbthrift-tests/constants/src/module.thrift"
   , "common/hs/thrift/exactprint/tests/fbthrift-tests/exceptions/src/module.thrift"
   , "common/hs/thrift/exactprint/tests/fbthrift-tests/fatal/src/module.thrift"
   , "common/hs/thrift/exactprint/tests/fbthrift-tests/from_map_construct/src/module.thrift"
   , "common/hs/thrift/exactprint/tests/fbthrift-tests/hack-const-collections/src/module.thrift"
   , "common/hs/thrift/exactprint/tests/fbthrift-tests/interactions/src/module.thrift"
+  , "common/hs/thrift/exactprint/tests/fbthrift-tests/interactions/src/shared.thrift"
   , "common/hs/thrift/exactprint/tests/fbthrift-tests/json_experimental/src/ThriftdocTest.thrift"
   , "common/hs/thrift/exactprint/tests/fbthrift-tests/map_construct/src/module.thrift"
   , "common/hs/thrift/exactprint/tests/fbthrift-tests/patch/src/module.thrift"
@@ -52,6 +54,7 @@ failingTests =
   , "common/hs/thrift/exactprint/tests/fbthrift-tests/sink/src/module.thrift"
   , "common/hs/thrift/exactprint/tests/fbthrift-tests/split/src/module.thrift"
   , "common/hs/thrift/exactprint/tests/fbthrift-tests/stream/src/module.thrift"
+  , "common/hs/thrift/exactprint/tests/fbthrift-tests/sync-methods-return-try/src/module.thrift"
   , "common/hs/thrift/exactprint/tests/fbthrift-tests/visitation/src/module.thrift"
   ]
 

@@ -187,6 +187,7 @@ struct ComposeStruct {
   2: AnnoyingEnum renamed_;
   3: PrimitiveStruct primitive;
   @cpp.Ref{type = cpp.RefType.Shared}
+  @cpp.AllowLegacyNonOptionalRef
   4: ListAlias aliased;
   6: thrift_dep.DepStruct xstruct;
   5: thrift_dep.DepEnum xenum;
@@ -204,8 +205,18 @@ union Onion {
   6: set<i64> intSet;
   4: string myString;
   @cpp.Ref{type = cpp.RefType.Shared}
+  @cpp.AllowLegacyNonOptionalRef
   8: list<double> doubleList;
   @cpp.Ref{type = cpp.RefType.Unique}
+  @cpp.AllowLegacyNonOptionalRef
   9: map<binary, string> strMap;
   10: id.ProtocolId adapted_int;
+}
+
+union SomeBinary {
+  1: IOBuf iobuf;
+  2: IOBufPtr iobuf_ptr;
+  @cpp.Ref{type = cpp.RefType.Unique}
+  @cpp.AllowLegacyNonOptionalRef
+  3: IOBuf iobufRef;
 }

@@ -2,14 +2,6 @@
 // generated-by : fbcode/common/hs/thrift/exactprint/tests/sync-fbthrift-tests.sh
 // source: thrift/compiler/test/fixtures/*
 // @generated
-// THIS FILE IS COPIED FROM FBTHRIFT, DO NOT MODIFY ITS CONTENTS DIRECTLY
-// generated-by : fbcode/common/hs/thrift/exactprint/tests/sync-fbthrift-tests.sh
-// source: thrift/compiler/test/fixtures/*
-// @generated
-// THIS FILE IS COPIED FROM FBTHRIFT, DO NOT MODIFY ITS CONTENTS DIRECTLY
-// generated-by : fbcode/common/hs/thrift/exactprint/tests/sync-fbthrift-tests.sh
-// source: thrift/compiler/test/fixtures/*
-// @generated
 /*
  * Copyright (c) Meta Platforms, Inc. and affiliates.
  *
@@ -26,19 +18,24 @@
  * limitations under the License.
  */
 
-namespace hack foo.hack_ns
+package "facebook.com/thrift/compiler/test/fixtures/default_values_rectification"
 
-enum Status {
-  Unknown = 0,
-}
+struct EmptyStruct {}
 
 struct TestStruct {
-  1: string str_value;
+  1: i32 unqualified_int_field = 0;
+
+  2: bool unqualified_bool_field = false;
+
+  3: list<i32> unqualified_list_field = [];
+
+  4: EmptyStruct unqualified_struct_field = {};
+
+  5: optional i32 optional_int_field = 42;
+
+  6: optional bool optional_bool_field = true;
+
+  7: optional list<i32> optional_list_field = [1, 2];
+
+  8: optional EmptyStruct optional_struct_field = {};
 }
-
-service FooHackService {
-}
-
-exception FooException {}
-
-typedef FooException ExTypedef

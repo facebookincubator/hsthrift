@@ -18,27 +18,16 @@
  * limitations under the License.
  */
 
-cpp_include "folly/sorted_vector_types.h"
-
-namespace cpp2 a.different.ns
-
 include "thrift/annotation/cpp.thrift"
+include "thrift/annotation/thrift.thrift"
 
-typedef i64 IncludedInt64
+@cpp.UseOpEncode
+package "facebook.com/thrift/compiler/test"
 
-const i64 IncludedConstant = 42;
-
-enum AnEnum {
-  FIELDA = 2,
-  FIELDB = 4,
-}
-
-struct AStruct {
-  1: i32 FieldA;
-}
-
-struct AStructB {
-  @cpp.Ref{type = cpp.RefType.Shared}
-  @cpp.AllowLegacyNonOptionalRef
-  1: AStruct FieldA;
+struct MyStruct {
+    1: i32 def_field;
+    2: optional i32 opt_field;
+    3: required i32 req_field;
+    @thrift.TerseWrite
+    4: i32 terse_field;
 }
