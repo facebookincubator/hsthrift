@@ -140,8 +140,7 @@ void ChannelWrapper::sendRequestImpl(
             envelope.methodName,
             std::move(request),
             std::move(header),
-            std::move(callback),
-            /* frameworkMetadata */ nullptr);
+            std::move(callback));
         break;
       case ChannelWrapper::RequestDirection::NO_RESPONSE:
         client->get()->sendRequestNoResponse(
@@ -149,8 +148,7 @@ void ChannelWrapper::sendRequestImpl(
             envelope.methodName,
             std::move(request),
             std::move(header),
-            std::move(callback),
-            /* frameworkMetadata */ nullptr);
+            std::move(callback));
         break;
     }
   });
