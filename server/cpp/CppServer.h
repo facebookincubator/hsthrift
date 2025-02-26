@@ -8,8 +8,6 @@
 
 #pragma once
 
-#include <unordered_set>
-
 #include <thrift/lib/cpp2/async/AsyncProcessor.h>
 
 #include "cpp/HaskellProcessor.h"

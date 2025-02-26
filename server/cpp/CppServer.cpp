@@ -14,7 +14,6 @@
 #include <folly/Memory.h>
 #include <glog/logging.h>
 
-#include <thrift/lib/cpp2/async/AsyncProcessor.h>
 #include <thrift/lib/cpp2/server/ThriftServer.h>
 
 #include "cpp/Destructible.h"
