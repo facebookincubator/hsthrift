@@ -20,6 +20,10 @@ description:
     the server-side HTTP implementation, and http-client for
     the client-side implementation.
     .
+    This transport is only compatible with itself. In particular, it
+    is *not* compatible with fbthrift or apache-thrift clients and
+    servers.
+    .
     NOTE: for build instructions and documentation, see
     https://github.com/facebookincubator/hsthrift
 

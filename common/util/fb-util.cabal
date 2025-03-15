@@ -74,6 +74,9 @@ flag opt
 flag clang
      default: False
 
+flag folly
+     default: False
+
 library
     import: fb-haskell, fb-cpp
 
@@ -87,20 +90,6 @@ library
         Control.Trace.VLog
         Data.MovingAverageRateLimiter
         Data.RateLimiterMap
-        Foreign.CPP.Addressable
-        Foreign.CPP.Dynamic
-        Foreign.CPP.HsStruct
-        Foreign.CPP.HsStruct.HsArray
-        Foreign.CPP.HsStruct.HsOption
-        Foreign.CPP.HsStruct.HsSet
-        Foreign.CPP.HsStruct.HsStdTuple
-        Foreign.CPP.HsStruct.HsMap
-        Foreign.CPP.HsStruct.HsStdVariant
-        Foreign.CPP.HsStruct.Types
-        Foreign.CPP.HsStruct.Unsafe
-        Foreign.CPP.HsStruct.Utils
-        Foreign.CPP.Marshallable
-        Foreign.CPP.Marshallable.TH
         Util.ASan
         Util.Async
         Util.Aeson
@@ -120,8 +109,6 @@ library
         -- Util.Dll
         Util.Encoding
         Util.Err
-        Util.EventBase
-        Util.Executor
         Util.Fd
         Util.FFI
         Util.FilePath
@@ -132,7 +119,6 @@ library
         Util.HUnit
         Util.HashMap.Strict
         Util.IO
-        Util.IOBuf
         Util.JSON.Pretty
         Util.Lens
         Util.Linter
@@ -167,13 +153,8 @@ library
         Util.WBVar
 
     cxx-sources:
-        cpp/cdynamic.cpp
         cpp/ffi.cpp
         cpp/logging.cpp
-        cpp/HsStruct.cpp
-        cpp/IOBuf.cpp
-        cpp/EventBaseDataplane.cpp
-        cpp/Executor.cpp
         Util/AsanAlloc.cpp
         -- Util/GFlags.cpp
 
@@ -250,8 +231,65 @@ library
     -- by ghc, because we depend on a Haskell package (mangle).
     hsc2hs-options: --cc=g++ --lflag=-lstdc++ --cflag=-D__HSC2HS__=1 --cflag=-std=c++17
 
-    pkgconfig-depends: libfolly, libglog, libevent, fmt, gflags
-    extra-libraries: double-conversion
+    pkgconfig-depends: libglog, libevent, fmt, gflags
+    if flag(folly)
+        extra-libraries: double-conversion
+    else
+        pkgconfig-depends: double-conversion
+
+-- Library modules that depend on folly
+library folly
+    import: fb-haskell, fb-cpp
+    visibility: public
+    if !flag(folly)
+       buildable: False
+
+    exposed-modules:
+        Foreign.CPP.Dynamic
+        Util.EventBase
+        Util.Executor
+        Util.IOBuf
+
+    cxx-sources:
+        cpp/cdynamic.cpp
+        cpp/EventBaseDataplane.cpp
+        cpp/Executor.cpp
+        cpp/HsStruct.cpp
+        cpp/IOBuf.cpp
+
+    if flag(folly)
+        pkgconfig-depends: libfolly
+
+-- HsStruct libraries for easy FFI marshalling between Haskell & C++
+-- (requires folly).
+library hs-struct
+    import: fb-haskell, fb-cpp
+    visibility: public
+    if !flag(folly)
+       buildable: False
+
+    exposed-modules:
+        Foreign.CPP.Addressable
+        Foreign.CPP.HsStruct
+        Foreign.CPP.HsStruct.HsArray
+        Foreign.CPP.HsStruct.HsOption
+        Foreign.CPP.HsStruct.HsSet
+        Foreign.CPP.HsStruct.HsStdTuple
+        Foreign.CPP.HsStruct.HsMap
+        Foreign.CPP.HsStruct.HsStdVariant
+        Foreign.CPP.HsStruct.Unsafe
+        Foreign.CPP.HsStruct.Types
+        Foreign.CPP.HsStruct.Utils
+        Foreign.CPP.Marshallable
+        Foreign.CPP.Marshallable.TH
+
+    cxx-sources:
+        cpp/HsStruct.cpp
+
+    pkgconfig-depends: libglog
+
+    if flag(folly)
+        pkgconfig-depends: libfolly
 
 common test-common
   extra-libraries: stdc++
@@ -317,6 +355,9 @@ test-suite iobuf
   main-is: IOBufTest.hs
   ghc-options: -main-is IOBufTest
   cxx-sources: tests/IOBufTest.cpp
+  build-depends: folly
+  if !flag(folly)
+     buildable: False
 test-suite alloc-limit
   import: fb-haskell, fb-cpp, test-common
   type: exitcode-stdio-1.0
@@ -372,6 +413,9 @@ test-suite exception
   type: exitcode-stdio-1.0
   main-is: ExceptionTest.hs
   ghc-options: -main-is ExceptionTest
+  build-depends: folly
+  if !flag(folly)
+     buildable: False
 test-suite control-exception
   import: fb-haskell, fb-cpp, test-common
   type: exitcode-stdio-1.0
@@ -428,14 +472,19 @@ test-suite dynamic
   main-is: DynamicTest.hs
   cxx-sources: tests/DynamicHelper.cpp
   ghc-options: -main-is DynamicTest
-test-suite hs-struct
+  build-depends: folly
+  if !flag(folly)
+     buildable: False
+test-suite test-hs-struct
   import: fb-haskell, fb-cpp, test-common
   type: exitcode-stdio-1.0
   main-is: HsStructTest.hs
   other-modules: HsStructTestTypes
   cxx-sources: tests/HsStructHelper.cpp
   ghc-options: -main-is HsStructTest
-  build-depends: extra
+  build-depends: hs-struct, extra
+  if !flag(folly)
+     buildable: False
 
 -- TODO: commented out because of a linker problem
 -- test-suite gflags
