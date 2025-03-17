@@ -8,9 +8,9 @@
 
 hs_include "if/hs_test_instances.hs"
 
-typedef i64 X (hs.newtype, rust.newtype)
+typedef i64 X (hs.newtype)
 typedef X Y
-typedef Y Z (hs.newtype, rust.newtype)
+typedef Y Z (hs.newtype)
 
 struct Foo {
   5: i32 bar;
