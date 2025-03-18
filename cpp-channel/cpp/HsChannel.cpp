@@ -156,11 +156,16 @@ void ChannelWrapper::sendRequestImpl(
   });
 }
 
-static_assert((int)Priority::HighImportant == (int)HIGH_IMPORTANT);
-static_assert((int)Priority::High == (int)HIGH);
-static_assert((int)Priority::Important == (int)IMPORTANT);
-static_assert((int)Priority::NormalPriority == (int)NORMAL);
-static_assert((int)Priority::BestEffort == (int)BEST_EFFORT);
+static_assert(
+    static_cast<int>(Priority::HighImportant) ==
+    static_cast<int>(HIGH_IMPORTANT));
+static_assert(static_cast<int>(Priority::High) == static_cast<int>(HIGH));
+static_assert(
+    static_cast<int>(Priority::Important) == static_cast<int>(IMPORTANT));
+static_assert(
+    static_cast<int>(Priority::NormalPriority) == static_cast<int>(NORMAL));
+static_assert(
+    static_cast<int>(Priority::BestEffort) == static_cast<int>(BEST_EFFORT));
 
 apache::thrift::RpcOptions getRpcOptions(
     uint8_t* rpcOptionsPtr,
