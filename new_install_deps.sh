@@ -14,7 +14,7 @@ THREADS=4
 # These are required source deps not satisifiable with common package systems
 # in topological order. You can pass additional deps on the command line.
 #
-BASE_DEPS="fmt folly"
+BASE_DEPS="fmt fast_float folly"
 FBTHRIFT_DEPS="fizz wangle mvfst fbthrift"
 EXTRA_DEPS=""
 
