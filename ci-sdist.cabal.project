@@ -4,6 +4,9 @@ packages: */*.cabal
 
 allow-newer: haskell-names:aeson, haskell-names:bytestring
 
+package fb-util
+  flags: +folly
+
 tests: true
 -- IPV6 is disabled in the Github Actions environment,
 -- so we make sure the appropriate tests in those packages
