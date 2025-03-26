@@ -15,6 +15,9 @@ allow-newer: haskell-names:aeson, haskell-names:bytestring
 
 tests: true
 
+package fb-util
+  flags: +folly
+
 -- IPV6 is disabled in the Github Actions environment,
 -- so we make sure the appropriate tests in those packages
 -- turn to IPV4.

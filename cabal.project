@@ -14,4 +14,7 @@ packages:
 
 allow-newer: haskell-names:aeson, haskell-names:bytestring
 
+package fb-util
+  flags: +folly
+
 tests: true
