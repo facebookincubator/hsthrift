@@ -106,9 +106,6 @@ struct TWrapped {
   2: binary fieldB;
 }
 
-@cpp.Type{name = "::thrift::test::python_capi::CppWrapperT"}
-typedef TWrapped (cpp.indirection) CppWrapper
-
 typedef list<TWrapped> ListOfWrapped
 
 // Should not be marshaled
