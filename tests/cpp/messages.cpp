@@ -8,6 +8,7 @@
 
 #include <if/gen-cpp2/hs_test_types.h>
 #include <if/gen-cpp2/hs_test_types_custom_protocol.h>
+#include <folly/ExceptionString.h>
 #include <folly/io/IOBuf.h>
 #include <folly/io/IOBufQueue.h>
 #include <thrift/lib/cpp2/protocol/BinaryProtocol.h>
