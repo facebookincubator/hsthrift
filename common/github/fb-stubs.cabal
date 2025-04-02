@@ -16,8 +16,10 @@ category:            Utilities
 build-type:          Simple
 
 description:
+    Stubs for dependencies of test code, used by hsthrift and Glean.
+
     NOTE: for build instructions, see
-    https://github.com/facebookincubator/hsthrift
+    <https://github.com/facebookincubator/hsthrift>
 
 source-repository head
     type: git

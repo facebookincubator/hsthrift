@@ -14,16 +14,16 @@ maintainer:          hsthrift-team@fb.com
 copyright:           (c) Facebook, All Rights Reserved
 category:            Thrift
 build-type:          Simple
-extra-source-files:  CHANGELOG.md,
-                     if/*.thrift,
+extra-source-files:  if/*.thrift,
                      test/if/*.thrift
+extra-doc-files:     CHANGELOG.md
 
 description:
     Support for building client and server applications that
     communicate using the Thrift protocols.
-    .
+
     NOTE: for build instructions and documentation, see
-    https://github.com/facebookincubator/hsthrift
+    <https://github.com/facebookincubator/hsthrift>
 
 source-repository head
     type: git
@@ -91,29 +91,34 @@ library
     extra-libraries: stdc++
 
     build-depends:
-        ghc-prim,
-        some,
-        containers,
-        deepseq,
-        STMonadTrans,
-        data-default,
-        fb-util,
-        bytestring-lexing,
-        scientific,
-        ghc,
-        aeson >= 1,
-        word8,
-        aeson-pretty,
-        text-show,
-        base >=4.11.1 && <4.17,
+        QuickCheck >= 2.14.3 && < 2.15,
+        STMonadTrans >= 0.4.8 && < 0.5,
+        aeson >= 1 && < 2.1,
+        aeson-pretty >= 0.8.10 && < 0.9,
         async ^>= 2.2,
-        transformers ^>=0.5.5.0,
+        base >=4.11.1 && <4.17,
         bytestring >=0.10.8.2 && <0.12,
-        network,
-        text ^>=1.2.3.0,
-        unordered-containers ^>=0.2.9.0,
+        bytestring-lexing >= 0.5.0 && < 0.6,
+        containers >= 0.6 && < 0.7,
+        data-default >= 0.8.0 && < 0.9,
+        deepseq >= 1.4.4 && < 1.5,
+        fb-stubs >= 0.1.0 && < 0.2,
+        fb-util >= 0.1.0 && < 0.2,
+        filepath >= 1.4.2 && < 1.5,
+        ghc >= 8.6.5 && < 9.3,
+        ghc-prim >= 0.5 && < 0.9,
         hashable >=1.2.7.0 && <1.5,
-        vector >=0.12.0.1 && < 0.14
+        hspec >= 2.11.11 && < 2.12,
+        hspec-contrib >= 0.5.2 && < 0.6,
+        network >= 3.2.7 && < 3.3,
+        scientific >= 0.3.7 && < 0.4,
+        some >= 1.0.6 && < 1.1,
+        text >= 1.2.3 && < 1.3,
+        text-show >= 3.10.5 && < 3.11,
+        transformers ^>=0.5.5.0,
+        unordered-containers >= 0.2.9.0 && < 0.3,
+        vector >= 0.12.0.1 && < 0.14,
+        word8 >= 0.1.3 && < 0.2
 
     if flag(tests_use_ipv4)
       -- for SocketChannel.hs
@@ -175,6 +180,7 @@ common test-deps
 -- This is used by local tests only
 library test-lib
   import: fb-haskell, test-deps
+  visibility: private
   hs-source-dirs:
         test/lib,
         test/gen-hs2,
