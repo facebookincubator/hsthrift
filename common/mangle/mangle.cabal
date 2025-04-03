@@ -3,7 +3,7 @@ cabal-version:       3.6
 -- Copyright (c) Facebook, Inc. and its affiliates.
 
 name:                mangle
-version:             0.1.0.0
+version:             0.1.0.1
 synopsis:            Convert C++ type signatures to their mangled form
 homepage:            https://github.com/facebookincubator/hsthrift
 bug-reports:         https://github.com/facebookincubator/hsthrift/issues
@@ -45,10 +45,10 @@ library
   exposed-modules:     Mangle, Mangle.TH
   default-extensions:  LambdaCase, GeneralizedNewtypeDeriving
   build-depends:
-      base >=4.11.1.0 && <4.17,
+      base >=4.11.1.0 && <4.18,
       containers >=0.5.11.0 && <0.7,
       parsec ^>=3.1.13.0,
-      template-haskell >=2.13 && <2.19
+      template-haskell >=2.13 && <2.20
   default-language:    Haskell2010
 
 executable mangle
@@ -56,10 +56,10 @@ executable mangle
   other-modules:       Mangle
   default-extensions:  LambdaCase, GeneralizedNewtypeDeriving
   build-depends:
-      base >=4.11.1 && <4.17,
+      base >=4.11.1 && <4.18,
       containers >=0.5.11 && <0.7,
       parsec ^>=3.1.13.0,
-      template-haskell >=2.13 && <2.19
+      template-haskell >=2.13 && <2.20
   default-language:    Haskell2010
 
 test-suite mangle-test
