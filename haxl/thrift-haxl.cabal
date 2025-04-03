@@ -3,7 +3,7 @@ cabal-version:       3.6
 -- Copyright (c) Facebook, Inc. and its affiliates.
 
 name:                thrift-haxl
-version:             0.1.0.0
+version:             0.1.0.1
 synopsis:            Support for using Haxl with Thrift services
 homepage:            https://github.com/facebookincubator/hsthrift
 bug-reports:         https://github.com/facebookincubator/hsthrift/issues
@@ -68,4 +68,4 @@ library
         text ^>=1.2.3.0,
         transformers ^>=0.5.5.0,
         unordered-containers ^>=0.2.9.0,
-        base >=4.11.1 && <4.17,
+        base >=4.11.1 && <4.18,
