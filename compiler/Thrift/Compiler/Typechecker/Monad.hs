@@ -66,12 +66,12 @@ instance Alternative (TC l) where
   -- first parater of '<|>'.
   empty = TC $ lift (Left [])
   t1 <|> t2 = TC $ do
-  env <- ask
-  lift $ case runTypechecker env t1 of
-    Left err1 -> case runTypechecker env t2 of
-      Left err2 -> Left (err1 <> err2)
-      x2@Right{} -> x2
-    x1@Right{} -> x1
+    env <- ask
+    lift $ case runTypechecker env t1 of
+      Left err1 -> case runTypechecker env t2 of
+        Left err2 -> Left (err1 <> err2)
+        x2@Right{} -> x2
+      x1@Right{} -> x1
 
 -- | See T45688659 for the weird tale of how badly-typed keys are getting
 -- ignored.  Try to be similar here, in weird mode, by dropping errors.

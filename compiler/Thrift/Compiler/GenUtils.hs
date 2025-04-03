@@ -54,7 +54,7 @@ genImportModule (QImport modName modAs) = ImportDecl
   , importSrc       = False
   , importSafe      = False
   , importPkg       = Nothing
-  , importAs        = Just . ModuleName () $ Text.unpack modAs
+  , importAs        = Just $ ModuleName () $ Text.unpack modAs
   , importSpecs     = Nothing
   }
 genImportModule (SymImport modName symbols) = ImportDecl

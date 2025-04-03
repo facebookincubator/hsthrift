@@ -293,12 +293,12 @@ genBuildField prev (Field{..} : fs) = flip genBuildField fs $
         Case () (var ("__field__" <> fieldName))
         [ Alt () (PApp () (qualSym "Prelude" "Just") [ pvar "_val" ])
           (UnGuardedRhs () $
-           (infixApp ":"
+           infixApp ":"
             (genField $ var "_val")
-            e))
+            e)
           Nothing
         , Alt () (PApp () (qualSym "Prelude" "Nothing") [])
-          (UnGuardedRhs () $ e)
+          (UnGuardedRhs () e)
           Nothing
         ]
     Optional{} ->

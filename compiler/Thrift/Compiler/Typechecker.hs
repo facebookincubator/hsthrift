@@ -739,7 +739,7 @@ resolveConst Const{..} = do
 resolveService :: Typecheckable l => Parsed Service -> Typechecked l Service
 resolveService s@Service{..} = do
   (super, stmts, sAnns)
-    <- (,,) <$> sequence (resolveSuper <$> serviceSuper)
+    <- (,,) <$> mapM resolveSuper serviceSuper
             <*> traverse resolveStmt serviceStmts
             <*> resolveStructuredAnns serviceSAnns
   Env{..} <- ask
@@ -766,7 +766,7 @@ resolveStmt (PerformsStmt Performs{..}) = do
 resolveInteraction :: Typecheckable l => Parsed Interaction -> Typechecked l Interaction
 resolveInteraction Interaction{..} = do
   (super, funs, sAnns)
-    <- (,,) <$> sequence (resolveSuper <$> interactionSuper)
+    <- (,,) <$> mapM resolveSuper interactionSuper
             <*> traverse resolveFunction interactionFunctions
             <*> resolveStructuredAnns interactionSAnns
   pure Interaction
