@@ -16,7 +16,8 @@ module Thrift.Compiler.GenUtils
   , intLit, stringLit, intP, stringP, listE
   , deriving_
   , genType, isBaseType, genThriftType, genConst, typeToDefault
-  , qualifyType, qualifyField, genConstructor
+  , qualifyType, qualifyField, qualifyResolvedType
+  , genConstructor
   , Import(..)
   , protocolFun
   , genCALL, genREPLY, genEXCEPTION, genONEWAY
@@ -424,6 +425,12 @@ qualifyType q (TTypedef name ty loc) =
   TTypedef (qualifyName q name) (qualifyType q ty) loc
 qualifyType q (TNewtype name ty loc) =
   TNewtype (qualifyName q name) (qualifyType q ty) loc
+
+qualifySomeType :: Text -> Some HSType -> Some HSType
+qualifySomeType q ty = mapSome (qualifyType q) ty
+
+qualifyResolvedType :: Text -> Maybe (Some HSType) -> Maybe (Some HSType)
+qualifyResolvedType q ty = fmap (qualifySomeType q) ty
 
 qualifyField
   :: Text -> Field u 'Resolved Haskell a -> Field u 'Resolved Haskell a

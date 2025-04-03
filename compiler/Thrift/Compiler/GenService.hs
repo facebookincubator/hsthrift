@@ -374,7 +374,8 @@ genRespWriter s@Service{..} =
             , Alt () (PApp () (qualSym "Prelude" "Right") [ pvar "_result" ])
               (UnGuardedRhs () $ genRespTup genREPLY
                 (protocolFun "genStruct" `app`
-                  HS.List () (genResp funResolvedType))
+                  HS.List ()
+                    (genResp $ qualifyResolvedType "Types" funResolvedType))
                 Nothing)
               Nothing
             ])
