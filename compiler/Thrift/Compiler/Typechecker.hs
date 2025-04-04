@@ -400,8 +400,12 @@ filterDecls reqSymbols symbolMap =
         filterEnumValue ev = ev { evSAnns = []}
     filterDecl (D_Const c, syms, smap) _ =
       (D_Const c {constSAnns=[]}, syms, smap)
+
     filterField field = field {fieldSAnns=[]}
+
+    filterAlt :: UnionAlt 'Unresolved l a -> UnionAlt 'Unresolved l a
     filterAlt alt = alt {altSAnns=[]}
+
     addSym symbol (syms, smap)
       | Text.null name = (Set.insert symbol syms, smap)
       | otherwise = (syms, Map.insertWith Set.union prefix nameSet smap)
