@@ -68,4 +68,4 @@ library
         text ^>=1.2.3.0,
         transformers >= 0.5.6 && < 0.7,
         unordered-containers ^>=0.2.9.0,
-        base >=4.11.1 && <4.19,
+        base >=4.11.1 && <4.20,
