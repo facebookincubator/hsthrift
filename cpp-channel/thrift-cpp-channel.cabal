@@ -124,7 +124,7 @@ library
         atomic
 
     build-depends:
-        base >=4.11.1 && <4.19,
+        base >=4.11.1 && <4.20,
         thrift-lib,
         fb-util,
         text,

@@ -2,7 +2,7 @@
 
 ## 0.1.0.1 -- YYYY-mm-dd
 
-* Builds with GHC 9.6.x
+* Builds with GHC 9.8.x
 
 ## 0.1.0.0 -- YYYY-mm-dd
 
