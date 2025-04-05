@@ -91,7 +91,7 @@ process proxy seqNum handler postProcess input = do
             <> genMsgEnd proxy
         , Just (toException ex, ClientError)
         , [] )
-    Right (Some cmd) -> processCommand proxy seqNum handler postProcess cmd
+    Right (msgSeqNum, Some cmd) -> processCommand proxy msgSeqNum handler postProcess cmd
   return (response, exc, headers)
 
 processCommand
@@ -125,9 +125,9 @@ processCommand proxy seqNum handler postProcess cmd =
 
 msgParser
   :: (Processor s, Protocol p)
-  => Proxy p -> Parser (Some s)
+  => Proxy p -> Parser (SeqNum, Some s)
 msgParser proxy = do
-  MsgBegin funName msgTy _ <- parseMsgBegin proxy
+  MsgBegin funName msgTy msgSeqNum <- parseMsgBegin proxy
   command <- case msgTy of
     1 -> reqParser proxy funName
     2 -> fail $ Text.unpack $ funName <> " expected call but got reply"
@@ -135,4 +135,4 @@ msgParser proxy = do
     4 -> reqParser proxy funName
     _ -> fail $ Text.unpack $ funName <> ": invalid message type"
   parseMsgEnd proxy
-  return command
+  return (msgSeqNum, command)
