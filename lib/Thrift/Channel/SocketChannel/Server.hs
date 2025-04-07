@@ -154,9 +154,9 @@ withServerIO p mport maxQueuedConns handler postProcess client  = do
             -- a command from it as well, potentially doing this several
             -- times, until either we're done or more input is needed to go
             -- further.
-            Right (Some cmd, leftover) -> do
+            Right ((msgSeqNum, Some cmd), leftover) -> do
               (response, mexc, _headers) <-
-                processCommand p seqNum handler postProcess cmd
+                processCommand p msgSeqNum handler postProcess cmd
               seqNum' <- counter
               case mexc of
                 Just (_exc, _blame) -> do
