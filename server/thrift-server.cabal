@@ -3,7 +3,7 @@ cabal-version:       3.6
 -- Copyright (c) Facebook, Inc. and its affiliates.
 
 name:                thrift-server
-version:             0.1.0.0
+version:             0.1.0.1
 synopsis:            Support for creating Thrift servers in Haskell
 homepage:            https://github.com/facebookincubator/hsthrift
 bug-reports:         https://github.com/facebookincubator/hsthrift/issues
@@ -23,7 +23,7 @@ description:
     communicate using the Thrift protocols.
     .
     NOTE: for build instructions and documentation, see
-    https://github.com/facebookincubator/hsthrift
+    <https://github.com/facebookincubator/hsthrift>
 
 source-repository head
     type: git
@@ -93,9 +93,9 @@ library
       fb-util,
       thrift-lib,
       thrift-cpp-channel,
-      base >=4.11.1 && <4.17,
+      base >=4.11.1 && <4.20,
       text ^>=1.2.3.0,
-      bytestring >=0.10.8.2 && <0.12,
+      bytestring >=0.10.8.2 && <0.13,
       async ^>=2.2.1,
       utf8-string,
       containers

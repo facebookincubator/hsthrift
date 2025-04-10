@@ -44,7 +44,23 @@ The repository contains the following packages:
 * [thrift-cpp-channel](cpp-channel), libraries for Thrift clients (using fbthrift)
 * [thrift-server](server), libraries for Thrift servers (using fbthrift)
 
-# Building and testing
+# Building from Hackage
+
+If you only want to use the HTTP transport (not fbthrift) then you can
+build the packages directly from Hackage; if not, go to the next
+section for instructions to build from the repository. All of the
+packages above are on Hackage except for `thrift-cpp-channel` and
+`thrift-server`.
+
+```
+$ cabal install thrift-compiler thrift-lib thrift-http
+```
+
+aren't on
+Hackage because they depend on fbthrift and can only be built from the
+repository; see the next section.
+
+# Building and testing from the repository
 
 The following instructions assume you want to use `fbthrift`. To omit
 the `fbthrift` dependency and use only the HTTP transport, follow the
