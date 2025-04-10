@@ -14,7 +14,28 @@ maintainer:          hsthrift-team@fb.com
 copyright:           (c) Facebook, All Rights Reserved
 category:            FFI
 build-type:          Simple
-extra-source-files:  CHANGELOG.md
+extra-doc-files:     CHANGELOG.md
+
+description:
+    Converts C++ type signatures to mangled symbol names.
+    This is useful for calling C++ functions via the FFI without using
+    @extern \"C\" { .. }@.
+
+    The library can be used with Template Haskell, so you can call C++
+    code directly from Haskell, e.g.
+
+    @
+    {-# LANGUAGE TemplateHaskell #-}
+    ...
+    import Mangle.TH
+    ...
+    $(mangle
+      "void glog_info(const char*, int, const char*)"
+      [d|
+        foreign import ccall
+          c_glog_info :: CString -> CInt -> CString -> IO ()
+      |])
+    @
 
 source-repository head
     type: git

@@ -28,7 +28,7 @@ description:
     implemented in C++ with the fbthrift infrastructure.
     .
     NOTE: for build instructions and documentation, see
-    https://github.com/facebookincubator/hsthrift
+    <https://github.com/facebookincubator/hsthrift>
 
 source-repository head
     type: git
