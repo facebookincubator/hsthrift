@@ -3,7 +3,7 @@ cabal-version:       3.6
 -- Copyright (c) Facebook, Inc. and its affiliates.
 
 name:                fb-stubs
-version:             0.1.0.0
+version:             0.1.0.1
 synopsis:            Stubs for dependencies of test code
 homepage:            https://github.com/facebookincubator/hsthrift
 bug-reports:         https://github.com/facebookincubator/hsthrift/issues
@@ -16,8 +16,10 @@ category:            Utilities
 build-type:          Simple
 
 description:
+    Stubs for dependencies of test code, used by hsthrift and Glean.
+
     NOTE: for build instructions, see
-    https://github.com/facebookincubator/hsthrift
+    <https://github.com/facebookincubator/hsthrift>
 
 source-repository head
     type: git
@@ -60,5 +62,5 @@ library
         Facebook.Init
 
     build-depends:
-        base >=4.11.1.0 && <4.17,
+        base >=4.11.1.0 && <4.20,
         HUnit ^>= 1.6.1

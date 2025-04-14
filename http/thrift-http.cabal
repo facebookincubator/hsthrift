@@ -3,7 +3,7 @@ cabal-version:       3.6
 -- Copyright (c) Facebook, Inc. and its affiliates.
 
 name:                thrift-http
-version:             0.1.0.0
+version:             0.1.0.1
 synopsis:            Support for Thrift-over-HTTP server and client
 homepage:            https://github.com/facebookincubator/hsthrift
 bug-reports:         https://github.com/facebookincubator/hsthrift/issues
@@ -19,13 +19,13 @@ description:
     using Thrift over an HTTP transport. Uses WAI and Warp as
     the server-side HTTP implementation, and http-client for
     the client-side implementation.
-    .
+
     This transport is only compatible with itself. In particular, it
     is *not* compatible with fbthrift or apache-thrift clients and
     servers.
-    .
+
     NOTE: for build instructions and documentation, see
-    https://github.com/facebookincubator/hsthrift
+    <https://github.com/facebookincubator/hsthrift>
 
 source-repository head
     type: git
@@ -59,8 +59,8 @@ common fb-haskell
         TypeFamilies
         TypeSynonymInstances
         NondecreasingIndentation
-  if flag(opt)
-     ghc-options: -O2
+    if flag(opt)
+       ghc-options: -O2
 
 flag opt
      default: False
@@ -72,20 +72,20 @@ library
       Thrift.Channel.HTTP
 
   build-depends:
-      fb-util,
-      thrift-lib,
-      base >=4.11.1 && <4.17,
+      fb-util >= 0.1.0 && < 0.2,
+      thrift-lib >= 0.1.0 && < 0.2,
+      base >=4.11.1 && <4.20,
       text ^>=1.2.3.0,
-      bytestring >=0.10.8.2 && <0.12,
+      bytestring >=0.10.8.2 && <0.13,
       async ^>=2.2.1,
-      utf8-string,
-      containers,
-      wai,
-      warp,
-      streaming-commons,
-      network,
-      http-client,
-      http-types
+      utf8-string >= 1.0.2 && < 1.1,
+      containers >= 0.6 && < 0.7,
+      wai >= 3.2.4 && < 3.3,
+      warp >= 3.3.30 && < 3.5,
+      streaming-commons >= 0.2.2 && < 0.3,
+      network >= 3.2.7 && < 3.3,
+      http-client >= 0.7.18 && < 0.8,
+      http-types >= 0.12.4 && < 0.13
 
   default-language:    Haskell2010
 
@@ -97,24 +97,26 @@ flag tests_use_ipv4
      manual: True
 
 common test-deps
-  build-depends: aeson,
-                 base,
-                 bytestring,
-                 data-default,
-                 deepseq,
-                 fb-stubs,
-                 fb-util,
-                 hashable,
-                 hspec,
-                 hspec-contrib,
-                 ghc-prim,
-                 HUnit ^>= 1.6.1,
-                 STMonadTrans,
-                 text,
-                 thrift-lib,
-                 thrift-lib:test-helpers,
-                 transformers,
-                 unordered-containers
+  build-depends:
+      base >=4.11.1 && <4.20,
+      aeson >= 2.0.3 && < 2.3,
+      bytestring,
+      data-default >= 0.8.0 && < 0.9,
+      deepseq >= 1.4.4 && < 1.6,
+      fb-stubs >= 0.1.0 && < 0.2,
+      fb-util,
+      hashable >= 1.4.4 && < 1.5,
+      hspec >= 2.11.10 && < 2.12,
+      hspec-contrib >= 0.5.2 && < 0.6,
+      ghc-prim >= 0.5.3 && < 0.12,
+      HUnit ^>= 1.6.1,
+      STMonadTrans >= 0.4.8 && < 0.5,
+      text,
+      thrift-lib,
+      thrift-lib:test-helpers,
+      transformers >= 0.5.6 && < 0.7,
+      unordered-containers >= 0.2.20 && < 0.3
+
   if flag(tests_use_ipv4)
     -- for test/Network.hs
     cpp-options: -DIPV4

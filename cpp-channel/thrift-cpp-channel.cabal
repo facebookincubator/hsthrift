@@ -28,7 +28,7 @@ description:
     implemented in C++ with the fbthrift infrastructure.
     .
     NOTE: for build instructions and documentation, see
-    https://github.com/facebookincubator/hsthrift
+    <https://github.com/facebookincubator/hsthrift>
 
 source-repository head
     type: git
@@ -124,7 +124,7 @@ library
         atomic
 
     build-depends:
-        base >=4.11.1 && <4.17,
+        base >=4.11.1 && <4.20,
         thrift-lib,
         fb-util,
         text,

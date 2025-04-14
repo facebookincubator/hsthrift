@@ -11,7 +11,7 @@ packages:
     haxl/thrift-haxl.cabal
     cpp-channel/thrift-cpp-channel.cabal
 
-allow-newer: haskell-names:aeson, haskell-names:bytestring
+allow-newer: haskell-names:aeson, haskell-names:bytestring, haskell-names:transformers, haskell-names:mtl
 
 tests: true
 

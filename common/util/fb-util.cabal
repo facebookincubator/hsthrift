@@ -3,7 +3,7 @@ cabal-version:       3.6
 -- Copyright (c) Facebook, Inc. and its affiliates.
 
 name:                fb-util
-version:             0.1.0.0
+version:             0.1.0.1
 synopsis:            Various utility libraries
 homepage:            https://github.com/facebookincubator/hsthrift
 bug-reports:         https://github.com/facebookincubator/hsthrift/issues
@@ -14,15 +14,17 @@ maintainer:          hsthrift-team@fb.com
 copyright:           (c) Facebook, All Rights Reserved
 category:            Utilities
 build-type:          Simple
-extra-source-files:  CHANGELOG.md,
-                     cpp/*.h,
+extra-source-files:  cpp/*.h,
                      tests/DynamicHelper.h,
                      tests/HsStructHelper.h,
                      hsc.h
+extra-doc-files:     CHANGELOG.md
 
 description:
+    Utility libraries used by Meta projects, notably hsthrift and Glean.
+
     NOTE: for build instructions, see
-    https://github.com/facebookincubator/hsthrift
+    <https://github.com/facebookincubator/hsthrift>
 
 source-repository head
     type: git
@@ -56,8 +58,8 @@ common fb-haskell
         TypeFamilies
         TypeSynonymInstances
         NondecreasingIndentation
-  if flag(opt)
-     ghc-options: -O2
+    if flag(opt)
+       ghc-options: -O2
 
 common fb-cpp
   cxx-options: -std=c++17
@@ -181,56 +183,57 @@ library
     hs-source-dirs: .
 
     build-depends:
-        atomic-primops,
-        aeson < 2.1,
-        attoparsec,
-        bytestring-lexing,
-        clock,
-        concurrent-extra,
-        exceptions,
-        ghc,
         HUnit ^>= 1.6.1,
-        json,
-        lens,
-        lifted-base,
-        mangle,
-        monad-control,
-        primitive < 0.8,
-        text-show,
-        optparse-applicative,
-        extra,
-        aeson-pretty,
-        either,
-        QuickCheck,
-        scientific,
-        haskell-src-exts,
-        some,
-        stm,
-        base >=4.11.1.0 && <4.17,
-        containers >=0.5.11 && <0.7,
-        text ^>=1.2.3.0,
-        ghci >=8.4.3 && <9.3,
-        binary ^>=0.8.5.1,
-        bytestring >=0.10.8.2 && <0.12,
-        hashable >=1.2.7.0 && <1.5,
-        unordered-containers ^>=0.2.9.0,
-        transformers ^>=0.5.5.0,
-        time >=1.8.0.2 && <1.12,
-        deepseq ^>=1.4.3.0,
-        filepath ^>=1.4.2,
-        async ^>=2.2.1,
-        split ^>=0.2.3.3,
-        directory ^>=1.3.1.5,
-        unix ^>=2.7.2.2,
-        process ^>=1.6.3.0,
-        vector >=0.12.0.1 && <0.14,
-        pretty ^>=1.1.3.6,
-        template-haskell >=2.13 && <2.19,
-        integer-gmp >=1.0.2.0 && <1.2,
-        mtl ^>=2.2.2,
+        QuickCheck >= 2.14.3 && < 2.15,
+        aeson < 2.3,
+        aeson-pretty >= 0.8.10 && < 0.9,
         array ^>=0.5.2.0,
+        async ^>=2.2.1,
+        atomic-primops >= 0.8.8 && < 0.9,
+        attoparsec >= 0.14.4 && < 0.15,
+        attoparsec-aeson >= 2.1 && < 2.3,
+        base >=4.11.1.0 && <4.20,
+        binary ^>=0.8.5.1,
+        bytestring >=0.10.8.2 && <0.13,
+        bytestring-lexing >= 0.5.0 && < 0.6,
+        clock >= 0.8.4 && < 0.9,
+        concurrent-extra >= 0.7.0 && < 0.8,
+        containers >=0.5.11 && <0.7,
+        data-default >= 0.8.0 && < 0.9,
+        deepseq >= 1.4.4 && < 1.6,
+        directory ^>=1.3.1.5,
+        either >= 5.0.2 && < 5.1,
+        exceptions >= 0.10.4 && < 0.11,
+        extra >= 1.8 && < 1.9,
+        filepath ^>=1.4.2,
+        ghc >= 8.6.5 && < 9.9,
+        ghci >=8.6.5 && < 9.9,
+        hashable >=1.2.7.0 && <1.5,
+        haskell-src-exts >= 1.23.1 && < 1.24,
+        integer-gmp >=1.0.2.0 && <1.2,
+        json >= 0.11 && < 0.12,
+        lens >= 5.3.3 && < 5.4,
+        lifted-base >= 0.2.3 && < 0.3,
+        mangle >= 0.1.0 && < 0.2,
+        monad-control >= 1.0.3 && < 1.1,
+        mtl >= 2.2.2 && < 2.4,
+        optparse-applicative >= 0.17 && < 0.19,
+        pretty ^>=1.1.3.6,
         prettyprinter >=1.2.1 && <1.8,
-        data-default,
+        primitive < 0.9,
+        process ^>=1.6.3.0,
+        scientific >= 0.3.7 && < 0.4,
+        some >= 1.0.6 && < 1.1,
+        split ^>=0.2.3.3,
+        stm >= 2.5.0 && < 2.6,
+        template-haskell >=2.13 && <2.22,
+        text ^>=1.2.3.0,
+        text-show >= 3.10.5 && < 3.12,
+        time >=1.8.0.2 && <1.13,
+        transformers >= 0.5.6 && < 0.7,
+        unix >= 2.7.2.2 && < 2.9,
+        unordered-containers ^>=0.2.9.0,
+        vector >=0.12.0.1 && <0.14,
 
     build-tool-depends: hsc2hs:hsc2hs
 

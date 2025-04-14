@@ -2,7 +2,7 @@
 
 packages: */*.cabal
 
-allow-newer: haskell-names:aeson, haskell-names:bytestring
+allow-newer: haskell-names:aeson, haskell-names:bytestring, haskell-names:transformers, haskell-names:mtl
 
 package fb-util
   flags: +folly
