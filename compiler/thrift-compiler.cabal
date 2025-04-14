@@ -23,9 +23,9 @@ extra-source-files:  CHANGELOG.md,
 
 description:
     A compiler from the Thrift Interface Definition Language (IDL) to Haskell.
-    .
+
     NOTE: for build instructions and documentation, see
-    https://github.com/facebookincubator/hsthrift
+    <https://github.com/facebookincubator/hsthrift>
 
 source-repository head
     type: git
@@ -90,17 +90,18 @@ library
         Thrift.Compiler.Plugins.Linter
 
     build-depends:
-        fb-util,
-        aeson,
-        aeson-pretty,
-        array,
-        extra,
-        some,
+        aeson >= 2.0.3 && < 2.1,
+        array >= 0.5.3 && < 0.6,
+        mtl >= 2.2.2 && < 2.3,
+        optparse-applicative >= 0.18.1 && < 0.19,
+        aeson-pretty >= 0.8.10 && < 0.9,
+        either >= 5.0.2 && < 5.1,
+        extra >= 1.8 && < 1.9,
+        fb-util >= 0.1.0 && < 0.2,
+        some >= 1.0.6 && < 1.1,
+        text-show >= 3.10.5 && < 3.11,
         haskell-src-exts >=1.20.3 && <1.24,
-        either,
-        optparse-applicative,
         haskell-names < 0.10,
-        text-show,
         base >=4.11.1 && <4.17,
         async ^>=2.2.1,
         filepath ^>=1.4.2,
@@ -110,15 +111,17 @@ library
         bytestring >=0.10.8.2 && <0.12,
         unordered-containers ^>=0.2.9.0,
         directory ^>=1.3.1.5,
-        pretty ^>=1.1.3.6,
-        mtl
+        pretty ^>=1.1.3.6
     build-tool-depends: alex:alex, happy:happy
 
 executable thrift-compiler
     import: fb-haskell
     hs-source-dirs: main
     main-is: Main.hs
-    build-depends: base, optparse-applicative, thrift-compiler
+    build-depends:
+        base >=4.11.1 && <4.17,
+        optparse-applicative >= 0.18.1 && < 0.19,
+        thrift-compiler
 
 test-suite thrift-compiler-tests
   import: fb-haskell
