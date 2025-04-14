@@ -203,6 +203,12 @@ struct HsVariant {
     return VectorType();
   }
 
+  static VectorType createVector(size_t size) {
+    auto vec = VectorType();
+    vec.reserve(size);
+    return vec;
+  }
+
   static int64_t vectorSize(const VectorType& vec) {
     return vec.size();
   }
@@ -236,6 +242,12 @@ struct HsVariant {
   // builders
   static SetType createSet() {
     return SetType();
+  }
+
+  static SetType createSet(size_t size) {
+    auto set = SetType();
+    set.reserve(size);
+    return set;
   }
 
   static int64_t setSize(const SetType& set) {
