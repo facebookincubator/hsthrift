@@ -20,7 +20,12 @@ import Thrift.Compiler.Plugins.Haskell
 import Thrift.Compiler.Types
 
 genConstImports :: HS Const -> Set.Set Import
-genConstImports Const{..} = typeToImport constResolvedType
+genConstImports Const{..} =
+  Set.union baseImports (typeToImport constResolvedType)
+  where
+    baseImports = Set.fromList
+      [ QImport "Data.Default" "Default"
+      ]
 
 genConstDecl :: HS Const -> [HS.Decl ()]
 genConstDecl Const{..} =
