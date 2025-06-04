@@ -37,6 +37,7 @@ failingTests =
   , "common/hs/thrift/exactprint/tests/fbthrift-tests/fatal/src/module.thrift"
   , "common/hs/thrift/exactprint/tests/fbthrift-tests/from_map_construct/src/module.thrift"
   , "common/hs/thrift/exactprint/tests/fbthrift-tests/hack-const-collections/src/module.thrift"
+  , "common/hs/thrift/exactprint/tests/fbthrift-tests/hack-strict-unions/src/module.thrift"
   , "common/hs/thrift/exactprint/tests/fbthrift-tests/interactions/src/module.thrift"
   , "common/hs/thrift/exactprint/tests/fbthrift-tests/interactions/src/shared.thrift"
   , "common/hs/thrift/exactprint/tests/fbthrift-tests/json_experimental/src/ThriftdocTest.thrift"

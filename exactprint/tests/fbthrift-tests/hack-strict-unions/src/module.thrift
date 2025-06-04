@@ -18,30 +18,13 @@
  * limitations under the License.
  */
 
-include "module.thrift"
+include "thrift/annotation/hack.thrift"
 
-namespace py3 meta.example.thrift
-
-struct EchoRequest {
-  1: string text;
-}
-
-struct EchoResponse {
-  1: string text;
-}
-
-exception WhisperException {
-  1: string message;
-}
-
-service EchoService {
-  EchoResponse echo(1: EchoRequest request) throws (1: WhisperException ex);
-}
-
-service ExtendedEchoService extends EchoService {
-  EchoResponse echo_2(1: EchoRequest request) throws (1: WhisperException ex);
-}
-
-service ExtendedMyService extends module.MyService {
-  void putDataById_2(1: i64 id, 2: string data);
+union Primitive {
+  @hack.Adapter{name = '\\TimestampToTimeAdapter'}
+  1: i64 i64_;
+  2: string string_;
+  5: float float5_ = 20;
+  4: float float4_ = 30;
+  3: float float3_ = 50;
 }

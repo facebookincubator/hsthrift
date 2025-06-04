@@ -67,6 +67,7 @@ struct TemplateLists {
   // 6: list<string> list_string;
 } (cpp.noncomparable)
 
+@cpp.EnableCustomTypeOrdering
 struct TemplateSets {
   @cpp.Type{template = "std::set"}
   1: set<string> std_set;
@@ -84,6 +85,7 @@ struct TemplateSets {
   7: set<string> folly_sorted_vector;
 }
 
+@cpp.EnableCustomTypeOrdering
 struct TemplateMaps {
   @cpp.Type{template = "std::map"}
   1: map<string, string> std_map;
@@ -105,7 +107,6 @@ struct TWrapped {
   1: string fieldA;
   2: binary fieldB;
 }
-
 typedef list<TWrapped> ListOfWrapped
 
 // Should not be marshaled

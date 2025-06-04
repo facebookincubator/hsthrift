@@ -182,11 +182,6 @@ exception AnotherException {
   2: string message;
 } (cpp.virtual)
 
-typedef map<MyEnumA, string> (
-  cpp.declare_hash,
-  cpp.declare_equal_to,
-) HashedTypedef
-
 struct containerStruct {
   1: bool fieldA;
   101: required bool req_fieldA;
