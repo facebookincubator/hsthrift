@@ -1,6 +1,7 @@
 -- Copyright (c) Facebook, Inc. and its affiliates.
 
 packages:
+    folly-clib/folly-clib.cabal
     common/util/fb-util.cabal
     common/github/fb-stubs.cabal
     common/mangle/mangle.cabal
