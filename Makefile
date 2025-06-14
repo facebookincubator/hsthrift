@@ -143,3 +143,19 @@ cabal-update::
 .PHONY: install
 install::
 	mkdir -p $(PREFIX)
+
+# Unpack the correct revisions of folly and fast_float under hsthrift/folly,
+# and run cmake to generate folly-config.h.
+.PHONY: setup-folly
+setup-folly::
+	rm -rf folly/folly folly/fast_float* folly/v*.tar.gz
+	(cd folly && git clone https://github.com/facebook/folly.git)
+	(cd folly/folly && \
+		git checkout $$(sed 's/Subproject commit //' <../../build/deps/github_hashes/facebook/folly-rev.txt) && \
+		mkdir _build && cd _build && \
+		cmake .. \
+	)
+	(cd folly && \
+	   	wget $$(grep 'url =' ../build/fbcode_builder/manifests/fast_float | sed 's/^.*= *//'); \
+		tar xvzf *.tar.gz \
+	)
