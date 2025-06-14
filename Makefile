@@ -5,7 +5,7 @@
 CABAL_BIN := cabal
 
 THRIFT1 := thrift1
-CABAL := $(CABAL_BIN) $(GETDEPS_CABAL_FLAGS)
+CABAL := $(CABAL_BIN) $(CABAL_CONFIG_FLAGS) $(GETDEPS_CABAL_FLAGS)
 
 # Targets in this file invoke Cabal and hence can't be built in parallel
 .NOTPARALLEL:
@@ -13,7 +13,7 @@ CABAL := $(CABAL_BIN) $(GETDEPS_CABAL_FLAGS)
 all:: compiler thrift-hs thrift-cpp server thrift-http
 
 compiler::
-	$(CABAL) build thrift-compiler
+	$(CABAL) build exe:thrift-compiler
 
 server::
 	$(CABAL) build thrift-server
@@ -143,3 +143,45 @@ cabal-update::
 .PHONY: install
 install::
 	mkdir -p $(PREFIX)
+
+# Unpack the correct revisions of folly and fast_float under hsthrift/folly,
+# and run cmake to generate folly-config.h.
+.PHONY: setup-folly
+setup-folly::
+	rm -rf folly-clib/folly folly-clib/fast_float* folly-clib/v*.tar.gz
+	(cd folly-clib && \
+		mkdir folly && cd folly && \
+		git init && \
+		git remote add origin https://github.com/facebook/folly.git && \
+		git fetch --depth=1 origin $$(sed 's/Subproject commit //' <../../build/deps/github_hashes/facebook/folly-rev.txt) && \
+		git checkout FETCH_HEAD \
+	)
+	(cd folly-clib/folly && \
+		echo 'message("FILES_CPP:$${files}")' >>CMakeLists.txt && \
+		echo 'message("FILES_H:$${hfiles}")' >>CMakeLists.txt && \
+		mkdir _build && cd _build && \
+		cmake .. 2>&1 | sed 's/[^m]*m//g' | tee out && \
+		grep '^FILES_CPP:' out | \
+			sed 's/FILES_CPP://' | \
+			sed "s|$$(dirname $$(pwd))/|folly/|g" | \
+			sed 's/;/ \\\n            /g' >cppfiles && \
+		grep '^FILES_H:' out | \
+			sed 's/FILES_H://' | \
+			sed "s|$$(dirname $$(pwd))/|folly/|g" | \
+			sed 's/;/ \\\n            /g' >hfiles && \
+		cd ../.. && sed "s|__CPP_FILES__|$$(cat <folly/_build/cppfiles)|;s|__H_FILES__|$$(cat <folly/_build/hfiles)|" <folly-clib.cabal.in >folly-clib.cabal \
+	)
+	(cd folly-clib && \
+	   	wget $$(grep 'url =' ../build/fbcode_builder/manifests/fast_float | sed 's/^.*= *//'); \
+		tar xvzf *.tar.gz \
+	)
+
+# Use the timestamp of the most recent commit as the version number,
+# since there are no upstream releases. Careful to generate something
+# that respects Cabal's constraints on version numbers: no leading
+# zeroes and fields must be <10 digits.
+.PHONY: setup-folly-version
+ver:=$(shell cd folly-clib/folly && date -u "--date=@$$(git log -1 --format=%ct)" +%Y%m%d.%-k%M)
+setup-folly-version::
+	sed -i "s/^version:\(\s*\).*$$/version:\1$(ver)/" folly-clib/folly-clib.cabal 
+	sed -i "s/^\(\s*\)build-depends:\(\s*\)folly-clib.*$$/\1build-depends: folly-clib==$(ver)/" common/util/fb-util.cabal

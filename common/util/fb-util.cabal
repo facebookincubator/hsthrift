@@ -3,7 +3,7 @@ cabal-version:       3.6
 -- Copyright (c) Facebook, Inc. and its affiliates.
 
 name:                fb-util
-version:             0.1.0.1
+version:             0.2.0.0
 synopsis:            Various utility libraries
 homepage:            https://github.com/facebookincubator/hsthrift
 bug-reports:         https://github.com/facebookincubator/hsthrift/issues
@@ -264,11 +264,14 @@ library
             Util.IOBuf
 
         install-includes:
+            cpp/Constructible.h
+            cpp/Destructible.h
             cpp/HsOption.h
             cpp/HsStdTuple.h
             cpp/HsStdVariant.h
             cpp/HsStruct.h
             cpp/HsStructDefines.h
+            cpp/Marshallable.h
 
         cxx-sources:
             cpp/HsStruct.cpp
@@ -278,7 +281,7 @@ library
             cpp/HsStruct.cpp
             cpp/IOBuf.cpp
 
-        pkgconfig-depends: libfolly
+        build-depends: folly-clib
 
 common test-common
   extra-libraries: stdc++

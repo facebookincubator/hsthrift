@@ -1,0 +1,81 @@
+cabal-version:      3.4
+name:               folly-clib
+version:            20250618.1107
+synopsis:           The folly C++ library from Meta
+author:             Simon Marlow
+maintainer:         marlowsd@gmail.com
+copyright:          Copyright (c) Meta Platforms, Inc. and affiliates.
+homepage:           https://github.com/facebook/folly
+bug-reports:        https://github.com/facebook/folly/issues
+license:            Apache-2.0
+license-files:
+  folly/LICENSE
+  fast_float-8.0.0/LICENSE-MIT
+  fast_float-8.0.0/LICENSE-BOOST
+  fast_float-8.0.0/LICENSE-APACHE
+build-type:         Simple
+extra-doc-files:    CHANGELOG.md
+
+description:
+  The folly C++ library from Meta, wrapped in a Cabal package so that
+  it can be easily depended on by other packages. Having a Cabal
+  package also means that we can version the library, which is useful
+  as there are no versioned upstream releases.
+
+  Also included is @fast_float-8.0.0@ because it is a dependency of
+  folly and this version is not widely available as a distro package
+  yet.
+
+source-repository head
+  type: git
+  location: https://github.com/facebook/folly.git
+
+common fb-cpp
+  cxx-options: -std=c++17
+  if !flag(clang)
+     cxx-options: -fcoroutines
+  if arch(x86_64)
+     cxx-options: -march=haswell
+  if flag(opt)
+     cxx-options: -O3
+
+flag opt
+  default: False
+
+flag clang
+  default: False
+
+-- If False, we just depend on folly from pkg-config. This is to support the
+-- original build setup using getdeps.py, used in CI.
+flag bundled-folly
+  default: True
+
+library
+    import: fb-cpp
+    default-language: Haskell2010
+    if !flag(bundled-folly)
+        pkgconfig-depends: libfolly
+    else
+        include-dirs: folly folly/_build fast_float-8.0.0/include
+        extra-libraries: stdc++, boost_filesystem, boost_program_options, boost_context
+        pkgconfig-depends: fmt, libglog, openssl, snappy, libunwind
+
+        -- The contents of cxx-sources and install-includes get spliced
+        -- in by running 'make setup-folly'
+        cxx-sources:
+            __CPP_FILES__
+
+        install-includes:
+            __H_FILES__
+
+        install-includes:
+            folly/_build/folly/folly-config.h
+            fast_float/ascii_number.h
+            fast_float/float_common.h
+            fast_float/constexpr_feature_detect.h
+            fast_float/fast_table.h
+            fast_float/decimal_to_binary.h
+            fast_float/digit_comparison.h
+            fast_float/bigint.h
+            fast_float/fast_float.h
+            fast_float/parse_number.h
