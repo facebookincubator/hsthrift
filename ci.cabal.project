@@ -1,6 +1,7 @@
 -- Copyright (c) Facebook, Inc. and its affiliates.
 
 packages:
+    folly/folly.cabal
     common/util/fb-util.cabal
     common/github/fb-stubs.cabal
     common/mangle/mangle.cabal
@@ -14,6 +15,9 @@ packages:
 allow-newer: haskell-names:aeson, haskell-names:bytestring, haskell-names:transformers, haskell-names:mtl
 
 tests: true
+
+package folly
+  flags: -bundled-folly
 
 package fb-util
   flags: +folly

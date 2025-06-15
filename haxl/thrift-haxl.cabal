@@ -3,7 +3,7 @@ cabal-version:       3.6
 -- Copyright (c) Facebook, Inc. and its affiliates.
 
 name:                thrift-haxl
-version:             0.1.0.1
+version:             0.2.0.0
 synopsis:            Support for using Haxl with Thrift services
 homepage:            https://github.com/facebookincubator/hsthrift
 bug-reports:         https://github.com/facebookincubator/hsthrift/issues
@@ -60,12 +60,12 @@ library
     exposed-modules:
         Haxl.DataSource.Thrift
     build-depends:
-        thrift-lib ^>= 0.1.0.0,
+        thrift-lib >= 0.1 && < 0.3,
         hashable >=1.2.7.0 && <1.5,
         haxl >= 2.1.2.0 && < 2.6,
         mtl >= 2.2.2 && < 2.4,
         text-show >= 3.10.5 && < 3.11,
-        text ^>=1.2.3.0,
+        text >= 1.2.3.0 && < 2.2,
         transformers >= 0.5.6 && < 0.7,
         unordered-containers ^>=0.2.9.0,
         base >=4.11.1 && <4.20,

@@ -104,7 +104,10 @@ jobs:
       - name: Generate Haskell code from thrift files
         run: make thrift-hs
       - name: Generate source distributions for all packages
-        run: cabal sdist --project-file=ci.cabal.project all
+        run: |
+          apt-get install -y libfast-float-dev wget
+          make setup-folly
+          cabal sdist --project-file=ci.cabal.project all
       - name: Unpack source distributions in new directory
         run: |
           mkdir _sdists
