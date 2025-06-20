@@ -4,19 +4,18 @@ packages:
     common/util/fb-util.cabal
     common/github/fb-stubs.cabal
     common/mangle/mangle.cabal
-    compiler/thrift-compiler.cabal
     lib/thrift-lib.cabal
     server/thrift-server.cabal
+    compiler/thrift-compiler.cabal
     tests/thrift-tests.cabal
     haxl/thrift-haxl.cabal
     cpp-channel/thrift-cpp-channel.cabal
-
-allow-newer: haskell-names:aeson, haskell-names:bytestring, haskell-names:transformers, haskell-names:mtl
-
-tests: true
+    http/thrift-http.cabal
 
 package fb-util
   flags: +folly
+
+tests: true
 
 -- IPV6 is disabled in the Github Actions environment,
 -- so we make sure the appropriate tests in those packages
