@@ -11,6 +11,10 @@ jobs:
       fail-fast: false
       matrix:
         ghc: [8.6.5, 8.8.4, 8.10.7, 9.2.8, 9.4.7, 9.6.6, 9.8.2]
+        buildtype: [getdeps]
+        include:
+          - ghc: 9.4.7
+            buildtype: cabal
     runs-on: ubuntu-latest
     container:
       image: ubuntu:24.04
@@ -41,7 +45,8 @@ jobs:
       - name: Env
         run: env
 
-      - name: Drop system libfmt
+      - if: matrix.buildtype == 'getdeps'
+        name: Drop system libfmt
         run: apt-get remove -y libfmt-dev
 
       - name: Install required packages
@@ -89,22 +94,59 @@ jobs:
           ghcup install ghc ${{ matrix.ghc }} --set
           echo "$HOME/.ghcup/bin" >> "$GITHUB_PATH"
 
-      - name: Install folly, fizz, wangle, fbthrift
+      - if: matrix.buildtype == 'getdeps'
+        name: Setup PACKAGES
+        run: |
+          echo "BUILD_PACKAGES=folly-clib fb-util fb-stubs mangle thrift-lib thrift-server thrift-compiler thrift-tests thrift-haxl thrift-cpp-channel thrift-http" >> "$GITHUB_ENV"
+          echo "TEST_PACKAGES=fb-util mangle thrift-lib thrift-server thrift-compiler thrift-tests thrift-http" >> "$GITHUB_ENV"
+
+      - if: matrix.buildtype == 'cabal'
+        name: Setup PACKAGES
+        run: |
+          echo "BUILD_PACKAGES=folly-clib fb-util fb-stubs mangle thrift-lib thrift-compiler thrift-haxl thrift-http" >> "$GITHUB_ENV"
+          echo "TEST_PACKAGES=fb-util mangle thrift-lib thrift-compiler thrift-http" >> "$GITHUB_ENV"
+
+      - if: matrix.buildtype == 'getdeps'
+        name: Install folly, fizz, wangle, fbthrift
         run: ./new_install_deps.sh
 
-      - name: Add fbthrift/thrift1 to PATH
+      - if: matrix.buildtype == 'getdeps'
+        name: Add fbthrift/thrift1 to PATH
         run: echo "$HOME/.hsthrift/bin" >> "$GITHUB_PATH"
+
+      - if: matrix.buildtype == 'getdeps'
+        name: Set Cabal flags
+        run: |
+          echo CABAL_CONFIG_FLAGS="$CABAL_CONFIG_FLAGS -f-bundled-folly -f-fbthrift" >>"$GITHUB_ENV"
+
+      - if: matrix.buildtype == 'cabal'
+        name: Install dependencies needed by the Cabal build
+        run: |
+          apt-get install -y libfmt-dev
+
+      - name: Grab folly sources
+        run: |
+          apt-get install -y libfast-float-dev wget
+          make setup-folly
+          make setup-folly-version
 
       - name: Populate hackage index
         run: cabal update
-      - name: Generate C++ code from thrift files
+
+      - if: matrix.buildtype == 'getdeps'
+        name: Generate C++ code from thrift files
         run: make thrift-cpp
+
       - name: Build everything up to thrift-compiler
-        run: cabal build --project-file=ci.cabal.project exe:thrift-compiler
+        run: cabal $CABAL_CONFIG_FLAGS build exe:thrift-compiler
+
       - name: Generate Haskell code from thrift files
         run: make thrift-hs
+
       - name: Generate source distributions for all packages
-        run: cabal sdist --project-file=ci.cabal.project all
+        run: |
+          cabal sdist $BUILD_PACKAGES
+
       - name: Unpack source distributions in new directory
         run: |
           mkdir _sdists
@@ -114,9 +156,11 @@ jobs:
           done
           cp ../ci-sdist.cabal.project cabal.project
           cd ..
+
       - name: Build all packages
-        run: cabal build all
+        run: cabal $CABAL_CONFIG_FLAGS build $BUILD_PACKAGES
         working-directory: ./_sdists
+
       - name: Run testsuites
-        run: cabal test mangle fb-util thrift-compiler thrift-lib thrift-tests thrift-server --keep-going
+        run: cabal $CABAL_CONFIG_FLAGS test $TEST_PACKAGES --keep-going
         working-directory: ./_sdists
