@@ -40,7 +40,6 @@ module Util.Text
   , isCfInfixOf
   , UnicodeException
   , Util.Text.withCStringLen
-  , useAsPtr
   , InvalidConversion(..)
   , textToInt
   , hexToInt
@@ -171,14 +170,6 @@ newCStringFromText = newCStringFromLazyByteString
 -- | A convenience wrapper for 'Show'.
 textShow :: Show a => a -> Text
 textShow = Text.pack . show
-
-{-# INLINE useAsPtr #-}
-useAsPtr :: Text -> (Ptr Word16 -> Text.I16 -> IO a) -> IO a
-#ifdef __HASKELL_SANITIZE_ADDRESS__
-useAsPtr = ASan.textUseAsPtr
-#else
-useAsPtr = Text.useAsPtr
-#endif
 
 -- | A pair of a 'Text' and a 'ByteString'. Useful for when we get a
 -- value in one format and we want to lazily compute and cache the
