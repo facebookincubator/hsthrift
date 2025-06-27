@@ -243,6 +243,16 @@ library
     else
         pkgconfig-depends: double-conversion
 
+    -- clients of fb-util can specify
+    --    build-depends: folly-clib > 0.0
+    -- to ensure that fb-util is built with +folly
+    if flag(folly)
+        -- the version here is spliced automatically by
+        -- 'make setup-folly-version':
+        build-depends: folly-clib
+    else
+        build-depends: folly-clib==0.0
+
     if flag(folly)
         exposed-modules:
             Foreign.CPP.Addressable
@@ -280,8 +290,6 @@ library
             cpp/Executor.cpp
             cpp/HsStruct.cpp
             cpp/IOBuf.cpp
-
-        build-depends: folly-clib
 
 common test-common
   extra-libraries: stdc++

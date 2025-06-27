@@ -167,7 +167,7 @@ setup-folly::
 			sed 's/;/ \\\n            /g' >cppfiles && \
 		grep '^FILES_H:' out | \
 			sed 's/FILES_H://' | \
-			sed "s|$$(dirname $$(pwd))/|folly/|g" | \
+			sed "s|$$(dirname $$(pwd))/||g" | \
 			sed 's/;/ \\\n            /g' >hfiles && \
 		cd ../.. && sed "s|__CPP_FILES__|$$(cat <folly/_build/cppfiles)|;s|__H_FILES__|$$(cat <folly/_build/hfiles)|" <folly-clib.cabal.in >folly-clib.cabal \
 	)
@@ -180,8 +180,13 @@ setup-folly::
 # since there are no upstream releases. Careful to generate something
 # that respects Cabal's constraints on version numbers: no leading
 # zeroes and fields must be <10 digits.
-.PHONY: setup-folly-version
+.PHONY: setup-folly-version setup-folly-0
 ver:=$(shell cd folly-clib/folly && date -u "--date=@$$(git log -1 --format=%ct)" +%Y%m%d.%-k%M)
 setup-folly-version::
 	sed -i "s/^version:\(\s*\).*$$/version:\1$(ver)/" folly-clib/folly-clib.cabal 
-	sed -i "s/^\(\s*\)build-depends:\(\s*\)folly-clib.*$$/\1build-depends: folly-clib==$(ver)/" common/util/fb-util.cabal
+	sed -i "s/^\(\s*\)build-depends:\(\s*\)folly-clib\s*$$/\1build-depends: folly-clib==$(ver)/" common/util/fb-util.cabal
+
+# Make version 0.0 of folly-clib, the empty package
+setup-folly-0::
+	sed "s|__CPP_FILES__||;s|__H_FILES__||" <folly-clib/folly-clib.cabal.in | grep -v '^\s*install-includes' | grep -v '\.h$$' >folly-clib/folly-clib.cabal
+	sed -i "s/^version:\(\s*\).*$$/version:\10.0/" folly-clib/folly-clib.cabal 
