@@ -17,7 +17,6 @@ module Util.ASan
   , byteStringWithCStringLen
   , textWithCStringLen
   , textWithCString
-  , textUseAsPtr
   ) where
 
 import Control.Exception
@@ -31,7 +30,6 @@ import qualified Data.ByteString.Internal as BI
 
 import Data.Text.Internal (Text(..))
 import Data.Text.Encoding (encodeUtf8)
-import qualified Data.Text.Foreign as TF
 
 import Util.FFI
 
@@ -96,11 +94,3 @@ byteStringWithCStringLen (BI.PS fp off len) fun =
   allocaBytes len $ \ptr' -> do
     unsafeWithForeignPtr fp $ \ptr -> copyBytes ptr' (ptr `plusPtr` off) len
     fun (ptr', len)
-
--- Text marshalling
-
-textUseAsPtr :: Text -> (Ptr Word16 -> TF.I16 -> IO a) -> IO a
-textUseAsPtr t@(Text _arr _off len) action =
-    allocaBytes (len * 2) $ \buf -> do
-      TF.unsafeCopyToPtr t buf
-      action (castPtr buf) (fromIntegral len)

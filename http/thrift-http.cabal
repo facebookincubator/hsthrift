@@ -75,7 +75,7 @@ library
       fb-util >= 0.1.0 && < 0.2,
       thrift-lib >= 0.1.0 && < 0.2,
       base >=4.11.1 && <4.20,
-      text ^>=1.2.3.0,
+      text >= 1.2.3.0 && < 2.2,
       bytestring >=0.10.8.2 && <0.13,
       async ^>=2.2.1,
       utf8-string >= 1.0.2 && < 1.1,
