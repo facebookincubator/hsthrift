@@ -3,7 +3,7 @@ cabal-version:       3.6
 -- Copyright (c) Facebook, Inc. and its affiliates.
 
 name:                thrift-compiler
-version:             0.1.0.1
+version:             0.2.0.0
 synopsis: A compiler from the Thrift Interface Definition Language (IDL) to Haskell
 homepage:            https://github.com/facebookincubator/hsthrift
 bug-reports:         https://github.com/facebookincubator/hsthrift/issues
@@ -14,8 +14,8 @@ maintainer:          hsthrift-team@fb.com
 copyright:           (c) Facebook, All Rights Reserved
 category:            Thrift
 build-type:          Simple
-extra-source-files:  CHANGELOG.md,
-                     test/fixtures/**/*.ast,
+extra-doc-files:     CHANGELOG.md
+extra-source-files:  test/fixtures/**/*.ast,
                      test/fixtures/gen-hs2/**/*.hs,
                      test/if/*.thrift,
                      tests/if/*.thrift,
@@ -97,7 +97,7 @@ library
         aeson-pretty >= 0.8.10 && < 0.9,
         either >= 5.0.2 && < 5.1,
         extra >= 1.8 && < 1.9,
-        fb-util >= 0.1.0 && < 0.2,
+        fb-util >= 0.1.0 && < 0.3,
         some >= 1.0.6 && < 1.1,
         text-show >= 3.10.5 && < 3.11,
         haskell-src-exts >=1.20.3 && <1.24,

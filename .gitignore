@@ -5,3 +5,7 @@ gen-hs2/
 gen-cpp2/
 lib/gen-hs2/
 lib/if/gen-cpp2/
+folly-clib/folly
+folly-clib/folly-clib.cabal
+folly-clib/fast_float*
+folly-clib/v*.tar.gz

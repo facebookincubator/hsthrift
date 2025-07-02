@@ -1,4 +1,4 @@
-# Revision history for thrift-compiler
+# Revision history for thrift-http
 
 ## 0.2.0.0
 
