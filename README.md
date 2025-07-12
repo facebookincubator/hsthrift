@@ -37,6 +37,7 @@ The repository contains the following packages:
   function prototypes into symbol names, useful for using C++ code via
   the Haskell FFI.
 * [fb-util](common/util), a collection of utilities
+* [folly-clib](folly-clib), the folly C++ library wrapped in a Cabal package
 * [thrift-compiler](compiler), the Haskell Thrift compiler
 * [thrift-lib](lib), libraries for Thrift clients
 * [thrift-tests](tests), a test suite
@@ -56,9 +57,9 @@ packages above are on Hackage except for `thrift-cpp-channel` and
 $ cabal install thrift-compiler thrift-lib thrift-http
 ```
 
-aren't on
-Hackage because they depend on fbthrift and can only be built from the
-repository; see the next section.
+`thrift-cpp-channel` and `thrift-server` aren't on Hackage because
+they depend on fbthrift and can only be built from the repository; see
+the next section.
 
 # Building and testing from the repository
 

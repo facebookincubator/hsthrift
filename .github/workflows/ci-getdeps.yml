@@ -117,7 +117,12 @@ jobs:
       - if: matrix.buildtype == 'getdeps'
         name: Set Cabal flags
         run: |
-          echo CABAL_CONFIG_FLAGS="$CABAL_CONFIG_FLAGS -f-bundled-folly -f-fbthrift" >>"$GITHUB_ENV"
+          echo CABAL_CONFIG_FLAGS="$CABAL_CONFIG_FLAGS -f-bundled-folly" >>"$GITHUB_ENV"
+
+      - if: matrix.buildtype == 'cabal'
+        name: Set Cabal flags
+        run: |
+          echo CABAL_CONFIG_FLAGS="$CABAL_CONFIG_FLAGS -f-fbthrift" >>"$GITHUB_ENV"
 
       - if: matrix.buildtype == 'cabal'
         name: Install dependencies needed by the Cabal build

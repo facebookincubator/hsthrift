@@ -46,8 +46,9 @@ flag clang
   default: False
 
 -- If False, we just depend on folly from pkg-config. This is to support the
--- original build setup using getdeps.py, used in CI.
+-- original build setup using getdeps.py, used in hsthrift's CI.
 flag bundled-folly
+  manual: True
   default: True
 
 library
@@ -69,7 +70,7 @@ library
             __H_FILES__
 
         install-includes:
-            folly/_build/folly/folly-config.h
+            folly/folly-config.h
             fast_float/ascii_number.h
             fast_float/float_common.h
             fast_float/constexpr_feature_detect.h
