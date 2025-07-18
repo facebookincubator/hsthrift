@@ -5,7 +5,7 @@
 CABAL_BIN := cabal
 
 THRIFT1 := thrift1
-CABAL := $(CABAL_BIN) $(CABAL_CONFIG_FLAGS) $(GETDEPS_CABAL_FLAGS)
+CABAL := $(CABAL_BIN) $(CABAL_CONFIG_FLAGS) $(GETDEPS_CABAL_FLAGS) -f-bundled-folly -f-fbthrift
 
 # Targets in this file invoke Cabal and hence can't be built in parallel
 .NOTPARALLEL:
@@ -183,7 +183,7 @@ setup-folly::
 .PHONY: setup-folly-version setup-folly-0
 ver:=$(shell cd folly-clib/folly && date -u "--date=@$$(git log -1 --format=%ct)" +%Y%m%d.%-k%M)
 setup-folly-version::
-	sed -i "s/^version:\(\s*\).*$$/version:\1$(ver)/" folly-clib/folly-clib.cabal 
+	sed -i "s/^version:\(\s*\).*$$/version:\1$(ver)/" folly-clib/folly-clib.cabal
 	sed -i "s/^\(\s*\)build-depends:\(\s*\)folly-clib\s*$$/\1build-depends: folly-clib==$(ver)/" common/util/fb-util.cabal
 
 # Make version 0.0 of folly-clib, the empty package
