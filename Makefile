@@ -181,7 +181,7 @@ setup-folly::
 # that respects Cabal's constraints on version numbers: no leading
 # zeroes and fields must be <10 digits.
 .PHONY: setup-folly-version setup-folly-0
-ver:=$(shell cd folly-clib/folly && date -u "--date=@$$(git log -1 --format=%ct)" +%Y%m%d.%-k%M)
+ver:=$(shell cd folly-clib/folly && date -u "--date=@$$(git log -1 --format=%ct)" +%Y%m%d.%-k%M | sed 's/\.0*/\./')
 setup-folly-version::
 	sed -i "s/^version:\(\s*\).*$$/version:\1$(ver)/" folly-clib/folly-clib.cabal 
 	sed -i "s/^\(\s*\)build-depends:\(\s*\)folly-clib\s*$$/\1build-depends: folly-clib==$(ver)/" common/util/fb-util.cabal
