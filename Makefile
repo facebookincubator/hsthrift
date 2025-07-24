@@ -183,10 +183,13 @@ setup-folly::
 .PHONY: setup-folly-version setup-folly-0
 ver:=$(shell cd folly-clib/folly && date -u "--date=@$$(git log -1 --format=%ct)" +%Y%m%d.%-k%M | sed 's/\.0*/\./')
 setup-folly-version::
-	sed -i "s/^version:\(\s*\).*$$/version:\1$(ver)/" folly-clib/folly-clib.cabal 
+	sed -i "s/^version:\(\s*\).*$$/version:\1$(ver)/" folly-clib/folly-clib.cabal
 	sed -i "s/^\(\s*\)build-depends:\(\s*\)folly-clib\s*$$/\1build-depends: folly-clib==$(ver)/" common/util/fb-util.cabal
 
 # Make version 0.0 of folly-clib, the empty package
 setup-folly-0::
 	sed "s|__CPP_FILES__||;s|__H_FILES__||" <folly-clib/folly-clib.cabal.in | grep -v '^\s*install-includes' | grep -v '\.h$$' >folly-clib/folly-clib.cabal
-	sed -i "s/^version:\(\s*\).*$$/version:\10.0/" folly-clib/folly-clib.cabal 
+	sed -i "s/^version:\(\s*\).*$$/version:\10.0/" folly-clib/folly-clib.cabal
+
+setup-meta::
+	ln -s cabal-meta.project cabal.project
