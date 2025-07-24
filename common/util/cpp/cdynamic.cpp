@@ -64,8 +64,9 @@ int readDynamicArray(
     const dynamic* d,
     size_t /*size*/,
     const dynamic** elems) noexcept {
-  if ((*d).type() != dynamic::ARRAY)
+  if ((*d).type() != dynamic::ARRAY) {
     return 0;
+  }
 
   int i = 0;
   for (const auto& e : *d) {
@@ -84,8 +85,9 @@ int readDynamicObject(
     size_t /*size*/,
     const dynamic** keys,
     const dynamic** vals) noexcept {
-  if ((*d).type() != dynamic::OBJECT)
+  if ((*d).type() != dynamic::OBJECT) {
     return 0;
+  }
 
   // Relying on the iterator referring to elements by reference here.
   auto it = (*d).items();

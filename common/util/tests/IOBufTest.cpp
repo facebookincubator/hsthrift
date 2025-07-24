@@ -35,8 +35,9 @@ IOBuf* create_buffer() noexcept {
     bufs[i] = IOBuf::createCombined(50);
     strncpy((char*)bufs[i]->writableData(), strs[i], lens[i]);
     bufs[i]->append(lens[i]);
-    if (i)
+    if (i) {
       bufs[0]->appendChain(std::move(bufs[i]));
+    }
   }
   return bufs[0].release();
 }
