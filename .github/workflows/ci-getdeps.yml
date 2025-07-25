@@ -135,6 +135,10 @@ jobs:
           make setup-folly
           make setup-folly-version
 
+      - name: Setup cabal.project
+        run: |
+          ln -s cabal-github.project cabal.project
+
       - name: Populate hackage index
         run: cabal update
 
