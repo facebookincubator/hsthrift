@@ -93,8 +93,9 @@ library
         if/gen-cpp2/RpcOptions_data.cpp
         if/gen-cpp2/RpcOptions_metadata.cpp
         if/gen-cpp2/RpcOptions_types.cpp
-        if/gen-cpp2/RpcOptions_types_compact.cpp
         if/gen-cpp2/RpcOptions_types_binary.cpp
+        if/gen-cpp2/RpcOptions_types_compact.cpp
+        if/gen-cpp2/RpcOptions_types_serialization.cpp
 
     hs-source-dirs: .
     build-tool-depends: hsc2hs:hsc2hs
@@ -158,8 +159,9 @@ test-suite header-channel
                test/if/gen-cpp2/AdderAsyncClient.cpp
                test/if/gen-cpp2/Adder.cpp
                test/if/gen-cpp2/math_types.cpp
-               test/if/gen-cpp2/math_types_compact.cpp
                test/if/gen-cpp2/math_types_binary.cpp
+               test/if/gen-cpp2/math_types_compact.cpp
+               test/if/gen-cpp2/math_types_serialization.cpp
                test/if/gen-cpp2/math_data.cpp
                test/if/gen-cpp2/math_metadata.cpp
   extra-libraries:
