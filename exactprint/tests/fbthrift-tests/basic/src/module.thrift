@@ -46,6 +46,7 @@ enum MyEnum {
   MyValue2 = 1,
 }
 
+@thrift.AllowLegacyTypedefUri
 typedef MyEnum MyEnumAlias
 
 struct MyStruct {
@@ -70,6 +71,7 @@ struct Containers {
 }
 
 struct MyDataItem {}
+@thrift.AllowLegacyTypedefUri
 typedef MyDataItem MyDataItemAlias
 
 union MyUnion {
