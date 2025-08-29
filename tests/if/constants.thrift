@@ -6,8 +6,6 @@
  * LICENSE file in the root directory of this source tree.
  */
 
-include "thrift/annotation/thrift.thrift"
-
 const i32 i32Const = 99;
 
 const bool boolConst = 0;
@@ -56,7 +54,6 @@ const i64 negative = -1;
 
 struct NagativeFields {
   1: required i64 u = negative;
-  @thrift.AllowUnsafeOptionalCustomDefaultValue
   2: optional i64 v = -1;
   3: i64 w = -2;
 }
