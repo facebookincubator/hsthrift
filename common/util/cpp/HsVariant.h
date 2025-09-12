@@ -339,5 +339,12 @@ struct HsVariant {
       const std::vector<std::pair<size_t, StringType>>& fields) {
     return -1;
   }
+
+  template <typename StableIdentifierCB>
+  static StructHandle registerStruct(
+      StableIdentifierCB&& /*stableIdentifierCb*/,
+      const std::vector<std::pair<size_t, StringType>>& /*fields*/) {
+    return -1;
+  }
   /** @} */
 };
