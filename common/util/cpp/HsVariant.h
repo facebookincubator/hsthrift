@@ -308,6 +308,10 @@ struct HsVariant {
     return stringFromData(src, n);
   }
 
+  static StringType createStaticStringSafe(const char* src, int n) {
+    return createStaticString(src, n);
+  }
+
   static StringType getStaticEmptyString() {
     return std::string();
   }
