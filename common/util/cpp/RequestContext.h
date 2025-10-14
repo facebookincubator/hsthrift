@@ -43,6 +43,7 @@ class RequestContextPtrScopeGuard {
       delete;
   RequestContextPtrScopeGuard& operator=(RequestContextPtrScopeGuard&&) =
       delete;
+  ~RequestContextPtrScopeGuard() = default;
 
  private:
   std::optional<folly::RequestContextScopeGuard> guard_;
