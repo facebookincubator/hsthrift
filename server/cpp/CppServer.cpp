@@ -74,8 +74,9 @@ class CppServer : public ThriftServer {
       AsyncProcessorFactory::MethodMetadataMap&& metadataMap)
       : metadataMap_(std::move(metadataMap)) {
     setPort(desiredPort);
-    setInterface(std::unique_ptr<AsyncProcessorFactory>(
-        factoryFn(callback, metadataMap_)));
+    setInterface(
+        std::unique_ptr<AsyncProcessorFactory>(
+            factoryFn(callback, metadataMap_)));
   }
 
   // Start serving traffic

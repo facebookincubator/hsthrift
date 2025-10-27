@@ -427,7 +427,7 @@ HS_STRUCT HsString {
     update();
   }
 
-  std::string toStdString()&& {
+  std::string toStdString() && {
     std::string res(std::move(s_));
     update();
     return res;
@@ -536,7 +536,7 @@ HS_STRUCT HsArray {
     return v_.size();
   }
 
-  std::vector<T> toStdVector()&& {
+  std::vector<T> toStdVector() && {
     auto res = std::move(v_);
     clear();
     return res;
@@ -666,13 +666,13 @@ HS_STRUCT HsSet {
     update();
   }
 
-  std::vector<Key> toStdVector()&& {
+  std::vector<Key> toStdVector() && {
     auto res = std::move(k_);
     update();
     return res;
   }
 
-  std::unordered_set<Key> toStdUnorderedSet()&& {
+  std::unordered_set<Key> toStdUnorderedSet() && {
     auto k = std::move(k_);
     std::unordered_set<Key> res(
         std::make_move_iterator(k.begin()), std::make_move_iterator(k.end()));
@@ -806,7 +806,7 @@ HS_STRUCT HsMap {
     update();
   }
 
-  std::pair<std::vector<Key>, std::vector<Value>> take_items()&& {
+  std::pair<std::vector<Key>, std::vector<Value>> take_items() && {
     auto res = std::make_pair(std::move(k_), std::move(v_));
     update();
     return res;

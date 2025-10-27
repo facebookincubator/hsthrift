@@ -41,11 +41,12 @@ HsMaybe<Nonmovable>* createHsMaybeNonmovable(
 }
 
 void fillCppTuple(hs_std_tuple::CppTupleIntJSONOnlyMovable* t) noexcept {
-  *t = hs_std_tuple::CppTupleIntJSONOnlyMovable(std::make_tuple(
-      42,
-      true,
-      facebook::common::hs::OnlyMovable(8),
-      HsEither<HsString, int64_t>(HsLeft, HsString("wut"s))));
+  *t = hs_std_tuple::CppTupleIntJSONOnlyMovable(
+      std::make_tuple(
+          42,
+          true,
+          facebook::common::hs::OnlyMovable(8),
+          HsEither<HsString, int64_t>(HsLeft, HsString("wut"s))));
 }
 
 } // extern "C"
@@ -69,9 +70,10 @@ bool checkHsEither(HsEither<HsString, int>* val, int left_or_right) {
     case 2:
       return val->getRight() == 42;
     default:
-      throw std::runtime_error(std::string(
-          "checkHsEither: left_or_right should be either 1 or 2. Given: %d",
-          left_or_right));
+      throw std::runtime_error(
+          std::string(
+              "checkHsEither: left_or_right should be either 1 or 2. Given: %d",
+              left_or_right));
   }
 }
 

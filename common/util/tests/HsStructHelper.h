@@ -32,7 +32,7 @@ HS_STRUCT Nonmovable {
   HsString description;
 
  public:
-  Nonmovable(int64_t resource, std::string && description)
+  Nonmovable(int64_t resource, std::string&& description)
       : resource(resource), description(std::move(description)) {}
 
   ~Nonmovable() {

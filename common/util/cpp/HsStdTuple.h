@@ -151,14 +151,14 @@ HS_STRUCT HsStdTuple {
     return &data_.tup;
   }
 
-  std::tuple<Ts...> toStdTuple()&& {
+  std::tuple<Ts...> toStdTuple() && {
     return std::move(data_.tup);
   }
 
   template <
       typename T = HsStdTuple<Ts...>,
       typename = std::enable_if_t<std::tuple_size_v<T> == 2>>
-  auto toStdPair()&& {
+  auto toStdPair() && {
     return std::make_pair(
         std::move(std::get<0>(data_.tup)), std::move(std::get<1>(data_.tup)));
   }

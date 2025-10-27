@@ -77,7 +77,7 @@ HS_STRUCT HsOption {
     return *this;
   }
 
-  std::optional<T> toStdOptional()&& {
+  std::optional<T> toStdOptional() && {
     std::optional<T> res = std::move(opt);
     opt = std::nullopt;
     update();

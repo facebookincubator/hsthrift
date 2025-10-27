@@ -71,9 +71,10 @@ struct HaskellProcessorTest : public Test {
         processor(callback, *metadataMap_),
         header(std::make_unique<transport::THeader>()),
         conn_context(std::make_unique<Cpp2ConnContext>()),
-        request_context(std::make_unique<Cpp2RequestContext>(
-            conn_context.get(),
-            header.get())) {}
+        request_context(
+            std::make_unique<Cpp2RequestContext>(
+                conn_context.get(),
+                header.get())) {}
 
   class Request {
    public:
