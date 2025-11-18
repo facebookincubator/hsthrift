@@ -12,11 +12,15 @@ module Thrift.Compiler.GenHaskell
   , writeModule, showModule
   , ThriftModule(..)
   , commonPragmas
+  , NamespacePathValidationError(..)
   ) where
 
+import Control.Exception (Exception, throwIO)
+import Control.Monad (unless)
 import Data.List
 import Data.List.Extra
 import Data.Text (Text)
+import Data.Typeable (Typeable)
 import Language.Haskell.Exts hiding (parse, Decl, name, app)
 import System.Directory
 import System.FilePath
@@ -51,10 +55,43 @@ data ThriftModule = ThriftModule
   , tmModuleName :: String
   }
 
+-- | Exception thrown when a namespace directive would result in files
+-- being generated outside the designated output directory
+data NamespacePathValidationError = NamespacePathValidationError
+  { npveOutputDir :: FilePath
+  , npveGeneratedPath :: FilePath
+  , npveOriginalPath :: FilePath
+  } deriving (Show, Typeable)
+
+instance Exception NamespacePathValidationError
+
 writeHsCode :: Options Haskell -> Program Haskell Thrift.Loc -> IO [FilePath]
 writeHsCode opts prog =
   -- Write the Generated Files
   mapM writeModule =<< genHsCode opts prog
+
+-- | Validate that a generated path is contained within the output directory
+-- Prevents namespace directives from writing files outside the intended
+-- output directory (see T243717416)
+validateOutputPath :: FilePath -> FilePath -> IO ()
+validateOutputPath outputDir generatedPath = do
+  -- Canonicalize both paths to resolve .., symlinks, etc.
+  canonicalOutput <- canonicalizePath outputDir
+  canonicalGenerated <- canonicalizePath generatedPath
+
+  -- Check if generated path is inside output directory
+  unless (canonicalOutput `isPrefixOf` canonicalGenerated) $
+    throwIO $ NamespacePathValidationError
+      { npveOutputDir = canonicalOutput
+      , npveGeneratedPath = canonicalGenerated
+      , npveOriginalPath = generatedPath
+      }
+  where
+    isPrefixOf :: FilePath -> FilePath -> Bool
+    isPrefixOf prefix path =
+      let prefix' = addTrailingPathSeparator prefix
+          path' = addTrailingPathSeparator path
+      in prefix' `Data.List.isPrefixOf` path'
 
 genHsCode :: Options Haskell -> Program Haskell Thrift.Loc -> IO [ThriftModule]
 genHsCode Options{..} prog@Program{..} = do
@@ -62,6 +99,7 @@ genHsCode Options{..} prog@Program{..} = do
     progHSPath = Text.unpack $ Text.replace "." "/" progHSName
     HsOpts{..} = optsLangSpecific
     dir = progOutPath </> hsoptsGenPrefix </> progHSPath
+  validateOutputPath optsOutPath dir
   relativeDir <- makeRelativeToCurrentDirectory dir
 
   let
