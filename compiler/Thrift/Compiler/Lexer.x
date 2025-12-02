@@ -80,6 +80,7 @@ tokens :-
   "binary"             { basicToken BINARY }
   "senum"              { basicToken SENUM }
   "stream"             { basicToken STREAM }
+  "sink"               { basicToken SINK }
   "void"               { basicToken VOID }
   "union"              { basicToken UNION }
   "view"               { basicToken VIEW }
@@ -160,7 +161,7 @@ data TokenType
   | SYMBOL String
   | TRUE | FALSE
   -- Stuff we don't use (yet)
-  | SENUM | STREAM | VOID | BINARY | INTERACTION
+  | SENUM | STREAM | VOID | BINARY | INTERACTION | SINK
   | UNION | VIEW | EXCEPTION | SERVICE
   | ONEWAY | EXTENDS | THROWS | ASYNC | PERFORMS
   | SAFE | TRANSIENT | STATEFUL | PERMANENT | SERVER | CLIENT

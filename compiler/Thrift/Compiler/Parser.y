@@ -76,6 +76,7 @@ import Thrift.Compiler.Types
        binary      { Tok BINARY _ }
        senum       { Tok SENUM _ }
        stream      { Tok STREAM _ }
+       sink        { Tok SINK _ }
        interaction { Tok INTERACTION _ }
        void        { Tok VOID _ }
        union       { Tok UNION _ }
@@ -616,6 +617,22 @@ ResponseAndStreamReturnType
           , rsStream = (Stream tStream $6 (annTy1 $3 $4 $7))
           }
     }
+  | sink '<' AnnotatedType Throws '>' ',' stream '<' AnnotatedType Throws '>'
+    { case $9 of
+        Some t -> ResponseAndStreamReturn
+          { rsReturn = Nothing
+          , rsComma = Nothing
+          , rsStream = (Stream t $10 (annTy1 $7 $8 $11))
+          }
+    }
+  | AnnotatedType ',' sink '<' AnnotatedType Throws '>' ',' stream '<' AnnotatedType Throws '>'
+    { case $11 of
+        Some t -> ResponseAndStreamReturn
+          { rsReturn = Nothing
+          , rsComma = Nothing
+          , rsStream = (Stream t $12 (annTy1 $9 $10 $13))
+          }
+    }
 
 Throw :: { Parsed (Field 'ThrowsField) }
 Throw : StructuredAnnotations intLit ':' AnnotatedType Symbol MaybeConst Annotations Separator
@@ -707,6 +724,8 @@ Symbol :: { L Text }
   | readonly    { L (getLoc $1) "readonly" }
   | idempotent  { L (getLoc $1) "idempotent" }
   | package     { L (getLoc $1) "package" }
+  | sink        { L (getLoc $1) "sink" }
+  | stream      { L (getLoc $1) "stream" }
 
 stringLit : stringTok
   {% case $1 of
