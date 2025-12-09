@@ -75,12 +75,12 @@ library
   build-depends:
       fb-util >= 0.1.0 && < 0.3,
       thrift-lib >= 0.1.0 && < 0.3,
-      base >=4.11.1 && <4.20,
+      base >=4.11.1 && <4.21,
       text >= 1.2.3.0 && < 2.2,
       bytestring >=0.10.8.2 && <0.13,
       async ^>=2.2.1,
       utf8-string >= 1.0.2 && < 1.1,
-      containers >= 0.6 && < 0.7,
+      containers >= 0.6 && < 0.8,
       wai >= 3.2.4 && < 3.3,
       warp >= 3.3.30 && < 3.5,
       streaming-commons >= 0.2.2 && < 0.3,
@@ -99,7 +99,7 @@ flag tests_use_ipv4
 
 common test-deps
   build-depends:
-      base >=4.11.1 && <4.20,
+      base >=4.11.1 && <4.21,
       aeson >= 2.0.3 && < 2.3,
       bytestring,
       data-default >= 0.8.0 && < 0.9,
