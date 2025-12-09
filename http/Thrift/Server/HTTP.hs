@@ -50,6 +50,7 @@ data ServerOptions = ServerOptions
   , numWorkerThreads :: Maybe Int
      -- ^ Currently ignored, provided for compatibility with CppServer
   , warpSettings :: Settings
+  , middleware :: Middleware
   }
 
 -- | Default options for creating a Thrift-over-HTTP service.
@@ -59,6 +60,7 @@ defaultOptions = ServerOptions
   , numWorkerThreads = Nothing
   , warpSettings = setHost (fromString "!6") defaultSettings
       -- IPv6 only by default
+  , middleware = id
   }
 
 -- | A running HTTP server.
@@ -97,7 +99,7 @@ withBackgroundServer' handler postProcess ServerOptions{..} action = do
   ready <- newEmptyMVar
   let
     host = getHost warpSettings
-    application = thriftApplication handler postProcess
+    application = middleware (thriftApplication handler postProcess)
 
     settings =
       maybe id setPort desiredPort $

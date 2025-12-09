@@ -5,6 +5,7 @@
   This source code is licensed under the BSD-style license found in the
   LICENSE file in the root directory of this source tree.
 -}
+{-# LANGUAGE TypeApplications #-}
 
 module ServerTest (main) where
 
@@ -12,6 +13,10 @@ import Control.Exception hiding (DivideByZero)
 import Control.Monad
 import Control.Monad.Trans.Class
 import Data.Either
+import Network.HTTP.Client (defaultRequest, Request (..), httpLbs, responseBody, newManager, defaultManagerSettings)
+import qualified Network.HTTP.Client as HTTP
+import Network.HTTP.Types (ok200)
+import qualified Network.Wai as Wai
 
 import Facebook.Init
 -- import Network (testServerHost)
@@ -106,6 +111,30 @@ echoTest pname protId = mkServerTest pname "echo" protId $ do
   where
     val = "AAAAAAAAAA_DO_NOT_DELETE"
 
+middlewareTest :: String -> ProtocolId -> Test
+middlewareTest pname protId =
+  TestLabel (pname ++ " middlewareTest") $ TestCase $ do
+    withTestServer serverOptions $ \port -> do
+      let httpConfig = mkHTTPConfig port protId
+      withHTTPChannel @Echoer httpConfig $ do
+        -- normal functionality still works
+        res <- echo val
+        lift $ assertEqual "echo echoed" val res
+
+        mgr <- lift $ newManager defaultManagerSettings
+        let req = mkRequest httpConfig
+        resp <- lift $ httpLbs req mgr
+        lift $ assertEqual "response" "bar" (responseBody resp)
+
+  where
+    val = "AAAAAAAAAA_DO_NOT_DELETE"
+    mkRequest httpConfig = defaultRequest { HTTP.host = httpHost httpConfig, HTTP.port = httpPort httpConfig, HTTP.method = "GET", HTTP.path = "/foo" }
+    serverOptions = defaultOptions
+      { middleware = \app req respond -> case Wai.pathInfo req of
+          ["foo"] -> respond $ Wai.responseLBS ok200 [] "bar"
+          _ -> app req respond
+      }
+
 portAlreadyBoundTest :: String -> ProtocolId -> Test
 portAlreadyBoundTest pname protId =
   TestLabel (pname ++ " portAlreadyBoundTest") $ TestCase $ do
@@ -134,6 +163,7 @@ tests pname protId = map (\f -> f pname protId)
   , multiTest
   , unimplementedTest
   , echoTest
+  , middlewareTest
   , portAlreadyBoundTest
   ]
 

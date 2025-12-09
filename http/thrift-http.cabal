@@ -142,7 +142,7 @@ library test-lib
 common test-common
   import: test-deps
   hs-source-dirs: test
-  build-depends: thrift-http:test-lib, thrift-http
+  build-depends: thrift-http:test-lib, thrift-http, http-client, wai, http-types
   ghc-options: -threaded
 
 test-suite server
