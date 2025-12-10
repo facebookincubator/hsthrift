@@ -11,11 +11,12 @@
 #include <glog/logging.h>
 
 #include <folly/executors/IOThreadPoolExecutor.h>
+#include <folly/system/HardwareConcurrency.h>
 
 extern "C" folly::IOThreadPoolExecutor*
 common_hs_eventbase_newExecutor() noexcept {
   return new folly::IOThreadPoolExecutor(
-      sysconf(_SC_NPROCESSORS_ONLN),
+      folly::available_concurrency(),
       std::make_shared<folly::NamedThreadFactory>("HaskellIOThreadPool"));
 }
 
