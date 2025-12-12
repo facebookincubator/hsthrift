@@ -3,7 +3,7 @@ cabal-version:       3.6
 -- Copyright (c) Facebook, Inc. and its affiliates.
 
 name:                thrift-compiler
-version:             0.2.0.0
+version:             0.3.0.0
 synopsis: A compiler from the Thrift Interface Definition Language (IDL) to Haskell
 homepage:            https://github.com/facebookincubator/hsthrift
 bug-reports:         https://github.com/facebookincubator/hsthrift/issues

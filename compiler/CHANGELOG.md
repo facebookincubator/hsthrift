@@ -1,5 +1,10 @@
 # Revision history for thrift-compiler
 
+## 0.3.0.0
+
+* Added parser support for 'sink' and 'stream'; both are ignored
+  by the compiler
+
 ## 0.2.0.0
 
 * The folly dependency is now bundled in the Hackage package folly-clib,
