@@ -15,6 +15,7 @@
 
 struct HsVariant {
   using VariantType = HsJSON;
+  using VariantTypeReference = const VariantType&;
   using MapType = HsObject<HsJSON>;
   using MapKeyType = HsString;
   using MapIterator = MapType::ConstIterator;
