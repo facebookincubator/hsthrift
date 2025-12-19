@@ -13,6 +13,7 @@ module Thrift.ExactPrint.PrettyPrint
   , roundTrip
   ) where
 
+import Data.Maybe (fromMaybe)
 import Data.Some
 import qualified Data.Text as Strict
 import Data.Text.Lazy (Text)
@@ -69,8 +70,8 @@ ppHeader HNamespace{..} = mconcat
 ppHeader HPackage {..} = mconcat
   [ ppSAnns pkgSAnns
   , addHeader pkgKeywordLoc, "package"
-  , addHeader pkgUriLoc
-  , ppStr pkgUri pkgQuoteType
+  , foldMap addHeader pkgUriLoc
+  , maybe mempty (\uri -> ppStr uri (fromMaybe DoubleQuote pkgQuoteType)) pkgUri
   ]
 
 -- Decls -----------------------------------------------------------------------

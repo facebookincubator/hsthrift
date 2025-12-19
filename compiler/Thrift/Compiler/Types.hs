@@ -118,10 +118,10 @@ data Header s l a
     , nmQuoteType  :: Maybe QuoteType
     }
   | HPackage
-    { pkgUri         :: Text
+    { pkgUri         :: Maybe Text
     , pkgKeywordLoc  :: Located a
-    , pkgUriLoc      :: Located a
-    , pkgQuoteType   :: QuoteType
+    , pkgUriLoc      :: Maybe (Located a)
+    , pkgQuoteType   :: Maybe QuoteType
     , pkgSAnns       :: [StructuredAnnotation s l a]
     }
 
@@ -855,7 +855,7 @@ data SCHEMA (l :: * {- Language -}) (t :: SchemaType) (s :: [(Symbol, *)]) where
      -> SCHEMA l 'StructSchema s
      -> SCHEMA l 'StructSchema ('(name, Maybe t) ': s)
 
--- | Renamed for target langauge
+-- | Renamed for target language
 data Name = Name
   { sourceName   :: ThriftName
   , resolvedName :: Name_ 'Resolved

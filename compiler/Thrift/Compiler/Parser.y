@@ -135,10 +135,19 @@ Header :: { Maybe (Parsed Header) }
     }
   | StructuredAnnotations package stringLit
     { Just HPackage
-      { pkgUri = lParsed $3
+      { pkgUri = Just (lParsed $3)
       , pkgKeywordLoc = getLoc $2
-      , pkgUriLoc     = lLoc $3
-      , pkgQuoteType  = lRep $3
+      , pkgUriLoc     = Just (lLoc $3)
+      , pkgQuoteType  = Just (lRep $3)
+      , pkgSAnns      = $1
+      }
+    }
+  | StructuredAnnotations package ';'
+    { Just HPackage
+      { pkgUri = Nothing
+      , pkgKeywordLoc = getLoc $2
+      , pkgUriLoc     = Nothing
+      , pkgQuoteType  = Nothing
       , pkgSAnns      = $1
       }
     }

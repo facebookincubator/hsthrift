@@ -80,10 +80,10 @@ computeHeaderOffsets origin HNamespace{..} =
 computeHeaderOffsets origin HPackage{..} =
   (HPackage { pkgSAnns = sAnns
             , pkgKeywordLoc = getOffsets sAnnsEnd pkgKeywordLoc
-            , pkgUriLoc    = getOffsets (lLocation pkgKeywordLoc) pkgUriLoc
+            , pkgUriLoc    = getOffsets (lLocation pkgKeywordLoc) <$> pkgUriLoc
             , ..
             },
-   lLocation pkgUriLoc)
+   maybe (lLocation pkgKeywordLoc) lLocation pkgUriLoc)
   where
     (sAnns, sAnnsEnd) = foldO sAnnOffsets origin pkgSAnns
 
