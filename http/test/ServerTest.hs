@@ -48,6 +48,7 @@ mkHTTPConfig port protId =
     { httpHost = "localhost" --testServerHost
     , httpPort = port
     , httpProtocolId = protId
+    , httpUseHttps = False
     , httpResponseTimeout = Nothing
     }
 

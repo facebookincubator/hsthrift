@@ -86,6 +86,7 @@ library
       streaming-commons >= 0.2.2 && < 0.3,
       network >= 3.2.7 && < 3.3,
       http-client >= 0.7.18 && < 0.8,
+      http-client-tls > 0.3 && < 0.4,
       http-types >= 0.12.4 && < 0.13
 
   default-language:    Haskell2010
