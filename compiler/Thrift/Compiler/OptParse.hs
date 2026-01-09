@@ -97,6 +97,7 @@ optionsParser = do
   _ <- switch (long "allow-neg-keys")
   _ <- switch (long "allow-neg-enum-vals")
   _ <- maybeStr [long "templates"]
+  _ <- maybeStr [long "extra-validation"]
   pure $ case lo of
     TheseLangOpts optsLangSpecific -> TheseOptions Options{..}
 
