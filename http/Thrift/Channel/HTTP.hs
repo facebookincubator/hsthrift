@@ -17,6 +17,7 @@ import qualified Data.ByteString.Lazy as LBS
 import Data.Proxy
 import qualified Data.Text.Encoding as Text
 import Network.HTTP.Client hiding (Proxy)
+import Network.HTTP.Client.TLS
 import Network.HTTP.Types
 
 import Thrift.Channel
@@ -33,6 +34,7 @@ data HTTPConfig s = HTTPConfig
   { httpHost :: ByteString
   , httpPort :: Int
   , httpProtocolId :: ProtocolId
+  , httpUseHttps :: Bool
   , httpResponseTimeout :: Maybe Int -- ^ microseconds
   }
   deriving Show
@@ -42,7 +44,7 @@ withHTTPChannel
     -> (forall p . Protocol p => ThriftM p HTTPChannel t a)
     -> IO a
 withHTTPChannel config@HTTPConfig{..} action = do
-  manager <- newManager defaultManagerSettings {
+  manager <- newTlsManagerWith tlsManagerSettings {
     managerResponseTimeout =
       maybe responseTimeoutNone responseTimeoutMicro httpResponseTimeout }
   withProxy httpProtocolId $ \proxy ->
@@ -61,7 +63,7 @@ withHTTPChannelIO
     -> (forall p . Protocol p => HTTPChannel t -> Proxy p -> IO a)
     -> IO a
 withHTTPChannelIO config@HTTPConfig{..} action = do
-  manager <- newManager defaultManagerSettings
+  manager <- newTlsManagerWith tlsManagerSettings
   withProxy httpProtocolId $ \proxy ->
     action (HTTPChannel config manager) proxy
 
@@ -81,6 +83,7 @@ httpRequest HTTPChannel{..} Request{..} sendCb recvCb = do
           { host = httpHost httpConfig
           , port = httpPort httpConfig
           , method = "POST"
+          , secure = httpUseHttps httpConfig
           , requestHeaders =
               [ (hContentType, if
                   | prot == binaryProtocolId ->
