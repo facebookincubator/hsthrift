@@ -81,13 +81,13 @@ library
       async ^>=2.2.1,
       utf8-string >= 1.0.2 && < 1.1,
       containers >= 0.6 && < 0.7,
-      wai >= 3.2.4 && < 3.3,
-      warp >= 3.3.30 && < 3.5,
+      wai >= 3.2.3 && < 3.3,
+      warp >= 3.3.25 && < 3.5,
       streaming-commons >= 0.2.2 && < 0.3,
-      network >= 3.2.7 && < 3.3,
-      http-client >= 0.7.18 && < 0.8,
+      network >= 3.1.4 && < 3.3,
+      http-client >= 0.7.15 && < 0.8,
       http-client-tls > 0.3 && < 0.4,
-      http-types >= 0.12.4 && < 0.13
+      http-types >= 0.12.3 && < 0.13
 
   default-language:    Haskell2010
 
@@ -103,21 +103,21 @@ common test-deps
       base >=4.11.1 && <4.20,
       aeson >= 2.0.3 && < 2.3,
       bytestring,
-      data-default >= 0.8.0 && < 0.9,
+      data-default >= 0.7.1 && < 0.9,
       deepseq >= 1.4.4 && < 1.6,
       fb-stubs >= 0.1.0 && < 0.2,
       fb-util,
-      hashable >= 1.4.4 && < 1.5,
-      hspec >= 2.11.10 && < 2.12,
+      hashable >= 1.4.3 && < 1.5,
+      hspec >= 2.10.10 && < 2.12,
       hspec-contrib >= 0.5.2 && < 0.6,
       ghc-prim >= 0.5.3 && < 0.12,
       HUnit ^>= 1.6.1,
-      STMonadTrans >= 0.4.8 && < 0.5,
+      STMonadTrans >= 0.4.7 && < 0.5,
       text,
       thrift-lib,
       thrift-lib:test-helpers,
       transformers >= 0.5.6 && < 0.7,
-      unordered-containers >= 0.2.20 && < 0.3
+      unordered-containers >= 0.2.19 && < 0.3
 
   if flag(tests_use_ipv4)
     -- for test/Network.hs
