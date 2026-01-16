@@ -145,7 +145,8 @@ install::
 	mkdir -p $(PREFIX)
 
 # Unpack the correct revisions of folly and fast_float under hsthrift/folly,
-# and run cmake to generate folly-config.h.
+# run cmake to generate folly-config.h, and collect the source files from
+# cmake to splice into the .cabal file.
 .PHONY: setup-folly
 setup-folly::
 	rm -rf folly-clib/folly folly-clib/fast_float* folly-clib/v*.tar.gz
@@ -156,15 +157,22 @@ setup-folly::
 		git fetch --depth=1 origin $$(sed 's/Subproject commit //' <../../build/deps/github_hashes/facebook/folly-rev.txt) && \
 		git checkout FETCH_HEAD \
 	)
+	-# This is an awful hack and is guaranteed to break from time to time.
+	-# We inject code into folly's CMake scripts that log the source
+	-# files, and then grab those from the CMake output and splice them
+	-# into the .cabal file with some gross sed stuff. Feel free to
+	-# make this better.
 	(cd folly-clib/folly && \
-		echo 'message("FILES_CPP:$${files}")' >>CMakeLists.txt && \
+		sed -i 's|^\(.*Create OBJECT library.*\)$$|  list(TRANSFORM _srcs PREPEND $${CMAKE_CURRENT_SOURCE_DIR}/ OUTPUT_VARIABLE _abssrcs)\n  message("FILES_CPP: $${_abssrcs}")\n\n\1|' CMake/FollyFunctions.cmake && \
 		echo 'message("FILES_H:$${hfiles}")' >>CMakeLists.txt && \
 		mkdir _build && cd _build && \
 		cmake .. 2>&1 | sed 's/[^m]*m//g' | tee out && \
 		grep '^FILES_CPP:' out | \
 			sed 's/FILES_CPP://' | \
 			sed "s|$$(dirname $$(pwd))/|folly/|g" | \
-			sed 's/;/ \\\n            /g' >cppfiles && \
+                        sed 's/;/\n /g' | sed 's/$$/ \\/g' | \
+			sed 's/^ f/            f/' | \
+			head -c -2 >cppfiles && \
 		grep '^FILES_H:' out | \
 			sed 's/FILES_H://' | \
 			sed "s|$$(dirname $$(pwd))/||g" | \
