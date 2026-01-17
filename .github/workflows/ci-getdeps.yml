@@ -84,6 +84,8 @@ jobs:
           libxxhash-dev
           libgtest-dev
           libtinfo-dev
+          libaio-dev
+          libgmock-dev
 
       - name: Setup Haskell
         run: |
