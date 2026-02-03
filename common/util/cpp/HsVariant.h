@@ -8,6 +8,7 @@
 
 #pragma once
 
+#include <common/serialize/SerializeImpl.h>
 #include "cpp/HsStruct.h"
 
 #include <utility>
@@ -191,6 +192,20 @@ struct HsVariant {
 
   static const HsJSON& mapValue(const MapIterator& it) {
     return it.getValue();
+  }
+
+  static bool mapExistsInt64Key(const MapType& map, int64_t key) {
+    auto keyStr = folly::to<std::string>(key);
+    return map.getPtr(folly::StringPiece(keyStr)) != nullptr;
+  }
+
+  static const VariantType& mapAtInt64Key(const MapType& map, int64_t key) {
+    auto keyStr = folly::to<std::string>(key);
+    const auto* ptr = map.getPtr(folly::StringPiece(keyStr));
+    if (!ptr) {
+      throw std::out_of_range("Key not found in map");
+    }
+    return *ptr;
   }
 
   /** @} */
