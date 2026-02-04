@@ -153,7 +153,7 @@ union ComplexUnion {
   25: MyStruct ref_field2;
   26: AnException excp_field;
   27: CustomProtocolType MyCustomField;
-} (cpp.methods = "void foo(const std::string& bar) {}")
+}
 
 exception AnException {
   1: i32 code;
