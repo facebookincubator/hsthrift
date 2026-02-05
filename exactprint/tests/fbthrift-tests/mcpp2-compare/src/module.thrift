@@ -233,7 +233,7 @@ struct containerStruct {
   30: MyEnumB fieldAC;
   31: includes.AnEnum fieldAD;
   32: map<string, i32> fieldAE = {};
-} (cpp.noncopyable, cpp.methods = "void foo(const std::string& bar) {}")
+} (cpp.noncopyable)
 
 enum MyEnumB {
   AField = 0,
