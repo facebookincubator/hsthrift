@@ -42,6 +42,7 @@ failingTests =
   , "common/hs/thrift/exactprint/tests/fbthrift-tests/interactions/src/shared.thrift"
   , "common/hs/thrift/exactprint/tests/fbthrift-tests/json_experimental/src/ThriftdocTest.thrift"
   , "common/hs/thrift/exactprint/tests/fbthrift-tests/map_construct/src/module.thrift"
+  , "common/hs/thrift/exactprint/tests/fbthrift-tests/mcpp2-compare/src/module.thrift"
   , "common/hs/thrift/exactprint/tests/fbthrift-tests/patch/src/module.thrift"
   , "common/hs/thrift/exactprint/tests/fbthrift-tests/php-migration/src/module.thrift"
   , "common/hs/thrift/exactprint/tests/fbthrift-tests/python_capi/src/serialized_dep.thrift"

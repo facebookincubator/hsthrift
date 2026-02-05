@@ -21,6 +21,10 @@
 include "includes.thrift"
 include "thrift/annotation/cpp.thrift"
 include "thrift/annotation/thrift.thrift"
+
+@thrift.AllowLegacyMissingUris
+package;
+
 cpp_include "<folly/small_vector.h>"
 
 namespace cpp2 some.valid.ns
@@ -61,19 +65,25 @@ const i32 AnIntegerEnum2 = MyEnumA.fieldB;
 
 const list<i32> ListOfIntsFromEnums = [MyEnumA.fieldB, MyEnumA.fieldA];
 
+@thrift.DeprecatedUnvalidatedAnnotations{
+  items = {"cpp.declare_bitwise_ops": "1"},
+}
 @cpp.EnumType{type = cpp.EnumUnderlyingType.U32}
 enum AnnotatedEnum {
   FIELDA = 2,
   FIELDB = 4,
   FIELDC = 9,
-} (cpp.declare_bitwise_ops)
+}
 
+@thrift.DeprecatedUnvalidatedAnnotations{
+  items = {"cpp.declare_bitwise_ops": "1"},
+}
 @cpp.EnumType{type = cpp.EnumUnderlyingType.I16}
 enum AnnotatedEnum2 {
   FIELDA = 2,
   FIELDB = 4,
   FIELDC = 9,
-} (cpp.declare_bitwise_ops)
+}
 
 const MyEnumA constEnumA = MyEnumA.fieldB;
 
@@ -81,9 +91,12 @@ const MyEnumA constEnumB = 3;
 
 struct Empty {}
 
+@thrift.DeprecatedUnvalidatedAnnotations{
+  items = {"no_default_comparators": "1"},
+}
 struct ASimpleStruct {
   1: i64 boolField;
-} (no_default_comparators)
+}
 
 struct ASimpleStructNoexcept {
   1: i64 boolField;
@@ -107,10 +120,11 @@ struct MyStruct {
   11: optional CustomProtocolType MyOptCustomField;
 }
 
+@thrift.DeprecatedUnvalidatedAnnotations{items = {"cpp.virtual": "1"}}
 union SimpleUnion {
   7: i64 intValue;
   2: string stringValue;
-} (cpp.virtual)
+}
 
 typedef i32 simpleTypeDef
 typedef map<i16, string> containerTypeDef
@@ -176,13 +190,15 @@ exception AnException {
   21: optional CustomProtocolType MyOptCustomField;
 }
 
+@thrift.DeprecatedUnvalidatedAnnotations{items = {"cpp.virtual": "1"}}
 exception AnotherException {
   1: i32 code;
   101: required i32 req_code;
   2: string message;
-} (cpp.virtual)
+}
 
-struct containerStruct {
+@thrift.DeprecatedUnvalidatedAnnotations{items = {"cpp.noncopyable": "1"}}
+struct ContainerStruct {
   1: bool fieldA;
   101: required bool req_fieldA;
   201: optional bool opt_fieldA;
@@ -233,12 +249,15 @@ struct containerStruct {
   30: MyEnumB fieldAC;
   31: includes.AnEnum fieldAD;
   32: map<string, i32> fieldAE = {};
-} (cpp.noncopyable)
+}
 
 enum MyEnumB {
   AField = 0,
 }
 
+@thrift.DeprecatedUnvalidatedAnnotations{
+  items = {"cpp2.declare_equal_to": "1", "cpp2.declare_hash": "1"},
+}
 struct MyIncludedStruct {
   1: includes.IncludedInt64 MyIncludedInt = includes.IncludedConstant;
   2: AStruct MyIncludedStruct;
@@ -247,7 +266,7 @@ struct MyIncludedStruct {
   @cpp.AllowLegacyDeprecatedTerseWritesRef
   3: AStruct ARefField;
   4: required AStruct ARequiredField;
-} (cpp2.declare_hash = 1, cpp2.declare_equal_to)
+}
 
 @cpp.Type{name = "CppFakeI32"}
 typedef i32 CppFakeI32
@@ -257,8 +276,8 @@ typedef list<i64> FollySmallVectorI64
 typedef set<string> SortedVectorSetString
 @cpp.Type{name = "FakeMap"}
 typedef map<i64, double> FakeMap
-@cpp.Type{name = "std::unordered_map<std::string, containerStruct>"}
-typedef map<string, containerStruct> UnorderedMapStruct
+@cpp.Type{name = "std::unordered_map<std::string, ContainerStruct>"}
+typedef map<string, ContainerStruct> UnorderedMapStruct
 @cpp.Type{template = "std::list"}
 typedef list<i32> std_list
 @cpp.Type{template = "std::deque"}
@@ -268,58 +287,66 @@ typedef set<string> folly_set
 @cpp.Type{template = "folly::sorted_vector_map"}
 typedef map<i64, string> folly_map
 
+@thrift.DeprecatedUnvalidatedAnnotations{
+  items = {
+    "cpp.declare_equal_to": "1",
+    "cpp.declare_hash": "1",
+    "cpp.noncopyable": "1",
+    "cpp.virtual": "1",
+  },
+}
 struct AnnotatedStruct {
-  1: containerStruct no_annotation;
+  1: ContainerStruct no_annotation;
   @cpp.Ref{type = cpp.RefType.Unique}
   @cpp.AllowLegacyNonOptionalRef
   @cpp.AllowLegacyDeprecatedTerseWritesRef
-  2: containerStruct cpp_unique_ref;
+  2: ContainerStruct cpp_unique_ref;
   @cpp.Ref{type = cpp.RefType.Unique}
   @cpp.AllowLegacyNonOptionalRef
   @cpp.AllowLegacyDeprecatedTerseWritesRef
-  3: containerStruct cpp2_unique_ref;
+  3: ContainerStruct cpp2_unique_ref;
   @cpp.Ref{type = cpp.RefType.Unique}
   @cpp.AllowLegacyNonOptionalRef
   @cpp.AllowLegacyDeprecatedTerseWritesRef
   4: map<i32, list<string>> container_with_ref;
   @cpp.Ref{type = cpp.RefType.Unique}
   @cpp.AllowLegacyNonOptionalRef
-  5: required containerStruct req_cpp_unique_ref;
+  5: required ContainerStruct req_cpp_unique_ref;
   @cpp.Ref{type = cpp.RefType.Unique}
   @cpp.AllowLegacyNonOptionalRef
-  6: required containerStruct req_cpp2_unique_ref;
+  6: required ContainerStruct req_cpp2_unique_ref;
   @cpp.Ref{type = cpp.RefType.Unique}
   @cpp.AllowLegacyNonOptionalRef
   7: required list<string> req_container_with_ref;
   @cpp.Ref{type = cpp.RefType.Unique}
-  8: optional containerStruct opt_cpp_unique_ref;
+  8: optional ContainerStruct opt_cpp_unique_ref;
   @cpp.Ref{type = cpp.RefType.Unique}
-  9: optional containerStruct opt_cpp2_unique_ref;
+  9: optional ContainerStruct opt_cpp2_unique_ref;
   @cpp.Ref{type = cpp.RefType.Unique}
   10: optional set<i32> opt_container_with_ref;
   @cpp.Ref{type = cpp.RefType.Unique}
   @cpp.AllowLegacyDeprecatedTerseWritesRef
   @cpp.AllowLegacyNonOptionalRef
-  11: containerStruct ref_type_unique;
+  11: ContainerStruct ref_type_unique;
   @cpp.Ref{type = cpp.RefType.SharedMutable}
   @cpp.AllowLegacyNonOptionalRef
-  12: containerStruct ref_type_shared;
+  12: ContainerStruct ref_type_shared;
   @cpp.Ref{type = cpp.RefType.Shared}
   @cpp.AllowLegacyNonOptionalRef
   13: map<i32, list<string>> ref_type_const;
   @cpp.Ref{type = cpp.RefType.SharedMutable}
   @cpp.AllowLegacyNonOptionalRef
-  14: required containerStruct req_ref_type_shared;
+  14: required ContainerStruct req_ref_type_shared;
   @cpp.Ref{type = cpp.RefType.Shared}
   @cpp.AllowLegacyNonOptionalRef
-  15: required containerStruct req_ref_type_const;
+  15: required ContainerStruct req_ref_type_const;
   @cpp.Ref{type = cpp.RefType.Unique}
   @cpp.AllowLegacyNonOptionalRef
   16: required list<string> req_ref_type_unique;
   @cpp.Ref{type = cpp.RefType.Shared}
-  17: optional containerStruct opt_ref_type_const;
+  17: optional ContainerStruct opt_ref_type_const;
   @cpp.Ref{type = cpp.RefType.Unique}
-  18: optional containerStruct opt_ref_type_unique;
+  18: optional ContainerStruct opt_ref_type_unique;
   @cpp.Ref{type = cpp.RefType.SharedMutable}
   19: optional set<i32> opt_ref_type_shared;
   20: CppFakeI32 base_type;
@@ -343,17 +370,11 @@ struct AnnotatedStruct {
   34: folly_map typedef_map_template;
   38: IOBuf iobuf_type_val = "value";
   39: IOBufPtr iobuf_ptr_val = "value2";
-  40: containerStruct struct_struct = {
+  40: ContainerStruct struct_struct = {
     "fieldD": "some string",
     "fieldI": false,
   };
-} (
-  cpp.virtual,
-  cpp.noncopyable,
-  cpp.declare_hash,
-  cpp.declare_equal_to = 1,
-  cpp.methods = "void foo(const std::string& bar) {}",
-)
+}
 
 struct ComplexContainerStruct {
   1: map<string, IOBuf> map_of_iobufs;
@@ -449,6 +470,36 @@ service ParamService {
   set<MyStruct> setstruct_ret_set_param(8: set<string> param1);
   ComplexUnion union_ret_i32_i32_param(4: i32 param1, 2: i32 param2);
   list<ComplexUnion> listunion_string_param(1: string param1);
+
+  void annotatedParams(
+    1: ContainerStruct no_annotation,
+    2: set<i32> opt_ref_type_shared,
+    3: CppFakeI32 base_type,
+    4: FollySmallVectorI64 list_type,
+    5: SortedVectorSetString set_type,
+    6: FakeMap map_type,
+    7: UnorderedMapStruct map_struct_type,
+    8: IOBuf iobuf_type,
+    9: IOBufPtr iobuf_ptr,
+    @cpp.Type{template = "std::list"}
+    10: list<i32> list_i32_template,
+    @cpp.Type{template = "std::deque"}
+    11: list<string> list_string_template,
+    @cpp.Type{template = "folly::sorted_vector_set"}
+    12: set<string> set_template,
+    @cpp.Type{template = "folly::sorted_vector_map"}
+    13: map<i64, string> map_template,
+    14: std_list typedef_list_template,
+    15: std_deque typedef_deque_template,
+    16: folly_set typedef_set_template,
+    17: folly_map typedef_map_template,
+    18: IOBuf iobuf_type_val = "value",
+    19: IOBufPtr iobuf_ptr_val = "value2",
+    20: ContainerStruct struct_struct = {
+      "fieldD": "some string",
+      "fieldI": false,
+    },
+  );
 }
 
 @cpp.Type{name = "folly::IOBuf"}
