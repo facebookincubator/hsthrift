@@ -18,6 +18,11 @@
  * limitations under the License.
  */
 
+include "thrift/annotation/thrift.thrift"
+
+@thrift.AllowLegacyMissingUris
+package;
+
 struct TestStruct {
   1: i64 aLong;
   2: string aString;

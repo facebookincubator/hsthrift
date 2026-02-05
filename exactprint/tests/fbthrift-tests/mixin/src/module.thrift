@@ -20,6 +20,9 @@
 
 include "thrift/annotation/thrift.thrift"
 
+@thrift.AllowLegacyMissingUris
+package;
+
 struct Mixin1 {
   1: string field1;
 }

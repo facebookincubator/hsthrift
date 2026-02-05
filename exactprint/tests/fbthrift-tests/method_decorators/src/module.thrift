@@ -19,8 +19,17 @@
  */
 
 include "thrift/annotation/cpp.thrift"
+include "thrift/annotation/thrift.thrift"
+
+@thrift.AllowLegacyMissingUris
+package;
 
 struct Request {
+  1: string id;
+}
+
+@cpp.Adapter{name = "::apache::thrift::test::AdaptedStruct<MyAdapter>"}
+struct AdaptedRequest {
   1: string id;
 }
 
@@ -28,17 +37,27 @@ struct Response {
   1: string text;
 }
 
+interaction LegacyPerforms {
+  void perform();
+}
+
+interaction EchoInteraction {
+  string interactionEcho(1: string text);
+}
+
 /**
  * This service just tests basic decorator generation
  */
 @cpp.GenerateServiceMethodDecorator
 service DecoratedService {
+  performs LegacyPerforms;
   void noop();
   string echo(1: string text);
   i64 increment(1: i64 num);
   i64 sum(1: list<i64> nums);
   Response withStruct(1: Request request);
   Response multiParam(1: string text, 2: i64 num, 3: Request request);
+  EchoInteraction echoInteraction();
 }
 
 /**
@@ -51,6 +70,7 @@ service UndecoratedService {
   i64 sum(1: list<i64> nums);
   Response withStruct(1: Request request);
   Response multiParam(1: string text, 2: i64 num, 3: Request request);
+  Response adaptedRequest(1: AdaptedRequest request);
 }
 
 // Test 1st level of inheritance

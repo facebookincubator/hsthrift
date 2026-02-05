@@ -27,20 +27,29 @@ include "thrift/annotation/python.thrift"
 include "thrift/annotation/thrift.thrift"
 include "thrift/annotation/scope.thrift"
 include "thrift/annotation/hack.thrift"
+include "thrift/annotation/java.thrift"
 include "thrift/annotation/rust.thrift"
 
 @thrift.Experimental
-package "facebook.com/thrift/test"
+package "facebook.com/thrift/test/fixtures/adapter"
 
 @thrift.AllowLegacyTypedefUri
 @hack.Adapter{name = '\\Adapter2'}
 @cpp.Adapter{name = '::my::Adapter2'}
 @rust.Adapter{name = "::my::Adapter2"}
+@java.Adapter{
+  adapterClassName = "com.facebook.thrift.my.Adapter2",
+  typeClassName = "com.facebook.thrift.my.AdaptedSet_2",
+}
 typedef set<string> (py.adapter = 'my.Adapter2') SetWithAdapter
 @thrift.AllowLegacyTypedefUri
 @hack.Adapter{name = '\\Adapter1'}
 @cpp.Adapter{name = '::my::Adapter1'}
 @rust.Adapter{name = "::my::Adapter1"}
+@java.Adapter{
+  adapterClassName = "com.facebook.thrift.my.Adapter1",
+  typeClassName = "com.facebook.thrift.my.AdaptedString_1",
+}
 typedef string (py.adapter = 'my.Adapter1') StringWithAdapter
 @thrift.AllowLegacyTypedefUri
 typedef list<StringWithAdapter> ListWithElemAdapter
@@ -48,6 +57,10 @@ typedef list<StringWithAdapter> ListWithElemAdapter
 @hack.Adapter{name = '\\Adapter2'}
 @cpp.Adapter{name = '::my::Adapter2'}
 @rust.Adapter{name = "::my::Adapter2"}
+@java.Adapter{
+  adapterClassName = "com.facebook.thrift.my.Adapter2",
+  typeClassName = "com.facebook.thrift.my.AdaptedList_2",
+}
 typedef ListWithElemAdapter ListWithElemAdapter_withAdapter
 
 enum Color {
@@ -70,6 +83,10 @@ struct MyAnnotation {
 @thrift.AllowLegacyTypedefUri
 @cpp.Adapter{name = "::my::Adapter1"}
 @rust.Adapter{name = "::my::Adapter1"}
+@java.Adapter{
+  adapterClassName = "com.facebook.thrift.my.Adapter1",
+  typeClassName = "com.facebook.thrift.my.AdaptedI64_1",
+}
 @MyAnnotation{signature = "MyI64", color = Color.GREEN}
 typedef i64 MyI64
 
@@ -80,6 +97,10 @@ typedef MyI64 DoubleTypedefI64
 @hack.Adapter{name = '\\Adapter1'}
 @cpp.Adapter{name = '::my::Adapter1'}
 @rust.Adapter{name = "::my::Adapter1"}
+@java.Adapter{
+  adapterClassName = "com.facebook.thrift.my.Adapter1",
+  typeClassName = "com.facebook.thrift.my.AdaptedI32_1",
+}
 typedef i32 MyI32
 
 @cpp.EnableCustomTypeOrdering
@@ -87,33 +108,61 @@ struct Foo {
   @hack.Adapter{name = '\\Adapter1'}
   @cpp.Adapter{name = '::my::Adapter1'}
   @rust.Adapter{name = "::my::Adapter1"}
+  @java.Adapter{
+    adapterClassName = "com.facebook.thrift.my.Adapter1",
+    typeClassName = "com.facebook.thrift.my.AdaptedI32_5137_1",
+  }
   1: i32_5137 intField;
   @hack.Adapter{name = '\\Adapter1'}
   @cpp.Adapter{name = '::my::Adapter1'}
   @rust.Adapter{name = "::my::Adapter1"}
+  @java.Adapter{
+    adapterClassName = "com.facebook.thrift.my.Adapter1",
+    typeClassName = "com.facebook.thrift.my.AdaptedI32_5137_1",
+  }
   2: optional i32_5137 optionalIntField;
   @hack.Adapter{name = '\\Adapter1'}
   @cpp.Adapter{name = '::my::Adapter1'}
   @rust.Adapter{name = "::my::Adapter1"}
+  @java.Adapter{
+    adapterClassName = "com.facebook.thrift.my.Adapter1",
+    typeClassName = "com.facebook.thrift.my.AdaptedI32_5137_1",
+  }
   3: i32_5137 intFieldWithDefault = 13;
   4: SetWithAdapter setField;
   5: optional SetWithAdapter optionalSetField;
   @hack.Adapter{name = '\\Adapter3'}
   @cpp.Adapter{name = '::my::Adapter3'}
   @rust.Adapter{name = "::my::Adapter3"}
+  @java.Adapter{
+    adapterClassName = "com.facebook.thrift.my.Adapter3",
+    typeClassName = "com.facebook.thrift.my.AdaptedMap_string_ListWithElemAdapter_withAdapter_8454_3",
+  }
   6: map_string_ListWithElemAdapter_withAdapter_8454 mapField;
   @hack.Adapter{name = '\\Adapter3'}
   @cpp.Adapter{name = '::my::Adapter3'}
   @rust.Adapter{name = "::my::Adapter3"}
+  @java.Adapter{
+    adapterClassName = "com.facebook.thrift.my.Adapter3",
+    typeClassName = "com.facebook.thrift.my.AdaptedMap_string_ListWithElemAdapter_withAdapter_8454_3",
+  }
   7: optional map_string_ListWithElemAdapter_withAdapter_8454 optionalMapField;
   @hack.Adapter{name = '\\Adapter1'}
   @cpp.Adapter{name = '::my::Adapter3'}
   @rust.Adapter{name = "::my::Adapter3"}
+  @java.Adapter{
+    adapterClassName = "com.facebook.thrift.my.Adapter3",
+    typeClassName = "com.facebook.thrift.my.AdaptedBinary_5673_3",
+  }
   8: binary_5673 binaryField;
   9: MyI64 longField;
   @cpp.Adapter{name = "::my::Adapter2"}
   @python.Adapter{name = "my.Adapter3", typeHint = "my.AdaptedType3[]"}
   @rust.Adapter{name = "::my::Adapter2"}
+  @java.Adapter{
+    adapterClassName = "com.facebook.thrift.my.Adapter2",
+    typeClassName = "com.facebook.thrift.my.AdaptedMyI64_2",
+  }
   10: MyI64 adaptedLongField;
   11: DoubleTypedefI64 doubleAdaptedField;
   @python.Adapter{name = "my.ListAdapter", typeHint = "typing.Sequence[int]"}
@@ -136,15 +185,27 @@ union Baz {
   @hack.Adapter{name = '\\Adapter1'}
   @cpp.Adapter{name = '::my::Adapter1'}
   @rust.Adapter{name = "::my::Adapter1"}
+  @java.Adapter{
+    adapterClassName = "com.facebook.thrift.my.Adapter1",
+    typeClassName = "com.facebook.thrift.my.AdaptedI32_5137_1",
+  }
   1: i32_5137 intField;
   4: SetWithAdapter setField;
   @hack.Adapter{name = '\\Adapter3'}
   @cpp.Adapter{name = '::my::Adapter3'}
   @rust.Adapter{name = "::my::Adapter3"}
+  @java.Adapter{
+    adapterClassName = "com.facebook.thrift.my.Adapter3",
+    typeClassName = "com.facebook.thrift.my.AdaptedMap_string_ListWithElemAdapter_withAdapter_8454_3",
+  }
   6: map_string_ListWithElemAdapter_withAdapter_8454 mapField;
   @hack.Adapter{name = '\\Adapter1'}
   @cpp.Adapter{name = '::my::Adapter1'}
   @rust.Adapter{name = "::my::Adapter1"}
+  @java.Adapter{
+    adapterClassName = "com.facebook.thrift.my.Adapter1",
+    typeClassName = "com.facebook.thrift.my.AdaptedBinary_5673_1",
+  }
   8: binary_5673 binaryField;
   9: MyI64 longField;
 }
@@ -153,7 +214,13 @@ union Baz {
 @hack.Adapter{name = '\\Adapter1'}
 @cpp.Adapter{name = '::my::Adapter1'}
 @rust.Adapter{name = "::my::Adapter1"}
+@java.Adapter{
+  adapterClassName = "com.facebook.thrift.my.Adapter1",
+  typeClassName = "com.facebook.thrift.my.AdaptedFoo_1",
+}
 typedef Foo FooWithAdapter
+
+typedef list<Foo> ListOfFooTypedef
 
 struct Bar {
   @hack.Adapter{name = '\\Adapter1'}
@@ -171,6 +238,7 @@ struct Bar {
   @cpp.Adapter{name = '::my::Adapter1'}
   6: optional Baz_7352 optionalUnionField;
   7: DirectlyAdapted adaptedStructField;
+  8: ListOfFooTypedef structListFieldWithTypedef;
 }
 
 @cpp.Adapter{name = "::my::Adapter"}
@@ -191,6 +259,10 @@ struct StructWithFieldAdapter {
   @cpp.Adapter{name = "::my::Adapter1"}
   @python.Adapter{name = "my.Adapter1", typeHint = "my.AdaptedType1"}
   @rust.Adapter{name = "::my::Adapter1<>"}
+  @java.Adapter{
+    adapterClassName = "com.facebook.thrift.my.Adapter1",
+    typeClassName = "com.facebook.thrift.my.AdaptedI32_1",
+  }
   1: i32 field;
   @cpp.Adapter{name = "::my::Adapter1"}
   @cpp.Ref{type = cpp.RefType.Shared}
@@ -199,6 +271,10 @@ struct StructWithFieldAdapter {
   @cpp.Adapter{name = "::my::Adapter1"}
   @cpp.Ref{type = cpp.RefType.Shared}
   @rust.Adapter{name = "::my::Adapter1<>"}
+  @java.Adapter{
+    adapterClassName = "com.facebook.thrift.my.Adapter1",
+    typeClassName = "com.facebook.thrift.my.AdaptedI32_1",
+  }
   3: optional i32 opt_shared_field;
   @cpp.Adapter{name = "::my::Adapter1"}
   @thrift.Box
@@ -235,11 +311,14 @@ struct B {
 typedef A AdaptedA
 struct A {}
 
+@thrift.AllowLegacyTypedefUri
+@cpp.Adapter{name = "::my::Adapter2"}
+typedef string StringWithCppAdapter
+
 service Service {
   MyI32_4873 func(
     1: StringWithAdapter_7208 arg1,
-    @cpp.Adapter{name = "::my::Adapter2"}
-    2: string arg2,
+    2: StringWithCppAdapter arg2,
     3: Foo arg3,
   );
 }

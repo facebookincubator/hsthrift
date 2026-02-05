@@ -18,6 +18,11 @@
  * limitations under the License.
  */
 
+include "thrift/annotation/thrift.thrift"
+
+@thrift.AllowLegacyMissingUris
+package;
+
 namespace hs My.Namespacing.Test
 namespace py3 my.namespacing.test
 namespace go my.namespacing.test

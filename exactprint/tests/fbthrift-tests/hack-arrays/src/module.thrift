@@ -19,6 +19,10 @@
  */
 
 include "thrift/annotation/hack.thrift"
+include "thrift/annotation/thrift.thrift"
+
+@thrift.AllowLegacyMissingUris
+package;
 
 @hack.SkipCodegen{reason = "Invalid key type"}
 typedef set<float> InvalidSetTypedef

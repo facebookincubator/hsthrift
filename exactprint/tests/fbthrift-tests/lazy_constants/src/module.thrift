@@ -18,6 +18,11 @@
  * limitations under the License.
  */
 
+include "thrift/annotation/thrift.thrift"
+
+@thrift.AllowLegacyMissingUris
+package;
+
 namespace java.swift test.fixtures.lazy_constants
 namespace hack test.fixtures.lazy_constants
 

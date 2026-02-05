@@ -19,6 +19,10 @@
  */
 
 include "php_include.thrift"
+include "thrift/annotation/thrift.thrift"
+
+@thrift.AllowLegacyMissingUris
+package;
 
 namespace php include_typedef
 

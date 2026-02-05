@@ -22,6 +22,9 @@ include "thrift/annotation/cpp.thrift"
 include "thrift/annotation/python.thrift"
 include "thrift/annotation/thrift.thrift"
 
+@thrift.AllowLegacyMissingUris
+package;
+
 namespace cpp2 py3.simple
 
 @cpp.Type{name = "std::unique_ptr<folly::IOBuf>"}
@@ -63,6 +66,11 @@ struct OptionalRefStruct {
   1: optional IOBufPtr optional_blob;
 }
 
+@python.ConstrainedFloat32{
+  precision_loss = python.ConstraintLevel.ALLOW_INVALID,
+}
+typedef float DeferredTruncationFloat
+
 struct SimpleStruct {
   1: bool is_on;
   2: byte tiny_int;
@@ -85,6 +93,13 @@ struct SimpleStruct {
   // @lint-ignore THRIFTCHECKS
   @thrift.AllowUnsafeOptionalCustomDefaultValue
   12: optional AnEnum opt_default_enum = AnEnum.THREE;
+}
+
+struct Float32Struct {
+  1: float float32;
+  2: DeferredTruncationFloat float64;
+  3: list<DeferredTruncationFloat> float_list;
+  4: map<string, list<DeferredTruncationFloat>> float_map;
 }
 
 @cpp.Adapter{name = "Adapter"}

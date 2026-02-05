@@ -26,6 +26,9 @@ include "thrift/annotation/go.thrift"
 include "thrift/annotation/hack.thrift"
 include "thrift/annotation/thrift.thrift"
 
+@thrift.AllowLegacyMissingUris
+package;
+
 @cpp.Name{value = "YourEnum"}
 enum MyEnum {
   MyValue1 = 0,

@@ -26,6 +26,11 @@ struct TrivialStruct {
   1: i32 int_value;
 }
 
+struct TrivialStructWithDefault {
+  1: i32 int_value_1;
+  2: i32 int_value_2 = 42;
+}
+
 struct StructWithNoCustomDefaultValues {
   1: i32 unqualified_integer;
   2: optional i32 optional_integer;
@@ -46,4 +51,19 @@ struct StructWithCustomDefaultValues {
   @thrift.AllowUnsafeOptionalCustomDefaultValue
   5: optional TrivialStruct optional_struct = TrivialStruct{int_value = 456};
   6: required TrivialStruct required_struct = TrivialStruct{int_value = 789};
+  7: TrivialStructWithDefault struct_with_default_unspecified = TrivialStructWithDefault{};
+  8: TrivialStructWithDefault struct_with_default_specified = TrivialStructWithDefault{
+    int_value_1 = 123,
+  };
+}
+
+struct StructWithCollectionDefaultValues {
+  1: list<i32> list_with_list_value = [];
+  2: set<i32> set_with_list_value = [];
+  3: map<i32, i32> map_with_map_value = {};
+
+  // Mixing empty list/map is a compiler warning, but allowed
+  4: list<i32> list_with_map_value = {};
+  5: set<i32> set_with_map_value = {};
+  6: map<i32, i32> map_with_list_value = [];
 }

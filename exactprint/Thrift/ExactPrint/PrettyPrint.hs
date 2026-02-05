@@ -71,7 +71,7 @@ ppHeader HPackage {..} = mconcat
   [ ppSAnns pkgSAnns
   , addHeader pkgKeywordLoc, "package"
   , foldMap addHeader pkgUriLoc
-  , maybe mempty (\uri -> ppStr uri (fromMaybe DoubleQuote pkgQuoteType)) pkgUri
+  , maybe ";" (\uri -> ppStr uri (fromMaybe DoubleQuote pkgQuoteType)) pkgUri
   ]
 
 -- Decls -----------------------------------------------------------------------

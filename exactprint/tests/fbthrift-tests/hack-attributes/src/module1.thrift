@@ -21,6 +21,10 @@
 namespace hack test.fixtures.jsenum
 
 include "thrift/annotation/hack.thrift"
+include "thrift/annotation/thrift.thrift"
+
+@thrift.AllowLegacyMissingUris
+package;
 
 @hack.Attributes{attributes = ["ApiEnum", "JSEnum"]}
 enum MyThriftEnum {

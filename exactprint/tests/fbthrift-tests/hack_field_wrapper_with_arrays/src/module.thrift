@@ -20,6 +20,10 @@
 
 include "thrift/annotation/hack.thrift"
 include "include.thrift"
+include "thrift/annotation/thrift.thrift"
+
+@thrift.AllowLegacyMissingUris
+package;
 
 struct MyStruct {
   1: i64 int_field;

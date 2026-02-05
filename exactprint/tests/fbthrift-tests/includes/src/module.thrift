@@ -19,6 +19,11 @@
  */
 
 include "includes.thrift"
+include "thrift/annotation/thrift.thrift"
+
+@thrift.AllowLegacyMissingUris
+package;
+
 namespace java.swift test.fixtures.includes
 
 struct MyStruct {

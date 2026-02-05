@@ -19,6 +19,10 @@
  */
 
 include "thrift/annotation/rust.thrift"
+include "thrift/annotation/thrift.thrift"
+
+@thrift.AllowLegacyMissingUris
+package;
 
 @rust.Derive{derives = ["Foo", "Bar"]}
 struct WithCustomDerives {

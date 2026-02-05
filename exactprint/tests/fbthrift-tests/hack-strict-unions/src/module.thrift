@@ -19,7 +19,13 @@
  */
 
 include "thrift/annotation/hack.thrift"
+include "thrift/annotation/thrift.thrift"
 
+@thrift.AllowLegacyMissingUris
+package;
+
+@hack.MigrationBlockingAllowInheritance
+@hack.MigrationBlockingLegacyJSONSerialization
 union Primitive {
   @hack.Adapter{name = '\\TimestampToTimeAdapter'}
   1: i64 i64_;
@@ -27,4 +33,30 @@ union Primitive {
   5: float float5_ = 20;
   4: float float4_ = 30;
   3: float float3_ = 50;
+}
+
+union OtherPrimitive {
+  @hack.Adapter{name = '\\TimestampToTimeAdapter'}
+  1: i64 i64_;
+  2: string string_;
+  5: float float5_ = 20;
+  4: float float4_ = 30;
+  3: float float3_ = 50;
+}
+
+// for testing rollout mechanism
+union Primitive1 {
+  1: i64 i64_;
+}
+
+union Primitive2 {
+  1: i64 i64_;
+}
+
+union Primitive3 {
+  1: i64 i64_;
+}
+
+union Primitive4 {
+  1: i64 i64_;
 }

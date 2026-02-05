@@ -19,6 +19,10 @@
  */
 
 include "b.thrift"
+include "thrift/annotation/thrift.thrift"
+
+@thrift.AllowLegacyMissingUris
+package;
 
 struct A {
   1: list<b.B> b;

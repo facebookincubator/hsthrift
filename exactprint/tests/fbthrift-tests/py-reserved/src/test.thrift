@@ -18,6 +18,12 @@
  * limitations under the License.
  */
 
+include "thrift/annotation/thrift.thrift"
+
+
+@thrift.AllowLegacyMissingUris
+package;
+
 struct def {
   1: i64 from;
   2: string in;
@@ -36,3 +42,9 @@ service lambda {
   bool global(1: i64 raise);
   def import();
 }
+
+enum from {
+  VALUE = 1,
+}
+
+typedef i64 and

@@ -18,7 +18,14 @@
  * limitations under the License.
  */
 
+/**
+ * Package level doctext.
+ */
 include "thrift/annotation/rust.thrift"
+include "thrift/annotation/thrift.thrift"
+
+@thrift.AllowLegacyMissingUris
+package;
 
 /** Constant foo */
 const string FOO = "foo";

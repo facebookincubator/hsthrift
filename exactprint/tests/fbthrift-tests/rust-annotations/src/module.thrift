@@ -22,6 +22,9 @@ include "thrift/annotation/rust.thrift"
 include "thrift/annotation/scope.thrift"
 include "thrift/annotation/thrift.thrift"
 
+@thrift.AllowLegacyMissingUris
+package;
+
 // --
 
 @rust.Type{name = "OrderedFloat<f64>"}

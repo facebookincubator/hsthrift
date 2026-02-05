@@ -18,6 +18,11 @@
  * limitations under the License.
  */
 
+include "thrift/annotation/thrift.thrift"
+
+@thrift.AllowLegacyMissingUris
+package;
+
 struct MyAnnot {}
 
 const i64 fortyTwo = 42;

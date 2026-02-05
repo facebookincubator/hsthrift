@@ -21,6 +21,10 @@
 namespace java.swift test.fixtures.basic
 
 include "thrift/annotation/java.thrift"
+include "thrift/annotation/thrift.thrift"
+
+@thrift.AllowLegacyMissingUris
+package;
 
 struct MyNomralStruct {
   1: string msg1;

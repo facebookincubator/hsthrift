@@ -20,6 +20,10 @@
 
 include "thrift/annotation/hack.thrift"
 include "thrift/annotation/scope.thrift"
+include "thrift/annotation/thrift.thrift"
+
+@thrift.AllowLegacyMissingUris
+package;
 
 @scope.Transitive
 @hack.Wrapper{name = "\\MyFieldWrapper"}

@@ -18,6 +18,12 @@
  * limitations under the License.
  */
 
+include "thrift/annotation/thrift.thrift"
+
+
+@thrift.AllowLegacyMissingUris
+package;
+
 namespace java.swift test.fixtures.constants
 namespace java.swift.constants test.fixtures.constants.ModuleConstants
 
@@ -86,6 +92,12 @@ const Internship instagram = {
 };
 
 const Internship partial_const = {"weeks": 8, "title": "Some Job"};
+
+const list<City> cities = [NYC, MPK, SEA, LON];
+typedef map<Company, list<City>> CompanyLocationsMap
+const CompanyLocationsMap company_locations = {
+  Company.FACEBOOK: cities,
+};
 
 struct Range {
   1: required i32 min;
@@ -289,3 +301,8 @@ const map<i32, bool> I2B = {
   3: false
 };
 const map<i32, bool> I2B_REF = I2B;
+
+// We allow but warn for these mismatched empty collection initializer
+const map<i32, i32> map_list_initializer = [];
+const list<i32> list_map_initializer = {};
+const set<i32> set_map_initializer = {};

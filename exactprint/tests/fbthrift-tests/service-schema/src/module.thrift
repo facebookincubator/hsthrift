@@ -18,9 +18,10 @@
  * limitations under the License.
  */
 
+include "extend.thrift"
 include "include.thrift"
 
-package "facebook.com/thrift/test"
+package "facebook.com/thrift/test/fixtures/service_schema"
 
 namespace java.swift test.fixtures.service_schema
 
@@ -39,4 +40,8 @@ service PrimitivesService {
   i64 init(1: i64 param0, 2: i64 param1);
   Result method_that_throws() throws (1: CustomException e);
   void return_void_method(1: i64 id, 2: include.I i);
+}
+
+service ExtendedService extends extend.BaseService {
+  i64 init(1: i64 param0, 2: i64 param1);
 }

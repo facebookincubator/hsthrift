@@ -22,6 +22,9 @@ namespace java.swift test.fixtures.optionals
 
 include "thrift/annotation/thrift.thrift"
 
+@thrift.AllowLegacyMissingUris
+package;
+
 struct Color {
   1: double red;
   2: double green;

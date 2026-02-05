@@ -21,6 +21,10 @@
 include "module.thrift"
 
 include "thrift/annotation/hack.thrift"
+include "thrift/annotation/thrift.thrift"
+
+@thrift.AllowLegacyMissingUris
+package;
 
 namespace hack hack_ns2
 

@@ -18,6 +18,8 @@
  * limitations under the License.
  */
 
+package "test.dev/fixtures/basic"
+
 include "module.thrift"
 
 namespace py3 meta.example.thrift

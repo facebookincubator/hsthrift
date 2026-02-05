@@ -19,6 +19,10 @@
  */
 
 include "IncludesAlso.thrift"
+include "thrift/annotation/thrift.thrift"
+
+@thrift.AllowLegacyMissingUris
+package;
 
 struct IncludesAlso {
   1: IncludesAlso.Also also;

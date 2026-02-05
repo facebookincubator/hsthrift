@@ -19,6 +19,10 @@
  */
 
 include "include.thrift"
+include "thrift/annotation/thrift.thrift"
+
+@thrift.AllowLegacyMissingUris
+package;
 
 namespace hack module_typedef
 

@@ -19,6 +19,10 @@
  */
 
 include "thrift/annotation/cpp.thrift"
+include "thrift/annotation/thrift.thrift"
+
+@thrift.AllowLegacyMissingUris
+package;
 
 union RefUnion {
   @cpp.Adapter{name = '::my::Adapter1'}
