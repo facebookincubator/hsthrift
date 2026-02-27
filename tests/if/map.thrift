@@ -6,6 +6,8 @@
  * LICENSE file in the root directory of this source tree.
  */
 
+include "thrift/annotation/thrift.thrift"
+
 typedef map<byte, string> Map
 
 typedef string KeyType (hs.newtype)
@@ -25,4 +27,5 @@ struct Y {
 }
 
 // The following were automatically generated and may benefit from renaming.
+@thrift.AllowUnsafeNonSealedKeyType
 typedef map<Y, string> (hs.type = "HashMap") map_Y_string_2031
