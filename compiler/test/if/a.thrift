@@ -3,6 +3,7 @@
 # @nolint
 
 include "test/if/b.thrift"
+include "thrift/annotation/thrift.thrift"
 
 typedef i64 T
 
@@ -15,6 +16,7 @@ struct A {
   5: map<i32, string> e;
   6: b.Number f = b.Two;
   7: optional string g;
+  @thrift.AllowUnsafeRequiredFieldQualifier
   8: required string h;
 }
 

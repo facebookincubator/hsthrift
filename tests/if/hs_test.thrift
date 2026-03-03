@@ -8,6 +8,8 @@
 
 hs_include "if/hs_test_instances.hs"
 
+include "thrift/annotation/thrift.thrift"
+
 typedef i64 X (hs.newtype)
 typedef X Y
 typedef Y Z (hs.newtype)
@@ -24,6 +26,7 @@ union tUnion {
 }
 
 struct TestStruct {
+  @thrift.AllowUnsafeRequiredFieldQualifier
   1: required bool f_bool;
   2: byte f_byte;
   3: double f_double;

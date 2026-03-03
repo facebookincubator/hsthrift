@@ -6,10 +6,13 @@
  * LICENSE file in the root directory of this source tree.
  */
 
+include "thrift/annotation/thrift.thrift"
+
 typedef i64 X
 
 struct Foo {
   1: optional i64 foo1;
+  @thrift.AllowUnsafeRequiredFieldQualifier
   2: required bool foo2;
   3: Bar foo3;
   4: X foo4;
