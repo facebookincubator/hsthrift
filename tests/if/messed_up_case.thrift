@@ -6,6 +6,8 @@
  * LICENSE file in the root directory of this source tree.
  */
 
+package "facebook.com/hs/thrift/tests/messed_up_case"
+
 typedef i64 (hs.type = "Int") intType
 
 const string Str = "";

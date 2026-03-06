@@ -6,6 +6,8 @@
  * LICENSE file in the root directory of this source tree.
  */
 
+package "facebook.com/hs/thrift/tests/typedef_annotation"
+
 typedef Foo Bar
 
 struct Foo {}

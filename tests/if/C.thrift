@@ -7,6 +7,7 @@
  */
 
 include "if/E.thrift"
+package "facebook.com/hs/thrift/tests/c"
 
 # INCLUSION HIERARCHY
 #

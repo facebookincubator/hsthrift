@@ -7,6 +7,7 @@
  */
 
 include "if/bar.thrift"
+package "facebook.com/hs/thrift/tests/baz"
 
 struct Baz {
   1: bar.NewBar theBar;

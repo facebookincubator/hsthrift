@@ -7,6 +7,7 @@
  */
 
 include "thrift/annotation/thrift.thrift"
+package "facebook.com/hs/thrift/tests/map"
 
 typedef map<byte, string> Map
 

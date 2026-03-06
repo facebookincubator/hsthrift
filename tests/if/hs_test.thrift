@@ -9,6 +9,9 @@
 hs_include "if/hs_test_instances.hs"
 
 include "thrift/annotation/thrift.thrift"
+package "facebook.com/hs/thrift/tests/hs_test"
+
+namespace cpp2 "cpp2"
 
 typedef i64 X (hs.newtype)
 typedef X Y

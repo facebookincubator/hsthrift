@@ -10,6 +10,7 @@ include "if/B.thrift"
 include "if/C.thrift"
 include "if/D.thrift"
 include "if/E.thrift"
+package "facebook.com/hs/thrift/tests/a"
 
 # INCLUSION HIERARCHY
 #

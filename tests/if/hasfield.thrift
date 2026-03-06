@@ -6,6 +6,10 @@
  * LICENSE file in the root directory of this source tree.
  */
 
+package "facebook.com/hs/thrift/tests/hasfield"
+
+namespace cpp2 "cpp2"
+
 typedef i64 X
 
 struct Foo {

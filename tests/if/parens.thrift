@@ -6,6 +6,8 @@
  * LICENSE file in the root directory of this source tree.
  */
 
+package "facebook.com/hs/thrift/tests/parens"
+
 struct X {
   # both Y and Int include <$> in their type parsers, so we need to insert parens
   # around these expressions

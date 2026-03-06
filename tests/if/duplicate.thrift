@@ -6,6 +6,8 @@
  * LICENSE file in the root directory of this source tree.
  */
 
+package "facebook.com/hs/thrift/tests/duplicate"
+
 struct X {
   1: string name;
   2: i64 payload;

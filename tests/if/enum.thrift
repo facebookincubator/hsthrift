@@ -6,6 +6,8 @@
  * LICENSE file in the root directory of this source tree.
  */
 
+package "facebook.com/hs/thrift/tests/enum"
+
 enum UnsortedEnum {
   G = 7,
   A = 1,

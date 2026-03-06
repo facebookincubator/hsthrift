@@ -6,6 +6,8 @@
  * LICENSE file in the root directory of this source tree.
  */
 
+package "facebook.com/hs/thrift/tests/d"
+
 typedef i64 (hs.type = "Int") Int
 
 const Int int_val = 123;

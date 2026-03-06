@@ -6,6 +6,10 @@
  * LICENSE file in the root directory of this source tree.
  */
 
+package "facebook.com/hs/thrift/test"
+
+namespace cpp2 "cpp2"
+
 exception NotFound {
   1: string key;
 }

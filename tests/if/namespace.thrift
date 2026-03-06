@@ -8,6 +8,8 @@
 
 include "if/namespace_included.thrift"
 
+package "facebook.com/hs/thrift/tests/namespace"
+
 namespace hs Thrift.Test
 
 struct X {

@@ -6,6 +6,8 @@
  * LICENSE file in the root directory of this source tree.
  */
 
+package "facebook.com/hs/thrift"
+
 namespace hs "Thrift.Protocol"
 
 enum ApplicationExceptionType {
