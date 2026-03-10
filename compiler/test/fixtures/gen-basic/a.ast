@@ -173,7 +173,8 @@
     ],
     "enums": [],
     "includes": [
-        "test/if/b.thrift"
+        "test/if/b.thrift",
+        "thrift/annotation/thrift.thrift"
     ],
     "name": "a",
     "options": {

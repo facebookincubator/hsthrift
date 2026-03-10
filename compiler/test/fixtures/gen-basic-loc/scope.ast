@@ -1,0 +1,159 @@
+{
+    "consts": [],
+    "enums": [],
+    "includes": [],
+    "name": "scope",
+    "options": {
+        "genfiles": null,
+        "include_path": ".",
+        "out_path": "test/fixtures/gen-basic-loc",
+        "path": "test/if/a.thrift",
+        "recursive": true
+    },
+    "path": "thrift/annotation/scope.thrift",
+    "services": [],
+    "structs": [
+        {
+            "fields": [],
+            "loc_keyword": "Loc {locFile = \"thrift/annotation/scope.thrift\", locStartLine = 70, locStartCol = 1, locEndLine = 70, locEndCol = 7}",
+            "loc_name": "Loc {locFile = \"thrift/annotation/scope.thrift\", locStartLine = 70, locStartCol = 8, locEndLine = 70, locEndCol = 18}",
+            "name": "Transitive",
+            "struct_type": "STRUCT"
+        },
+        {
+            "fields": [],
+            "loc_keyword": "Loc {locFile = \"thrift/annotation/scope.thrift\", locStartLine = 78, locStartCol = 1, locEndLine = 78, locEndCol = 7}",
+            "loc_name": "Loc {locFile = \"thrift/annotation/scope.thrift\", locStartLine = 78, locStartCol = 8, locEndLine = 78, locEndCol = 15}",
+            "name": "Program",
+            "struct_type": "STRUCT"
+        },
+        {
+            "fields": [],
+            "loc_keyword": "Loc {locFile = \"thrift/annotation/scope.thrift\", locStartLine = 81, locStartCol = 1, locEndLine = 81, locEndCol = 7}",
+            "loc_name": "Loc {locFile = \"thrift/annotation/scope.thrift\", locStartLine = 81, locStartCol = 8, locEndLine = 81, locEndCol = 14}",
+            "name": "Struct",
+            "struct_type": "STRUCT"
+        },
+        {
+            "fields": [],
+            "loc_keyword": "Loc {locFile = \"thrift/annotation/scope.thrift\", locStartLine = 84, locStartCol = 1, locEndLine = 84, locEndCol = 7}",
+            "loc_name": "Loc {locFile = \"thrift/annotation/scope.thrift\", locStartLine = 84, locStartCol = 8, locEndLine = 84, locEndCol = 13}",
+            "name": "Union",
+            "struct_type": "STRUCT"
+        },
+        {
+            "fields": [],
+            "loc_keyword": "Loc {locFile = \"thrift/annotation/scope.thrift\", locStartLine = 87, locStartCol = 1, locEndLine = 87, locEndCol = 7}",
+            "loc_name": "Loc {locFile = \"thrift/annotation/scope.thrift\", locStartLine = 87, locStartCol = 8, locEndLine = 87, locEndCol = 17}",
+            "name": "Exception",
+            "struct_type": "STRUCT"
+        },
+        {
+            "fields": [],
+            "loc_keyword": "Loc {locFile = \"thrift/annotation/scope.thrift\", locStartLine = 90, locStartCol = 1, locEndLine = 90, locEndCol = 7}",
+            "loc_name": "Loc {locFile = \"thrift/annotation/scope.thrift\", locStartLine = 90, locStartCol = 8, locEndLine = 90, locEndCol = 23}",
+            "name": "ThrownException",
+            "struct_type": "STRUCT"
+        },
+        {
+            "fields": [],
+            "loc_keyword": "Loc {locFile = \"thrift/annotation/scope.thrift\", locStartLine = 93, locStartCol = 1, locEndLine = 93, locEndCol = 7}",
+            "loc_name": "Loc {locFile = \"thrift/annotation/scope.thrift\", locStartLine = 93, locStartCol = 8, locEndLine = 93, locEndCol = 13}",
+            "name": "Field",
+            "struct_type": "STRUCT"
+        },
+        {
+            "fields": [],
+            "loc_keyword": "Loc {locFile = \"thrift/annotation/scope.thrift\", locStartLine = 96, locStartCol = 1, locEndLine = 96, locEndCol = 7}",
+            "loc_name": "Loc {locFile = \"thrift/annotation/scope.thrift\", locStartLine = 96, locStartCol = 8, locEndLine = 96, locEndCol = 15}",
+            "name": "Typedef",
+            "struct_type": "STRUCT"
+        },
+        {
+            "fields": [],
+            "loc_keyword": "Loc {locFile = \"thrift/annotation/scope.thrift\", locStartLine = 99, locStartCol = 1, locEndLine = 99, locEndCol = 7}",
+            "loc_name": "Loc {locFile = \"thrift/annotation/scope.thrift\", locStartLine = 99, locStartCol = 8, locEndLine = 99, locEndCol = 15}",
+            "name": "Service",
+            "struct_type": "STRUCT"
+        },
+        {
+            "fields": [],
+            "loc_keyword": "Loc {locFile = \"thrift/annotation/scope.thrift\", locStartLine = 102, locStartCol = 1, locEndLine = 102, locEndCol = 7}",
+            "loc_name": "Loc {locFile = \"thrift/annotation/scope.thrift\", locStartLine = 102, locStartCol = 8, locEndLine = 102, locEndCol = 19}",
+            "name": "Interaction",
+            "struct_type": "STRUCT"
+        },
+        {
+            "fields": [],
+            "loc_keyword": "Loc {locFile = \"thrift/annotation/scope.thrift\", locStartLine = 105, locStartCol = 1, locEndLine = 105, locEndCol = 7}",
+            "loc_name": "Loc {locFile = \"thrift/annotation/scope.thrift\", locStartLine = 105, locStartCol = 8, locEndLine = 105, locEndCol = 16}",
+            "name": "Function",
+            "struct_type": "STRUCT"
+        },
+        {
+            "fields": [],
+            "loc_keyword": "Loc {locFile = \"thrift/annotation/scope.thrift\", locStartLine = 109, locStartCol = 1, locEndLine = 109, locEndCol = 7}",
+            "loc_name": "Loc {locFile = \"thrift/annotation/scope.thrift\", locStartLine = 109, locStartCol = 8, locEndLine = 109, locEndCol = 25}",
+            "name": "FunctionParameter",
+            "struct_type": "STRUCT"
+        },
+        {
+            "fields": [],
+            "loc_keyword": "Loc {locFile = \"thrift/annotation/scope.thrift\", locStartLine = 112, locStartCol = 1, locEndLine = 112, locEndCol = 7}",
+            "loc_name": "Loc {locFile = \"thrift/annotation/scope.thrift\", locStartLine = 112, locStartCol = 8, locEndLine = 112, locEndCol = 17}",
+            "name": "EnumValue",
+            "struct_type": "STRUCT"
+        },
+        {
+            "fields": [],
+            "loc_keyword": "Loc {locFile = \"thrift/annotation/scope.thrift\", locStartLine = 115, locStartCol = 1, locEndLine = 115, locEndCol = 7}",
+            "loc_name": "Loc {locFile = \"thrift/annotation/scope.thrift\", locStartLine = 115, locStartCol = 8, locEndLine = 115, locEndCol = 13}",
+            "name": "Const",
+            "struct_type": "STRUCT"
+        },
+        {
+            "fields": [],
+            "loc_keyword": "Loc {locFile = \"thrift/annotation/scope.thrift\", locStartLine = 120, locStartCol = 1, locEndLine = 120, locEndCol = 7}",
+            "loc_name": "Loc {locFile = \"thrift/annotation/scope.thrift\", locStartLine = 120, locStartCol = 8, locEndLine = 120, locEndCol = 12}",
+            "name": "Enum",
+            "struct_type": "STRUCT"
+        },
+        {
+            "fields": [],
+            "loc_keyword": "Loc {locFile = \"thrift/annotation/scope.thrift\", locStartLine = 128, locStartCol = 1, locEndLine = 128, locEndCol = 7}",
+            "loc_name": "Loc {locFile = \"thrift/annotation/scope.thrift\", locStartLine = 128, locStartCol = 8, locEndLine = 128, locEndCol = 18}",
+            "name": "Structured",
+            "struct_type": "STRUCT"
+        },
+        {
+            "fields": [],
+            "loc_keyword": "Loc {locFile = \"thrift/annotation/scope.thrift\", locStartLine = 134, locStartCol = 1, locEndLine = 134, locEndCol = 7}",
+            "loc_name": "Loc {locFile = \"thrift/annotation/scope.thrift\", locStartLine = 134, locStartCol = 8, locEndLine = 134, locEndCol = 17}",
+            "name": "Interface",
+            "struct_type": "STRUCT"
+        },
+        {
+            "fields": [],
+            "loc_keyword": "Loc {locFile = \"thrift/annotation/scope.thrift\", locStartLine = 144, locStartCol = 1, locEndLine = 144, locEndCol = 7}",
+            "loc_name": "Loc {locFile = \"thrift/annotation/scope.thrift\", locStartLine = 144, locStartCol = 8, locEndLine = 144, locEndCol = 22}",
+            "name": "RootDefinition",
+            "struct_type": "STRUCT"
+        },
+        {
+            "fields": [],
+            "loc_keyword": "Loc {locFile = \"thrift/annotation/scope.thrift\", locStartLine = 153, locStartCol = 1, locEndLine = 153, locEndCol = 7}",
+            "loc_name": "Loc {locFile = \"thrift/annotation/scope.thrift\", locStartLine = 153, locStartCol = 8, locEndLine = 153, locEndCol = 18}",
+            "name": "Definition",
+            "struct_type": "STRUCT"
+        },
+        {
+            "fields": [],
+            "loc_keyword": "Loc {locFile = \"thrift/annotation/scope.thrift\", locStartLine = 160, locStartCol = 1, locEndLine = 160, locEndCol = 7}",
+            "loc_name": "Loc {locFile = \"thrift/annotation/scope.thrift\", locStartLine = 160, locStartCol = 8, locEndLine = 160, locEndCol = 26}",
+            "name": "DisableSchemaConst",
+            "struct_type": "STRUCT"
+        }
+    ],
+    "typedefs": [],
+    "unions": []
+}

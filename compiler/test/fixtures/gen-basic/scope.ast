@@ -1,0 +1,119 @@
+{
+    "consts": [],
+    "enums": [],
+    "includes": [],
+    "name": "scope",
+    "options": {
+        "genfiles": null,
+        "include_path": ".",
+        "out_path": "test/fixtures/gen-basic",
+        "path": "test/if/a.thrift",
+        "recursive": true
+    },
+    "path": "thrift/annotation/scope.thrift",
+    "services": [],
+    "structs": [
+        {
+            "fields": [],
+            "name": "Transitive",
+            "struct_type": "STRUCT"
+        },
+        {
+            "fields": [],
+            "name": "Program",
+            "struct_type": "STRUCT"
+        },
+        {
+            "fields": [],
+            "name": "Struct",
+            "struct_type": "STRUCT"
+        },
+        {
+            "fields": [],
+            "name": "Union",
+            "struct_type": "STRUCT"
+        },
+        {
+            "fields": [],
+            "name": "Exception",
+            "struct_type": "STRUCT"
+        },
+        {
+            "fields": [],
+            "name": "ThrownException",
+            "struct_type": "STRUCT"
+        },
+        {
+            "fields": [],
+            "name": "Field",
+            "struct_type": "STRUCT"
+        },
+        {
+            "fields": [],
+            "name": "Typedef",
+            "struct_type": "STRUCT"
+        },
+        {
+            "fields": [],
+            "name": "Service",
+            "struct_type": "STRUCT"
+        },
+        {
+            "fields": [],
+            "name": "Interaction",
+            "struct_type": "STRUCT"
+        },
+        {
+            "fields": [],
+            "name": "Function",
+            "struct_type": "STRUCT"
+        },
+        {
+            "fields": [],
+            "name": "FunctionParameter",
+            "struct_type": "STRUCT"
+        },
+        {
+            "fields": [],
+            "name": "EnumValue",
+            "struct_type": "STRUCT"
+        },
+        {
+            "fields": [],
+            "name": "Const",
+            "struct_type": "STRUCT"
+        },
+        {
+            "fields": [],
+            "name": "Enum",
+            "struct_type": "STRUCT"
+        },
+        {
+            "fields": [],
+            "name": "Structured",
+            "struct_type": "STRUCT"
+        },
+        {
+            "fields": [],
+            "name": "Interface",
+            "struct_type": "STRUCT"
+        },
+        {
+            "fields": [],
+            "name": "RootDefinition",
+            "struct_type": "STRUCT"
+        },
+        {
+            "fields": [],
+            "name": "Definition",
+            "struct_type": "STRUCT"
+        },
+        {
+            "fields": [],
+            "name": "DisableSchemaConst",
+            "struct_type": "STRUCT"
+        }
+    ],
+    "typedefs": [],
+    "unions": []
+}

@@ -10,17 +10,17 @@
 {-# OPTIONS_GHC -fno-warn-overlapping-patterns#-}
 {-# OPTIONS_GHC -fno-warn-incomplete-patterns#-}
 {-# OPTIONS_GHC -fno-warn-incomplete-uni-patterns#-}
+{-# OPTIONS_GHC -fno-warn-incomplete-record-updates#-}
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
-{-# LANGUAGE DataKinds #-}
-{-# LANGUAGE FlexibleInstances #-}
-{-# LANGUAGE MultiParamTypeClasses #-}
 module Scope.Types
        (Transitive(Transitive), Program(Program), Struct(Struct),
-        Union(Union), Exception(Exception), Field(Field), Typedef(Typedef),
+        Union(Union), Exception(Exception),
+        ThrownException(ThrownException), Field(Field), Typedef(Typedef),
         Service(Service), Interaction(Interaction), Function(Function),
-        EnumValue(EnumValue), Const(Const), Enum(Enum),
-        Structured(Structured), Interface(Interface),
-        RootDefinition(RootDefinition), Definition(Definition))
+        FunctionParameter(FunctionParameter), EnumValue(EnumValue),
+        Const(Const), Enum(Enum), Structured(Structured),
+        Interface(Interface), RootDefinition(RootDefinition),
+        Definition(Definition), DisableSchemaConst(DisableSchemaConst))
        where
 import qualified Control.DeepSeq as DeepSeq
 import qualified Control.Monad as Monad
@@ -216,6 +216,41 @@ instance Default.Default Exception where
 instance Hashable.Hashable Exception where
   hashWithSalt __salt Exception = __salt
 
+data ThrownException = ThrownException{}
+                       deriving (Prelude.Eq, Prelude.Show, Prelude.Ord)
+
+instance Aeson.ToJSON ThrownException where
+  toJSON ThrownException = Aeson.object Prelude.mempty
+
+instance Thrift.ThriftStruct ThrownException where
+  buildStruct _proxy ThrownException = Thrift.genStruct _proxy []
+  parseStruct _proxy
+    = ST.runSTT
+        (do Prelude.return ()
+            let
+              _parse _lastId
+                = do _fieldBegin <- Trans.lift
+                                      (Thrift.parseFieldBegin _proxy _lastId _idMap)
+                     case _fieldBegin of
+                       Thrift.FieldBegin _type _id _bool -> do case _id of
+                                                                 _ -> Trans.lift
+                                                                        (Thrift.parseSkip _proxy
+                                                                           _type
+                                                                           (Prelude.Just _bool))
+                                                               _parse _id
+                       Thrift.FieldEnd -> do Prelude.pure (ThrownException)
+              _idMap = HashMap.fromList []
+            _parse 0)
+
+instance DeepSeq.NFData ThrownException where
+  rnf ThrownException = ()
+
+instance Default.Default ThrownException where
+  def = ThrownException
+
+instance Hashable.Hashable ThrownException where
+  hashWithSalt __salt ThrownException = __salt
+
 data Field = Field{}
              deriving (Prelude.Eq, Prelude.Show, Prelude.Ord)
 
@@ -390,6 +425,41 @@ instance Default.Default Function where
 
 instance Hashable.Hashable Function where
   hashWithSalt __salt Function = __salt
+
+data FunctionParameter = FunctionParameter{}
+                         deriving (Prelude.Eq, Prelude.Show, Prelude.Ord)
+
+instance Aeson.ToJSON FunctionParameter where
+  toJSON FunctionParameter = Aeson.object Prelude.mempty
+
+instance Thrift.ThriftStruct FunctionParameter where
+  buildStruct _proxy FunctionParameter = Thrift.genStruct _proxy []
+  parseStruct _proxy
+    = ST.runSTT
+        (do Prelude.return ()
+            let
+              _parse _lastId
+                = do _fieldBegin <- Trans.lift
+                                      (Thrift.parseFieldBegin _proxy _lastId _idMap)
+                     case _fieldBegin of
+                       Thrift.FieldBegin _type _id _bool -> do case _id of
+                                                                 _ -> Trans.lift
+                                                                        (Thrift.parseSkip _proxy
+                                                                           _type
+                                                                           (Prelude.Just _bool))
+                                                               _parse _id
+                       Thrift.FieldEnd -> do Prelude.pure (FunctionParameter)
+              _idMap = HashMap.fromList []
+            _parse 0)
+
+instance DeepSeq.NFData FunctionParameter where
+  rnf FunctionParameter = ()
+
+instance Default.Default FunctionParameter where
+  def = FunctionParameter
+
+instance Hashable.Hashable FunctionParameter where
+  hashWithSalt __salt FunctionParameter = __salt
 
 data EnumValue = EnumValue{}
                  deriving (Prelude.Eq, Prelude.Show, Prelude.Ord)
@@ -635,3 +705,38 @@ instance Default.Default Definition where
 
 instance Hashable.Hashable Definition where
   hashWithSalt __salt Definition = __salt
+
+data DisableSchemaConst = DisableSchemaConst{}
+                          deriving (Prelude.Eq, Prelude.Show, Prelude.Ord)
+
+instance Aeson.ToJSON DisableSchemaConst where
+  toJSON DisableSchemaConst = Aeson.object Prelude.mempty
+
+instance Thrift.ThriftStruct DisableSchemaConst where
+  buildStruct _proxy DisableSchemaConst = Thrift.genStruct _proxy []
+  parseStruct _proxy
+    = ST.runSTT
+        (do Prelude.return ()
+            let
+              _parse _lastId
+                = do _fieldBegin <- Trans.lift
+                                      (Thrift.parseFieldBegin _proxy _lastId _idMap)
+                     case _fieldBegin of
+                       Thrift.FieldBegin _type _id _bool -> do case _id of
+                                                                 _ -> Trans.lift
+                                                                        (Thrift.parseSkip _proxy
+                                                                           _type
+                                                                           (Prelude.Just _bool))
+                                                               _parse _id
+                       Thrift.FieldEnd -> do Prelude.pure (DisableSchemaConst)
+              _idMap = HashMap.fromList []
+            _parse 0)
+
+instance DeepSeq.NFData DisableSchemaConst where
+  rnf DisableSchemaConst = ()
+
+instance Default.Default DisableSchemaConst where
+  def = DisableSchemaConst
+
+instance Hashable.Hashable DisableSchemaConst where
+  hashWithSalt __salt DisableSchemaConst = __salt
