@@ -16,7 +16,7 @@ category:            Thrift
 build-type:          Simple
 extra-doc-files:     CHANGELOG.md
 extra-source-files:  test/fixtures/**/*.ast,
-                     test/fixtures/gen-hs2/**/*.hs,
+                     test/fixtures/**/*.hs,
                      test/if/*.thrift,
                      tests/**/*.thrift,
                      tests/**/*.hs,

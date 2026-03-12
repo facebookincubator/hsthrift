@@ -25,6 +25,8 @@ import qualified Data.Int as Int
 import qualified Data.Map.Strict as Map
 import qualified Data.Proxy as Proxy
 import qualified Data.Text as Text
+import qualified Facebook.Thrift.Annotation.Haskell.Haskell.Types
+       as Facebook.Thrift.Annotation.Haskell.Haskell
 import qualified Prelude as Prelude
 import qualified Service.Types as Types
 import qualified Thrift.Binary.Parser as Parser

@@ -48,7 +48,7 @@ withFixtureOptions f = do
          [ (TheseLangOpts defaultHsOpts, EmitCode, False, "",
             "tests/if/hs_test.thrift")
          , (TheseLangOpts defaultHsOpts{hsoptsExtraHasFields=True},
-            EmitCode, False, "",
+            EmitCode, False, "gen-hasfields",
             "tests/if/service.thrift")
          ] ++
          [ (TheseLangOpts defaultHsOpts, EmitCode, False, "", path)
@@ -71,19 +71,9 @@ withFixtureOptions f = do
             "compiler/test/if/a.thrift")
          , (TheseLangOpts NoOpts, EmitJSON WithLoc, True, "gen-single-out-loc",
             "compiler/test/if/a.thrift")
+         , (TheseLangOpts defaultHsOpts, EmitCode, False, "gen-structured",
+            "compiler/test/if/h.thrift")
          ]
-    ] ++
-    -- Structured annotation tests need repo root as include path
-    [ TheseOptions (defaultOptions (defaultHsOpts :: LangOpts Haskell))
-         { optsPath = if inTree
-             then "compiler" </> "test" </> "if" </> "h.thrift"
-             else "test" </> "if" </> "h.thrift"
-         , optsOutPath = outPath </> "gen-structured"
-         , optsIncludePath = if inTree then "." else ".."
-         , optsRecursive = True
-         , optsGenMode = EmitCode
-         , optsSingleOutput = False
-         }
     ]
 
 findCompilerDir :: FilePath -> IO FilePath
