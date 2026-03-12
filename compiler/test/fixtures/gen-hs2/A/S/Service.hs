@@ -27,8 +27,6 @@ import qualified Data.Int as Int
 import qualified Data.Map.Strict as Map
 import qualified Data.Proxy as Proxy
 import qualified Data.Text as Text
-import qualified Facebook.Thrift.Annotation.Thrift.Thrift.Types
-       as Facebook.Thrift.Annotation.Thrift.Thrift
 import qualified Prelude as Prelude
 import qualified Thrift.Binary.Parser as Parser
 import qualified Thrift.Codegen as Thrift
