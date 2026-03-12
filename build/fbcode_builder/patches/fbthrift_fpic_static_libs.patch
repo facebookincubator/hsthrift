@@ -1,0 +1,68 @@
+diff --git a/thrift/compiler/CMakeLists.txt b/thrift/compiler/CMakeLists.txt
+--- a/thrift/compiler/CMakeLists.txt
++++ b/thrift/compiler/CMakeLists.txt
+@@ -93,6 +93,7 @@ add_library(
+   diagnostic.cc
+   source_location.cc
+ )
++set_target_properties(compiler_base PROPERTIES POSITION_INDEPENDENT_CODE "${BUILD_SHARED_LIBS}")
+ target_link_libraries(
+   compiler_base
+   fmt::fmt
+@@ -130,6 +131,7 @@ add_library(
+   sema/sema_context.cc
+   sema/resolution_mismatch.cc
+ )
++set_target_properties(compiler_lib PROPERTIES POSITION_INDEPENDENT_CODE "${BUILD_SHARED_LIBS}")
+ target_compile_definitions(compiler_lib PRIVATE THRIFT_OSS)
+ target_link_libraries(
+   compiler_lib
+@@ -168,6 +170,7 @@ add_library(
+   whisker/standard_library.cc
+   whisker/token.cc
+ )
++set_target_properties(whisker PROPERTIES POSITION_INDEPENDENT_CODE "${BUILD_SHARED_LIBS}")
+ target_link_libraries(
+   whisker
+   fmt::fmt
+diff --git a/thrift/lib/cpp/CMakeLists.txt b/thrift/lib/cpp/CMakeLists.txt
+--- a/thrift/lib/cpp/CMakeLists.txt
++++ b/thrift/lib/cpp/CMakeLists.txt
+@@ -65,5 +65,7 @@ add_library(
+   ../cpp2/transport/rocket/framing/Util.cpp
+   ../cpp2/Flags.cpp
++  ../cpp2/transport/rocket/compression/CompressionAlgorithmSelector.cpp
++  ../cpp2/transport/rocket/compression/CompressionManager.cpp
+   util/PausableTimer.cpp
+   util/THttpParser.cpp
+   util/VarintUtils.cpp
+@@ -78,17 +80,7 @@ target_link_libraries(
+     concurrency
+     thrift-core
+     rpcmetadata
+-    # We need to link to libthriftcpp2.a after libtransport.a because
+-    # libtransport.a uses
+-    # apache::thrift::rocket::CompressionManager::uncompressBuffer()
+-    # that is defined in libthriftcpp2.a.
+-    #
+-    # We don't need this for libtransport.so because libthriftcpp2.so
+-    # and libtransport.so are cyclic dependencies and libthriftcpp2.so
+-    # has libtransport.so dependency. We can't link to
+-    # libthriftcpp2.so from libtransport.so. It's not allowed.
+-    $<$<AND:$<NOT:$<BOOL:${BUILD_SHARED_LIBS}>>,$<NOT:$<BOOL:${THRIFT_SERIALIZATION_ONLY}>>>:$<INSTALL_INTERFACE:FBThrift::thriftcpp2>>
+     Folly::folly
+     ZLIB::ZLIB
+     ${OPENSSL_LIBRARIES}
+     ${ZSTD_LIBRARIES}
+diff --git a/thrift/lib/cpp2/CMakeLists.txt b/thrift/lib/cpp2/CMakeLists.txt
+--- a/thrift/lib/cpp2/CMakeLists.txt
++++ b/thrift/lib/cpp2/CMakeLists.txt
+@@ -428,8 +428,6 @@ add_library(
+   transport/rocket/FdSocket.cpp
+   transport/rocket/ChecksumGenerator.cpp
+   transport/rocket/Types.cpp
+-  transport/rocket/compression/CompressionManager.cpp
+-  transport/rocket/compression/CompressionAlgorithmSelector.cpp
+   transport/rocket/compression/CustomCompressorRegistry.cpp
+   transport/rocket/client/RequestContext.cpp
+   transport/rocket/client/RequestContextQueue.cpp
