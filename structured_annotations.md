@@ -74,13 +74,7 @@ Haskell-specific annotations - that is, all annotations beginning `hs.`.
 
 ## Remaining TODOs
 
-### Convert remaining test files to structured annotations
-
-`hs_test.thrift` and `service.thrift` in `tests/if/` were not converted
-because adding `include "haskell.thrift"` brings in dependency modules
-(e.g. `Scope/Types.hs`, `Haskell/Types.hs`) whose generated output
-differs when `--extra-hasfields` is used, causing fixture conflicts with
-existing expected output.
+(none — all tasks complete)
 
 ## Completed
 
@@ -139,3 +133,9 @@ existing expected output.
   "Type" "name"` as a fallback when no unstructured `hs.type` is
   present. Supports `Int`, `String`, `ByteString`, `HashMap`,
   `HashSet`, and `Vector`/`VectorStorable`. Tests added to `h.thrift`.
+
+* `hs_test.thrift` and `service.thrift` converted to use structured
+  annotations (`@haskell.Newtype`, `@haskell.Type`, `@haskell.Prefix`).
+  `service.thrift` moved to its own output directory (`gen-hasfields/`)
+  to avoid fixture conflicts with `hs_test.thrift` (which uses default
+  options). All 34 compiler tests and 29 thrift-tests suites pass.

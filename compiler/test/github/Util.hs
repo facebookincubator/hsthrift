@@ -48,7 +48,7 @@ withFixtureOptions f = do
          [ (TheseLangOpts defaultHsOpts, EmitCode, False, "",
             "tests/if/hs_test.thrift")
          , (TheseLangOpts defaultHsOpts{hsoptsExtraHasFields=True},
-            EmitCode, False, "",
+            EmitCode, False, "gen-hasfields",
             "tests/if/service.thrift")
          , (TheseLangOpts defaultHsOpts, EmitCode, False, "",
             "compiler/test/if/a.thrift")

@@ -56,6 +56,7 @@ import qualified Data.Vector.Storable as VectorStorable
 import qualified Facebook.Thrift.Annotation.Thrift.Thrift.Types
        as Facebook.Thrift.Annotation.Thrift.Thrift
 import qualified GHC.Magic as GHC
+import qualified Haskell.Types as Haskell
 import qualified Prelude as Prelude
 import qualified Thrift.Binary.Parser as Parser
 import qualified Thrift.CodegenTypesOnly as Thrift
@@ -74,7 +75,7 @@ import qualified Data.Vector as Vector
 import qualified Data.Vector.Storable as VectorStorable
 {-# LINE 7 "if/hs_test_instances.hs" #-}
 import Prelude ((/=), ($))
-{-# LINE 78 "test/fixtures/gen-hs2/HsTest/Types.hs" #-}
+{-# LINE 79 "test/fixtures/gen-hs2/HsTest/Types.hs" #-}
 
 newtype X = X{unX :: Int.Int64}
             deriving (Prelude.Eq, Prelude.Show, DeepSeq.NFData, Prelude.Ord)
