@@ -1,0 +1,12 @@
+diff --git a/thrift/lib/cpp2/CMakeLists.txt b/thrift/lib/cpp2/CMakeLists.txt
+index 78b2066..5b7e4ea 100644
+--- a/thrift/lib/cpp2/CMakeLists.txt
++++ b/thrift/lib/cpp2/CMakeLists.txt
+@@ -231,7 +231,6 @@ target_link_libraries(
+     common
+     Folly::folly
+     thriftannotation
+-    thriftanyrep
+     thrifttyperep
+     thriftprotocol
+ )
