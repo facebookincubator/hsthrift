@@ -53,6 +53,7 @@ struct MapKey {
 }
 
 struct MapContainer {
+  @thrift.AllowUnsafeNonSealedKeyType
   1: map<MapKey, string> mapval;
 }
 

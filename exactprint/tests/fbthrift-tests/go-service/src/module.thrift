@@ -34,6 +34,7 @@ struct GetEntityResponse {
 struct NonComparableStruct {
   1: string foo;
   2: list<string> bar;
+  @thrift.AllowUnsafeNonSealedKeyType
   3: map<NonComparableStruct, i64> baz;
 }
 

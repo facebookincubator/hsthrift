@@ -129,6 +129,7 @@ union SimpleUnion {
 typedef i32 simpleTypeDef
 typedef map<i16, string> containerTypeDef
 typedef list<map<i16, string>> complexContainerTypeDef
+@thrift.AllowUnsafeNonSealedKeyType
 typedef set<SimpleUnion> unionTypeDef
 typedef list<MyStruct> structTypeDef
 typedef list<map<Empty, MyStruct>> complexStructTypeDef
@@ -150,6 +151,7 @@ union ComplexUnion {
   12: MyEnumA enum_field;
   13: list<MyEnumA> enum_container;
   14: MyStruct a_struct;
+  @thrift.AllowUnsafeNonSealedKeyType
   15: set<MyStruct> a_set_struct;
   16: SimpleUnion a_union;
   216: SimpleUnion opt_a_union;
@@ -182,6 +184,7 @@ exception AnException {
   6: MyEnumA enum_field;
   7: list<MyEnumA> enum_container;
   8: MyStruct a_struct;
+  @thrift.AllowUnsafeNonSealedKeyType
   9: set<MyStruct> a_set_struct;
   10: list<SimpleUnion> a_union_list;
   11: unionTypeDef union_typedef;
@@ -239,6 +242,7 @@ struct ContainerStruct {
   23: MyStruct fieldV;
   123: required MyStruct req_fieldV;
   223: optional MyStruct opt_fieldV;
+  @thrift.AllowUnsafeNonSealedKeyType
   24: set<MyStruct> fieldW;
   25: ComplexUnion fieldX;
   125: required ComplexUnion req_fieldX;
@@ -433,6 +437,7 @@ service ParamService {
   i64 i64_ret_float_double_param(1: float param1, 3: double param2);
   i64 i64_ret_string_typedef_param(
     1: string param1,
+    @thrift.AllowUnsafeNonSealedKeyType
     3: set<mostComplexTypeDef> param2,
   );
   @cpp.ProcessInEbThreadUnsafe
@@ -443,7 +448,10 @@ service ParamService {
     4: i32 param4,
     5: i32 param5,
   );
-  double double_ret_setstruct_param(4: set<MyStruct> param1);
+  double double_ret_setstruct_param(
+    @thrift.AllowUnsafeNonSealedKeyType
+    4: set<MyStruct> param1,
+  );
   string string_ret_string_param(1: string param1);
   binary binary_ret_binary_param(1: binary param1);
   map<string, i64> map_ret_bool_param(1: bool param1);
