@@ -1,6 +1,10 @@
 # These are a few rules to help build the open-source hsthrift. This
 # file will hopefully go away in due course.
 #
+# If you are integrating this Makefile into another build system like Nix,
+# consider setting the environment/Make variables:
+# - THRIFT_COMPILE: location of a built hsthrift compiler binary
+# - EXTERNAL_FOLLY_CLIB: when set, assumes folly-clib is already provided in the environment
 
 CABAL_BIN := cabal
 
@@ -26,93 +30,103 @@ thrift-http::
 
 thrift:: thrift-cpp thrift-hs
 
-thrift-hs:: compiler
+.PHONY: thrift-compiler
+# Allow injecting a prebuilt thrift compiler by setting THRIFT_COMPILE in
+# environment (e.g. with Nix).
+ifndef THRIFT_COMPILE
+thrift-compiler:: compiler
+	$(eval THRIFT_COMPILE := $$(shell $$(CABAL) -v0 list-bin exe:thrift-compiler))
+else
+thrift-compiler::
+	# no-op
+endif
+
+thrift-hs:: thrift-compiler
 	( \
-		THRIFT_COMPILE=$$($(CABAL) -v0 list-bin exe:thrift-compiler); \
-		(cd lib && $${THRIFT_COMPILE} --hs \
+		(cd lib && $(THRIFT_COMPILE) --hs \
 			if/RpcOptions.thrift); \
-		(cd lib && $${THRIFT_COMPILE} --hs \
+		(cd lib && $(THRIFT_COMPILE) --hs \
 			if/ApplicationException.thrift); \
-		(cd lib && $${THRIFT_COMPILE} --hs --use-int \
+		(cd lib && $(THRIFT_COMPILE) --hs --use-int \
 			test/if/math.thrift \
 			-o test); \
 		mkdir -p cpp-channel/test/if; \
-		(cd lib && $${THRIFT_COMPILE} --hs --use-int \
+		(cd lib && $(THRIFT_COMPILE) --hs --use-int \
 			test/if/math.thrift \
 			-o ../cpp-channel/test/if); \
-		(cd lib && $${THRIFT_COMPILE} --hs --use-int \
+		(cd lib && $(THRIFT_COMPILE) --hs --use-int \
 			test/if/math.thrift \
 			-o ../server/test); \
-		(cd lib && $${THRIFT_COMPILE} --hs --use-int \
+		(cd lib && $(THRIFT_COMPILE) --hs --use-int \
 			test/if/math.thrift \
 			-o ../http/test); \
-		(cd lib && $${THRIFT_COMPILE} --hs --use-int \
+		(cd lib && $(THRIFT_COMPILE) --hs --use-int \
 			test/if/echoer.thrift \
 			-o test); \
-		(cd lib && $${THRIFT_COMPILE} --hs --use-int \
+		(cd lib && $(THRIFT_COMPILE) --hs --use-int \
 			test/if/echoer.thrift \
 			-o ../server/test); \
-		(cd lib && $${THRIFT_COMPILE} --hs --use-int \
+		(cd lib && $(THRIFT_COMPILE) --hs --use-int \
 			test/if/echoer.thrift \
 			-o ../http/test); \
-		(cd server && $${THRIFT_COMPILE} --hs \
+		(cd server && $(THRIFT_COMPILE) --hs \
 			test/if/hash_map.thrift \
 			-o test); \
-		(cd tests && $${THRIFT_COMPILE} --hs \
+		(cd tests && $(THRIFT_COMPILE) --hs \
 			if/hs_prefix.thrift); \
-		(cd tests && $${THRIFT_COMPILE} --hs \
+		(cd tests && $(THRIFT_COMPILE) --hs \
 			if/foo.thrift); \
-		(cd tests && $${THRIFT_COMPILE} --hs \
+		(cd tests && $(THRIFT_COMPILE) --hs \
 			if/constants.thrift); \
-		(cd tests && $${THRIFT_COMPILE} --hs \
+		(cd tests && $(THRIFT_COMPILE) --hs \
 			--duplicate-names \
 			if/duplicate.thrift); \
-		(cd tests && $${THRIFT_COMPILE} --hs \
+		(cd tests && $(THRIFT_COMPILE) --hs \
 			if/EnumConst.thrift); \
-		(cd tests && $${THRIFT_COMPILE} --hs \
+		(cd tests && $(THRIFT_COMPILE) --hs \
 			if/enum.thrift); \
-		(cd tests && $${THRIFT_COMPILE} --hs \
+		(cd tests && $(THRIFT_COMPILE) --hs \
 			if/exception.thrift); \
-		(cd tests && $${THRIFT_COMPILE} --hs \
+		(cd tests && $(THRIFT_COMPILE) --hs \
 			--use-int --use-hash-map --use-hash-set \
 			if/flags.thrift); \
-		(cd tests && $${THRIFT_COMPILE} --hs \
+		(cd tests && $(THRIFT_COMPILE) --hs \
 			--extra-hasfields \
 			if/hasfield.thrift); \
-		(cd tests && $${THRIFT_COMPILE} --hs \
+		(cd tests && $(THRIFT_COMPILE) --hs \
 			if/A.thrift); \
-		(cd tests && $${THRIFT_COMPILE} --hs \
+		(cd tests && $(THRIFT_COMPILE) --hs \
 			if/B.thrift); \
-		(cd tests && $${THRIFT_COMPILE} --hs \
+		(cd tests && $(THRIFT_COMPILE) --hs \
 			if/C.thrift); \
-		(cd tests && $${THRIFT_COMPILE} --hs \
+		(cd tests && $(THRIFT_COMPILE) --hs \
 			if/D.thrift); \
-		(cd tests && $${THRIFT_COMPILE} --hs \
+		(cd tests && $(THRIFT_COMPILE) --hs \
 			if/E.thrift); \
-		(cd tests && $${THRIFT_COMPILE} --hs \
+		(cd tests && $(THRIFT_COMPILE) --hs \
 			if/versions.thrift); \
-		(cd tests && $${THRIFT_COMPILE} --hs \
+		(cd tests && $(THRIFT_COMPILE) --hs \
 			if/monoid.thrift); \
-		(cd tests && $${THRIFT_COMPILE} --hs \
+		(cd tests && $(THRIFT_COMPILE) --hs \
 			if/hs_test.thrift); \
-		(cd tests && $${THRIFT_COMPILE} --hs \
+		(cd tests && $(THRIFT_COMPILE) --hs \
 			if/hs_test.thrift -o ../lib/test); \
-		(cd tests && $${THRIFT_COMPILE} --hs \
+		(cd tests && $(THRIFT_COMPILE) --hs \
 			if/map.thrift); \
-		(cd tests && $${THRIFT_COMPILE} --hs \
+		(cd tests && $(THRIFT_COMPILE) --hs \
 			if/messed_up_case.thrift); \
-		(cd tests && $${THRIFT_COMPILE} --hs \
+		(cd tests && $(THRIFT_COMPILE) --hs \
 			if/namespace.thrift); \
-		(cd tests && $${THRIFT_COMPILE} --hs \
+		(cd tests && $(THRIFT_COMPILE) --hs \
 			if/namespace_included.thrift); \
-		(cd tests && $${THRIFT_COMPILE} --hs \
+		(cd tests && $(THRIFT_COMPILE) --hs \
 			if/parens.thrift); \
-		(cd tests && $${THRIFT_COMPILE} --hs \
+		(cd tests && $(THRIFT_COMPILE) --hs \
 			--required-symbols "A,B,C,X,weNeedThis" \
 			if/huge.thrift); \
-		(cd tests && $${THRIFT_COMPILE} --hs \
+		(cd tests && $(THRIFT_COMPILE) --hs \
 			if/scoped_enums.thrift); \
-		(cd tests && $${THRIFT_COMPILE} --hs \
+		(cd tests && $(THRIFT_COMPILE) --hs \
 			if/service.thrift); \
 	)
 	# those files are required for thrift-compiler's tests
@@ -148,6 +162,7 @@ install::
 # run cmake to generate folly-config.h, and collect the source files from
 # cmake to splice into the .cabal file.
 .PHONY: setup-folly
+ifndef EXTERNAL_FOLLY_CLIB
 setup-folly::
 	rm -rf folly-clib/folly folly-clib/fast_float* folly-clib/v*.tar.gz
 	(cd folly-clib && \
@@ -198,6 +213,13 @@ setup-folly-version::
 setup-folly-0::
 	sed "s|__CPP_FILES__||;s|__H_FILES__||" <folly-clib/folly-clib.cabal.in | grep -v '^\s*install-includes' | grep -v '\.h$$' >folly-clib/folly-clib.cabal
 	sed -i "s/^version:\(\s*\).*$$/version:\10.0/" folly-clib/folly-clib.cabal
+
+else
+setup-folly::
+.PHONY: setup-folly-version setup-folly-0
+setup-folly-version::
+setup-folly-0::
+endif
 
 setup-meta::
 	ln -s cabal-meta.project cabal.project
