@@ -16,8 +16,6 @@
 {-# LANGUAGE TypeOperators #-}
 module A.ParentService.Client (ParentService) where
 import qualified B.Types as B
-import qualified Facebook.Thrift.Annotation.Thrift.Thrift.Types
-       as Facebook.Thrift.Annotation.Thrift.Thrift
 import qualified Thrift.Codegen as Thrift
 import A.Types
 

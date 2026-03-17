@@ -4,7 +4,7 @@
 -- DO NOT EDIT UNLESS YOU ARE SURE THAT YOU KNOW WHAT YOU ARE DOING
 --  @generated
 -----------------------------------------------------------------
-{-# LINE 8 "test/fixtures/gen-hs2/HsTest/Types.hs" #-}
+{-# LINE 8 "compiler/test/fixtures/gen-hs2/HsTest/Types.hs" #-}
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE BangPatterns #-}
 {-# OPTIONS_GHC -fno-warn-unused-imports#-}
@@ -53,8 +53,6 @@ import qualified Data.Text as Text
 import qualified Data.Text.Encoding as Text
 import qualified Data.Vector as Vector
 import qualified Data.Vector.Storable as VectorStorable
-import qualified Facebook.Thrift.Annotation.Thrift.Thrift.Types
-       as Facebook.Thrift.Annotation.Thrift.Thrift
 import qualified GHC.Magic as GHC
 import qualified Prelude as Prelude
 import qualified Thrift.Binary.Parser as Parser
@@ -74,7 +72,7 @@ import qualified Data.Vector as Vector
 import qualified Data.Vector.Storable as VectorStorable
 {-# LINE 7 "if/hs_test_instances.hs" #-}
 import Prelude ((/=), ($))
-{-# LINE 78 "test/fixtures/gen-hs2/HsTest/Types.hs" #-}
+{-# LINE 76 "compiler/test/fixtures/gen-hs2/HsTest/Types.hs" #-}
 
 newtype X = X{unX :: Int.Int64}
             deriving (Prelude.Eq, Prelude.Show, DeepSeq.NFData, Prelude.Ord)
