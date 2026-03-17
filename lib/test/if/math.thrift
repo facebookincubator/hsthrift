@@ -6,6 +6,8 @@
  * LICENSE file in the root directory of this source tree.
  */
 
+include "thrift/annotation/thrift.thrift"
+
 package "facebook.com/hs/thrift/test"
 
 namespace cpp2 "cpp2"
@@ -30,7 +32,8 @@ service Calculator extends Adder {
 
   oneway void put(1: i64 val);
 
-  oneway void putMany(1: list<i64> val) (haxl.batched);
+  @thrift.DeprecatedUnvalidatedAnnotations{items = {"haxl.batched": "1"}}
+  oneway void putMany(1: list<i64> val);
 
   i64 get();
 

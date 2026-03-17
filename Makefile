@@ -7,6 +7,10 @@ CABAL_BIN := cabal
 THRIFT1 := thrift1
 CABAL := $(CABAL_BIN) $(CABAL_CONFIG_FLAGS) $(GETDEPS_CABAL_FLAGS)
 
+# Include path for fbthrift annotation files (installed by new_install_deps.sh)
+HSTHRIFT_PREFIX ?= $(HOME)/.hsthrift
+THRIFT_INCLUDE := -I $(HSTHRIFT_PREFIX)/include
+
 # Targets in this file invoke Cabal and hence can't be built in parallel
 .NOTPARALLEL:
 
@@ -122,13 +126,13 @@ thrift-hs:: compiler
 
 thrift-cpp::
 	mkdir -p cpp-channel/if cpp-channel/test/if
-	cd lib && $(THRIFT1) -I . --gen mstch_cpp2 \
+	cd lib && $(THRIFT1) $(THRIFT_INCLUDE) -I . --gen mstch_cpp2 \
 		-o ../cpp-channel/if \
 		if/RpcOptions.thrift
-	cd lib/test/if && $(THRIFT1) -I . --gen mstch_cpp2 \
+	cd lib/test/if && $(THRIFT1) $(THRIFT_INCLUDE) -I . --gen mstch_cpp2 \
                 -o ../../../cpp-channel/test/if \
                 math.thrift
-	cd tests/if && $(THRIFT1) -I . --gen mstch_cpp2 \
+	cd tests/if && $(THRIFT1) $(THRIFT_INCLUDE) -I . --gen mstch_cpp2 \
 		-o . \
 		hs_test.thrift
 
