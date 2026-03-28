@@ -8,7 +8,6 @@
 
 hs_include "if/hs_test_instances.hs"
 
-include "thrift/annotation/thrift.thrift"
 package "facebook.com/hs/thrift/tests/hs_test"
 
 namespace cpp2 "cpp2"
@@ -29,7 +28,6 @@ union tUnion {
 }
 
 struct TestStruct {
-  @thrift.AllowUnsafeRequiredFieldQualifier
   1: required bool f_bool;
   2: byte f_byte;
   3: double f_double;

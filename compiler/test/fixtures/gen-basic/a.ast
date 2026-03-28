@@ -173,14 +173,13 @@
     ],
     "enums": [],
     "includes": [
-        "test/if/b.thrift",
-        "thrift/annotation/thrift.thrift"
+        "test/if/b.thrift"
     ],
     "name": "a",
     "options": {
         "genfiles": null,
-        "include_path": ".",
-        "out_path": "test/fixtures/gen-basic",
+        "include_path": "compiler",
+        "out_path": "compiler/test/fixtures/gen-basic",
         "path": "test/if/a.thrift",
         "recursive": true
     },
