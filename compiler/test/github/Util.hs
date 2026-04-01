@@ -35,7 +35,7 @@ withFixtureOptions f = do
         | Just rest <- stripPrefix "tests/" fp = rest
         | otherwise = fp
 
-  withCurrentDirectory testsCwd $ f
+  withCurrentDirectory testsCwd $ f $
     [ TheseOptions (defaultOptions langopts)
          { optsPath = fixup path
          , optsOutPath = outPath </> genDir
@@ -61,6 +61,18 @@ withFixtureOptions f = do
          , (TheseLangOpts NoOpts, EmitJSON WithLoc, True, "gen-single-out-loc",
             "compiler/test/if/a.thrift")
          ]
+    ] ++
+    -- Structured annotation tests need repo root as include path
+    [ TheseOptions (defaultOptions (defaultHsOpts :: LangOpts Haskell))
+         { optsPath = if inTree
+             then "compiler" </> "test" </> "if" </> "h.thrift"
+             else "test" </> "if" </> "h.thrift"
+         , optsOutPath = outPath </> "gen-structured"
+         , optsIncludePath = if inTree then "." else ".."
+         , optsRecursive = True
+         , optsGenMode = EmitCode
+         , optsSingleOutput = False
+         }
     ]
 
 findCompilerDir :: FilePath -> IO FilePath

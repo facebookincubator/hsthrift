@@ -890,4 +890,5 @@ filterHiddenFields  = filter (not . isHiddenField)
       any (\annot -> case annot of
         SimpleAnn{saTag = "hs.hidden"} -> True
         _ -> False
-      ) $ getAnns fieldAnns
+      ) (getAnns fieldAnns)
+      || any (\StructuredAnn{..} -> saType == "haskell.Hidden") fieldSAnns

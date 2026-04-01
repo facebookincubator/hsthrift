@@ -207,7 +207,8 @@ instance Typecheckable Haskell where
 
   renameFunction _ Function{..} = lowercase $ prefix <> funName
     where
-      prefix = fromMaybe "" $ getPrefix $ getAnns funAnns
+      prefix = fromMaybe "" $
+        getPrefix (getAnns funAnns) <|> getStructuredPrefix funSAnns
 
   renameTypedef _ Typedef{..} = toConstructorName tdName
 
@@ -215,7 +216,8 @@ instance Typecheckable Haskell where
 
   renameEnumAlt opts e@Enum{..} name =
     fixCase $ if
-      | Just prefix <- getPrefix (getAnns enumAnns) -> prefix <> name
+      | Just prefix <- getPrefix (getAnns enumAnns)
+                       <|> getStructuredPrefix enumSAnns -> prefix <> name
       | otherwise -> enumName <> "_" <> name
     where
       fixCase = case enumFlavourTag opts e of
@@ -225,11 +227,13 @@ instance Typecheckable Haskell where
   renameUnion _ Union{..} = toConstructorName unionName
 
   renameUnionAlt _ Union{..} UnionAlt{..} =
-    toConstructorName $ fromMaybe (unionName <> "_") (getPrefix $ getAnns unionAnns) <>
+    toConstructorName $ fromMaybe (unionName <> "_")
+      (getPrefix (getAnns unionAnns) <|> getStructuredPrefix unionSAnns) <>
     altName
 
   getUnionEmptyName _ Union{..} =
-    toConstructorName $ fromMaybe (unionName <> "_") (getPrefix $ getAnns unionAnns) <>
+    toConstructorName $ fromMaybe (unionName <> "_")
+      (getPrefix (getAnns unionAnns) <|> getStructuredPrefix unionSAnns) <>
     "EMPTY"
 
   fieldsAreUnique Options{ optsLangSpecific = HsOpts{..} } = not hsoptsDupNames
@@ -239,7 +243,12 @@ instance Typecheckable Haskell where
   enumFlavourTag _ Enum{..}
     | hasSimpleAnn "hs.pseudoenum" = PseudoEnum False
     | hasValueAnn "hs.pseudoenum" "thriftenum" = PseudoEnum True
+    | hasStructuredAnn "haskell.PseudoEnum" enumSAnns =
+        case getStructuredAnnStringField "haskell.PseudoEnum" "value" enumSAnns of
+          Just "thriftenum" -> PseudoEnum True
+          _ -> PseudoEnum False
     | hasSimpleAnn "hs.nounknown" = SumTypeEnum True
+    | hasStructuredAnn "haskell.NoUnknown" enumSAnns = SumTypeEnum True
     | otherwise = SumTypeEnum False
     where
       hasSimpleAnn t = or
@@ -306,7 +315,8 @@ getDeclIface opts name mname decl = ifaceFromSymbols mname $ case decl of
         enumConstants
   -- Typedefs
   D_Typedef t@Typedef{..}
-    | isNewtype (getAnns tdAnns) ->
+    | isNewtype (getAnns tdAnns)
+      || hasStructuredAnn "haskell.Newtype" tdSAnns ->
         mkNewtype (packT tdName) (packHs $ renameTypedef opts t)
         (packHs $ ("un" <>) $ renameTypedef opts t)
     | otherwise ->
