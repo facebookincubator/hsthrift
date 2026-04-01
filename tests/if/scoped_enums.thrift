@@ -6,6 +6,8 @@
  * LICENSE file in the root directory of this source tree.
  */
 
+include "thrift/annotation/haskell.thrift"
+
 package "facebook.com/hs/thrift/tests/scoped_enums"
 
 enum X {
@@ -16,9 +18,10 @@ enum Y {
   A = -1,
 }
 
+@haskell.Prefix{name="a_"}
 enum Z {
   A = 9,
-} (hs.prefix = "a_")
+}
 
 const X x = X.A;
 const X x2 = A;
@@ -27,14 +30,17 @@ const Y y = Y.A;
 
 const Z z = Z.A;
 
+@haskell.PseudoEnum
 enum A {
   A = 1,
-} (hs.pseudoenum)
+}
 
 const A pseudo = A.A;
 
+@haskell.PseudoEnum
+@haskell.Prefix{name="enum_"}
 enum B {
   B = 2,
-} (hs.pseudoenum, hs.prefix = 'enum_')
+}
 
 const B prefix = B.B;

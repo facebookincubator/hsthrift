@@ -17,6 +17,8 @@ module Thrift.Compiler.Plugin
   , getNamespace
   , isNewtype
   , filterHsAnns, getTypeAnns
+  , hasStructuredAnn, getStructuredAnnStringField
+  , getStructuredPrefix
   ) where
 
 import Data.Bifunctor
@@ -292,3 +294,28 @@ getTypeAnns lang anns =
   [ (ty, a) | a@ValueAnn{vaVal=TextAnn ty _,..} <- anns, vaTag == typeTag ]
   where
     typeTag = lang <> ".type"
+
+-- Structured Annotation Helpers -----------------------------------------------
+
+-- | Check if a structured annotation with the given type name exists
+hasStructuredAnn :: Text -> [StructuredAnnotation s l a] -> Bool
+hasStructuredAnn name = any (\StructuredAnn{..} -> saType == name)
+
+-- | Get a string field value from a structured annotation
+getStructuredAnnStringField
+  :: Text -> Text -> [StructuredAnnotation s l a] -> Maybe Text
+getStructuredAnnStringField annName fieldName sAnns =
+  listToMaybe
+    [ val
+    | StructuredAnn{..} <- sAnns
+    , saType == annName
+    , Just (StructuredAnnElems{..}) <- [saMaybeElems]
+    , ListElem{..} <- saElems
+    , StructPair{..} <- [leElem]
+    , spKey == fieldName
+    , StringConst val _ <- [ucConst spVal]
+    ]
+
+-- | Get prefix from structured @haskell.Prefix annotation
+getStructuredPrefix :: [StructuredAnnotation s l a] -> Maybe Text
+getStructuredPrefix = getStructuredAnnStringField "haskell.Prefix" "name"
