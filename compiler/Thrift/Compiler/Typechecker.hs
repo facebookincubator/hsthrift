@@ -518,11 +518,13 @@ resolveTypedef t@Typedef{..} = mkTypedef
       thisty <- resolveAnnotatedType tdType
       sAnns   <- resolveStructuredAnns tdSAnns
       declIsNewtype <- or <$> mapM checkAnn (filterHsAnns $ getAnns tdAnns)
+      let structuredNewtype = hasStructuredAnn "haskell.Newtype" tdSAnns
       case thisty of
         Some ty -> return $ Typedef
           { tdResolvedName = renameTypedef options t
           , tdResolvedType = ty
-          , tdTag = if declIsNewtype then IsNewtype else IsTypedef
+          , tdTag = if declIsNewtype || structuredNewtype
+                    then IsNewtype else IsTypedef
           , tdSAnns = sAnns
           , ..
           }
@@ -536,7 +538,8 @@ resolveStruct
   -> Typechecked l Struct
 resolveStruct s@Struct{..} = do
   Env{..} <- ask
-  fields <- resolveFields structName (getAnns structAnns) structMembers
+  fields <- resolveFields structName (getAnns structAnns) structSAnns
+              structMembers
   sAnns   <- resolveStructuredAnns structSAnns
   return Struct
     { structResolvedName = renameStruct options s
@@ -549,15 +552,23 @@ resolveFields
   :: Typecheckable l
   => Text
   -> [Annotation Loc]
+  -> [Parsed StructuredAnnotation]
   -> [Parsed (Field u)]
   -> TC l [Field u 'Resolved l Loc]
-resolveFields sname as fs =
+resolveFields sname as sAnns fs =
   (traverse (resolveField as sname) =<< fields) <*
   -- Check for duplicate field ids
   foldM checkId Set.empty fs
   where
     update lazy f = f { fieldLaziness = lazy }
-    fields = foldM checkAnn fs $ filterHsAnns as
+    fields = do
+      fs' <- foldM checkAnn fs $ filterHsAnns as
+      -- Also check structured annotations for laziness
+      pure $ if hasStructuredAnn "haskell.Strict" sAnns
+             then map (update Strict) fs'
+             else if hasStructuredAnn "haskell.Lazy" sAnns
+             then map (update Lazy) fs'
+             else fs'
     checkAnn _ SimpleAnn{..}
       | saTag == "hs.strict" = pure $ map (update Strict) fs
       | saTag == "hs.lazy"   = pure $ map (update Lazy) fs
@@ -602,7 +613,9 @@ resolveField anns sname field@Field{..} = do
             [SimpleAnn{..}]
               | saTag == "hs.strict" -> pure Strict
               | saTag == "hs.lazy"   -> pure Lazy
-            [] -> pure fieldLaziness
+            [] | hasStructuredAnn "haskell.Strict" fieldSAnns -> pure Strict
+               | hasStructuredAnn "haskell.Lazy" fieldSAnns -> pure Lazy
+               | otherwise -> pure fieldLaziness
             ann : _ -> typeError (annLoc ann) $ AnnotationMismatch AnnField ann
       sAnns <- resolveStructuredAnns fieldSAnns
       Env{..} <- ask
@@ -638,10 +651,16 @@ resolveUnion u@Union{..} = do
   thishasEmpty <-
     fromMaybe (Some HasEmpty) . listToMaybe . catMaybes <$>
     mapM resolveAnn (filterHsAnns $ getAnns unionAnns)
+  -- Also check structured annotations for NonEmpty
+  let thishasEmpty' = case thishasEmpty of
+        Some HasEmpty
+          | hasStructuredAnn "haskell.NonEmpty" unionSAnns ->
+              Some NonEmpty
+        other -> other
   sAnns <- resolveStructuredAnns unionSAnns
 
   Env{..} <- ask
-  case thishasEmpty of
+  case thishasEmpty' of
     Some hasEmpty -> return Union
       { unionResolvedName = renameUnion options u
       , unionAlts = alts
@@ -792,8 +811,8 @@ resolveFunction f@Function{..} = do
     <- (,,,,) <$>
         sequence (resolveFunctionTypeTy funType)
           <*> resolveFunctionType funName annNoPriorities funType
-          <*> resolveFields funName annNoPriorities funArgs
-          <*> resolveFields funName annNoPriorities funExceptions
+          <*> resolveFields funName annNoPriorities [] funArgs
+          <*> resolveFields funName annNoPriorities [] funExceptions
           <*> resolveStructuredAnns funSAnns
   Env{..} <- ask
   pure $ Function
@@ -848,7 +867,7 @@ resolveFunctionType
           , ..
           }
       resolveThrows Throws{..} = do
-        fields <- resolveFields structName ann throwsFields
+        fields <- resolveFields structName ann [] throwsFields
         pure $ Throws
           { throwsFields = fields
           , ..
@@ -927,7 +946,8 @@ mkConstMap (thriftName, opts) imap tmap = foldM insertC emptyContext
     -- Unions define data constructors
     insertC m (D_Union u@Union{..})
       | unionAltsAreUnique opts =
-          (if any isETag $ getAnns unionAnns
+          (if any isETag (getAnns unionAnns)
+              || hasStructuredAnn "haskell.NonEmpty" unionSAnns
            then pure
            else addToScope (lLocation $ slName unionLoc)
                 (getUnionEmptyName opts u))
@@ -948,7 +968,8 @@ mkConstMap (thriftName, opts) imap tmap = foldM insertC emptyContext
     -- If a typedef is s newtype, we have to add the data constructor to the
     -- scope
     insertC m (D_Typedef t@Typedef{..})
-      | isNewtype (getAnns tdAnns) =
+      | isNewtype (getAnns tdAnns)
+        || hasStructuredAnn "haskell.Newtype" tdSAnns =
           let
             name = renameTypedef opts t
             loc  = lLocation $ tdlName tdLoc
@@ -1545,7 +1566,9 @@ mkTypemap (thriftName, opts) imap =
           hsname = renameTypedef opts t
           mkTypedef :: Some (Type l) -> Some (Type l)
           mkTypedef (Some u)
-            | isNewtype (getAnns tdAnns) = Some $ TNewtype uname u loc
+            | isNewtype (getAnns tdAnns)
+              || hasStructuredAnn "haskell.Newtype" tdSAnns =
+                Some $ TNewtype uname u loc
             -- Other annotations will be checked in resolveTypedef
             | otherwise = Some $ TTypedef uname u loc
     resolve m (D_Struct s@Struct{..}) =

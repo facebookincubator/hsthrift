@@ -7,6 +7,7 @@
  */
 
 include "thrift/annotation/thrift.thrift"
+include "thrift/annotation/haskell.thrift"
 package "facebook.com/hs/thrift/tests/foo"
 
 typedef i64 X
@@ -49,7 +50,8 @@ const Foo fooConst = {
 
 const map<i32, list<i32>> mapConst = {0: [], 1: [1, 2, 3]};
 
-typedef map<i64, i64> (hs.type = "HashMap") NewtypeMap (hs.newtype)
+@haskell.Newtype
+typedef map<i64, i64> (hs.type = "HashMap") NewtypeMap
 
 typedef string (hs.type = "String") HsString
 
