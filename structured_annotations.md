@@ -74,13 +74,6 @@ Haskell-specific annotations - that is, all annotations beginning `hs.`.
 
 ## Remaining TODOs
 
-### Support `hs.type` / `haskell.Type`
-
-The `hs.type` annotation allows overriding the generated Haskell type
-for a typedef. Supporting a structured `@haskell.Type` equivalent would
-require architectural changes to pass structured annotations through
-type resolution at the `AnnotatedType` level.
-
 ### Convert remaining test files to structured annotations
 
 `hs_test.thrift` and `service.thrift` in `tests/if/` were not converted
@@ -130,3 +123,19 @@ existing expected output.
   typechecking (for declaration pruning) so resolved annotations are not
   available. This is acceptable because symbol prefixes and enum flavour
   don't affect pruning decisions. A comment in the code documents this.
+
+* `hasStructuredAnn` and `getStructuredAnnStringField` (text-based
+  annotation helpers) removed — all annotation checks now use resolved
+  variants (`hasResolvedAnn`, `getResolvedAnnStringField`).
+
+* `haskell.Newtype` checks in `mkTypemap` and `mkConstMap` now use
+  `hasResolvedAnn "Newtype"` on resolved structured annotations instead
+  of text-based `hasStructuredAnn "haskell.Newtype"`.
+
+* `hs.type` / `@haskell.Type` support: `resolveTypeAnnotations` now
+  takes `[StructuredAnnotation 'Resolved l Loc]` for declaration-level
+  resolved annotations. `resolveAnnotatedType` threads these through to
+  `resolveType`. The Haskell plugin checks `getResolvedAnnStringField
+  "Type" "name"` as a fallback when no unstructured `hs.type` is
+  present. Supports `Int`, `String`, `ByteString`, `HashMap`,
+  `HashSet`, and `Vector`/`VectorStorable`. Tests added to `h.thrift`.
