@@ -328,8 +328,7 @@ getDeclIface opts name mname decl = ifaceFromSymbols mname $ case decl of
         enumConstants
   -- Typedefs
   D_Typedef t@Typedef{..}
-    | isNewtype (getAnns tdAnns)
-      || hasStructuredAnn "haskell.Newtype" tdSAnns ->
+    | isNewtype (getAnns tdAnns) ->
         mkNewtype (packT tdName) (packHs $ renameTypedef opts t)
         (packHs $ ("un" <>) $ renameTypedef opts t)
     | otherwise ->

@@ -17,7 +17,6 @@ module Thrift.Compiler.Plugin
   , getNamespace
   , isNewtype
   , filterHsAnns, getTypeAnns
-  , hasStructuredAnn, getStructuredAnnStringField
   , hasResolvedAnn, getResolvedAnnStringField
   , getResolvedPrefix
   ) where
@@ -320,32 +319,11 @@ getTypeAnns lang anns =
   where
     typeTag = lang <> ".type"
 
--- Structured Annotation Helpers -----------------------------------------------
-
--- | Check if a structured annotation with the given type name exists
-hasStructuredAnn :: Text -> [StructuredAnnotation s l a] -> Bool
-hasStructuredAnn name = any (\StructuredAnn{..} -> saType == name)
-
--- | Get a string field value from a structured annotation
-getStructuredAnnStringField
-  :: Text -> Text -> [StructuredAnnotation s l a] -> Maybe Text
-getStructuredAnnStringField annName fieldName sAnns =
-  listToMaybe
-    [ val
-    | StructuredAnn{..} <- sAnns
-    , saType == annName
-    , Just (StructuredAnnElems{..}) <- [saMaybeElems]
-    , ListElem{..} <- saElems
-    , StructPair{..} <- [leElem]
-    , spKey == fieldName
-    , StringConst val _ <- [ucConst spVal]
-    ]
-
 -- Resolved Structured Annotation Helpers --------------------------------------
 
 -- | Check if a resolved structured annotation matches by its resolved type.
--- More robust than 'hasStructuredAnn' because it checks the canonical type
--- identity rather than the import-dependent text name.
+-- Checks the canonical type identity via the package URI rather than the
+-- import-dependent text name.
 hasResolvedAnn :: Text -> [StructuredAnnotation 'Resolved l a] -> Bool
 hasResolvedAnn expectedName = any (isHaskellAnn expectedName)
 
