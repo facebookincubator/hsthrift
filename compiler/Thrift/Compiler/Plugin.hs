@@ -51,13 +51,15 @@ class Monoid (Interface l) => Typecheckable l  where
 
   -- * Annotation Processing
 
-  -- | Given a resolved Thrift type and a list of annotations, produce some new
+  -- | Given a resolved Thrift type, a list of unstructured annotations, and
+  -- declaration-level resolved structured annotations, produce some new
   -- transformed type. This is how TSpecial types get generated
   resolveTypeAnnotations
     :: Type l t
     -> [Annotation Loc]
+    -> [StructuredAnnotation 'Resolved l Loc]
     -> TC l (Some (Type l))
-  resolveTypeAnnotations ty _ = pure $ Some ty
+  resolveTypeAnnotations ty _ _ = pure $ Some ty
 
   -- | Recursively qualify all of the named types in a SpecialType so that they
   -- can be properly identified in imports
