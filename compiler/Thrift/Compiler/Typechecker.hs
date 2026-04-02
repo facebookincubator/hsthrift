@@ -518,7 +518,7 @@ resolveTypedef t@Typedef{..} = mkTypedef
       thisty <- resolveAnnotatedType tdType
       sAnns   <- resolveStructuredAnns tdSAnns
       declIsNewtype <- or <$> mapM checkAnn (filterHsAnns $ getAnns tdAnns)
-      let structuredNewtype = hasStructuredAnn "haskell.Newtype" tdSAnns
+      let structuredNewtype = hasResolvedAnn "Newtype" sAnns
       case thisty of
         Some ty -> return $ Typedef
           { tdResolvedName = renameTypedef options t
@@ -538,9 +538,9 @@ resolveStruct
   -> Typechecked l Struct
 resolveStruct s@Struct{..} = do
   Env{..} <- ask
-  fields <- resolveFields structName (getAnns structAnns) structSAnns
-              structMembers
   sAnns   <- resolveStructuredAnns structSAnns
+  fields <- resolveFields structName (getAnns structAnns) sAnns
+              structMembers
   return Struct
     { structResolvedName = renameStruct options s
     , structMembers      = fields
@@ -552,7 +552,7 @@ resolveFields
   :: Typecheckable l
   => Text
   -> [Annotation Loc]
-  -> [Parsed StructuredAnnotation]
+  -> [StructuredAnnotation 'Resolved l Loc]
   -> [Parsed (Field u)]
   -> TC l [Field u 'Resolved l Loc]
 resolveFields sname as sAnns fs =
@@ -563,10 +563,10 @@ resolveFields sname as sAnns fs =
     update lazy f = f { fieldLaziness = lazy }
     fields = do
       fs' <- foldM checkAnn fs $ filterHsAnns as
-      -- Also check structured annotations for laziness
-      pure $ if hasStructuredAnn "haskell.Strict" sAnns
+      -- Also check resolved structured annotations for laziness
+      pure $ if hasResolvedAnn "Strict" sAnns
              then map (update Strict) fs'
-             else if hasStructuredAnn "haskell.Lazy" sAnns
+             else if hasResolvedAnn "Lazy" sAnns
              then map (update Lazy) fs'
              else fs'
     checkAnn _ SimpleAnn{..}
@@ -609,15 +609,15 @@ resolveField anns sname field@Field{..} = do
   case thisty of
     Some ty -> do
       val  <- sequence (typecheckConst ty <$> fieldVal)
+      sAnns <- resolveStructuredAnns fieldSAnns
       lazy <- case filterHsAnns $ getAnns fieldAnns of
             [SimpleAnn{..}]
               | saTag == "hs.strict" -> pure Strict
               | saTag == "hs.lazy"   -> pure Lazy
-            [] | hasStructuredAnn "haskell.Strict" fieldSAnns -> pure Strict
-               | hasStructuredAnn "haskell.Lazy" fieldSAnns -> pure Lazy
+            [] | hasResolvedAnn "Strict" sAnns -> pure Strict
+               | hasResolvedAnn "Lazy" sAnns -> pure Lazy
                | otherwise -> pure fieldLaziness
             ann : _ -> typeError (annLoc ann) $ AnnotationMismatch AnnField ann
-      sAnns <- resolveStructuredAnns fieldSAnns
       Env{..} <- ask
       case resolveTag fieldTag ty of
         Nothing -> typeError (lLocation $ flName fieldLoc) $
@@ -651,13 +651,13 @@ resolveUnion u@Union{..} = do
   thishasEmpty <-
     fromMaybe (Some HasEmpty) . listToMaybe . catMaybes <$>
     mapM resolveAnn (filterHsAnns $ getAnns unionAnns)
-  -- Also check structured annotations for NonEmpty
+  sAnns <- resolveStructuredAnns unionSAnns
+  -- Also check resolved structured annotations for NonEmpty
   let thishasEmpty' = case thishasEmpty of
         Some HasEmpty
-          | hasStructuredAnn "haskell.NonEmpty" unionSAnns ->
+          | hasResolvedAnn "NonEmpty" sAnns ->
               Some NonEmpty
         other -> other
-  sAnns <- resolveStructuredAnns unionSAnns
 
   Env{..} <- ask
   case thishasEmpty' of
