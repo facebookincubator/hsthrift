@@ -53,10 +53,11 @@ import qualified Data.Text as Text
 import qualified Data.Text.Encoding as Text
 import qualified Data.Vector as Vector
 import qualified Data.Vector.Storable as VectorStorable
+import qualified Facebook.Thrift.Annotation.Haskell.Haskell.Types
+       as Facebook.Thrift.Annotation.Haskell.Haskell
 import qualified Facebook.Thrift.Annotation.Thrift.Thrift.Types
        as Facebook.Thrift.Annotation.Thrift.Thrift
 import qualified GHC.Magic as GHC
-import qualified Haskell.Types as Haskell
 import qualified Prelude as Prelude
 import qualified Thrift.Binary.Parser as Parser
 import qualified Thrift.CodegenTypesOnly as Thrift
