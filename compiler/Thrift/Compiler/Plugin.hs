@@ -18,7 +18,6 @@ module Thrift.Compiler.Plugin
   , isNewtype
   , filterHsAnns, getTypeAnns
   , hasStructuredAnn, getStructuredAnnStringField
-  , getStructuredPrefix
   , hasResolvedAnn, getResolvedAnnStringField
   , getResolvedPrefix
   ) where
@@ -99,11 +98,12 @@ class Monoid (Interface l) => Typecheckable l  where
 
   renameField
     :: Options l
-    -> [Annotation a]
+    -> [Annotation a] -- ^ unstructured struct annotations
+    -> [StructuredAnnotation 'Resolved l Loc] -- ^ resolved struct annotations
     -> Text
     -> Field u s m a
     -> Text
-  renameField _ _ _ Field{..} = fieldName
+  renameField _ _ _ _ Field{..} = fieldName
 
   renameConst :: Options l -> Text -> Text
   renameConst _ = id
@@ -111,8 +111,12 @@ class Monoid (Interface l) => Typecheckable l  where
   renameService :: Options l -> Service s u a -> Text
   renameService _ Service{..} = serviceName
 
-  renameFunction :: Options l -> Function s u a -> Text
-  renameFunction _ Function{..} = funName
+  renameFunction
+    :: Options l
+    -> [StructuredAnnotation 'Resolved l Loc]
+    -> Function s u a
+    -> Text
+  renameFunction _ _ Function{..} = funName
 
   renameTypedef :: Options l -> Typedef s u a -> Text
   renameTypedef _ Typedef{..} = tdName
@@ -120,17 +124,31 @@ class Monoid (Interface l) => Typecheckable l  where
   renameEnum :: Options l -> Enum s u a -> Text
   renameEnum _ Enum{..} = enumName
 
-  renameEnumAlt :: Options l -> Enum s u a -> Text -> Text
-  renameEnumAlt _ _ name = name
+  renameEnumAlt
+    :: Options l
+    -> [StructuredAnnotation 'Resolved l Loc]
+    -> Enum s u a
+    -> Text
+    -> Text
+  renameEnumAlt _ _ _ name = name
 
   renameUnion :: Options l -> Union s u a -> Text
   renameUnion _ Union{..} = unionName
 
-  renameUnionAlt :: Options l -> Union s u a -> UnionAlt s u a -> Text
-  renameUnionAlt _ _ UnionAlt{..} = altName
+  renameUnionAlt
+    :: Options l
+    -> [StructuredAnnotation 'Resolved l Loc]
+    -> Union s u a
+    -> UnionAlt s u a
+    -> Text
+  renameUnionAlt _ _ _ UnionAlt{..} = altName
 
-  getUnionEmptyName :: Options l -> Union s u a -> Text
-  getUnionEmptyName _ Union{..} = unionName <> "_EMPTY"
+  getUnionEmptyName
+    :: Options l
+    -> [StructuredAnnotation 'Resolved l Loc]
+    -> Union s u a
+    -> Text
+  getUnionEmptyName _ _ Union{..} = unionName <> "_EMPTY"
 
   -- * Uniqueness options specify whether various renamed symbols need to be
   -- globally unique to the entire Thrift (if False, they are still unique
@@ -318,10 +336,6 @@ getStructuredAnnStringField annName fieldName sAnns =
     , spKey == fieldName
     , StringConst val _ <- [ucConst spVal]
     ]
-
--- | Get prefix from structured @haskell.Prefix annotation
-getStructuredPrefix :: [StructuredAnnotation s l a] -> Maybe Text
-getStructuredPrefix = getStructuredAnnStringField "haskell.Prefix" "name"
 
 -- Resolved Structured Annotation Helpers --------------------------------------
 

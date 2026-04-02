@@ -74,14 +74,17 @@ Haskell-specific annotations - that is, all annotations beginning `hs.`.
 
 ## Remaining TODOs
 
-### Refactor Plugins/Haskell.hs to use resolved annotations
+### Refactor `enumFlavourTag` and `getDeclIface` to use resolved annotations
 
-The `Typecheckable` class methods (`enumFlavourTag`, `renameFunction`,
-`renameEnumAlt`, `renameUnionAlt`, `getUnionEmptyName`, `getDeclIface`)
-all receive `Parsed` types where `saResolvedType :: ()`. They currently
-use text-based `hasStructuredAnn "haskell.Foo"` checks. To use
-resolved-type checks, the `Typecheckable` class interface would need to
-be changed to pass resolved structured annotations to these methods.
+`enumFlavourTag` in `Plugins/Haskell.hs` still uses text-based
+`hasStructuredAnn "haskell.PseudoEnum"` / `"haskell.NoUnknown"` checks
+because it receives `Parsed` types. The same pattern as the other rename
+methods could be applied (pass resolved annotations as a parameter).
+
+`getDeclIface` also uses `[]` for resolved annotations — it runs before
+typechecking (for declaration pruning) so resolved annotations are not
+available. This is acceptable because symbol prefixes don't affect
+pruning decisions. A comment in the code documents this.
 
 ### Support `hs.type` / `haskell.Type`
 
@@ -89,13 +92,6 @@ The `hs.type` annotation allows overriding the generated Haskell type
 for a typedef. Supporting a structured `@haskell.Type` equivalent would
 require architectural changes to pass structured annotations through
 type resolution at the `AnnotatedType` level.
-
-### Support `hs.prefix` on structs affecting field names
-
-The `hs.prefix` annotation on structs affects the generated names of
-the struct's fields. The `renameField` class method in `Typecheckable`
-doesn't currently receive the parent struct's data, so supporting
-`@haskell.Prefix` here would require changing the class signature.
 
 ### Convert remaining test files to structured annotations
 
@@ -116,3 +112,20 @@ existing expected output.
   the file path suffix. `Name` has a new `namePackage :: Maybe Text`
   field, populated from the `package` declaration in the source thrift
   file.
+
+* `hs.prefix` on structs: `renameField` now takes both unstructured
+  annotations and `[StructuredAnnotation 'Resolved l Loc]`, and the
+  plugin handles prefix extraction. The typechecker passes annotations
+  through without interpreting them.
+
+* `renameFunction`, `renameEnumAlt`, `renameUnionAlt`, `getUnionEmptyName`
+  all take resolved structured annotations. The Haskell plugin checks
+  `getResolvedPrefix` first, falling back to unstructured `getPrefix`.
+
+* All map builders (`mkConstMap`, `mkEnumMap`, `mkUnionMap`,
+  `mkServiceMap`) now resolve structured annotations before calling
+  rename methods. `mkSchemaMap` is built first (sequentially) so its
+  result is available to the others.
+
+* `getStructuredPrefix` removed — all prefix handling now goes through
+  `getResolvedPrefix` on resolved annotations.
