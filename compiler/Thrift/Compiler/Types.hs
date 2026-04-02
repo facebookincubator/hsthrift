@@ -47,7 +47,6 @@ module Thrift.Compiler.Types
   , SCHEMA(..), Schema, USchema
   , SpecialType
   , Name(..), ThriftName, Name_(..), localName, mapName, mkName
-  , filterHiddenFields
   ) where
 
 import Prelude hiding (Enum)
@@ -885,12 +884,4 @@ mkName pkg tname rname = Name
   , namePackage = pkg
   }
 
-filterHiddenFields :: [Field u s l a] -> [Field u s l a]
-filterHiddenFields  = filter (not . isHiddenField)
-  where
-    isHiddenField Field{..} =
-      any (\annot -> case annot of
-        SimpleAnn{saTag = "hs.hidden"} -> True
-        _ -> False
-      ) (getAnns fieldAnns)
-      || any (\StructuredAnn{..} -> saType == "haskell.Hidden") fieldSAnns
+
