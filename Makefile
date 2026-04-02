@@ -27,93 +27,100 @@ thrift-http::
 thrift:: thrift-cpp thrift-hs
 
 thrift-hs:: compiler
+	ls -l thrift
+	ls -l compiler
+	ls -l tests
 	( \
-		THRIFT_COMPILE=$$($(CABAL) -v0 list-bin exe:thrift-compiler); \
+		THRIFT_COMPILE=$$($(CABAL) -v0 list-bin exe:thrift-compiler) && \
 		(cd lib && $${THRIFT_COMPILE} --hs \
-			if/RpcOptions.thrift); \
+			if/RpcOptions.thrift) && \
 		(cd lib && $${THRIFT_COMPILE} --hs \
-			if/ApplicationException.thrift); \
+			if/ApplicationException.thrift) && \
 		(cd lib && $${THRIFT_COMPILE} --hs --use-int \
 			test/if/math.thrift \
-			-o test); \
-		mkdir -p cpp-channel/test/if; \
+			-o test) && \
+		mkdir -p cpp-channel/test/if && \
 		(cd lib && $${THRIFT_COMPILE} --hs --use-int \
 			test/if/math.thrift \
-			-o ../cpp-channel/test/if); \
+			-o ../cpp-channel/test/if) && \
 		(cd lib && $${THRIFT_COMPILE} --hs --use-int \
 			test/if/math.thrift \
-			-o ../server/test); \
+			-o ../server/test) && \
 		(cd lib && $${THRIFT_COMPILE} --hs --use-int \
 			test/if/math.thrift \
-			-o ../http/test); \
+			-o ../http/test) && \
 		(cd lib && $${THRIFT_COMPILE} --hs --use-int \
 			test/if/echoer.thrift \
-			-o test); \
+			-o test) && \
 		(cd lib && $${THRIFT_COMPILE} --hs --use-int \
 			test/if/echoer.thrift \
-			-o ../server/test); \
+			-o ../server/test) && \
 		(cd lib && $${THRIFT_COMPILE} --hs --use-int \
 			test/if/echoer.thrift \
-			-o ../http/test); \
+			-o ../http/test) && \
 		(cd server && $${THRIFT_COMPILE} --hs \
 			test/if/hash_map.thrift \
-			-o test); \
+			-o test) && \
 		(cd tests && $${THRIFT_COMPILE} --hs \
-			if/hs_prefix.thrift); \
+			thrift/annotation/thrift.thrift) && \
 		(cd tests && $${THRIFT_COMPILE} --hs \
-			if/foo.thrift); \
+			thrift/annotation/scope.thrift) && \
 		(cd tests && $${THRIFT_COMPILE} --hs \
-			if/constants.thrift); \
+			if/hs_prefix.thrift) && \
+		(cd tests && $${THRIFT_COMPILE} --hs \
+			if/foo.thrift) && \
+		(cd tests && $${THRIFT_COMPILE} --hs \
+			if/constants.thrift) && \
 		(cd tests && $${THRIFT_COMPILE} --hs \
 			--duplicate-names \
-			if/duplicate.thrift); \
+			if/duplicate.thrift) && \
 		(cd tests && $${THRIFT_COMPILE} --hs \
-			if/EnumConst.thrift); \
+			if/EnumConst.thrift) && \
 		(cd tests && $${THRIFT_COMPILE} --hs \
-			if/enum.thrift); \
+			if/enum.thrift) && \
 		(cd tests && $${THRIFT_COMPILE} --hs \
-			if/exception.thrift); \
+			if/exception.thrift) && \
 		(cd tests && $${THRIFT_COMPILE} --hs \
 			--use-int --use-hash-map --use-hash-set \
-			if/flags.thrift); \
+			if/flags.thrift) && \
 		(cd tests && $${THRIFT_COMPILE} --hs \
 			--extra-hasfields \
-			if/hasfield.thrift); \
+			if/hasfield.thrift) && \
 		(cd tests && $${THRIFT_COMPILE} --hs \
-			if/A.thrift); \
+			if/A.thrift) && \
 		(cd tests && $${THRIFT_COMPILE} --hs \
-			if/B.thrift); \
+			if/B.thrift) && \
 		(cd tests && $${THRIFT_COMPILE} --hs \
-			if/C.thrift); \
+			if/C.thrift) && \
 		(cd tests && $${THRIFT_COMPILE} --hs \
-			if/D.thrift); \
+			if/D.thrift) && \
 		(cd tests && $${THRIFT_COMPILE} --hs \
-			if/E.thrift); \
+			if/E.thrift) && \
 		(cd tests && $${THRIFT_COMPILE} --hs \
-			if/versions.thrift); \
+			if/versions.thrift) && \
 		(cd tests && $${THRIFT_COMPILE} --hs \
-			if/monoid.thrift); \
+			if/monoid.thrift) && \
 		(cd tests && $${THRIFT_COMPILE} --hs \
-			if/hs_test.thrift); \
+			if/hs_test.thrift) && \
 		(cd tests && $${THRIFT_COMPILE} --hs \
-			if/hs_test.thrift -o ../lib/test); \
+			if/hs_test.thrift -o ../lib/test) && \
 		(cd tests && $${THRIFT_COMPILE} --hs \
-			if/map.thrift); \
+			if/map.thrift) && \
 		(cd tests && $${THRIFT_COMPILE} --hs \
-			if/messed_up_case.thrift); \
+			if/messed_up_case.thrift) && \
 		(cd tests && $${THRIFT_COMPILE} --hs \
-			if/namespace.thrift); \
+			if/namespace.thrift) && \
 		(cd tests && $${THRIFT_COMPILE} --hs \
-			if/namespace_included.thrift); \
+			if/namespace_included.thrift) && \
 		(cd tests && $${THRIFT_COMPILE} --hs \
-			if/parens.thrift); \
+			if/parens.thrift) && \
 		(cd tests && $${THRIFT_COMPILE} --hs \
 			--required-symbols "A,B,C,X,weNeedThis" \
-			if/huge.thrift); \
+			if/huge.thrift) && \
 		(cd tests && $${THRIFT_COMPILE} --hs \
-			if/scoped_enums.thrift); \
+			if/scoped_enums.thrift) && \
 		(cd tests && $${THRIFT_COMPILE} --hs \
-			if/service.thrift); \
+			if/service.thrift) \
 	)
 	# those files are required for thrift-compiler's tests
 	mkdir -p compiler/tests/if
