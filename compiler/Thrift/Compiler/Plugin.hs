@@ -236,6 +236,7 @@ qualName :: (Text, Text) -> Name -> Name
 qualName (tm, rm) Name{..} = Name
   { sourceName = qualName_ tm sourceName
   , resolvedName = qualName_ rm resolvedName
+  , namePackage = namePackage
   }
 
 qualName_ :: Text -> Name_ s -> Name_ s
@@ -349,11 +350,14 @@ getResolvedAnnStringField annName fieldName sAnns =
 getResolvedPrefix :: [StructuredAnnotation 'Resolved l a] -> Maybe Text
 getResolvedPrefix = getResolvedAnnStringField "Prefix" "name"
 
--- | Check if a resolved annotation's type is a struct from haskell.thrift
--- with the given local name.
+-- | Check if a resolved annotation's type is a struct from the
+-- haskell annotation package with the given local name.
 isHaskellAnn :: Text -> StructuredAnnotation 'Resolved l a -> Bool
 isHaskellAnn expectedName StructuredAnn{..} = case saResolvedType of
-  TStruct name loc ->
+  TStruct name _loc ->
     localName (resolvedName name) == expectedName
-    && "haskell.thrift" `isSuffixOf` locFile loc
+    && namePackage name == Just haskellAnnotationPackage
   _ -> False
+
+haskellAnnotationPackage :: Text
+haskellAnnotationPackage = "facebook.com/thrift/annotation/haskell"

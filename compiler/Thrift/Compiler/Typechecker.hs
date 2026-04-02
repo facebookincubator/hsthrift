@@ -107,22 +107,23 @@ typecheckModule opts@Options{..} progs tf@ThriftFile{..} = do
                 , optsLenient || progPath `elem` imports ]
     importMap = mkImportMap opts progs imports
     renamedModule = renameModule opts tf
+    pkg = listToMaybe [ uri | HPackage{pkgUri = Just uri} <- thriftHeaders ]
     thriftDeclsNew
       | optsLenient && Map.notMember thriftName importMap =
           unSelfQualDecls thriftName thriftDecls
       | otherwise = thriftDecls
   -- Make Type Map
-  tmap <- mkTypemap (thriftName, opts) importMap thriftDeclsNew
+  tmap <- mkTypemap (thriftName, opts) pkg importMap thriftDeclsNew
   -- Make Schema, Constants, and Services Maps
   let
     Decls{..} = partitionDecls thriftDeclsNew
-    emap = mkEnumMap opts dEnums
+    emap = mkEnumMap opts pkg dEnums
     imap = mkEnumInt opts dEnums
   (smap, umap, cmap, servMap)
      <- (,,,) <$> mkSchemaMap (thriftName, opts) importMap tmap dStructs
          <*> mkUnionMap (thriftName, opts) importMap tmap dUnions
-         <*> mkConstMap (thriftName, opts) importMap tmap thriftDeclsNew
-         <*> mkServiceMap (thriftName, opts) importMap dServs
+         <*> mkConstMap (thriftName, opts) pkg importMap tmap thriftDeclsNew
+         <*> mkServiceMap (thriftName, opts) pkg importMap dServs
 
   -- Build the Env
   let env = Env { typeMap    = tmap
@@ -918,11 +919,12 @@ resolveStructuredAnn StructuredAnn{..} = do
 mkConstMap
   :: forall l. Typecheckable l
   => (Text, Options l)
+  -> Maybe Text
   -> ImportMap l
   -> TypeMap l
   -> [Parsed Decl]
   -> Either [TypeError l] (ConstMap l)
-mkConstMap (thriftName, opts) imap tmap = foldM insertC emptyContext
+mkConstMap (thriftName, opts) pkg imap tmap = foldM insertC emptyContext
   where
     -- Structs don't define constants, but they have symbols in scope
     insertC m (D_Struct s@Struct{..}) = do
@@ -988,7 +990,7 @@ mkConstMap (thriftName, opts) imap tmap = foldM insertC emptyContext
     insertC m (D_Const Const{..}) = do
       ty <- runTypechecker env $ resolveAnnotatedType constType
       let renamed = renameConst opts constName
-      insertContext loc constName renamed (ty, mkName constName renamed, loc) m
+      insertContext loc constName renamed (ty, mkName pkg constName renamed, loc) m
       where
         env = (emptyEnv (thriftName, opts))
           { typeMap   = tmap
@@ -999,12 +1001,12 @@ mkConstMap (thriftName, opts) imap tmap = foldM insertC emptyContext
     insertC m D_Service{} = pure m
     insertC m D_Interaction{} = pure m
 
-getEnumType :: Typecheckable l => Options l -> Parsed Enum -> Some (Type l)
-getEnumType opts enum@Enum{..} = case enumFlavourTag opts enum of
+getEnumType :: Typecheckable l => Options l -> Maybe Text -> Parsed Enum -> Some (Type l)
+getEnumType opts pkg enum@Enum{..} = case enumFlavourTag opts enum of
   PseudoEnum{} -> Some $ TNewtype name enumValueType loc
   SumTypeEnum noUnknown -> Some $ TEnum name loc noUnknown
   where
-    name = mkName enumName $ renameEnum opts enum
+    name = mkName pkg enumName $ renameEnum opts enum
     loc = lLocation (slName enumLoc)
 
 -- Typecheck Constants ---------------------------------------------------------
@@ -1546,10 +1548,11 @@ addToScope loc x ctx@Context{..}
 mkTypemap
   :: forall l. Typecheckable l
   => (Text, Options l)
+  -> Maybe Text
   -> ImportMap l
   -> [Parsed Decl]
   -> Either [TypeError l] (TypeMap l)
-mkTypemap (thriftName, opts) imap =
+mkTypemap (thriftName, opts) pkg imap =
     foldM resolve emptyContext <=< sortDecls
   where
     resolve :: TypeMap l -> Parsed Decl -> Either [TypeError l] (TypeMap l)
@@ -1562,7 +1565,7 @@ mkTypemap (thriftName, opts) imap =
             { typeMap   = m
             , importMap = imap
             }
-          uname = mkName tdName hsname
+          uname = mkName pkg tdName hsname
           hsname = renameTypedef opts t
           mkTypedef :: Some (Type l) -> Some (Type l)
           mkTypedef (Some u)
@@ -1575,7 +1578,7 @@ mkTypemap (thriftName, opts) imap =
       insertContext (lLocation $ slName structLoc) structName hsname structTy m
         where
           loc = lLocation (slName structLoc)
-          uname = mkName structName hsname
+          uname = mkName pkg structName hsname
           hsname = renameStruct opts s
           structTy =
             case structType of
@@ -1586,11 +1589,11 @@ mkTypemap (thriftName, opts) imap =
       (Some $ TUnion uname loc) m
       where
         loc = lLocation (slName unionLoc)
-        uname = mkName unionName hsname
+        uname = mkName pkg unionName hsname
         hsname = renameUnion opts u
     resolve m (D_Enum e@Enum{..}) =
       insertContext (lLocation $ slName enumLoc) enumName (renameEnum opts e)
-      (getEnumType opts e) m
+      (getEnumType opts pkg e) m
     resolve m D_Const{} = pure m
     resolve m D_Service{} = pure m
     resolve m D_Interaction{} = pure m
@@ -1774,8 +1777,8 @@ mkUSchema u@Union{..} =
 
 -- We need the enums to be resolved in order to build the map because we need to
 -- know the numeric values for each field
-mkEnumMap :: Typecheckable l => Options l -> [Parsed Enum] -> EnumMap
-mkEnumMap opts = Map.fromList . map mkAssoc
+mkEnumMap :: Typecheckable l => Options l -> Maybe Text -> [Parsed Enum] -> EnumMap
+mkEnumMap opts pkg = Map.fromList . map mkAssoc
   where
     mkAssoc :: Parsed Enum -> (Text, EnumValues)
     mkAssoc e@Enum{..} = (enumName, enumValues)
@@ -1789,7 +1792,7 @@ mkEnumMap opts = Map.fromList . map mkAssoc
             | EnumValue{..} <- enumConstants
             ]
           )
-        rename name = mkName name $ renameEnumAlt opts e name
+        rename name = mkName pkg name $ renameEnumAlt opts e name
 
 -- Build EnumInt Map -----------------------------------------------------------
 
@@ -1814,15 +1817,16 @@ mkEnumInt opts
 mkServiceMap
   :: Typecheckable l
   => (Text, Options l)
+  -> Maybe Text
   -> ImportMap l
   -> [Parsed Service]
   -> Either [TypeError l] ServiceMap
-mkServiceMap (thriftName, opts) imap =
+mkServiceMap (thriftName, opts) pkg imap =
     foldM addToMap Map.empty <=< sortServices
   where
     addToMap ctx s@Service{..} = do
       scope <- mkScope ctx s
-      let renamed = mkName serviceName $ renameService opts s
+      let renamed = mkName pkg serviceName $ renameService opts s
           loc = sloc serviceLoc
       insertUnique loc serviceName (renamed, scope, loc) ctx
     addToSet loc x s
