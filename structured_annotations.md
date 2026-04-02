@@ -83,14 +83,6 @@ use text-based `hasStructuredAnn "haskell.Foo"` checks. To use
 resolved-type checks, the `Typecheckable` class interface would need to
 be changed to pass resolved structured annotations to these methods.
 
-### Refactor filterHiddenFields to use resolved annotations
-
-`filterHiddenFields` in `Types.hs` is polymorphic in status (`s`), so
-it must work on both Parsed and Resolved fields. It currently uses the
-text-based check `saType == "haskell.Hidden"`. Supporting resolved
-checks here would require either specializing the function or adding a
-class constraint.
-
 ### Support `hs.type` / `haskell.Type`
 
 The `hs.type` annotation allows overriding the generated Haskell type
@@ -112,3 +104,15 @@ because adding `include "haskell.thrift"` brings in dependency modules
 (e.g. `Scope/Types.hs`, `Haskell/Types.hs`) whose generated output
 differs when `--extra-hasfields` is used, causing fixture conflicts with
 existing expected output.
+
+## Completed
+
+* `filterHiddenFields` moved from the parser into the typechecker
+  (`resolveField` in `Typechecker.hs`), now uses resolved annotations
+  via `hasResolvedAnn "Hidden"`.
+
+* `isHaskellAnn` now checks `namePackage` against the canonical package
+  URI `"facebook.com/thrift/annotation/haskell"` instead of matching
+  the file path suffix. `Name` has a new `namePackage :: Maybe Text`
+  field, populated from the `package` declaration in the source thrift
+  file.
