@@ -19,7 +19,8 @@ extra-source-files:  test/fixtures/**/*.ast,
                      test/fixtures/gen-hs2/**/*.hs,
                      test/if/*.thrift,
                      tests/**/*.thrift,
-                     tests/**/*.hs
+                     tests/**/*.hs,
+                     thrift/**/*.thrift
 
 description:
     A compiler from the Thrift Interface Definition Language (IDL) to Haskell.

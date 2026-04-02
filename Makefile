@@ -37,40 +37,40 @@ thrift-hs:: compiler
 			if/RpcOptions.thrift); \
 		(cd lib && $${THRIFT_COMPILE} --hs \
 			if/ApplicationException.thrift); \
-		$${THRIFT_COMPILE} --hs \
+		(cd lib && $${THRIFT_COMPILE} --hs \
 			thrift/annotation/thrift.thrift \
-			-o lib/test; \
-		$${THRIFT_COMPILE} --hs \
+			-o test); \
+		(cd lib && $${THRIFT_COMPILE} --hs \
 			thrift/annotation/scope.thrift \
-			-o lib/test; \
+			-o test); \
 		(cd lib && $${THRIFT_COMPILE} --hs --use-int \
 			test/if/math.thrift \
 			-o test); \
 		mkdir -p cpp-channel/test/if; \
-		$${THRIFT_COMPILE} --hs \
+		(cd lib && $${THRIFT_COMPILE} --hs \
 			thrift/annotation/thrift.thrift \
-			-o cpp-channel/test; \
-		$${THRIFT_COMPILE} --hs \
+			-o ../cpp-channel/test); \
+		(cd lib && $${THRIFT_COMPILE} --hs \
 			thrift/annotation/scope.thrift \
-			-o cpp-channel/test; \
+			-o ../cpp-channel/test); \
 		(cd lib && $${THRIFT_COMPILE} --hs --use-int \
 			test/if/math.thrift \
 			-o ../cpp-channel/test/if); \
-		$${THRIFT_COMPILE} --hs \
+		(cd lib && $${THRIFT_COMPILE} --hs \
 			thrift/annotation/thrift.thrift \
-			-o server/test; \
-		$${THRIFT_COMPILE} --hs \
+			-o ../server/test); \
+		(cd lib && $${THRIFT_COMPILE} --hs \
 			thrift/annotation/scope.thrift \
-			-o server/test; \
+			-o ../server/test); \
 		(cd lib && $${THRIFT_COMPILE} --hs --use-int \
 			test/if/math.thrift \
 			-o ../server/test); \
-		$${THRIFT_COMPILE} --hs \
+		(cd lib && $${THRIFT_COMPILE} --hs \
 			thrift/annotation/thrift.thrift \
-			-o http/test; \
-		$${THRIFT_COMPILE} --hs \
+			-o ../http/test); \
+		(cd lib && $${THRIFT_COMPILE} --hs \
 			thrift/annotation/scope.thrift \
-			-o http/test; \
+			-o ../http/test); \
 		(cd lib && $${THRIFT_COMPILE} --hs --use-int \
 			test/if/math.thrift \
 			-o ../http/test); \
