@@ -737,7 +737,7 @@ resolveEnum enum@Enum{..} = do
   return Enum
     { enumResolvedName = renameEnum options enum
     , enumConstants = consts
-    , enumFlavour = enumFlavourTag options enum
+    , enumFlavour = enumFlavourTag options sAnns enum
     , enumSAnns = sAnns
     , ..
     }
@@ -1048,10 +1048,16 @@ mkConstMap (thriftName, opts) pkg imap tmap smap = foldM insertC emptyContext
     insertC m D_Service{} = pure m
     insertC m D_Interaction{} = pure m
 
-getEnumType :: Typecheckable l => Options l -> Maybe Text -> Parsed Enum -> Some (Type l)
-getEnumType opts pkg enum@Enum{..} = case enumFlavourTag opts enum of
-  PseudoEnum{} -> Some $ TNewtype name enumValueType loc
-  SumTypeEnum noUnknown -> Some $ TEnum name loc noUnknown
+getEnumType :: Typecheckable l
+  => Options l
+  -> [StructuredAnnotation 'Resolved l Loc]
+  -> Maybe Text
+  -> Parsed Enum
+  -> Some (Type l)
+getEnumType opts resolvedAnns pkg enum@Enum{..} =
+  case enumFlavourTag opts resolvedAnns enum of
+    PseudoEnum{} -> Some $ TNewtype name enumValueType loc
+    SumTypeEnum noUnknown -> Some $ TEnum name loc noUnknown
   where
     name = mkName pkg enumName $ renameEnum opts enum
     loc = lLocation (slName enumLoc)
@@ -1638,9 +1644,15 @@ mkTypemap (thriftName, opts) pkg imap =
         loc = lLocation (slName unionLoc)
         uname = mkName pkg unionName hsname
         hsname = renameUnion opts u
-    resolve m (D_Enum e@Enum{..}) =
+    resolve m (D_Enum e@Enum{..}) = do
+      sAnns <- runTypechecker env $ resolveStructuredAnns enumSAnns
       insertContext (lLocation $ slName enumLoc) enumName (renameEnum opts e)
-      (getEnumType opts pkg e) m
+        (getEnumType opts sAnns pkg e) m
+      where
+        env = (emptyEnv (thriftName, opts))
+          { typeMap   = m
+          , importMap = imap
+          }
     resolve m D_Const{} = pure m
     resolve m D_Service{} = pure m
     resolve m D_Interaction{} = pure m
