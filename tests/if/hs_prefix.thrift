@@ -27,10 +27,11 @@ struct S {
   2: E B = E.B;
 }
 
+@haskell.Prefix{name="ps_"}
 struct PrefixedS {
   1: i64 A;
   3: PrefixedE B = PrefixedE.B;
-} (hs.prefix = "ps_")
+}
 
 union U {
   1: E A;

@@ -193,31 +193,34 @@ instance Typecheckable Haskell where
 
   renameStruct _ Struct{..} = toConstructorName structName
 
-  renameField Options{..} ann sname Field{..} =
+  renameField Options{..} anns resolvedAnns sname Field{..} =
     case optsLangSpecific of
       HsOpts{..} ->
         let basePrefix
               | hsoptsDupNames = ""
               | otherwise = sname <> "_"
-        in  lowercase $ fromMaybe basePrefix (getPrefix ann) <> fieldName
+            prefix = getResolvedPrefix resolvedAnns
+              <|> getPrefix anns
+        in  lowercase $ fromMaybe basePrefix prefix <> fieldName
 
   renameConst _ = lowercase
 
   renameService _ Service{..} = toConstructorName serviceName
 
-  renameFunction _ Function{..} = lowercase $ prefix <> funName
+  renameFunction _ resolvedAnns Function{..} = lowercase $ prefix <> funName
     where
       prefix = fromMaybe "" $
-        getPrefix (getAnns funAnns) <|> getStructuredPrefix funSAnns
+        getResolvedPrefix resolvedAnns
+        <|> getPrefix (getAnns funAnns)
 
   renameTypedef _ Typedef{..} = toConstructorName tdName
 
   renameEnum _ Enum{..} = toConstructorName enumName
 
-  renameEnumAlt opts e@Enum{..} name =
+  renameEnumAlt opts resolvedAnns e@Enum{..} name =
     fixCase $ if
-      | Just prefix <- getPrefix (getAnns enumAnns)
-                       <|> getStructuredPrefix enumSAnns -> prefix <> name
+      | Just prefix <- getResolvedPrefix resolvedAnns
+                       <|> getPrefix (getAnns enumAnns) -> prefix <> name
       | otherwise -> enumName <> "_" <> name
     where
       fixCase = case enumFlavourTag opts e of
@@ -226,14 +229,16 @@ instance Typecheckable Haskell where
 
   renameUnion _ Union{..} = toConstructorName unionName
 
-  renameUnionAlt _ Union{..} UnionAlt{..} =
+  renameUnionAlt _ resolvedAnns Union{..} UnionAlt{..} =
     toConstructorName $ fromMaybe (unionName <> "_")
-      (getPrefix (getAnns unionAnns) <|> getStructuredPrefix unionSAnns) <>
+      (getResolvedPrefix resolvedAnns
+       <|> getPrefix (getAnns unionAnns)) <>
     altName
 
-  getUnionEmptyName _ Union{..} =
+  getUnionEmptyName _ resolvedAnns Union{..} =
     toConstructorName $ fromMaybe (unionName <> "_")
-      (getPrefix (getAnns unionAnns) <|> getStructuredPrefix unionSAnns) <>
+      (getResolvedPrefix resolvedAnns
+       <|> getPrefix (getAnns unionAnns)) <>
     "EMPTY"
 
   fieldsAreUnique Options{ optsLangSpecific = HsOpts{..} } = not hsoptsDupNames
@@ -274,6 +279,14 @@ instance Typecheckable Haskell where
 
 -- Compute Decl Interfaces -----------------------------------------------------
 
+-- Note: getDeclIface passes [] for resolved structured annotations to the
+-- rename functions. This means @haskell.Prefix structured annotations are
+-- not taken into account here. This is used only for declaration pruning
+-- (determining which symbols are referenced in splice files), not for actual
+-- code generation. Symbol prefixes shouldn't affect pruning decisions, so
+-- this is acceptable. Fixing it properly would require typechecking before
+-- pruning, which is a much larger change.
+
 getDeclIface
   :: Options Haskell -> Text -> E.ModuleName () -> Parsed Decl -> HsInterface
 getDeclIface opts name mname decl = ifaceFromSymbols mname $ case decl of
@@ -283,7 +296,7 @@ getDeclIface opts name mname decl = ifaceFromSymbols mname $ case decl of
     concatMap
     (\field ->
       mkSelector (packT structName)
-      (packHs $ renameField opts (getAnns structAnns) structName field)
+      (packHs $ renameField opts (getAnns structAnns) [] structName field)
       (packHs $ renameStruct opts s))
     structMembers
   -- Unions
@@ -292,7 +305,7 @@ getDeclIface opts name mname decl = ifaceFromSymbols mname $ case decl of
     concatMap
     (\alt ->
       mkConstructor (packT unionName)
-      (packHs $ renameUnionAlt opts u alt)
+      (packHs $ renameUnionAlt opts [] u alt)
       (packHs $ renameUnion opts u))
     unionAlts
   -- Enums
@@ -303,14 +316,14 @@ getDeclIface opts name mname decl = ifaceFromSymbols mname $ case decl of
           (packHs $ ("un" <>) $ renameEnum opts e) ++
         concatMap
         (\EnumValue{..} ->
-          mkValue (packT enumName) (packHs $ renameEnumAlt opts e evName))
+          mkValue (packT enumName) (packHs $ renameEnumAlt opts [] e evName))
         enumConstants
       SumTypeEnum{} ->
         mkData (packT enumName) (packHs $ renameEnum opts e) ++
         concatMap
         (\EnumValue{..} ->
           mkConstructor (packT enumName)
-          (packHs $ renameEnumAlt opts e evName)
+          (packHs $ renameEnumAlt opts [] e evName)
           (packHs $ renameEnum opts e))
         enumConstants
   -- Typedefs
