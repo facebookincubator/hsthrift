@@ -74,18 +74,6 @@ Haskell-specific annotations - that is, all annotations beginning `hs.`.
 
 ## Remaining TODOs
 
-### Refactor `enumFlavourTag` and `getDeclIface` to use resolved annotations
-
-`enumFlavourTag` in `Plugins/Haskell.hs` still uses text-based
-`hasStructuredAnn "haskell.PseudoEnum"` / `"haskell.NoUnknown"` checks
-because it receives `Parsed` types. The same pattern as the other rename
-methods could be applied (pass resolved annotations as a parameter).
-
-`getDeclIface` also uses `[]` for resolved annotations — it runs before
-typechecking (for declaration pruning) so resolved annotations are not
-available. This is acceptable because symbol prefixes don't affect
-pruning decisions. A comment in the code documents this.
-
 ### Support `hs.type` / `haskell.Type`
 
 The `hs.type` annotation allows overriding the generated Haskell type
@@ -129,3 +117,16 @@ existing expected output.
 
 * `getStructuredPrefix` removed — all prefix handling now goes through
   `getResolvedPrefix` on resolved annotations.
+
+* `enumFlavourTag` now takes `[StructuredAnnotation 'Resolved l Loc]`
+  and checks `hasResolvedAnn`/`getResolvedAnnStringField` for
+  `PseudoEnum` and `NoUnknown`, falling back to unstructured
+  `hs.pseudoenum`/`hs.nounknown`. Both call sites updated:
+  `resolveEnum` passes already-resolved annotations, and `mkTypemap`
+  resolves annotations via `runTypechecker` (works because annotation
+  types come from imports).
+
+* `getDeclIface` passes `[]` for resolved annotations — it runs before
+  typechecking (for declaration pruning) so resolved annotations are not
+  available. This is acceptable because symbol prefixes and enum flavour
+  don't affect pruning decisions. A comment in the code documents this.

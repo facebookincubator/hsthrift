@@ -223,7 +223,7 @@ instance Typecheckable Haskell where
                        <|> getPrefix (getAnns enumAnns) -> prefix <> name
       | otherwise -> enumName <> "_" <> name
     where
-      fixCase = case enumFlavourTag opts e of
+      fixCase = case enumFlavourTag opts resolvedAnns e of
         PseudoEnum{} -> lowercase
         _ -> uppercase
 
@@ -245,15 +245,15 @@ instance Typecheckable Haskell where
   unionAltsAreUnique _ = True
   enumAltsAreUnique Options{} = True
 
-  enumFlavourTag _ Enum{..}
-    | hasSimpleAnn "hs.pseudoenum" = PseudoEnum False
-    | hasValueAnn "hs.pseudoenum" "thriftenum" = PseudoEnum True
-    | hasStructuredAnn "haskell.PseudoEnum" enumSAnns =
-        case getStructuredAnnStringField "haskell.PseudoEnum" "value" enumSAnns of
+  enumFlavourTag _ resolvedAnns Enum{..}
+    | hasResolvedAnn "PseudoEnum" resolvedAnns =
+        case getResolvedAnnStringField "PseudoEnum" "value" resolvedAnns of
           Just "thriftenum" -> PseudoEnum True
           _ -> PseudoEnum False
+    | hasSimpleAnn "hs.pseudoenum" = PseudoEnum False
+    | hasValueAnn "hs.pseudoenum" "thriftenum" = PseudoEnum True
+    | hasResolvedAnn "NoUnknown" resolvedAnns = SumTypeEnum True
     | hasSimpleAnn "hs.nounknown" = SumTypeEnum True
-    | hasStructuredAnn "haskell.NoUnknown" enumSAnns = SumTypeEnum True
     | otherwise = SumTypeEnum False
     where
       hasSimpleAnn t = or
@@ -310,7 +310,7 @@ getDeclIface opts name mname decl = ifaceFromSymbols mname $ case decl of
     unionAlts
   -- Enums
   D_Enum e@Enum{..} ->
-    case enumFlavourTag opts e of
+    case enumFlavourTag opts [] e of
       PseudoEnum{} ->
         mkNewtype (packT enumName) (packHs $ renameEnum opts e)
           (packHs $ ("un" <>) $ renameEnum opts e) ++
