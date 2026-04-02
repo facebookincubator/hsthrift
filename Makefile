@@ -37,16 +37,40 @@ thrift-hs:: compiler
 			if/RpcOptions.thrift); \
 		(cd lib && $${THRIFT_COMPILE} --hs \
 			if/ApplicationException.thrift); \
+		(cd lib && $${THRIFT_COMPILE} --hs \
+			thrift/annotation/thrift.thrift \
+			-o test); \
+		(cd lib && $${THRIFT_COMPILE} --hs \
+			thrift/annotation/scope.thrift \
+			-o test); \
 		(cd lib && $${THRIFT_COMPILE} --hs --use-int \
 			test/if/math.thrift \
 			-o test); \
 		mkdir -p cpp-channel/test/if; \
+		(cd lib && $${THRIFT_COMPILE} --hs \
+			thrift/annotation/thrift.thrift \
+			-o ../cpp-channel/test); \
+		(cd lib && $${THRIFT_COMPILE} --hs \
+			thrift/annotation/scope.thrift \
+			-o ../cpp-channel/test); \
 		(cd lib && $${THRIFT_COMPILE} --hs --use-int \
 			test/if/math.thrift \
 			-o ../cpp-channel/test/if); \
+		(cd lib && $${THRIFT_COMPILE} --hs \
+			thrift/annotation/thrift.thrift \
+			-o ../server/test); \
+		(cd lib && $${THRIFT_COMPILE} --hs \
+			thrift/annotation/scope.thrift \
+			-o ../server/test); \
 		(cd lib && $${THRIFT_COMPILE} --hs --use-int \
 			test/if/math.thrift \
 			-o ../server/test); \
+		(cd lib && $${THRIFT_COMPILE} --hs \
+			thrift/annotation/thrift.thrift \
+			-o ../http/test); \
+		(cd lib && $${THRIFT_COMPILE} --hs \
+			thrift/annotation/scope.thrift \
+			-o ../http/test); \
 		(cd lib && $${THRIFT_COMPILE} --hs --use-int \
 			test/if/math.thrift \
 			-o ../http/test); \
@@ -62,6 +86,10 @@ thrift-hs:: compiler
 		(cd server && $${THRIFT_COMPILE} --hs \
 			test/if/hash_map.thrift \
 			-o test); \
+		(cd tests && $${THRIFT_COMPILE} --hs \
+			thrift/annotation/thrift.thrift); \
+		(cd tests && $${THRIFT_COMPILE} --hs \
+			thrift/annotation/scope.thrift); \
 		(cd tests && $${THRIFT_COMPILE} --hs \
 			if/hs_prefix.thrift); \
 		(cd tests && $${THRIFT_COMPILE} --hs \
@@ -123,6 +151,8 @@ thrift-hs:: compiler
 	mkdir -p compiler/tests/if
 	cp tests/if/*.thrift compiler/tests/if/
 	cp tests/if/*.hs compiler/tests/if/
+	mkdir -p compiler/tests/thrift/annotation
+	cp thrift/annotation/*.thrift compiler/tests/thrift/annotation
 
 thrift-cpp::
 	mkdir -p cpp-channel/if cpp-channel/test/if

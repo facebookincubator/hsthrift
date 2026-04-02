@@ -137,6 +137,8 @@ library test-lib
         Math.Calculator.Client
         Math.Calculator.Service
         Math.Types
+        Facebook.Thrift.Annotation.Thrift.Thrift.Types
+        Scope.Types
   build-depends:
         containers
 

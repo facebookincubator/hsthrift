@@ -159,6 +159,8 @@ library test-lib
         HashMap.HashMapService.Client
         HashMap.HashMapService.Service
         HashMap.Types
+        Facebook.Thrift.Annotation.Thrift.Thrift.Types
+        Scope.Types
   build-depends:
         containers
 
