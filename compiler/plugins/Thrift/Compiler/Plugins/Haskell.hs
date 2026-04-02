@@ -106,7 +106,7 @@ instance Typecheckable Haskell where
 
   -- Annotation Processing
 
-  resolveTypeAnnotations ty anns = do
+  resolveTypeAnnotations ty anns resolvedAnns = do
     Env{ options = Options{..} } <- ask
     case optsLangSpecific of
       HsOpts{..} ->
@@ -114,22 +114,36 @@ instance Typecheckable Haskell where
         ifFlag hsoptsUseHashMap map2HashMap .
         ifFlag hsoptsUseHashSet set2HashSet <$>
         resolve ty (getTypeAnns "hs" anns)
+                   (getResolvedAnnStringField "Type" "name" resolvedAnns)
     where
       resolve
         :: HSType t
         -> [(Text, Annotation Thrift.Loc)]
+        -> Maybe Text
         -> TC Haskell (Some HSType)
-      resolve I64 [("Int",_)] = special HsInt
-      resolve TText [("String",_)] = special HsString
-      resolve (TMap k v) [("HashMap",_)] = pure $ Some $ THashMap k v
-      resolve (TSet u) [("HashSet",_)] = pure $ Some $ THashSet u
-      resolve TText [("ByteString",_)] = special HsByteString
-      resolve (TList u) [(vec,_)]
+      -- Unstructured hs.type annotations take priority
+      resolve I64 [("Int",_)] _ = special HsInt
+      resolve TText [("String",_)] _ = special HsString
+      resolve (TMap k v) [("HashMap",_)] _ = pure $ Some $ THashMap k v
+      resolve (TSet u) [("HashSet",_)] _ = pure $ Some $ THashSet u
+      resolve TText [("ByteString",_)] _ = special HsByteString
+      resolve (TList u) [(vec,_)] _
         | Just kind <-
             lookup vec [(hsVectorQual x,x) | x <- [minBound .. maxBound]] =
               special $ HsVector kind u
-      resolve u [] = pure $ Some u
-      resolve u ((_,a):_) =
+      -- Fall back to @haskell.Type structured annotation
+      resolve I64 [] (Just "Int") = special HsInt
+      resolve TText [] (Just "String") = special HsString
+      resolve (TMap k v) [] (Just "HashMap") = pure $ Some $ THashMap k v
+      resolve (TSet u) [] (Just "HashSet") = pure $ Some $ THashSet u
+      resolve TText [] (Just "ByteString") = special HsByteString
+      resolve (TList u) [] (Just vec)
+        | Just kind <-
+            lookup vec [(hsVectorQual x,x) | x <- [minBound .. maxBound]] =
+              special $ HsVector kind u
+      -- No type annotations
+      resolve u [] _ = pure $ Some u
+      resolve u ((_,a):_) _ =
         typeError (annLoc a) $ AnnotationMismatch (AnnType u) a
 
       special = pure . Some . TSpecial
