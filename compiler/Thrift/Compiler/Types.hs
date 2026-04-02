@@ -859,6 +859,7 @@ data SCHEMA (l :: * {- Language -}) (t :: SchemaType) (s :: [(Symbol, *)]) where
 data Name = Name
   { sourceName   :: ThriftName
   , resolvedName :: Name_ 'Resolved
+  , namePackage  :: Maybe Text -- ^ Package URI of the defining module
   } deriving (Eq)
 
 -- | Name in the original thrift source file
@@ -877,10 +878,11 @@ mapName :: (Text -> Text) -> Name_ s -> Name_ s
 mapName f (UName n) = UName $ f n
 mapName f (QName m n) = QName m $ f n
 
-mkName :: Text -> Text -> Name
-mkName tname rname = Name
+mkName :: Maybe Text -> Text -> Text -> Name
+mkName pkg tname rname = Name
   { sourceName = UName tname
   , resolvedName = UName rname
+  , namePackage = pkg
   }
 
 filterHiddenFields :: [Field u s l a] -> [Field u s l a]
