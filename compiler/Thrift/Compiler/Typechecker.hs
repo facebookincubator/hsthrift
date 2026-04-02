@@ -557,7 +557,7 @@ resolveFields
   -> [Parsed (Field u)]
   -> TC l [Field u 'Resolved l Loc]
 resolveFields sname as sAnns fs =
-  (traverse (resolveField as sname) =<< fields) <*
+  (catMaybes <$> (traverse (resolveField as sname) =<< fields)) <*
   -- Check for duplicate field ids
   foldM checkId Set.empty fs
   where
@@ -602,7 +602,7 @@ resolveField
   => [Annotation Loc]
   -> Text
   -> Parsed (Field u)
-  -> Typechecked l (Field u)
+  -> TC l (Maybe (Field u 'Resolved l Loc))
 resolveField anns sname field@Field{..} = do
   when (fieldId == 0) $
     typeError (lLocation $ flId fieldLoc) $ InvalidFieldId fieldName 0
@@ -611,6 +611,12 @@ resolveField anns sname field@Field{..} = do
     Some ty -> do
       val  <- sequence (typecheckConst ty <$> fieldVal)
       sAnns <- resolveStructuredAnns fieldSAnns
+      -- Filter out hidden fields
+      let hidden = any (\a -> case a of
+                     SimpleAnn{saTag = "hs.hidden"} -> True; _ -> False)
+                     (getAnns fieldAnns)
+                   || hasResolvedAnn "Hidden" sAnns
+      if hidden then pure Nothing else do
       lazy <- case filterHsAnns $ getAnns fieldAnns of
             [SimpleAnn{..}]
               | saTag == "hs.strict" -> pure Strict
@@ -624,7 +630,7 @@ resolveField anns sname field@Field{..} = do
         Nothing -> typeError (lLocation $ flName fieldLoc) $
                    InvalidThrows ty fieldName
         Just tag ->
-          return Field
+          return $ Just Field
           { fieldResolvedName = renameField options anns sname field
           , fieldResolvedType = ty
           , fieldResolvedVal  = val
