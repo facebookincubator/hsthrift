@@ -168,8 +168,12 @@ class Monoid (Interface l) => Typecheckable l  where
   enumAltsAreUnique _ = False
 
   -- | Get enum flavour from annotation tags
-  enumFlavourTag :: Options l -> Enum s u a -> EnumFlavour
-  enumFlavourTag _ _ = SumTypeEnum False
+  enumFlavourTag
+    :: Options l
+    -> [StructuredAnnotation 'Resolved l Loc]
+    -> Enum s u a
+    -> EnumFlavour
+  enumFlavourTag _ _ _ = SumTypeEnum False
 
   -- * Back translators
   -- Translate Stuff Back to regular thrift for pretty printing and JSON output
