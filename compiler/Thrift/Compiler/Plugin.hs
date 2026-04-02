@@ -19,6 +19,8 @@ module Thrift.Compiler.Plugin
   , filterHsAnns, getTypeAnns
   , hasStructuredAnn, getStructuredAnnStringField
   , getStructuredPrefix
+  , hasResolvedAnn, getResolvedAnnStringField
+  , getResolvedPrefix
   ) where
 
 import Data.Bifunctor
@@ -319,3 +321,39 @@ getStructuredAnnStringField annName fieldName sAnns =
 -- | Get prefix from structured @haskell.Prefix annotation
 getStructuredPrefix :: [StructuredAnnotation s l a] -> Maybe Text
 getStructuredPrefix = getStructuredAnnStringField "haskell.Prefix" "name"
+
+-- Resolved Structured Annotation Helpers --------------------------------------
+
+-- | Check if a resolved structured annotation matches by its resolved type.
+-- More robust than 'hasStructuredAnn' because it checks the canonical type
+-- identity rather than the import-dependent text name.
+hasResolvedAnn :: Text -> [StructuredAnnotation 'Resolved l a] -> Bool
+hasResolvedAnn expectedName = any (isHaskellAnn expectedName)
+
+-- | Get a string field value from a resolved structured annotation
+getResolvedAnnStringField
+  :: Text -> Text -> [StructuredAnnotation 'Resolved l a] -> Maybe Text
+getResolvedAnnStringField annName fieldName sAnns =
+  listToMaybe
+    [ val
+    | sa@StructuredAnn{..} <- sAnns
+    , isHaskellAnn annName sa
+    , Just (StructuredAnnElems{..}) <- [saMaybeElems]
+    , ListElem{..} <- saElems
+    , StructPair{..} <- [leElem]
+    , spKey == fieldName
+    , StringConst val _ <- [ucConst spVal]
+    ]
+
+-- | Get prefix from resolved @haskell.Prefix annotation
+getResolvedPrefix :: [StructuredAnnotation 'Resolved l a] -> Maybe Text
+getResolvedPrefix = getResolvedAnnStringField "Prefix" "name"
+
+-- | Check if a resolved annotation's type is a struct from haskell.thrift
+-- with the given local name.
+isHaskellAnn :: Text -> StructuredAnnotation 'Resolved l a -> Bool
+isHaskellAnn expectedName StructuredAnn{..} = case saResolvedType of
+  TStruct name loc ->
+    localName (resolvedName name) == expectedName
+    && "haskell.thrift" `isSuffixOf` locFile loc
+  _ -> False
