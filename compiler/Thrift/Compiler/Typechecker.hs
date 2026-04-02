@@ -1005,16 +1005,25 @@ mkConstMap (thriftName, opts) pkg imap tmap smap = foldM insertC emptyContext
         isETag SimpleAnn{..} = saTag == "hs.nonempty"
         isETag ValueAnn{} = False
 
-    -- If a typedef is s newtype, we have to add the data constructor to the
+    -- If a typedef is a newtype, we have to add the data constructor to the
     -- scope
-    insertC m (D_Typedef t@Typedef{..})
-      | isNewtype (getAnns tdAnns)
-        || hasStructuredAnn "haskell.Newtype" tdSAnns =
-          let
+    insertC m (D_Typedef t@Typedef{..}) = do
+      resolvedSAnns <- runTypechecker env $
+        resolveStructuredAnns tdSAnns
+      if isNewtype (getAnns tdAnns)
+         || hasResolvedAnn "Newtype" resolvedSAnns
+        then let
             name = renameTypedef opts t
             loc  = lLocation $ tdlName tdLoc
           in addToScope loc name =<< addToScope loc ("un" <> name) m
-      | otherwise = pure m
+        else pure m
+      where
+        env = (emptyEnv (thriftName, opts))
+          { typeMap   = tmap
+          , constMap  = m
+          , importMap = imap
+          , schemaMap = smap
+          }
 
     -- All the enum constants have the type of the enum
     insertC m (D_Enum enum@Enum{..})
@@ -1610,7 +1619,8 @@ mkTypemap (thriftName, opts) pkg imap =
   where
     resolve :: TypeMap l -> Parsed Decl -> Either [TypeError l] (TypeMap l)
     resolve m (D_Typedef t@Typedef{..}) = do
-      tdef <- mkTypedef <$> runTypechecker env (resolveAnnotatedType tdType)
+      sAnns <- runTypechecker env $ resolveStructuredAnns tdSAnns
+      tdef <- mkTypedef sAnns <$> runTypechecker env (resolveAnnotatedType tdType)
       insertContext loc tdName hsname tdef m
         where
           loc = lLocation (tdlName tdLoc)
@@ -1620,10 +1630,11 @@ mkTypemap (thriftName, opts) pkg imap =
             }
           uname = mkName pkg tdName hsname
           hsname = renameTypedef opts t
-          mkTypedef :: Some (Type l) -> Some (Type l)
-          mkTypedef (Some u)
+          mkTypedef :: [StructuredAnnotation 'Resolved l Loc]
+                    -> Some (Type l) -> Some (Type l)
+          mkTypedef sAnns (Some u)
             | isNewtype (getAnns tdAnns)
-              || hasStructuredAnn "haskell.Newtype" tdSAnns =
+              || hasResolvedAnn "Newtype" sAnns =
                 Some $ TNewtype uname u loc
             -- Other annotations will be checked in resolveTypedef
             | otherwise = Some $ TTypedef uname u loc
