@@ -7,6 +7,8 @@
  */
 
 include "thrift/annotation/thrift.thrift"
+include "thrift/annotation/haskell.thrift"
+
 package "facebook.com/hs/thrift/tests/constants"
 
 const i32 i32Const = 99;
@@ -39,7 +41,8 @@ struct Foo {
 const Foo fooConst = {'bar': 'hello world'};
 const Foo partial = {};
 
-typedef i64 Id (hs.newtype)
+@haskell.Newtype
+typedef i64 Id
 
 const Id idConst = 12345;
 
@@ -63,9 +66,10 @@ struct NagativeFields {
   3: i64 w = -2;
 }
 
+@haskell.NonEmpty
 union NonEmpty {
   1: i64 ne;
-} (hs.nonempty)
+}
 
 const bool trueConst = true;
 const bool falseConst = false;
