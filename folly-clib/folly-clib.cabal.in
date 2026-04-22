@@ -68,6 +68,8 @@ library
 
         install-includes:
             __H_FILES__
+            -- tmp:
+            folly/test/SocketAddressTestHelper.h
 
         install-includes:
             folly/folly-config.h
