@@ -43,7 +43,7 @@ import Util.Log
 -- (technically, children of 'SomeAsyncException').  Catching
 -- asynchronous exceptions is almost never what you want to do: it can
 -- result in ignoring 'ThreadKilled' which can lead to deadlock (see
--- <https://our.internmc.facebook.com/intern/diff/D4745709/
+-- <https://www.internalfb.com/intern/diff/D4745709/
 -- D4745709>).
 --
 -- Use this instead of the raw 'catch' when catching 'SomeException'.
