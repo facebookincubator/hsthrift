@@ -7,11 +7,13 @@
  */
 
 include "thrift/annotation/thrift.thrift"
+include "thrift/annotation/haskell.thrift"
 package "facebook.com/hs/thrift/tests/map"
 
 typedef map<byte, string> Map
 
-typedef string KeyType (hs.newtype)
+@haskell.Newtype
+typedef string KeyType
 
 struct X {
   1: map<i32, string> intMap;
