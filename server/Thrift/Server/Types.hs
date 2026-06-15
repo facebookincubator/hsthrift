@@ -12,6 +12,7 @@ module Thrift.Server.Types
   , ServerException(..)
   , FactoryFunction
   , ModifyFunction
+  , ThriftServer
   ) where
 
 import Control.Exception hiding (handle)
