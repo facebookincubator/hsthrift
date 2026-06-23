@@ -239,10 +239,6 @@ library
     build-tool-depends: hsc2hs:hsc2hs
 
     pkgconfig-depends: libglog, libevent, fmt, gflags
-    if flag(folly)
-        extra-libraries: double-conversion
-    else
-        pkgconfig-depends: double-conversion
 
     -- clients of fb-util can specify
     --    build-depends: folly-clib > 0.0
