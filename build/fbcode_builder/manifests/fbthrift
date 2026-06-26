@@ -16,6 +16,7 @@ fbthrift = thrift/lib/rust
 [build]
 builder = cmake
 job_weight_mib = 2048
+patchfile = fbthrift_shared_lib_fix.patch
 
 [cmake.defines.all(not(os=windows),test=on)]
 enable_tests=ON

@@ -18,7 +18,8 @@ extra-source-files:  cpp/*.h, cpp/*.cpp,
                      if/*.thrift,
                      if/gen-cpp2/*.h,
                      if/gen-cpp2/*.cpp,
-                     if/gen-cpp2/*.tcc
+                     if/gen-cpp2/*.tcc,
+                     thrift/**/*.thrift
 
 description:
     Tests for Haskell Thrift.

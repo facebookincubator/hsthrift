@@ -1,0 +1,12 @@
+diff --git a/thrift/compiler/CMakeLists.txt b/thrift/compiler/CMakeLists.txt
+index ed30a2d..b49dbde 100644
+--- a/thrift/compiler/CMakeLists.txt
++++ b/thrift/compiler/CMakeLists.txt
+@@ -233,6 +233,7 @@ if (BUILD_SHARED_LIBS)
+     whisker
+     compiler_generators
+     PROPERTIES VERSION ${PACKAGE_VERSION}
++      POSITION_INDEPENDENT_CODE TRUE
+   )
+ endif ()
+ 
