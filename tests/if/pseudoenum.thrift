@@ -6,11 +6,14 @@
  * LICENSE file in the root directory of this source tree.
  */
 
+include "thrift/annotation/haskell.thrift"
+
 package "facebook.com/hs/thrift/tests/pseudoenum"
 
+@haskell.PseudoEnum{value="thriftenum"}
 enum PerfectEnum {
   W = 0,
   X = 1,
   Y = 2,
   Z = 3,
-} (hs.pseudoenum = "thriftenum")
+}

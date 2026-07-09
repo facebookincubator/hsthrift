@@ -9,13 +9,16 @@
 hs_include "if/hs_test_instances.hs"
 
 include "thrift/annotation/thrift.thrift"
+include "thrift/annotation/haskell.thrift"
 package "facebook.com/hs/thrift/tests/hs_test"
 
 namespace cpp2 "cpp2"
 
-typedef i64 X (hs.newtype)
+@haskell.Newtype
+typedef i64 X
 typedef X Y
-typedef Y Z (hs.newtype)
+@haskell.Newtype
+typedef Y Z
 
 struct Foo {
   5: i32 bar;
@@ -73,8 +76,13 @@ enum Void {
 }
 
 // The following were automatically generated and may benefit from renaming.
-typedef list<i64> (hs.type = "VectorStorable") list_i64_1894
-typedef list<i64> (hs.type = "Vector") list_i64_7708
-typedef map<Number, i64> (hs.type = "HashMap") map_Number_i64_1522
-typedef string (hs.type = "ByteString") string_1484
-typedef string (hs.type = "String") string_5858
+@haskell.Type{name="VectorStorable"}
+typedef list<i64> list_i64_1894
+@haskell.Type{name="Vector"}
+typedef list<i64> list_i64_7708
+@haskell.Type{name="HashMap"}
+typedef map<Number, i64> map_Number_i64_1522
+@haskell.Type{name="ByteString"}
+typedef string string_1484
+@haskell.Type{name="String"}
+typedef string string_5858
