@@ -6,6 +6,11 @@
  * LICENSE file in the root directory of this source tree.
  */
 
+include "thrift/annotation/thrift.thrift"
+
+@thrift.AllowLegacyMissingUris
+package;
+
 struct B {
   1: i16 a = 1;
   2: i32 b;

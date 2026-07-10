@@ -5,6 +5,9 @@
 include "test/if/b.thrift"
 include "thrift/annotation/thrift.thrift"
 
+@thrift.AllowLegacyMissingUris
+package;
+
 typedef i64 T
 
 const T a = b.i64_value;

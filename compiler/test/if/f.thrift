@@ -6,6 +6,11 @@
  * LICENSE file in the root directory of this source tree.
  */
 
+include "thrift/annotation/thrift.thrift"
+
+@thrift.AllowLegacyMissingUris
+package;
+
 enum HugeEnum {
   VALUE_0001 = 1,
   VALUE_0002 = 2,

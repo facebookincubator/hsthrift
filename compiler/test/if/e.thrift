@@ -2,6 +2,11 @@
 
 # @nolint
 
+include "thrift/annotation/thrift.thrift"
+
+@thrift.AllowLegacyMissingUris
+package;
+
 namespace hs Namespace
 typedef i64 _Type
 

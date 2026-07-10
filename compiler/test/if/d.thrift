@@ -6,6 +6,11 @@
  * LICENSE file in the root directory of this source tree.
  */
 
+include "thrift/annotation/thrift.thrift"
+
+@thrift.AllowLegacyMissingUris
+package;
+
 typedef map<string, string> hstypedef
 typedef map<string, string> hsnewtypeann (hs.newtype)
 

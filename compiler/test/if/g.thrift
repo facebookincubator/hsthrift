@@ -3,6 +3,11 @@
 # @nolint
 
 # field/type are entirely ignored due to hs.hidden annotation
+include "thrift/annotation/thrift.thrift"
+
+@thrift.AllowLegacyMissingUris
+package;
+
 struct Foo {
   1: some_type bar (hs.hidden);
   2: some_type bar (hs.lazy, hs.hidden);
