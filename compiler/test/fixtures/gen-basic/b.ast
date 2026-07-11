@@ -637,7 +637,9 @@
             "name": "Number_Empty"
         }
     ],
-    "includes": [],
+    "includes": [
+        "thrift/annotation/thrift.thrift"
+    ],
     "name": "b",
     "options": {
         "genfiles": null,

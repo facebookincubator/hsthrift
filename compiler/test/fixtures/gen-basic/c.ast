@@ -50,7 +50,9 @@
             "name": "MyEnum"
         }
     ],
-    "includes": [],
+    "includes": [
+        "thrift/annotation/thrift.thrift"
+    ],
     "name": "c",
     "options": {
         "genfiles": null,

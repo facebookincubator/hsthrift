@@ -357,6 +357,8 @@ import qualified Data.Function as Function
 import qualified Data.HashMap.Strict as HashMap
 import qualified Data.Hashable as Hashable
 import qualified Data.Int as Int
+import qualified Facebook.Thrift.Annotation.Thrift.Thrift.Types
+       as Facebook.Thrift.Annotation.Thrift.Thrift
 import qualified GHC.Magic as GHC
 import qualified Prelude as Prelude
 import qualified Thrift.CodegenTypesOnly as Thrift

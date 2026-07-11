@@ -112,7 +112,9 @@
             "name": "HsEnumEmptyPseudoenumThriftAnn"
         }
     ],
-    "includes": [],
+    "includes": [
+        "thrift/annotation/thrift.thrift"
+    ],
     "name": "D",
     "options": {
         "genfiles": null,

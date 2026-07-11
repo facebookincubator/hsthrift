@@ -69,6 +69,8 @@ import qualified Data.Map.Strict as Map
 import qualified Data.Ord as Ord
 import qualified Data.Text as Text
 import qualified Data.Text.Encoding as Text
+import qualified Facebook.Thrift.Annotation.Thrift.Thrift.Types
+       as Facebook.Thrift.Annotation.Thrift.Thrift
 import qualified GHC.Magic as GHC
 import qualified Prelude as Prelude
 import qualified Thrift.Binary.Parser as Parser
