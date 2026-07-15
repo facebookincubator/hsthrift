@@ -18,8 +18,9 @@ extra-doc-files:     CHANGELOG.md
 extra-source-files:  test/fixtures/**/*.ast,
                      test/fixtures/gen-hs2/**/*.hs,
                      test/if/*.thrift,
-                     tests/if/*.thrift,
-                     tests/if/*.hs
+                     tests/**/*.thrift,
+                     tests/**/*.hs,
+                     thrift/**/*.thrift
 
 description:
     A compiler from the Thrift Interface Definition Language (IDL) to Haskell.

@@ -18,7 +18,8 @@ extra-source-files:  cpp/*.h, cpp/*.cpp,
                      if/*.thrift,
                      if/gen-cpp2/*.h,
                      if/gen-cpp2/*.cpp,
-                     if/gen-cpp2/*.tcc
+                     if/gen-cpp2/*.tcc,
+                     thrift/**/*.thrift
 
 description:
     Tests for Haskell Thrift.
@@ -109,25 +110,37 @@ test-suite binary-protocol
   import: fb-haskell, test-common
   type: exitcode-stdio-1.0
   main-is: BinaryProtocolTest.hs
-  other-modules: Foo.Types
+  other-modules:
+    Foo.Types,
+    Facebook.Thrift.Annotation.Thrift.Thrift.Types,
+    Scope.Types
   ghc-options: -main-is BinaryProtocolTest
 test-suite const-gen
   import: fb-haskell, test-common
   type: exitcode-stdio-1.0
   main-is: ConstGenTest.hs
-  other-modules: Constants.Types
+  other-modules:
+    Constants.Types,
+    Facebook.Thrift.Annotation.Thrift.Thrift.Types,
+    Scope.Types
   ghc-options: -main-is ConstGenTest
 test-suite const-parser
   import: fb-haskell, test-common
   type: exitcode-stdio-1.0
   main-is: ConstParserTest.hs
-  other-modules: Constants.Types
+  other-modules:
+    Constants.Types,
+    Facebook.Thrift.Annotation.Thrift.Thrift.Types,
+    Scope.Types
   ghc-options: -main-is ConstParserTest
 test-suite const
   import: fb-haskell, test-common
   type: exitcode-stdio-1.0
   main-is: ConstTest.hs
-  other-modules: Constants.Types, Foo.Types
+  other-modules:
+    Constants.Types, Foo.Types,
+    Facebook.Thrift.Annotation.Thrift.Thrift.Types,
+    Scope.Types
   ghc-options: -main-is ConstTest
 test-suite duplicate-names
   import: fb-haskell, test-common
@@ -215,7 +228,10 @@ test-suite json
   import: fb-haskell, test-common
   type: exitcode-stdio-1.0
   main-is: JSONTest.hs
-  other-modules: Foo.Types
+  other-modules:
+    Foo.Types,
+    Facebook.Thrift.Annotation.Thrift.Thrift.Types,
+    Scope.Types
   ghc-options: -main-is JSONTest
 test-suite lexer
   import: fb-haskell, test-common
@@ -227,7 +243,10 @@ test-suite map
   import: fb-haskell, test-common
   type: exitcode-stdio-1.0
   main-is: MapTest.hs
-  other-modules: Map.Types
+  other-modules:
+    Map.Types,
+    Facebook.Thrift.Annotation.Thrift.Thrift.Types,
+    Scope.Types
   ghc-options: -main-is MapTest
 test-suite message
   import: fb-haskell, fb-cpp, test-common

@@ -3,7 +3,7 @@ cabal-version:       3.6
 -- Copyright (c) Facebook, Inc. and its affiliates.
 
 name:                thrift-http
-version:             0.2.0.0
+version:             0.3.0.0
 synopsis:            Support for Thrift-over-HTTP server and client
 homepage:            https://github.com/facebookincubator/hsthrift
 bug-reports:         https://github.com/facebookincubator/hsthrift/issues
@@ -137,6 +137,8 @@ library test-lib
         Math.Calculator.Client
         Math.Calculator.Service
         Math.Types
+        Facebook.Thrift.Annotation.Thrift.Thrift.Types
+        Scope.Types
   build-depends:
         containers
 
