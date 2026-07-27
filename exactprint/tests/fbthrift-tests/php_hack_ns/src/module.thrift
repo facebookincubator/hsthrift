@@ -40,12 +40,14 @@ union TestUnion {
   1: string string_value;
 }
 
-@hack.NamePrefix{prefix = "Prefixed", apply_on_getName = false}
+@hack.NamePrefix{prefix = "Prefixed"}
+@hack.LegacyOmitPrefixInNameString
 exception TestException {
   1: string message;
 }
 
-@hack.NamePrefix{prefix = "Double_", apply_on_getName = false}
+@hack.NamePrefix{prefix = "Double_"}
+@hack.LegacyOmitPrefixInNameString
 @hack.Name{name = "Prefixed_"}
 struct TestStruct {
   1: string str_value;
