@@ -14,6 +14,7 @@
 #include <folly/Memory.h>
 #include <glog/logging.h>
 
+#include <thrift/lib/cpp/concurrency/ThreadManager.h>
 #include <thrift/lib/cpp2/server/ThriftServer.h>
 
 #include "cpp/Destructible.h"
@@ -138,6 +139,9 @@ CreateCppServerResult* c_create_cpp_server(
     apache::thrift::TFactory factoryFn,
     int desiredPort,
     int workers,
+    const int* poolSizeOverridePriorities,
+    const size_t* poolSizeOverrideSizes,
+    size_t numPoolSizeOverrides,
     const apache::thrift::concurrency::PRIORITY* methodPriorities,
     const bool* methodOneways,
     const char** methodNames,
@@ -171,6 +175,25 @@ CreateCppServerResult* c_create_cpp_server(
 
     if (workers > 0) {
       cppServer->setNumCPUWorkerThreads(workers);
+    }
+
+    if (numPoolSizeOverrides > 0) {
+      // Start from PriorityThreadManager's own defaults and override only the
+      // priorities the caller asked for, so we never duplicate or drift from
+      // the default pool sizing.
+      auto poolSizes = apache::thrift::concurrency::PriorityThreadManager::
+          defaultThreadCounts(cppServer->getNumCPUWorkerThreads());
+      for (size_t i = 0; i < numPoolSizeOverrides; i++) {
+        const int priority = poolSizeOverridePriorities[i];
+        if (priority >= 0 &&
+            priority <
+                static_cast<int>(apache::thrift::concurrency::N_PRIORITIES)) {
+          poolSizes[priority] = poolSizeOverrideSizes[i];
+        }
+      }
+      cppServer->setThreadManagerType(
+          apache::thrift::ThriftServer::ThreadManagerType::PRIORITY);
+      cppServer->setThreadManagerPoolSizes(poolSizes);
     }
 
     return new CreateCppServerResult(HsLeft, std::move(cppServer));

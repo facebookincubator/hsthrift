@@ -19,6 +19,8 @@ import Control.Exception hiding (handle)
 import Data.Text (Text)
 import Foreign.Ptr
 
+import Thrift.Protocol.RpcOptions.Types (Priority)
+
 -- -----------------------------------------------------------------------------
 -- Factory function
 
@@ -47,6 +49,11 @@ data ServerOptions = ServerOptions
   , customFactoryFn :: Maybe FactoryFunction
       -- ^ whether a custom factory should be used
   , customModifyFn :: Maybe ModifyFunction
+  , cpuPriorityPoolSizes :: [(Priority, Int)]
+      -- ^ CPU worker pool size overrides, per Thrift RPC priority. Priorities
+      -- not listed keep the fbthrift default (see
+      -- @PriorityThreadManager::defaultThreadCounts@): the number of CPU cores
+      -- for NORMAL and an implementation-defined number for the rest.
   }
 
 -- | Takes the `onewayFunctions'` from your thrift Service instance
@@ -56,6 +63,7 @@ defaultOptions = ServerOptions
   , numWorkerThreads = Nothing
   , customFactoryFn = Nothing
   , customModifyFn = Nothing
+  , cpuPriorityPoolSizes = []
   }
 
 -- -----------------------------------------------------------------------------

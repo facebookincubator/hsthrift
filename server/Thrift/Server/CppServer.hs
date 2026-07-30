@@ -102,14 +102,25 @@ withBackgroundServer' handler postProcess ServerOptions{..} action =
     priorities =
       fromIntegral . fromThriftEnum . methodPriority <$> Map.elems infos
 
+    -- CPU worker pool size overrides, split into parallel arrays of priority
+    -- ordinal and size for the C++ side. Priorities not listed keep the
+    -- fbthrift default.
+    poolOverridePriorities =
+      fromIntegral . fromThriftEnum . fst <$> cpuPriorityPoolSizes
+    poolOverrideSizes = fromIntegral . snd <$> cpuPriorityPoolSizes
+    numPoolOverrides = fromIntegral (length cpuPriorityPoolSizes)
+
     -- Creates a PServer to run `act` on
     withCServer cb act =
       useTextsAsCStringLens names $ \names_ptr names_sizes names_len ->
       withArray priorities $ \priorities_ptr ->
-      withArray oneways $ \oneways_pts -> do
+      withArray oneways $ \oneways_pts ->
+      withArray poolOverridePriorities $ \pool_prios_ptr ->
+      withArray poolOverrideSizes $ \pool_sizes_ptr -> do
         let
           alloc =
             let create = create_cpp_server cb factoryFn cPort cNumWorkers
+                  pool_prios_ptr pool_sizes_ptr numPoolOverrides
                   priorities_ptr oneways_pts
                   names_ptr names_sizes names_len
             in
@@ -150,6 +161,9 @@ foreign import ccall safe "c_create_cpp_server"
                     -> FactoryFunction
                     -> CInt -- ^ port
                     -> CInt -- ^ workers, or 0 to use the default
+                    -> Ptr CInt -- ^ pool size override priorities
+                    -> Ptr CSize -- ^ pool size override sizes
+                    -> CSize -- ^ number of pool size overrides
                     -> Ptr CInt -- ^ method priorities array
                     -> Ptr Bool -- ^ one way methods
                     -> Ptr CString -- ^ method names array

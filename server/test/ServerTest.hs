@@ -132,6 +132,7 @@ portAlreadyBoundTest pname protId =
       , numWorkerThreads = Just 2
       , customFactoryFn = Nothing
       , customModifyFn = Nothing
+      , cpuPriorityPoolSizes = []
       }
     headerConfig :: HeaderConfig t
     headerConfig = mkHeaderConfig port protId
