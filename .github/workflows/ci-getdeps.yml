@@ -86,6 +86,7 @@ jobs:
           libtinfo-dev
           libaio-dev
           libgmock-dev
+          libbenchmark-dev
 
       - name: Setup Haskell
         run: |

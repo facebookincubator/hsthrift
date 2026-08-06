@@ -174,6 +174,7 @@ setup-folly::
 		grep '^FILES_CPP:' out | \
 			sed 's/FILES_CPP://' | \
 			sed "s|$$(dirname $$(pwd))/|folly/|g" | \
+			grep -v folly/test/ | \
                         sed 's/;/\n /g' | sed 's/$$/ \\/g' | \
 			sed 's/^ f/            f/' | \
 			head -c -2 >cppfiles && \
