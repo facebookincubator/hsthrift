@@ -60,7 +60,8 @@ withFixtureOptions f = do
             "compiler/test/if/d.thrift",
             "compiler/test/if/e.thrift",
             "compiler/test/if/f.thrift",
-            "compiler/test/if/g.thrift"
+            "compiler/test/if/g.thrift",
+            "compiler/test/if/recursive_annotation.thrift"
            ]
          ] ++
          [ (TheseLangOpts NoOpts, EmitJSON WithoutLoc, False, "gen-basic",
