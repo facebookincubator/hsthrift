@@ -899,6 +899,39 @@ resolveStructuredAnns
   -> TC l [StructuredAnnotation 'Resolved  l Loc]
 resolveStructuredAnns = mapM resolveStructuredAnn
 
+{-
+We need to check for @haskell annotations at various points during
+typechecking but this introduces a tricky recursive
+dependency. Consider something like
+
+  @Ann{x=42}
+  typedef i64 T
+
+  struct Ann { 1: T x }
+
+we can't resolve the @Ann{x=42} annotation until we have the schema
+for the struct, but we can't build the schema for the struct until
+we have processed the typedef for T, which has the annotation. And
+we need to resolve the annotation on the typedef to know whether
+it's @haskell.Newtype.
+
+(I checked and fbthrift handles this example)
+
+So this is a bit of a hack: when we need annotations during
+mkTypeMap/mkSchemaMap/mkConstMap we resolve the annotation but
+ignore any errors. If the annotation is a @haskell annotation, that
+will resolve fine because it's imported, but others might fail -
+that's fine, we only need the @haskell annotations at this
+point. The annotations will be resolved fully in the final
+resolveDecl step.
+-}
+resolveStructuredAnnsOptional
+  :: Typecheckable l
+  => [StructuredAnnotation 'Unresolved () Loc]
+  -> TC l [StructuredAnnotation 'Resolved  l Loc]
+resolveStructuredAnnsOptional sAnns =
+  resolveStructuredAnns sAnns <|> pure []
+
 resolveStructuredAnn
   :: Typecheckable l
   => Parsed StructuredAnnotation
@@ -911,25 +944,13 @@ resolveStructuredAnn StructuredAnn{..} = do
     (Some ty, Some schema) -> do
       val <- typecheckStruct lLocation schema =<<
              mkStructFieldMap (maybe [] saElems saMaybeElems)
-      case ty of
-        TStruct _ loc | not $ loc `isDefinedAt` lLocation ->
-            typeError lLocation (NotDefinedBeforeUsed ty)
-        _ ->
-            pure StructuredAnn
-            { saResolvedType = ty
-            , saResolvedVal = Some val
-            , ..
-            }
+      pure StructuredAnn
+        { saResolvedType = ty
+        , saResolvedVal = Some val
+        , ..
+        }
   where
     Located{..} = a0Ty saTypeLoc
-    isDefinedAt :: Loc -> Loc -> Bool
-    isDefinedAt defLoc loc
-      | locFile defLoc /= locFile loc = True
-      | locEndLine defLoc < locStartLine loc = True
-      | locEndLine defLoc > locStartLine loc = False
-      -- locEndLine defLoc == locStartLine loc
-      | locEndCol defLoc <= locStartCol loc = True
-      | otherwise = False
 
 -- Build the Constant Map ------------------------------------------------------
 
@@ -952,7 +973,7 @@ mkConstMap (thriftName, opts) pkg imap tmap smap = foldM insertC emptyContext
       if fieldsAreUnique opts
         then do
           resolvedSAnns <- runTypechecker env $
-            resolveStructuredAnns structSAnns
+            resolveStructuredAnnsOptional structSAnns
           foldM (insFieldName opts resolvedSAnns) scope structMembers
         else return scope
       where
@@ -977,7 +998,7 @@ mkConstMap (thriftName, opts) pkg imap tmap smap = foldM insertC emptyContext
     insertC m (D_Union u@Union{..})
       | unionAltsAreUnique opts = do
           resolvedSAnns <- runTypechecker env $
-            resolveStructuredAnns unionSAnns
+            resolveStructuredAnnsOptional unionSAnns
           scope <- foldM (addAlt opts resolvedSAnns) m unionAlts
           if any isETag (getAnns unionAnns)
               || hasResolvedAnn "NonEmpty" resolvedSAnns
@@ -1009,7 +1030,7 @@ mkConstMap (thriftName, opts) pkg imap tmap smap = foldM insertC emptyContext
     -- scope
     insertC m (D_Typedef t@Typedef{..}) = do
       resolvedSAnns <- runTypechecker env $
-        resolveStructuredAnns tdSAnns
+        resolveStructuredAnnsOptional tdSAnns
       if isNewtype (getAnns tdAnns)
          || hasResolvedAnn "Newtype" resolvedSAnns
         then let
@@ -1029,7 +1050,7 @@ mkConstMap (thriftName, opts) pkg imap tmap smap = foldM insertC emptyContext
     insertC m (D_Enum enum@Enum{..})
       | enumAltsAreUnique opts = do
           resolvedSAnns <- runTypechecker env $
-            resolveStructuredAnns enumSAnns
+            resolveStructuredAnnsOptional enumSAnns
           foldM (insE resolvedSAnns) m enumConstants
       | otherwise = pure m
       where
@@ -1619,7 +1640,7 @@ mkTypemap (thriftName, opts) pkg imap =
   where
     resolve :: TypeMap l -> Parsed Decl -> Either [TypeError l] (TypeMap l)
     resolve m (D_Typedef t@Typedef{..}) = do
-      sAnns <- runTypechecker env $ resolveStructuredAnns tdSAnns
+      sAnns <- runTypechecker env $ resolveStructuredAnnsOptional tdSAnns
       tdef <- mkTypedef sAnns <$> runTypechecker env (resolveAnnotatedType sAnns tdType)
       insertContext loc tdName hsname tdef m
         where
@@ -1656,7 +1677,7 @@ mkTypemap (thriftName, opts) pkg imap =
         uname = mkName pkg unionName hsname
         hsname = renameUnion opts u
     resolve m (D_Enum e@Enum{..}) = do
-      sAnns <- runTypechecker env $ resolveStructuredAnns enumSAnns
+      sAnns <- runTypechecker env $ resolveStructuredAnnsOptional enumSAnns
       insertContext (lLocation $ slName enumLoc) enumName (renameEnum opts e)
         (getEnumType opts sAnns pkg e) m
       where
@@ -1798,7 +1819,7 @@ mkSchemaMap (thriftName, opts) imap tmap = foldM insertSchema Map.empty
 
 mkSchema :: Typecheckable l => Parsed Struct -> TC l (Some (Schema l))
 mkSchema Struct{..} = do
-  resolvedSAnns <- resolveStructuredAnns structSAnns
+  resolvedSAnns <- resolveStructuredAnnsOptional structSAnns
   buildSchema resolvedSAnns structMembers
   where
     buildSchema resolvedSAnns (field@Field{..} : fields) = do
@@ -1841,7 +1862,7 @@ mkUnionMap (thriftName, opts) imap tmap smap = foldM insertSchema Map.empty
 mkUSchema
   :: Typecheckable l => Parsed Union -> TC l (Some (USchema l))
 mkUSchema u@Union{..} = do
-  resolvedSAnns <- resolveStructuredAnns unionSAnns
+  resolvedSAnns <- resolveStructuredAnnsOptional unionSAnns
   foldM (buildSchema resolvedSAnns) (Some SEmpty) unionAlts
   where
     buildSchema resolvedSAnns (Some schema) alt@UnionAlt{..} = do
@@ -1868,7 +1889,7 @@ mkEnumMap (thriftName, opts) pkg imap tmap smap = fmap Map.fromList . mapM mkAss
     mkAssoc :: Parsed Enum -> Either [TypeError l] (Text, EnumValues)
     mkAssoc e@Enum{..} = do
       resolvedSAnns <- runTypechecker env $
-        resolveStructuredAnns enumSAnns
+        resolveStructuredAnnsOptional enumSAnns
       let rename name = mkName pkg name $
             renameEnumAlt opts resolvedSAnns e name
       pure (enumName,
@@ -1944,7 +1965,7 @@ mkServiceMap (thriftName, opts) pkg imap tmap smap =
       foldM (insFunc env) scope serviceStmts
     insFunc env ctx (FunctionStmt f@Function{..}) = do
       resolvedSAnns <- runTypechecker env $
-        resolveStructuredAnns funSAnns
+        resolveStructuredAnnsOptional funSAnns
       addToSet (lLocation $ fnlName funLoc)
         (renameFunction opts resolvedSAnns f) ctx
     insFunc _ ctxt _ = Right ctxt
