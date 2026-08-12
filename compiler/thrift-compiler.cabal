@@ -32,6 +32,9 @@ source-repository head
     type: git
     location: https://github.com/facebookincubator/hsthrift.git
 
+flag dev
+     default: False
+
 common fb-haskell
     default-language: Haskell2010
     default-extensions:
@@ -130,6 +133,30 @@ test-suite thrift-compiler-tests
   hs-source-dirs: test, test/github
   main-is: TestFixtures.hs
   ghc-options: -threaded -main-is TestFixtures
+  other-modules: Util
+  build-depends: aeson-pretty,
+                 base,
+                 directory,
+                 extra,
+                 filepath,
+                 fb-stubs,
+                 haskell-src-exts >=1.20.3 && <1.24,
+                 hspec,
+                 hspec-contrib,
+                 HUnit ^>= 1.6.1,
+                 process,
+                 temporary,
+                 text,
+                 thrift-compiler
+
+executable install-fixtures
+  if !flag(dev)
+     buildable: False
+  import: fb-haskell
+  type: exitcode-stdio-1.0
+  hs-source-dirs: test, test/github
+  main-is: InstallFixtures.hs
+  ghc-options: -threaded -main-is InstallFixtures
   other-modules: Util
   build-depends: aeson-pretty,
                  base,
