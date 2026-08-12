@@ -598,6 +598,15 @@ getPriority = listToMaybe . mapMaybe getP
       | p == "N_PRIORITIES"   = Just NPriorities
     getP _ = Nothing
 
+isHidden
+  :: [Annotation Loc]
+  -> [StructuredAnnotation 'Resolved l Loc]
+  -> Bool
+isHidden anns sAnns =
+  any (\a -> case a of
+    SimpleAnn{saTag = "hs.hidden"} -> True; _ -> False) anns
+  || hasResolvedAnn "Hidden" sAnns
+
 resolveField
   :: Typecheckable l
   => [Annotation Loc]
@@ -609,16 +618,12 @@ resolveField anns structSAnns sname field@Field{..} = do
   when (fieldId == 0) $
     typeError (lLocation $ flId fieldLoc) $ InvalidFieldId fieldName 0
   sAnns <- resolveStructuredAnns fieldSAnns
+  -- Filter out hidden fields
+  if isHidden (getAnns fieldAnns) sAnns then pure Nothing else do
   thisty <- resolveAnnotatedType sAnns fieldType
   case thisty of
     Some ty -> do
       val  <- sequence (typecheckConst ty <$> fieldVal)
-      -- Filter out hidden fields
-      let hidden = any (\a -> case a of
-                     SimpleAnn{saTag = "hs.hidden"} -> True; _ -> False)
-                     (getAnns fieldAnns)
-                   || hasResolvedAnn "Hidden" sAnns
-      if hidden then pure Nothing else do
       lazy <- case filterHsAnns $ getAnns fieldAnns of
             [SimpleAnn{..}]
               | saTag == "hs.strict" -> pure Strict
@@ -989,10 +994,14 @@ mkConstMap (thriftName, opts) pkg imap tmap smap = foldM insertC emptyContext
           -> ConstMap l
           -> Parsed (Field u)
           -> Either [TypeError l] (ConstMap l)
-        insFieldName opts' resolvedSAnns scope field@Field{..} =
+        insFieldName opts' resolvedSAnns scope field@Field{..} = do
+          sAnns <- runTypechecker env $
+            resolveStructuredAnnsOptional fieldSAnns
+          if isHidden (getAnns fieldAnns) sAnns then return scope else do
           addToScope (lLocation $ flName fieldLoc)
-          (renameField opts' (getAnns structAnns) resolvedSAnns structName field)
-          scope
+            (renameField opts' (getAnns structAnns)
+              resolvedSAnns structName field)
+            scope
 
     -- Unions define data constructors
     insertC m (D_Union u@Union{..})
@@ -1823,6 +1832,10 @@ mkSchema Struct{..} = do
   buildSchema resolvedSAnns structMembers
   where
     buildSchema resolvedSAnns (field@Field{..} : fields) = do
+      sAnns <- resolveStructuredAnnsOptional fieldSAnns
+      if isHidden (getAnns fieldAnns) sAnns
+        then buildSchema resolvedSAnns fields
+        else do
       (rty, tschema) <- (,)
         <$> resolveAnnotatedType [] fieldType
         <*> buildSchema resolvedSAnns fields
