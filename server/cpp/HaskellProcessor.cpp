@@ -18,6 +18,32 @@ namespace {
 const std::string kEx = "ex";
 const std::string kUex = "uex";
 const std::string kUexw = "uexw";
+
+// The inbound Thrift `client_id` of the request being handled on this thread,
+// or nullptr when the caller sent none. Only set for the duration of the
+// synchronous callback into Haskell, so a Haskell handler must read it before
+// handing work to another thread.
+thread_local const std::string* tlInboundClientId = nullptr;
+
+// Publishes `clientId` as this thread's inbound client_id, restoring whatever
+// was there before on scope exit.
+class InboundClientIdGuard {
+ public:
+  explicit InboundClientIdGuard(const std::string* clientId)
+      : previous_(tlInboundClientId) {
+    tlInboundClientId = clientId;
+  }
+
+  ~InboundClientIdGuard() {
+    tlInboundClientId = previous_;
+  }
+
+  InboundClientIdGuard(const InboundClientIdGuard&) = delete;
+  InboundClientIdGuard& operator=(const InboundClientIdGuard&) = delete;
+
+ private:
+  const std::string* previous_;
+};
 } // namespace
 
 HaskellAsyncProcessor::HaskellAsyncProcessor(
@@ -47,10 +73,19 @@ void HaskellAsyncProcessor::run(
   auto input_data = input_range.data();
   auto input_len = input_range.size();
 
-  // Send the bytes to Haskell and get the return bytes back
+  // Send the bytes to Haskell and get the return bytes back. The inbound
+  // client_id is published for the duration of this call: hsthrift does not
+  // surface transport headers to Haskell handlers, and this is the one point
+  // where we hold both the request context and the handler's thread.
   TResponse response;
-  (*cb)(
-      context->getHeader()->getProtocolId(), input_data, input_len, &response);
+  {
+    InboundClientIdGuard clientIdGuard(context->clientId());
+    (*cb)(
+        context->getHeader()->getProtocolId(),
+        input_data,
+        input_len,
+        &response);
+  }
   std::unique_ptr<uint8_t[], decltype(free)*> output_str(response.data, free);
 
   for (auto& hdr : response.headers) {
@@ -204,6 +239,25 @@ void HaskellAsyncProcessor::processSerializedCompressedRequestWithMetadata(
   auto ka = tm->getKeepAlive(pri, source);
   ka->add(std::move(task));
 }
+
+extern "C" {
+
+// Read the inbound Thrift `client_id` of the request currently being handled on
+// this thread, for Thrift.Server.ClientId. Sets *len to its length and returns
+// a pointer into memory owned by the request, so the caller must copy it before
+// returning from the handler. Returns nullptr with *len 0 when the caller sent
+// no client_id, or when called off a request thread.
+const char* c_hsthrift_inbound_client_id(size_t* len) {
+  if (tlInboundClientId == nullptr) {
+    *len = 0;
+    return nullptr;
+  }
+  *len = tlInboundClientId->size();
+  return tlInboundClientId->data();
+}
+
+} // extern "C"
+
 } // namespace thrift
 } // namespace apache
 

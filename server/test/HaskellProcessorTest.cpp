@@ -13,6 +13,13 @@
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 
+#include <optional>
+#include <string>
+
+// Defined in HaskellProcessor.cpp; declared here rather than in the header so
+// the header stays limited to what non-test callers need.
+extern "C" const char* c_hsthrift_inbound_client_id(size_t* len);
+
 namespace apache {
 namespace thrift {
 
@@ -125,7 +132,19 @@ struct HaskellProcessorTest : public Test {
     thread_manager.executor->drain();
   }
 
+  // Reads the inbound client_id the way Thrift.Server.ClientId does, i.e. from
+  // inside the callback, which is the only window in which it is published.
+  static std::optional<std::string> readInboundClientId() {
+    size_t len = 0;
+    const char* clientId = c_hsthrift_inbound_client_id(&len);
+    if (clientId == nullptr) {
+      return std::nullopt;
+    }
+    return std::string(clientId, len);
+  }
+
   static void callback(uint16_t, const uint8_t*, size_t, TResponse* resp) {
+    observedClientId = readInboundClientId();
     auto result = malloc(response.size());
     std::memcpy(result, response.data(), response.size());
     resp->data = reinterpret_cast<uint8_t*>(result);
@@ -133,6 +152,9 @@ struct HaskellProcessorTest : public Test {
   }
 
   static const folly::fbstring response;
+
+  // What `callback` saw for the request it last handled.
+  static std::optional<std::string> observedClientId;
 
   std::shared_ptr<AsyncProcessorFactory::MethodMetadataMap> metadataMap_;
 
@@ -149,6 +171,7 @@ struct HaskellProcessorTest : public Test {
 };
 
 const folly::fbstring HaskellProcessorTest::response = "Hello, world!";
+std::optional<std::string> HaskellProcessorTest::observedClientId;
 
 TEST_F(HaskellProcessorTest, respond) {
   folly::fbstring response;
@@ -175,6 +198,33 @@ TEST_F(HaskellProcessorTest, not_active) {
   process(req);
   EXPECT_TRUE(req.alive());
   event_base.loop();
+}
+
+TEST_F(HaskellProcessorTest, PublishesInboundClientIdToCallback) {
+  transport::THeader::StringToStringMap readHeaders;
+  readHeaders[transport::THeader::kClientId] = "test_client_id";
+  header->setReadHeaders(std::move(readHeaders));
+  observedClientId.reset();
+
+  Request req;
+  EXPECT_CALL(*req, sendReply(_, _, _));
+  process(req);
+  event_base.loop();
+
+  EXPECT_EQ(observedClientId, std::optional<std::string>("test_client_id"));
+  // Published only for the duration of the callback.
+  EXPECT_EQ(readInboundClientId(), std::nullopt);
+}
+
+TEST_F(HaskellProcessorTest, NoInboundClientIdWhenCallerSendsNone) {
+  observedClientId = "stale";
+
+  Request req;
+  EXPECT_CALL(*req, sendReply(_, _, _));
+  process(req);
+  event_base.loop();
+
+  EXPECT_EQ(observedClientId, std::nullopt);
 }
 
 } // namespace thrift

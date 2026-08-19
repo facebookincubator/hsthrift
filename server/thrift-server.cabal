@@ -84,6 +84,7 @@ library
       Thrift.Server.Types
       Thrift.Server.ProcessorCallback
       Thrift.Server.CppServer
+      Thrift.Server.ClientId
 
   cxx-sources:
       cpp/CppServer.cpp
