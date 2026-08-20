@@ -157,6 +157,11 @@ jobs:
         name: Generate C++ code from thrift files
         run: make thrift-cpp
 
+      # thrift-compiler.cabal globs thrift/**/*.thrift into the sdist, so this
+      # has to run before `cabal sdist`, not just before the Makefile codegen.
+      - name: Create the thrift/ symlinks
+        run: make symlinks
+
       - name: Build everything up to thrift-compiler
         run: cabal $CABAL_CONFIG_FLAGS build exe:thrift-compiler
 

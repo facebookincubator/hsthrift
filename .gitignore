@@ -5,6 +5,8 @@ gen-hs2/
 gen-cpp2/
 lib/gen-hs2/
 lib/if/gen-cpp2/
+lib/thrift
+compiler/thrift
 folly-clib/folly
 folly-clib/folly-clib.cabal
 folly-clib/fast_float*
