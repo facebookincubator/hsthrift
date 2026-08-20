@@ -12,9 +12,11 @@
 {-# OPTIONS_GHC -fno-warn-incomplete-uni-patterns#-}
 {-# OPTIONS_GHC -fno-warn-incomplete-record-updates#-}
 {-# LANGUAGE GADTs #-}
-module Service.X.Service
-       (XCommand(..), reqName', reqParser', respWriter', methodsInfo')
+module C.MyService.Service
+       (MyServiceCommand(..), reqName', reqParser', respWriter',
+        methodsInfo')
        where
+import qualified C.Types as Types
 import qualified Control.Exception as Exception
 import qualified Control.Monad.ST.Trans as ST
 import qualified Control.Monad.Trans.Class as Trans
@@ -25,8 +27,10 @@ import qualified Data.Int as Int
 import qualified Data.Map.Strict as Map
 import qualified Data.Proxy as Proxy
 import qualified Data.Text as Text
+import qualified Data.Text.Encoding as Text
+import qualified Facebook.Thrift.Annotation.Thrift.Thrift.Types
+       as Facebook.Thrift.Annotation.Thrift.Thrift
 import qualified Prelude as Prelude
-import qualified Service.Types as Types
 import qualified Thrift.Binary.Parser as Parser
 import qualified Thrift.Codegen as Thrift
 import qualified Thrift.Processor as Thrift
@@ -36,36 +40,47 @@ import Control.Applicative ((<*), (*>))
 import Data.Monoid ((<>))
 import Prelude ((<$>), (<*>), (++), (.), (==))
 
-data XCommand a where
-  TestFunc :: XCommand Int.Int32
+data MyServiceCommand a where
+  MyFunction :: Types.Annotated_string -> MyServiceCommand Int.Int64
 
-instance Thrift.Processor XCommand where
+instance Thrift.Processor MyServiceCommand where
   reqName = reqName'
   reqParser = reqParser'
   respWriter = respWriter'
   methodsInfo _ = methodsInfo'
 
-reqName' :: XCommand a -> Text.Text
-reqName' TestFunc = "testFunc"
+reqName' :: MyServiceCommand a -> Text.Text
+reqName' (MyFunction __field__param) = "my_function"
 
 reqParser' ::
              Thrift.Protocol p =>
-             Proxy.Proxy p -> Text.Text -> Parser.Parser (Thrift.Some XCommand)
-reqParser' _proxy "testFunc"
+             Proxy.Proxy p ->
+               Text.Text -> Parser.Parser (Thrift.Some MyServiceCommand)
+reqParser' _proxy "my_function"
   = ST.runSTT
       (do Prelude.return ()
+          __field__param <- ST.newSTRef ""
           let
             _parse _lastId
               = do _fieldBegin <- Trans.lift
                                     (Thrift.parseFieldBegin _proxy _lastId _idMap)
                    case _fieldBegin of
                      Thrift.FieldBegin _type _id _bool -> do case _id of
+                                                               2 | _type ==
+                                                                     Thrift.getStringType _proxy
+                                                                   ->
+                                                                   do !_val <- Trans.lift
+                                                                                 (Thrift.parseText
+                                                                                    _proxy)
+                                                                      ST.writeSTRef __field__param
+                                                                        _val
                                                                _ -> Trans.lift
                                                                       (Thrift.parseSkip _proxy _type
                                                                          (Prelude.Just _bool))
                                                              _parse _id
-                     Thrift.FieldEnd -> do Prelude.pure (Thrift.Some TestFunc)
-            _idMap = HashMap.fromList []
+                     Thrift.FieldEnd -> do !__val__param <- ST.readSTRef __field__param
+                                           Prelude.pure (Thrift.Some (MyFunction __val__param))
+            _idMap = HashMap.fromList [("param", 2)]
           _parse 0)
 reqParser' _ funName
   = Prelude.errorWithoutStackTrace
@@ -75,12 +90,12 @@ respWriter' ::
               Thrift.Protocol p =>
               Proxy.Proxy p ->
                 Int.Int32 ->
-                  XCommand a ->
+                  MyServiceCommand a ->
                     Prelude.Either Exception.SomeException a ->
                       (Builder.Builder,
                        Prelude.Maybe (Exception.SomeException, Thrift.Blame))
-respWriter' _proxy _seqNum TestFunc{} _r
-  = (Thrift.genMsgBegin _proxy "testFunc" _msgType _seqNum <>
+respWriter' _proxy _seqNum MyFunction{} _r
+  = (Thrift.genMsgBegin _proxy "my_function" _msgType _seqNum <>
        _msgBody
        <> Thrift.genMsgEnd _proxy,
      _msgException)
@@ -101,13 +116,13 @@ respWriter' _proxy _seqNum TestFunc{} _r
                                 Prelude.Just (Exception.toException _e, Thrift.ServerError))
           Prelude.Right _result -> (2,
                                     Thrift.genStruct _proxy
-                                      [Thrift.genFieldPrim _proxy "" (Thrift.getI32Type _proxy) 0 0
-                                         (Thrift.genI32Prim _proxy)
+                                      [Thrift.genFieldPrim _proxy "" (Thrift.getI64Type _proxy) 0 0
+                                         (Thrift.genI64Prim _proxy)
                                          _result],
                                     Prelude.Nothing)
 
 methodsInfo' :: Map.Map Text.Text Thrift.MethodInfo
 methodsInfo'
   = Map.fromList
-      [("testFunc",
+      [("my_function",
         Thrift.MethodInfo Thrift.NormalPriority Prelude.False)]
