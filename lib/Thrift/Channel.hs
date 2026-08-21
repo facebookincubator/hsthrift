@@ -74,6 +74,8 @@ data Response = Response
   , respHeader :: Header
   }
 
+-- | Thrift transport (THeader) name/value pairs, e.g. @ex@, @uex@, @uexw@.
+-- Both name and value are raw bytes rather than text.
 type Header = [(ByteString, ByteString)]
 
 newtype ChannelException = ChannelException Text
