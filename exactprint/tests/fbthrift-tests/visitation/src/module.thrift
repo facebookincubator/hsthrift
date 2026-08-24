@@ -86,7 +86,6 @@ struct structA {
   2: string b;
 }
 
-@cpp.Type{name = "test_cpp_reflection::custom_structA"}
 typedef structA my_structA
 
 union unionA {
