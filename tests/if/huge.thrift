@@ -20,7 +20,6 @@ hs_include "if/huge.hs"
 
 package "facebook.com/hs/thrift/tests/huge"
 
-
 struct A {
   1: B b;
   2: C c;
