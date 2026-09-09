@@ -6,6 +6,8 @@
  * LICENSE file in the root directory of this source tree.
  */
 
+include "thrift/annotation/haskell.thrift"
+
 package "facebook.com/hs/thrift/tests/enum"
 
 enum UnsortedEnum {
@@ -17,10 +19,11 @@ enum UnsortedEnum {
   B = 2,
 }
 
+@haskell.NoUnknown
 enum EnumWithNounknown {
   U = 0,
   V = 1,
-} (hs.nounknown)
+}
 
 enum PerfectEnum {
   W = 0,

@@ -31,6 +31,8 @@ import qualified Data.List as List
 import qualified Data.Ord as Ord
 import qualified Data.Text as Text
 import qualified Data.Text.Encoding as Text
+import qualified Facebook.Thrift.Annotation.Haskell.Haskell.Types
+       as Facebook.Thrift.Annotation.Haskell.Haskell
 import qualified Prelude as Prelude
 import qualified Thrift.Binary.Parser as Parser
 import qualified Thrift.CodegenTypesOnly as Thrift

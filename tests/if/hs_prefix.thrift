@@ -6,34 +6,40 @@
  * LICENSE file in the root directory of this source tree.
  */
 
+include "thrift/annotation/haskell.thrift"
+
 package "facebook.com/hs/thrift/tests/hs_prefix"
 
+@haskell.NoUnknown
 enum E {
   A = 0,
   B = 1,
-} (hs.nounknown)
+}
 
+@haskell.Prefix{name="PE_"}
 enum PrefixedE {
   A = 0,
   B = 1,
-} (hs.prefix = "PE_")
+}
 
 struct S {
   1: i64 A;
   2: E B = E.B;
 }
 
+@haskell.Prefix{name="ps_"}
 struct PrefixedS {
   1: i64 A;
   3: PrefixedE B = PrefixedE.B;
-} (hs.prefix = "ps_")
+}
 
 union U {
   1: E A;
   2: S B;
 }
 
+@haskell.Prefix{name="PU_"}
 union PrefixedU {
   1: PrefixedE A;
   2: PrefixedS B;
-} (hs.prefix = "PU_")
+}

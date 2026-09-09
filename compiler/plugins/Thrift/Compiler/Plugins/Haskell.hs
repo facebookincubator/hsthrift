@@ -106,7 +106,7 @@ instance Typecheckable Haskell where
 
   -- Annotation Processing
 
-  resolveTypeAnnotations ty anns = do
+  resolveTypeAnnotations ty anns resolvedAnns = do
     Env{ options = Options{..} } <- ask
     case optsLangSpecific of
       HsOpts{..} ->
@@ -114,22 +114,36 @@ instance Typecheckable Haskell where
         ifFlag hsoptsUseHashMap map2HashMap .
         ifFlag hsoptsUseHashSet set2HashSet <$>
         resolve ty (getTypeAnns "hs" anns)
+                   (getResolvedAnnStringField "Type" "name" resolvedAnns)
     where
       resolve
         :: HSType t
         -> [(Text, Annotation Thrift.Loc)]
+        -> Maybe Text
         -> TC Haskell (Some HSType)
-      resolve I64 [("Int",_)] = special HsInt
-      resolve TText [("String",_)] = special HsString
-      resolve (TMap k v) [("HashMap",_)] = pure $ Some $ THashMap k v
-      resolve (TSet u) [("HashSet",_)] = pure $ Some $ THashSet u
-      resolve TText [("ByteString",_)] = special HsByteString
-      resolve (TList u) [(vec,_)]
+      -- Unstructured hs.type annotations take priority
+      resolve I64 [("Int",_)] _ = special HsInt
+      resolve TText [("String",_)] _ = special HsString
+      resolve (TMap k v) [("HashMap",_)] _ = pure $ Some $ THashMap k v
+      resolve (TSet u) [("HashSet",_)] _ = pure $ Some $ THashSet u
+      resolve TText [("ByteString",_)] _ = special HsByteString
+      resolve (TList u) [(vec,_)] _
         | Just kind <-
             lookup vec [(hsVectorQual x,x) | x <- [minBound .. maxBound]] =
               special $ HsVector kind u
-      resolve u [] = pure $ Some u
-      resolve u ((_,a):_) =
+      -- Fall back to @haskell.Type structured annotation
+      resolve I64 [] (Just "Int") = special HsInt
+      resolve TText [] (Just "String") = special HsString
+      resolve (TMap k v) [] (Just "HashMap") = pure $ Some $ THashMap k v
+      resolve (TSet u) [] (Just "HashSet") = pure $ Some $ THashSet u
+      resolve TText [] (Just "ByteString") = special HsByteString
+      resolve (TList u) [] (Just vec)
+        | Just kind <-
+            lookup vec [(hsVectorQual x,x) | x <- [minBound .. maxBound]] =
+              special $ HsVector kind u
+      -- No type annotations
+      resolve u [] _ = pure $ Some u
+      resolve u ((_,a):_) _ =
         typeError (annLoc a) $ AnnotationMismatch (AnnType u) a
 
       special = pure . Some . TSpecial
@@ -193,52 +207,66 @@ instance Typecheckable Haskell where
 
   renameStruct _ Struct{..} = toConstructorName structName
 
-  renameField Options{..} ann sname Field{..} =
+  renameField Options{..} anns resolvedAnns sname Field{..} =
     case optsLangSpecific of
       HsOpts{..} ->
         let basePrefix
               | hsoptsDupNames = ""
               | otherwise = sname <> "_"
-        in  lowercase $ fromMaybe basePrefix (getPrefix ann) <> fieldName
+            prefix = getResolvedPrefix resolvedAnns
+              <|> getPrefix anns
+        in  lowercase $ fromMaybe basePrefix prefix <> fieldName
 
   renameConst _ = lowercase
 
   renameService _ Service{..} = toConstructorName serviceName
 
-  renameFunction _ Function{..} = lowercase $ prefix <> funName
+  renameFunction _ resolvedAnns Function{..} = lowercase $ prefix <> funName
     where
-      prefix = fromMaybe "" $ getPrefix $ getAnns funAnns
+      prefix = fromMaybe "" $
+        getResolvedPrefix resolvedAnns
+        <|> getPrefix (getAnns funAnns)
 
   renameTypedef _ Typedef{..} = toConstructorName tdName
 
   renameEnum _ Enum{..} = toConstructorName enumName
 
-  renameEnumAlt opts e@Enum{..} name =
+  renameEnumAlt opts resolvedAnns e@Enum{..} name =
     fixCase $ if
-      | Just prefix <- getPrefix (getAnns enumAnns) -> prefix <> name
+      | Just prefix <- getResolvedPrefix resolvedAnns
+                       <|> getPrefix (getAnns enumAnns) -> prefix <> name
       | otherwise -> enumName <> "_" <> name
     where
-      fixCase = case enumFlavourTag opts e of
+      fixCase = case enumFlavourTag opts resolvedAnns e of
         PseudoEnum{} -> lowercase
         _ -> uppercase
 
   renameUnion _ Union{..} = toConstructorName unionName
 
-  renameUnionAlt _ Union{..} UnionAlt{..} =
-    toConstructorName $ fromMaybe (unionName <> "_") (getPrefix $ getAnns unionAnns) <>
+  renameUnionAlt _ resolvedAnns Union{..} UnionAlt{..} =
+    toConstructorName $ fromMaybe (unionName <> "_")
+      (getResolvedPrefix resolvedAnns
+       <|> getPrefix (getAnns unionAnns)) <>
     altName
 
-  getUnionEmptyName _ Union{..} =
-    toConstructorName $ fromMaybe (unionName <> "_") (getPrefix $ getAnns unionAnns) <>
+  getUnionEmptyName _ resolvedAnns Union{..} =
+    toConstructorName $ fromMaybe (unionName <> "_")
+      (getResolvedPrefix resolvedAnns
+       <|> getPrefix (getAnns unionAnns)) <>
     "EMPTY"
 
   fieldsAreUnique Options{ optsLangSpecific = HsOpts{..} } = not hsoptsDupNames
   unionAltsAreUnique _ = True
   enumAltsAreUnique Options{} = True
 
-  enumFlavourTag _ Enum{..}
+  enumFlavourTag _ resolvedAnns Enum{..}
+    | hasResolvedAnn "PseudoEnum" resolvedAnns =
+        case getResolvedAnnStringField "PseudoEnum" "value" resolvedAnns of
+          Just "thriftenum" -> PseudoEnum True
+          _ -> PseudoEnum False
     | hasSimpleAnn "hs.pseudoenum" = PseudoEnum False
     | hasValueAnn "hs.pseudoenum" "thriftenum" = PseudoEnum True
+    | hasResolvedAnn "NoUnknown" resolvedAnns = SumTypeEnum True
     | hasSimpleAnn "hs.nounknown" = SumTypeEnum True
     | otherwise = SumTypeEnum False
     where
@@ -265,6 +293,14 @@ instance Typecheckable Haskell where
 
 -- Compute Decl Interfaces -----------------------------------------------------
 
+-- Note: getDeclIface passes [] for resolved structured annotations to the
+-- rename functions. This means @haskell.Prefix structured annotations are
+-- not taken into account here. This is used only for declaration pruning
+-- (determining which symbols are referenced in splice files), not for actual
+-- code generation. Symbol prefixes shouldn't affect pruning decisions, so
+-- this is acceptable. Fixing it properly would require typechecking before
+-- pruning, which is a much larger change.
+
 getDeclIface
   :: Options Haskell -> Text -> E.ModuleName () -> Parsed Decl -> HsInterface
 getDeclIface opts name mname decl = ifaceFromSymbols mname $ case decl of
@@ -274,7 +310,7 @@ getDeclIface opts name mname decl = ifaceFromSymbols mname $ case decl of
     concatMap
     (\field ->
       mkSelector (packT structName)
-      (packHs $ renameField opts (getAnns structAnns) structName field)
+      (packHs $ renameField opts (getAnns structAnns) [] structName field)
       (packHs $ renameStruct opts s))
     structMembers
   -- Unions
@@ -283,25 +319,25 @@ getDeclIface opts name mname decl = ifaceFromSymbols mname $ case decl of
     concatMap
     (\alt ->
       mkConstructor (packT unionName)
-      (packHs $ renameUnionAlt opts u alt)
+      (packHs $ renameUnionAlt opts [] u alt)
       (packHs $ renameUnion opts u))
     unionAlts
   -- Enums
   D_Enum e@Enum{..} ->
-    case enumFlavourTag opts e of
+    case enumFlavourTag opts [] e of
       PseudoEnum{} ->
         mkNewtype (packT enumName) (packHs $ renameEnum opts e)
           (packHs $ ("un" <>) $ renameEnum opts e) ++
         concatMap
         (\EnumValue{..} ->
-          mkValue (packT enumName) (packHs $ renameEnumAlt opts e evName))
+          mkValue (packT enumName) (packHs $ renameEnumAlt opts [] e evName))
         enumConstants
       SumTypeEnum{} ->
         mkData (packT enumName) (packHs $ renameEnum opts e) ++
         concatMap
         (\EnumValue{..} ->
           mkConstructor (packT enumName)
-          (packHs $ renameEnumAlt opts e evName)
+          (packHs $ renameEnumAlt opts [] e evName)
           (packHs $ renameEnum opts e))
         enumConstants
   -- Typedefs
