@@ -277,8 +277,8 @@
     "name": "a",
     "options": {
         "genfiles": null,
-        "include_path": ".",
-        "out_path": "test/fixtures/gen-basic-loc",
+        "include_path": "compiler",
+        "out_path": "compiler/test/fixtures/gen-basic-loc",
         "path": "test/if/a.thrift",
         "recursive": true
     },

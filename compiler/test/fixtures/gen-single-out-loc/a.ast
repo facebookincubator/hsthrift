@@ -278,8 +278,8 @@
         "name": "a",
         "options": {
             "genfiles": null,
-            "include_path": ".",
-            "out_path": "test/fixtures/gen-single-out-loc",
+            "include_path": "compiler",
+            "out_path": "compiler/test/fixtures/gen-single-out-loc",
             "path": "test/if/a.thrift",
             "recursive": true
         },
@@ -1619,8 +1619,8 @@
         "name": "b",
         "options": {
             "genfiles": null,
-            "include_path": ".",
-            "out_path": "test/fixtures/gen-single-out-loc",
+            "include_path": "compiler",
+            "out_path": "compiler/test/fixtures/gen-single-out-loc",
             "path": "test/if/a.thrift",
             "recursive": true
         },
@@ -1890,8 +1890,8 @@
         "name": "thrift",
         "options": {
             "genfiles": null,
-            "include_path": ".",
-            "out_path": "test/fixtures/gen-single-out-loc",
+            "include_path": "compiler",
+            "out_path": "compiler/test/fixtures/gen-single-out-loc",
             "path": "test/if/a.thrift",
             "recursive": true
         },
@@ -2190,8 +2190,8 @@
         "name": "scope",
         "options": {
             "genfiles": null,
-            "include_path": ".",
-            "out_path": "test/fixtures/gen-single-out-loc",
+            "include_path": "compiler",
+            "out_path": "compiler/test/fixtures/gen-single-out-loc",
             "path": "test/if/a.thrift",
             "recursive": true
         },
