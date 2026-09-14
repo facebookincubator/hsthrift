@@ -192,6 +192,7 @@ library test-lib
         Math.Adder.Service
         Math.Calculator.Service
         HsTest.Types
+        Facebook.Thrift.Annotation.Haskell.Haskell.Types
         Facebook.Thrift.Annotation.Thrift.Thrift.Types
         Scope.Types
 

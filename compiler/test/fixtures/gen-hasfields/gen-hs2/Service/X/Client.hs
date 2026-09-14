@@ -14,10 +14,9 @@
 {-# LANGUAGE FlexibleContexts #-}
 {-# LANGUAGE TypeFamilies #-}
 {-# LANGUAGE TypeOperators #-}
-module Service.Q.Client
-       (Q, testFunc1, testFunc1IO, send_testFunc1, _build_testFunc1,
-        testFunc2, testFunc2IO, send_testFunc2, _build_testFunc2,
-        recv_testFunc2, _parse_testFunc2)
+module Service.X.Client
+       (X, testFunc, testFuncIO, send_testFunc, _build_testFunc,
+        recv_testFunc, _parse_testFunc)
        where
 import qualified Control.Arrow as Arrow
 import qualified Control.Concurrent as Concurrent
@@ -31,6 +30,8 @@ import qualified Data.HashMap.Strict as HashMap
 import qualified Data.Int as Int
 import qualified Data.List as List
 import qualified Data.Proxy as Proxy
+import qualified Facebook.Thrift.Annotation.Haskell.Haskell.Types
+       as Facebook.Thrift.Annotation.Haskell.Haskell
 import qualified Prelude as Prelude
 import qualified Thrift.Binary.Parser as Parser
 import qualified Thrift.Codegen as Thrift
@@ -40,116 +41,72 @@ import Data.Monoid ((<>))
 import Prelude ((==), (=<<), (>>=), (<$>), (.))
 import Service.Types
 
-data Q
+data X
 
-testFunc1 ::
-            (Thrift.Protocol p, Thrift.ClientChannel c, (Thrift.<:) s Q) =>
-            Thrift.ThriftM p c s ()
-testFunc1
+testFunc ::
+           (Thrift.Protocol p, Thrift.ClientChannel c, (Thrift.<:) s X) =>
+           Thrift.ThriftM p c s Int.Int32
+testFunc
   = do Thrift.ThriftEnv _proxy _channel _opts _counter <- Reader.ask
-       Trans.lift (testFunc1IO _proxy _channel _counter _opts)
+       Trans.lift (testFuncIO _proxy _channel _counter _opts)
 
-testFunc1IO ::
-              (Thrift.Protocol p, Thrift.ClientChannel c, (Thrift.<:) s Q) =>
-              Proxy.Proxy p ->
-                c s -> Thrift.Counter -> Thrift.RpcOptions -> Prelude.IO ()
-testFunc1IO _proxy _channel _counter _opts
-  = do _handle <- Concurrent.newEmptyMVar
-       send_testFunc1 _proxy _channel _counter
-         (Concurrent.putMVar _handle)
-         _opts
-       Concurrent.takeMVar _handle >>=
-         Prelude.maybe (Prelude.return ()) Exception.throw
-
-send_testFunc1 ::
-                 (Thrift.Protocol p, Thrift.ClientChannel c, (Thrift.<:) s Q) =>
-                 Proxy.Proxy p ->
-                   c s ->
-                     Thrift.Counter ->
-                       Thrift.SendCallback -> Thrift.RpcOptions -> Prelude.IO ()
-send_testFunc1 _proxy _channel _counter _sendCob _rpcOpts
-  = do _seqNum <- _counter
-       let
-         _callMsg
-           = LBS.toStrict
-               (ByteString.toLazyByteString (_build_testFunc1 _proxy _seqNum))
-       Thrift.sendOnewayRequest _channel
-         (Thrift.Request _callMsg
-            (Thrift.setRpcPriority _rpcOpts Thrift.NormalPriority))
-         _sendCob
-
-_build_testFunc1 ::
-                   Thrift.Protocol p =>
-                   Proxy.Proxy p -> Int.Int32 -> ByteString.Builder
-_build_testFunc1 _proxy _seqNum
-  = Thrift.genMsgBegin _proxy "testFunc1" 1 _seqNum <>
-      Thrift.genStruct _proxy []
-      <> Thrift.genMsgEnd _proxy
-
-testFunc2 ::
-            (Thrift.Protocol p, Thrift.ClientChannel c, (Thrift.<:) s Q) =>
-            Thrift.ThriftM p c s Int.Int32
-testFunc2
-  = do Thrift.ThriftEnv _proxy _channel _opts _counter <- Reader.ask
-       Trans.lift (testFunc2IO _proxy _channel _counter _opts)
-
-testFunc2IO ::
-              (Thrift.Protocol p, Thrift.ClientChannel c, (Thrift.<:) s Q) =>
-              Proxy.Proxy p ->
-                c s -> Thrift.Counter -> Thrift.RpcOptions -> Prelude.IO Int.Int32
-testFunc2IO _proxy _channel _counter _opts
+testFuncIO ::
+             (Thrift.Protocol p, Thrift.ClientChannel c, (Thrift.<:) s X) =>
+             Proxy.Proxy p ->
+               c s -> Thrift.Counter -> Thrift.RpcOptions -> Prelude.IO Int.Int32
+testFuncIO _proxy _channel _counter _opts
   = do (_handle, _sendCob, _recvCob) <- Thrift.mkCallbacks
-                                          (recv_testFunc2 _proxy)
-       send_testFunc2 _proxy _channel _counter _sendCob _recvCob _opts
+                                          (recv_testFunc _proxy)
+       send_testFunc _proxy _channel _counter _sendCob _recvCob _opts
        Thrift.wait _handle
 
-send_testFunc2 ::
-                 (Thrift.Protocol p, Thrift.ClientChannel c, (Thrift.<:) s Q) =>
-                 Proxy.Proxy p ->
-                   c s ->
-                     Thrift.Counter ->
-                       Thrift.SendCallback ->
-                         Thrift.RecvCallback -> Thrift.RpcOptions -> Prelude.IO ()
-send_testFunc2 _proxy _channel _counter _sendCob _recvCob _rpcOpts
+send_testFunc ::
+                (Thrift.Protocol p, Thrift.ClientChannel c, (Thrift.<:) s X) =>
+                Proxy.Proxy p ->
+                  c s ->
+                    Thrift.Counter ->
+                      Thrift.SendCallback ->
+                        Thrift.RecvCallback -> Thrift.RpcOptions -> Prelude.IO ()
+send_testFunc _proxy _channel _counter _sendCob _recvCob _rpcOpts
   = do _seqNum <- _counter
        let
          _callMsg
            = LBS.toStrict
-               (ByteString.toLazyByteString (_build_testFunc2 _proxy _seqNum))
+               (ByteString.toLazyByteString (_build_testFunc _proxy _seqNum))
        Thrift.sendRequest _channel
          (Thrift.Request _callMsg
             (Thrift.setRpcPriority _rpcOpts Thrift.NormalPriority))
          _sendCob
          _recvCob
 
-recv_testFunc2 ::
-                 (Thrift.Protocol p) =>
-                 Proxy.Proxy p ->
-                   Thrift.Response -> Prelude.Either Exception.SomeException Int.Int32
-recv_testFunc2 _proxy (Thrift.Response _response _)
+recv_testFunc ::
+                (Thrift.Protocol p) =>
+                Proxy.Proxy p ->
+                  Thrift.Response -> Prelude.Either Exception.SomeException Int.Int32
+recv_testFunc _proxy (Thrift.Response _response _)
   = Monad.join
       (Arrow.left (Exception.SomeException . Thrift.ProtocolException)
-         (Parser.parse (_parse_testFunc2 _proxy) _response))
+         (Parser.parse (_parse_testFunc _proxy) _response))
 
-_build_testFunc2 ::
-                   Thrift.Protocol p =>
-                   Proxy.Proxy p -> Int.Int32 -> ByteString.Builder
-_build_testFunc2 _proxy _seqNum
-  = Thrift.genMsgBegin _proxy "testFunc2" 1 _seqNum <>
+_build_testFunc ::
+                  Thrift.Protocol p =>
+                  Proxy.Proxy p -> Int.Int32 -> ByteString.Builder
+_build_testFunc _proxy _seqNum
+  = Thrift.genMsgBegin _proxy "testFunc" 1 _seqNum <>
       Thrift.genStruct _proxy []
       <> Thrift.genMsgEnd _proxy
 
-_parse_testFunc2 ::
-                   Thrift.Protocol p =>
-                   Proxy.Proxy p ->
-                     Parser.Parser (Prelude.Either Exception.SomeException Int.Int32)
-_parse_testFunc2 _proxy
+_parse_testFunc ::
+                  Thrift.Protocol p =>
+                  Proxy.Proxy p ->
+                    Parser.Parser (Prelude.Either Exception.SomeException Int.Int32)
+_parse_testFunc _proxy
   = do Thrift.MsgBegin _name _msgTy _ <- Thrift.parseMsgBegin _proxy
        _result <- case _msgTy of
-                    1 -> Prelude.fail "testFunc2: expected reply but got function call"
-                    2 | _name == "testFunc2" ->
+                    1 -> Prelude.fail "testFunc: expected reply but got function call"
+                    2 | _name == "testFunc" ->
                         do let
-                             _idMap = HashMap.fromList [("testFunc2_success", 0)]
+                             _idMap = HashMap.fromList [("testFunc_success", 0)]
                            _fieldBegin <- Thrift.parseFieldBegin _proxy 0 _idMap
                            case _fieldBegin of
                              Thrift.FieldBegin _type _id _bool -> do case _id of
@@ -174,7 +131,7 @@ _parse_testFunc2 _proxy
                            (Thrift.parseStruct _proxy ::
                               Parser.Parser Thrift.ApplicationException)
                     4 -> Prelude.fail
-                           "testFunc2: expected reply but got oneway function call"
-                    _ -> Prelude.fail "testFunc2: invalid message type"
+                           "testFunc: expected reply but got oneway function call"
+                    _ -> Prelude.fail "testFunc: invalid message type"
        Thrift.parseMsgEnd _proxy
        Prelude.return _result

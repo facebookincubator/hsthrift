@@ -17,6 +17,8 @@ module Thrift.Compiler.Plugin
   , getNamespace
   , isNewtype
   , filterHsAnns, getTypeAnns
+  , hasResolvedAnn, getResolvedAnnStringField
+  , getResolvedPrefix
   ) where
 
 import Data.Bifunctor
@@ -49,13 +51,15 @@ class Monoid (Interface l) => Typecheckable l  where
 
   -- * Annotation Processing
 
-  -- | Given a resolved Thrift type and a list of annotations, produce some new
+  -- | Given a resolved Thrift type, a list of unstructured annotations, and
+  -- declaration-level resolved structured annotations, produce some new
   -- transformed type. This is how TSpecial types get generated
   resolveTypeAnnotations
     :: Type l t
     -> [Annotation Loc]
+    -> [StructuredAnnotation 'Resolved l Loc]
     -> TC l (Some (Type l))
-  resolveTypeAnnotations ty _ = pure $ Some ty
+  resolveTypeAnnotations ty _ _ = pure $ Some ty
 
   -- | Recursively qualify all of the named types in a SpecialType so that they
   -- can be properly identified in imports
@@ -95,11 +99,12 @@ class Monoid (Interface l) => Typecheckable l  where
 
   renameField
     :: Options l
-    -> [Annotation a]
+    -> [Annotation a] -- ^ unstructured struct annotations
+    -> [StructuredAnnotation 'Resolved l Loc] -- ^ resolved struct annotations
     -> Text
     -> Field u s m a
     -> Text
-  renameField _ _ _ Field{..} = fieldName
+  renameField _ _ _ _ Field{..} = fieldName
 
   renameConst :: Options l -> Text -> Text
   renameConst _ = id
@@ -107,8 +112,12 @@ class Monoid (Interface l) => Typecheckable l  where
   renameService :: Options l -> Service s u a -> Text
   renameService _ Service{..} = serviceName
 
-  renameFunction :: Options l -> Function s u a -> Text
-  renameFunction _ Function{..} = funName
+  renameFunction
+    :: Options l
+    -> [StructuredAnnotation 'Resolved l Loc]
+    -> Function s u a
+    -> Text
+  renameFunction _ _ Function{..} = funName
 
   renameTypedef :: Options l -> Typedef s u a -> Text
   renameTypedef _ Typedef{..} = tdName
@@ -116,17 +125,31 @@ class Monoid (Interface l) => Typecheckable l  where
   renameEnum :: Options l -> Enum s u a -> Text
   renameEnum _ Enum{..} = enumName
 
-  renameEnumAlt :: Options l -> Enum s u a -> Text -> Text
-  renameEnumAlt _ _ name = name
+  renameEnumAlt
+    :: Options l
+    -> [StructuredAnnotation 'Resolved l Loc]
+    -> Enum s u a
+    -> Text
+    -> Text
+  renameEnumAlt _ _ _ name = name
 
   renameUnion :: Options l -> Union s u a -> Text
   renameUnion _ Union{..} = unionName
 
-  renameUnionAlt :: Options l -> Union s u a -> UnionAlt s u a -> Text
-  renameUnionAlt _ _ UnionAlt{..} = altName
+  renameUnionAlt
+    :: Options l
+    -> [StructuredAnnotation 'Resolved l Loc]
+    -> Union s u a
+    -> UnionAlt s u a
+    -> Text
+  renameUnionAlt _ _ _ UnionAlt{..} = altName
 
-  getUnionEmptyName :: Options l -> Union s u a -> Text
-  getUnionEmptyName _ Union{..} = unionName <> "_EMPTY"
+  getUnionEmptyName
+    :: Options l
+    -> [StructuredAnnotation 'Resolved l Loc]
+    -> Union s u a
+    -> Text
+  getUnionEmptyName _ _ Union{..} = unionName <> "_EMPTY"
 
   -- * Uniqueness options specify whether various renamed symbols need to be
   -- globally unique to the entire Thrift (if False, they are still unique
@@ -146,8 +169,12 @@ class Monoid (Interface l) => Typecheckable l  where
   enumAltsAreUnique _ = False
 
   -- | Get enum flavour from annotation tags
-  enumFlavourTag :: Options l -> Enum s u a -> EnumFlavour
-  enumFlavourTag _ _ = SumTypeEnum False
+  enumFlavourTag
+    :: Options l
+    -> [StructuredAnnotation 'Resolved l Loc]
+    -> Enum s u a
+    -> EnumFlavour
+  enumFlavourTag _ _ _ = SumTypeEnum False
 
   -- * Back translators
   -- Translate Stuff Back to regular thrift for pretty printing and JSON output
@@ -232,6 +259,7 @@ qualName :: (Text, Text) -> Name -> Name
 qualName (tm, rm) Name{..} = Name
   { sourceName = qualName_ tm sourceName
   , resolvedName = qualName_ rm resolvedName
+  , namePackage = namePackage
   }
 
 qualName_ :: Text -> Name_ s -> Name_ s
@@ -292,3 +320,42 @@ getTypeAnns lang anns =
   [ (ty, a) | a@ValueAnn{vaVal=TextAnn ty _,..} <- anns, vaTag == typeTag ]
   where
     typeTag = lang <> ".type"
+
+-- Resolved Structured Annotation Helpers --------------------------------------
+
+-- | Check if a resolved structured annotation matches by its resolved type.
+-- Checks the canonical type identity via the package URI rather than the
+-- import-dependent text name.
+hasResolvedAnn :: Text -> [StructuredAnnotation 'Resolved l a] -> Bool
+hasResolvedAnn expectedName = any (isHaskellAnn expectedName)
+
+-- | Get a string field value from a resolved structured annotation
+getResolvedAnnStringField
+  :: Text -> Text -> [StructuredAnnotation 'Resolved l a] -> Maybe Text
+getResolvedAnnStringField annName fieldName sAnns =
+  listToMaybe
+    [ val
+    | sa@StructuredAnn{..} <- sAnns
+    , isHaskellAnn annName sa
+    , Just (StructuredAnnElems{..}) <- [saMaybeElems]
+    , ListElem{..} <- saElems
+    , StructPair{..} <- [leElem]
+    , spKey == fieldName
+    , StringConst val _ <- [ucConst spVal]
+    ]
+
+-- | Get prefix from resolved @haskell.Prefix annotation
+getResolvedPrefix :: [StructuredAnnotation 'Resolved l a] -> Maybe Text
+getResolvedPrefix = getResolvedAnnStringField "Prefix" "name"
+
+-- | Check if a resolved annotation's type is a struct from the
+-- haskell annotation package with the given local name.
+isHaskellAnn :: Text -> StructuredAnnotation 'Resolved l a -> Bool
+isHaskellAnn expectedName StructuredAnn{..} = case saResolvedType of
+  TStruct name _loc ->
+    localName (resolvedName name) == expectedName
+    && namePackage name == Just haskellAnnotationPackage
+  _ -> False
+
+haskellAnnotationPackage :: Text
+haskellAnnotationPackage = "facebook.com/thrift/annotation/haskell"

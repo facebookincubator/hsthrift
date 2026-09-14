@@ -14,9 +14,9 @@
 {-# LANGUAGE FlexibleContexts #-}
 {-# LANGUAGE TypeFamilies #-}
 {-# LANGUAGE TypeOperators #-}
-module Service.X.Client
-       (X, testFunc, testFuncIO, send_testFunc, _build_testFunc,
-        recv_testFunc, _parse_testFunc)
+module C.MyService.Client
+       (MyService, my_function, my_functionIO, send_my_function,
+        _build_my_function, recv_my_function, _parse_my_function)
        where
 import qualified Control.Arrow as Arrow
 import qualified Control.Concurrent as Concurrent
@@ -30,6 +30,10 @@ import qualified Data.HashMap.Strict as HashMap
 import qualified Data.Int as Int
 import qualified Data.List as List
 import qualified Data.Proxy as Proxy
+import qualified Data.Text as Text
+import qualified Data.Text.Encoding as Text
+import qualified Facebook.Thrift.Annotation.Thrift.Thrift.Types
+       as Facebook.Thrift.Annotation.Thrift.Thrift
 import qualified Prelude as Prelude
 import qualified Thrift.Binary.Parser as Parser
 import qualified Thrift.Codegen as Thrift
@@ -37,84 +41,99 @@ import qualified Thrift.Protocol.ApplicationException.Types
        as Thrift
 import Data.Monoid ((<>))
 import Prelude ((==), (=<<), (>>=), (<$>), (.))
-import Service.Types
+import C.Types
 
-data X
+data MyService
 
-testFunc ::
-           (Thrift.Protocol p, Thrift.ClientChannel c, (Thrift.<:) s X) =>
-           Thrift.ThriftM p c s Int.Int32
-testFunc
+my_function ::
+              (Thrift.Protocol p, Thrift.ClientChannel c,
+               (Thrift.<:) s MyService) =>
+              Annotated_string -> Thrift.ThriftM p c s Int.Int64
+my_function __field__param
   = do Thrift.ThriftEnv _proxy _channel _opts _counter <- Reader.ask
-       Trans.lift (testFuncIO _proxy _channel _counter _opts)
+       Trans.lift
+         (my_functionIO _proxy _channel _counter _opts __field__param)
 
-testFuncIO ::
-             (Thrift.Protocol p, Thrift.ClientChannel c, (Thrift.<:) s X) =>
-             Proxy.Proxy p ->
-               c s -> Thrift.Counter -> Thrift.RpcOptions -> Prelude.IO Int.Int32
-testFuncIO _proxy _channel _counter _opts
-  = do (_handle, _sendCob, _recvCob) <- Thrift.mkCallbacks
-                                          (recv_testFunc _proxy)
-       send_testFunc _proxy _channel _counter _sendCob _recvCob _opts
-       Thrift.wait _handle
-
-send_testFunc ::
-                (Thrift.Protocol p, Thrift.ClientChannel c, (Thrift.<:) s X) =>
+my_functionIO ::
+                (Thrift.Protocol p, Thrift.ClientChannel c,
+                 (Thrift.<:) s MyService) =>
                 Proxy.Proxy p ->
                   c s ->
                     Thrift.Counter ->
-                      Thrift.SendCallback ->
-                        Thrift.RecvCallback -> Thrift.RpcOptions -> Prelude.IO ()
-send_testFunc _proxy _channel _counter _sendCob _recvCob _rpcOpts
+                      Thrift.RpcOptions -> Annotated_string -> Prelude.IO Int.Int64
+my_functionIO _proxy _channel _counter _opts __field__param
+  = do (_handle, _sendCob, _recvCob) <- Thrift.mkCallbacks
+                                          (recv_my_function _proxy)
+       send_my_function _proxy _channel _counter _sendCob _recvCob _opts
+         __field__param
+       Thrift.wait _handle
+
+send_my_function ::
+                   (Thrift.Protocol p, Thrift.ClientChannel c,
+                    (Thrift.<:) s MyService) =>
+                   Proxy.Proxy p ->
+                     c s ->
+                       Thrift.Counter ->
+                         Thrift.SendCallback ->
+                           Thrift.RecvCallback ->
+                             Thrift.RpcOptions -> Annotated_string -> Prelude.IO ()
+send_my_function _proxy _channel _counter _sendCob _recvCob
+  _rpcOpts __field__param
   = do _seqNum <- _counter
        let
          _callMsg
            = LBS.toStrict
-               (ByteString.toLazyByteString (_build_testFunc _proxy _seqNum))
+               (ByteString.toLazyByteString
+                  (_build_my_function _proxy _seqNum __field__param))
        Thrift.sendRequest _channel
          (Thrift.Request _callMsg
             (Thrift.setRpcPriority _rpcOpts Thrift.NormalPriority))
          _sendCob
          _recvCob
 
-recv_testFunc ::
-                (Thrift.Protocol p) =>
-                Proxy.Proxy p ->
-                  Thrift.Response -> Prelude.Either Exception.SomeException Int.Int32
-recv_testFunc _proxy (Thrift.Response _response _)
+recv_my_function ::
+                   (Thrift.Protocol p) =>
+                   Proxy.Proxy p ->
+                     Thrift.Response -> Prelude.Either Exception.SomeException Int.Int64
+recv_my_function _proxy (Thrift.Response _response _)
   = Monad.join
       (Arrow.left (Exception.SomeException . Thrift.ProtocolException)
-         (Parser.parse (_parse_testFunc _proxy) _response))
+         (Parser.parse (_parse_my_function _proxy) _response))
 
-_build_testFunc ::
-                  Thrift.Protocol p =>
-                  Proxy.Proxy p -> Int.Int32 -> ByteString.Builder
-_build_testFunc _proxy _seqNum
-  = Thrift.genMsgBegin _proxy "testFunc" 1 _seqNum <>
-      Thrift.genStruct _proxy []
+_build_my_function ::
+                     Thrift.Protocol p =>
+                     Proxy.Proxy p ->
+                       Int.Int32 -> Annotated_string -> ByteString.Builder
+_build_my_function _proxy _seqNum __field__param
+  = Thrift.genMsgBegin _proxy "my_function" 1 _seqNum <>
+      Thrift.genStruct _proxy
+        (Thrift.genField _proxy "param" (Thrift.getStringType _proxy) 2 0
+           (Thrift.genText _proxy __field__param)
+           : [])
       <> Thrift.genMsgEnd _proxy
 
-_parse_testFunc ::
-                  Thrift.Protocol p =>
-                  Proxy.Proxy p ->
-                    Parser.Parser (Prelude.Either Exception.SomeException Int.Int32)
-_parse_testFunc _proxy
+_parse_my_function ::
+                     Thrift.Protocol p =>
+                     Proxy.Proxy p ->
+                       Parser.Parser (Prelude.Either Exception.SomeException Int.Int64)
+_parse_my_function _proxy
   = do Thrift.MsgBegin _name _msgTy _ <- Thrift.parseMsgBegin _proxy
        _result <- case _msgTy of
-                    1 -> Prelude.fail "testFunc: expected reply but got function call"
-                    2 | _name == "testFunc" ->
+                    1 -> Prelude.fail
+                           "my_function: expected reply but got function call"
+                    2 | _name == "my_function" ->
                         do let
-                             _idMap = HashMap.fromList [("testFunc_success", 0)]
+                             _idMap = HashMap.fromList [("my_function_success", 0)]
                            _fieldBegin <- Thrift.parseFieldBegin _proxy 0 _idMap
                            case _fieldBegin of
                              Thrift.FieldBegin _type _id _bool -> do case _id of
                                                                        0 | _type ==
-                                                                             Thrift.getI32Type
+                                                                             Thrift.getI64Type
                                                                                _proxy
                                                                            ->
                                                                            Prelude.fmap
                                                                              Prelude.Right
-                                                                             (Thrift.parseI32
+                                                                             (Thrift.parseI64
                                                                                 _proxy)
                                                                        _ -> Prelude.fail
                                                                               (Prelude.unwords
@@ -129,7 +148,7 @@ _parse_testFunc _proxy
                            (Thrift.parseStruct _proxy ::
                               Parser.Parser Thrift.ApplicationException)
                     4 -> Prelude.fail
-                           "testFunc: expected reply but got oneway function call"
-                    _ -> Prelude.fail "testFunc: invalid message type"
+                           "my_function: expected reply but got oneway function call"
+                    _ -> Prelude.fail "my_function: invalid message type"
        Thrift.parseMsgEnd _proxy
        Prelude.return _result

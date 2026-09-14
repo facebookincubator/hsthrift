@@ -6,6 +6,8 @@
  * LICENSE file in the root directory of this source tree.
  */
 
+include "thrift/annotation/haskell.thrift"
+
 package "facebook.com/hs/thrift/tests/service"
 
 struct Z {
@@ -17,7 +19,8 @@ const Z z = {"name": "Z"};
 service MyService {
   i64 testFunc(1: i64 arg1, 2: Z arg2 = z);
 
-  void foo() throws (1: Ex ex) (hs.prefix = "x_");
+  @haskell.Prefix{name="x_"}
+  void foo() throws (1: Ex ex);
 }
 
 service X {

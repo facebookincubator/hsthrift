@@ -35,7 +35,7 @@ withFixtureOptions f = do
         | Just rest <- stripPrefix "tests/" fp = rest
         | otherwise = fp
 
-  withCurrentDirectory testsCwd $ f
+  withCurrentDirectory testsCwd $ f $
     [ TheseOptions (defaultOptions langopts)
          { optsPath = fixup path
          , optsOutPath = outPath </> genDir
@@ -48,11 +48,23 @@ withFixtureOptions f = do
          [ (TheseLangOpts defaultHsOpts, EmitCode, False, "",
             "tests/if/hs_test.thrift")
          , (TheseLangOpts defaultHsOpts{hsoptsExtraHasFields=True},
-            EmitCode, False, "",
+            EmitCode, False, "gen-hasfields",
             "tests/if/service.thrift")
-         , (TheseLangOpts defaultHsOpts, EmitCode, False, "",
-            "compiler/test/if/a.thrift")
-         , (TheseLangOpts NoOpts, EmitJSON WithoutLoc, False, "gen-basic",
+         ] ++
+         [ (TheseLangOpts defaultHsOpts, EmitCode, False, "", path)
+         | path <- [
+            "compiler/test/if/a.thrift",
+            "compiler/test/if/b.thrift",
+            "compiler/test/if/bidi.thrift",
+            "compiler/test/if/c.thrift",
+            "compiler/test/if/d.thrift",
+            "compiler/test/if/e.thrift",
+            "compiler/test/if/f.thrift",
+            "compiler/test/if/g.thrift",
+            "compiler/test/if/recursive_annotation.thrift"
+           ]
+         ] ++
+         [ (TheseLangOpts NoOpts, EmitJSON WithoutLoc, False, "gen-basic",
             "compiler/test/if/a.thrift")
          , (TheseLangOpts NoOpts, EmitJSON WithoutLoc, True, "gen-single-out",
             "compiler/test/if/a.thrift")
@@ -60,6 +72,8 @@ withFixtureOptions f = do
             "compiler/test/if/a.thrift")
          , (TheseLangOpts NoOpts, EmitJSON WithLoc, True, "gen-single-out-loc",
             "compiler/test/if/a.thrift")
+         , (TheseLangOpts defaultHsOpts, EmitCode, False, "gen-structured",
+            "compiler/test/if/h.thrift")
          ]
     ]
 

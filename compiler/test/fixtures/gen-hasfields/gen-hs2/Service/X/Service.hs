@@ -12,8 +12,8 @@
 {-# OPTIONS_GHC -fno-warn-incomplete-uni-patterns#-}
 {-# OPTIONS_GHC -fno-warn-incomplete-record-updates#-}
 {-# LANGUAGE GADTs #-}
-module Service.Q.Service
-       (QCommand(..), reqName', reqParser', respWriter', methodsInfo')
+module Service.X.Service
+       (XCommand(..), reqName', reqParser', respWriter', methodsInfo')
        where
 import qualified Control.Exception as Exception
 import qualified Control.Monad.ST.Trans as ST
@@ -25,6 +25,8 @@ import qualified Data.Int as Int
 import qualified Data.Map.Strict as Map
 import qualified Data.Proxy as Proxy
 import qualified Data.Text as Text
+import qualified Facebook.Thrift.Annotation.Haskell.Haskell.Types
+       as Facebook.Thrift.Annotation.Haskell.Haskell
 import qualified Prelude as Prelude
 import qualified Service.Types as Types
 import qualified Thrift.Binary.Parser as Parser
@@ -36,24 +38,22 @@ import Control.Applicative ((<*), (*>))
 import Data.Monoid ((<>))
 import Prelude ((<$>), (<*>), (++), (.), (==))
 
-data QCommand a where
-  TestFunc1 :: QCommand ()
-  TestFunc2 :: QCommand Int.Int32
+data XCommand a where
+  TestFunc :: XCommand Int.Int32
 
-instance Thrift.Processor QCommand where
+instance Thrift.Processor XCommand where
   reqName = reqName'
   reqParser = reqParser'
   respWriter = respWriter'
   methodsInfo _ = methodsInfo'
 
-reqName' :: QCommand a -> Text.Text
-reqName' TestFunc1 = "testFunc1"
-reqName' TestFunc2 = "testFunc2"
+reqName' :: XCommand a -> Text.Text
+reqName' TestFunc = "testFunc"
 
 reqParser' ::
              Thrift.Protocol p =>
-             Proxy.Proxy p -> Text.Text -> Parser.Parser (Thrift.Some QCommand)
-reqParser' _proxy "testFunc1"
+             Proxy.Proxy p -> Text.Text -> Parser.Parser (Thrift.Some XCommand)
+reqParser' _proxy "testFunc"
   = ST.runSTT
       (do Prelude.return ()
           let
@@ -66,23 +66,7 @@ reqParser' _proxy "testFunc1"
                                                                       (Thrift.parseSkip _proxy _type
                                                                          (Prelude.Just _bool))
                                                              _parse _id
-                     Thrift.FieldEnd -> do Prelude.pure (Thrift.Some TestFunc1)
-            _idMap = HashMap.fromList []
-          _parse 0)
-reqParser' _proxy "testFunc2"
-  = ST.runSTT
-      (do Prelude.return ()
-          let
-            _parse _lastId
-              = do _fieldBegin <- Trans.lift
-                                    (Thrift.parseFieldBegin _proxy _lastId _idMap)
-                   case _fieldBegin of
-                     Thrift.FieldBegin _type _id _bool -> do case _id of
-                                                               _ -> Trans.lift
-                                                                      (Thrift.parseSkip _proxy _type
-                                                                         (Prelude.Just _bool))
-                                                             _parse _id
-                     Thrift.FieldEnd -> do Prelude.pure (Thrift.Some TestFunc2)
+                     Thrift.FieldEnd -> do Prelude.pure (Thrift.Some TestFunc)
             _idMap = HashMap.fromList []
           _parse 0)
 reqParser' _ funName
@@ -93,34 +77,12 @@ respWriter' ::
               Thrift.Protocol p =>
               Proxy.Proxy p ->
                 Int.Int32 ->
-                  QCommand a ->
+                  XCommand a ->
                     Prelude.Either Exception.SomeException a ->
                       (Builder.Builder,
                        Prelude.Maybe (Exception.SomeException, Thrift.Blame))
-respWriter' _proxy _seqNum TestFunc1{} _r
-  = (Thrift.genMsgBegin _proxy "testFunc1" _msgType _seqNum <>
-       _msgBody
-       <> Thrift.genMsgEnd _proxy,
-     _msgException)
-  where
-    (_msgType, _msgBody, _msgException)
-      = case _r of
-          Prelude.Left _ex | Prelude.Just
-                               _e@Thrift.ApplicationException{} <- Exception.fromException _ex
-                             ->
-                             (3, Thrift.buildStruct _proxy _e,
-                              Prelude.Just (_ex, Thrift.ServerError))
-                           | Prelude.otherwise ->
-                             let _e
-                                   = Thrift.ApplicationException (Text.pack (Prelude.show _ex))
-                                       Thrift.ApplicationExceptionType_InternalError
-                               in
-                               (3, Thrift.buildStruct _proxy _e,
-                                Prelude.Just (Exception.toException _e, Thrift.ServerError))
-          Prelude.Right _result -> (2, Thrift.genStruct _proxy [],
-                                    Prelude.Nothing)
-respWriter' _proxy _seqNum TestFunc2{} _r
-  = (Thrift.genMsgBegin _proxy "testFunc2" _msgType _seqNum <>
+respWriter' _proxy _seqNum TestFunc{} _r
+  = (Thrift.genMsgBegin _proxy "testFunc" _msgType _seqNum <>
        _msgBody
        <> Thrift.genMsgEnd _proxy,
      _msgException)
@@ -149,7 +111,5 @@ respWriter' _proxy _seqNum TestFunc2{} _r
 methodsInfo' :: Map.Map Text.Text Thrift.MethodInfo
 methodsInfo'
   = Map.fromList
-      [("testFunc1",
-        Thrift.MethodInfo Thrift.NormalPriority Prelude.True),
-       ("testFunc2",
+      [("testFunc",
         Thrift.MethodInfo Thrift.NormalPriority Prelude.False)]
