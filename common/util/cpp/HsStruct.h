@@ -11,6 +11,7 @@
 #include <glog/logging.h>
 #include <cstddef>
 #include <string_view>
+#include <unordered_set>
 
 #include <folly/Memory.h>
 #include <folly/Optional.h>
