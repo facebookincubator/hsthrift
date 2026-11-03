@@ -30,11 +30,10 @@ cpp_include "<deque>"
 cpp_include "<unordered_map>"
 cpp_include "<unordered_set>"
 cpp_include "<folly/container/F14Set.h>"
-cpp_include "<folly/FBString.h>"
+cpp_include "<memory_resource>"
 cpp_include "<folly/container/F14Map.h>"
 cpp_include "<folly/small_vector.h>"
 cpp_include "thrift/test/python_capi/adapter.h"
-cpp_include "thrift/lib/cpp2/util/ManagedStringView.h"
 
 package "test.dev/fixtures/python_capi"
 
@@ -43,6 +42,22 @@ package "test.dev/fixtures/python_capi"
 typedef i64 uint64
 @thrift.AllowLegacyTypedefUri
 typedef uint64 ui64
+@thrift.AllowLegacyTypedefUri
+@cpp.Type{name = "uint8_t"}
+typedef byte uint8
+
+@thrift.AllowLegacyTypedefUri
+@cpp.Type{template = "folly::small_vector"}
+typedef list<uint8> small_vector_uint8
+@thrift.AllowLegacyTypedefUri
+@cpp.Type{template = "folly::fbvector"}
+typedef list<uint8> fbvector_uint8
+@thrift.AllowLegacyTypedefUri
+@cpp.Type{template = "folly::fbvector"}
+typedef list<fbvector_uint8> fbvector2_uint8
+@thrift.AllowLegacyTypedefUri
+@cpp.Type{template = "folly::fbvector"}
+typedef list<double> fbvector_double
 
 enum MyEnum {
   MyValue1 = 0,
@@ -121,10 +136,10 @@ struct PrimitiveStruct {
   15: IOBufPtr pointbuffy;
   18: MyStruct patched_struct;
   19: EmptyStruct empty_struct;
-  @cpp.Type{name = "folly::fbstring"}
-  20: binary fbstring;
-  @cpp.Type{name = "::apache::thrift::ManagedStringViewWithConversions"}
-  21: string managed_string_view;
+  @cpp.Type{name = "folly::IOBuf"}
+  20: binary custom_iobuf;
+  @cpp.Type{name = "::std::pmr::string"}
+  21: string pmr_string;
   22: thrift_dep.SomeError some_error;
 }
 
@@ -138,6 +153,7 @@ struct AdaptedFields {
   4: id.ExternId inline_adapted_int;
 }
 
+@thrift.DeprecatedUnvalidatedAnnotations{items = {"cpp.noncopyable": "1"}}
 struct ListStruct {
   1: list<bool> boolz;
   2: optional list<i64> intz;
@@ -145,15 +161,15 @@ struct ListStruct {
   3: optional list<string> stringz;
   @cpp.Type{template = "std::deque"}
   4: list<binary> encoded;
-  @cpp.Type{name = "std::deque<uint64_t>"}
-  5: list<i64> uidz;
+  @cpp.Type{template = "std::deque"}
+  5: list<uint64> uidz;
   6: list<list<double>> matrix;
-  @cpp.Type{name = "folly::small_vector<folly::small_vector<uint8_t>>"}
-  7: list<list<byte>> ucharz;
-  @cpp.Type{name = "folly::fbvector<folly::fbvector<folly::fbvector<uint8_t>>>"}
-  8: list<list<list<signed_byte>>> voxels;
+  @cpp.Type{template = "folly::small_vector"}
+  7: list<small_vector_uint8> ucharz;
+  @cpp.Type{template = "folly::fbvector"}
+  8: list<fbvector2_uint8> voxels;
   9: list<IOBufPtr> buf_ptrs;
-} (cpp.noncopyable)
+}
 @thrift.AllowLegacyTypedefUri
 typedef ListStruct ListAlias
 
@@ -165,10 +181,10 @@ struct SetStruct {
   3: optional set<binary> binnaz;
   @cpp.Type{template = "std::unordered_set"}
   4: set<binary> encoded;
-  @cpp.Type{name = "std::unordered_set<uint64_t>"}
-  5: set<i64> uidz;
-  @cpp.Type{name = "folly::F14FastSet<uint8_t>"}
-  6: set<byte> charz;
+  @cpp.Type{template = "std::unordered_set"}
+  5: set<uint64> uidz;
+  @cpp.Type{template = "folly::F14FastSet"}
+  6: set<uint8> charz;
   7: list<set<i64>> setz;
 }
 
@@ -180,16 +196,17 @@ struct MapStruct {
   3: optional map<binary, PrimitiveStruct> binnaz;
   @cpp.Type{template = "std::unordered_map"}
   4: map<string, double> encoded;
-  @cpp.Type{name = "std::unordered_map<uint64_t, float>"}
-  5: map<i64, float> flotz;
+  @cpp.Type{template = "std::unordered_map"}
+  5: map<uint64, float> flotz;
   6: list<map<i32, i64>> map_list;
   7: map<i32, list<i64>> list_map;
-  @cpp.Type{name = "folly::F14FastMap<int, folly::fbvector<double>>"}
-  8: map<i32, list<double>> fast_list_map;
+  @cpp.Type{template = "folly::F14FastMap"}
+  8: map<i32, fbvector_double> fast_list_map;
   9: map<binary, IOBufPtr> buf_map;
   10: map<ui64, list<ui64>> unsigned_list_map;
 }
 
+@thrift.DeprecatedUnvalidatedAnnotations{items = {"cpp.noncopyable": "1"}}
 struct ComposeStruct {
   1: MyEnum enum_;
   2: AnnoyingEnum renamed_;
@@ -203,7 +220,7 @@ struct ComposeStruct {
   7: list<thrift_dep.DepStruct> friends;
   9: serialized_dep.SerializedUnion serial_union;
   10: serialized_dep.SerializedError serial_error;
-} (cpp.noncopyable)
+}
 
 @cpp.Name{value = "Shallot"}
 union Onion {

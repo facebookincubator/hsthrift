@@ -22,6 +22,8 @@ include "thrift/annotation/cpp.thrift"
 include "thrift/annotation/python.thrift"
 include "thrift/annotation/thrift.thrift"
 
+cpp_include "<memory_resource>"
+
 @thrift.AllowLegacyMissingUris
 package;
 
@@ -102,6 +104,13 @@ struct Float32Struct {
   4: map<string, list<DeferredTruncationFloat>> float_map;
 }
 
+@python.EnableUnsafeIssetInspection
+struct IssetInspectionStruct {
+  1: i32 int_field;
+  2: optional string opt_str_field;
+  3: bool bool_field;
+}
+
 @cpp.Adapter{name = "Adapter"}
 typedef SimpleStruct AdaptedTypeDef
 @python.Py3Hidden
@@ -129,8 +138,8 @@ safe exception HiddenException {
 
 typedef AdaptedUnion ImplicitlyHiddenTypeDef
 
-@cpp.Type{name = "foo::Bar"}
-typedef binary foo_bar
+@cpp.Type{name = "folly::IOBuf"}
+typedef binary CustomBuffer
 
 struct ComplexStruct {
   1: SimpleStruct structOne;
@@ -142,16 +151,18 @@ struct ComplexStruct {
   @python.Name{name = "sender"}
   7: string from;
   8: string cdef;
-  9: foo_bar bytes_with_cpp_type;
+  9: CustomBuffer bytes_with_cpp_type;
 }
 
+@thrift.DeprecatedUnvalidatedAnnotations{items = {"cpp.noncomparable": "1"}}
 union BinaryUnion {
   1: IOBuf iobuf_val;
-} (cpp.noncomparable)
+}
 
+@thrift.DeprecatedUnvalidatedAnnotations{items = {"cpp.noncomparable": "1"}}
 struct BinaryUnionStruct {
   1: BinaryUnion u;
-} (cpp.noncomparable)
+}
 
 const bool A_BOOL = true;
 const byte A_BYTE = 8;
@@ -242,9 +253,10 @@ service SimpleService {
   SimpleStruct get_struct_hidden();
 }
 
+@thrift.DeprecatedUnvalidatedAnnotations{items = {"bar": "1", "foo": '"""'}}
 service DerivedService extends SimpleService {
   i32 get_six();
-} (foo = '"""', bar)
+}
 
 service RederivedService extends DerivedService {
   i32 get_seven();
@@ -256,15 +268,15 @@ typedef bool CustomBool
 typedef i64 CustomInteger
 @cpp.Type{name = "::MyType"}
 typedef double CustomDouble
-@cpp.Type{name = "::MyType"}
+@cpp.Type{name = "::std::pmr::string"}
 typedef string CustomString
-@cpp.Type{name = "::MyType"}
+@cpp.Type{name = "std::unique_ptr<folly::IOBuf>"}
 typedef binary CustomBinary
-@cpp.Type{name = "::MyType"}
+@cpp.Type{template = "::MyType"}
 typedef list<i32> CustomList
-@cpp.Type{name = "::MyType"}
+@cpp.Type{template = "::MyType"}
 typedef set<i32> CustomSet
-@cpp.Type{name = "::MyType"}
+@cpp.Type{template = "::MyType"}
 typedef map<i32, i32> CustomMap
 typedef SimpleStruct CustomStruct
 
@@ -299,15 +311,15 @@ struct CustomFields {
   2: i64 integer_field;
   @cpp.Type{name = "::MyType"}
   3: double double_field;
-  @cpp.Type{name = "::MyType"}
+  @cpp.Type{name = "std::pmr::string"}
   4: string string_field;
-  @cpp.Type{name = "::MyType"}
+  @cpp.Type{name = "folly::IOBuf"}
   5: binary binary_field;
-  @cpp.Type{name = "::MyType"}
+  @cpp.Type{template = "::MyType"}
   6: list<i32> list_field;
-  @cpp.Type{name = "::MyType"}
+  @cpp.Type{template = "::MyType"}
   7: set<i32> set_field;
-  @cpp.Type{name = "::MyType"}
+  @cpp.Type{template = "::MyType"}
   8: map<i32, i32> map_field;
   9: SimpleStruct struct_field;
 }
