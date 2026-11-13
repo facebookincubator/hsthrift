@@ -207,7 +207,7 @@ setup-folly::
 	-# into the .cabal file with some gross sed stuff. Feel free to
 	-# make this better.
 	(cd folly-clib/folly && \
-		sed -i 's|^\(.*Create OBJECT library.*\)$$|  list(TRANSFORM _srcs PREPEND $${CMAKE_CURRENT_SOURCE_DIR}/ OUTPUT_VARIABLE _abssrcs)\n  message("FILES_CPP: $${_abssrcs}")\n\n\1|' CMake/FollyFunctions.cmake && \
+		sed -i 's|^\(.*Create OBJECT library.*\)$$|  list(TRANSFORM _srcs PREPEND $${CMAKE_CURRENT_SOURCE_DIR}/ OUTPUT_VARIABLE _abssrcs)\n  message("FILES_CPP: $${_abssrcs}")\n\n\1|' cmake/FollyFunctions.cmake && \
 		echo 'message("FILES_H:$${hfiles}")' >>CMakeLists.txt && \
 		mkdir _build && cd _build && \
 		cmake .. 2>&1 | sed 's/[^m]*m//g' | tee out && \
