@@ -31,6 +31,8 @@ import qualified Data.HashMap.Strict as HashMap
 import qualified Data.Int as Int
 import qualified Data.List as List
 import qualified Data.Proxy as Proxy
+import qualified Facebook.Thrift.Annotation.Haskell.Haskell.Types
+       as Facebook.Thrift.Annotation.Haskell.Haskell
 import qualified Prelude as Prelude
 import qualified Thrift.Binary.Parser as Parser
 import qualified Thrift.Codegen as Thrift

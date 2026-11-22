@@ -53,6 +53,9 @@ thrift-hs:: compiler symlinks
 		(cd lib && $${THRIFT_COMPILE} --hs \
 			thrift/annotation/scope.thrift \
 			-o test); \
+		(cd lib && $${THRIFT_COMPILE} --hs \
+			thrift/annotation/haskell.thrift \
+			-o test); \
 		(cd lib && $${THRIFT_COMPILE} --hs --use-int \
 			test/if/math.thrift \
 			-o test); \
@@ -96,6 +99,8 @@ thrift-hs:: compiler symlinks
 		(cd server && $${THRIFT_COMPILE} --hs \
 			test/if/hash_map.thrift \
 			-o test); \
+		(cd tests && $${THRIFT_COMPILE} --hs \
+			thrift/annotation/haskell.thrift); \
 		(cd tests && $${THRIFT_COMPILE} --hs \
 			thrift/annotation/thrift.thrift); \
 		(cd tests && $${THRIFT_COMPILE} --hs \
@@ -172,7 +177,7 @@ thrift-cpp::
 	cd lib/test/if && $(THRIFT1) $(THRIFT_INCLUDE) -I . --gen mstch_cpp2 \
                 -o ../../../cpp-channel/test/if \
                 math.thrift
-	cd tests/if && $(THRIFT1) $(THRIFT_INCLUDE) -I . --gen mstch_cpp2 \
+	cd tests/if && $(THRIFT1) $(THRIFT_INCLUDE) -I . -I ../.. --gen mstch_cpp2 \
 		-o . \
 		hs_test.thrift
 

@@ -73,7 +73,7 @@ genEnumDecl Enum{ enumFlavour=PseudoEnum{..},..} =
       , constResolvedName = evResolvedName
       , constType = AnnotatedType (TNamed enumName) Nothing (Arity0Loc nlc)
       , constResolvedType =
-        TNewtype (mkName enumName enumResolvedName) enumValueType noLoc
+        TNewtype (mkName Nothing enumName enumResolvedName) enumValueType noLoc
       , constVal =
         UntypedConst nlc $ IntConst (fromIntegral evValue) (showt evValue)
       , constResolvedVal = Literal $ New $ fromIntegral evValue
