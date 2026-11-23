@@ -50,9 +50,20 @@ withFixtureOptions f = do
          , (TheseLangOpts defaultHsOpts{hsoptsExtraHasFields=True},
             EmitCode, False, "",
             "tests/if/service.thrift")
-         , (TheseLangOpts defaultHsOpts, EmitCode, False, "",
-            "compiler/test/if/a.thrift")
-         , (TheseLangOpts NoOpts, EmitJSON WithoutLoc, False, "gen-basic",
+         ] ++
+         [ (TheseLangOpts defaultHsOpts, EmitCode, False, "", path)
+         | path <- [
+            "compiler/test/if/a.thrift",
+            "compiler/test/if/b.thrift",
+            "compiler/test/if/bidi.thrift",
+            "compiler/test/if/c.thrift",
+            "compiler/test/if/d.thrift",
+            "compiler/test/if/e.thrift",
+            "compiler/test/if/f.thrift",
+            "compiler/test/if/g.thrift"
+           ]
+         ] ++
+         [ (TheseLangOpts NoOpts, EmitJSON WithoutLoc, False, "gen-basic",
             "compiler/test/if/a.thrift")
          , (TheseLangOpts NoOpts, EmitJSON WithoutLoc, True, "gen-single-out",
             "compiler/test/if/a.thrift")
